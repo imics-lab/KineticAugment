@@ -16,12 +16,14 @@ SMPL-X Parameters:
     - expression (10): Facial expression parameters
 
 Example:
-    >>> wrapper = SMPLXWrapper(model_path="models/smplx", gender="neutral")
+    >>> wrapper = SMPLXWrapper(model_path="models", gender="neutral")
     >>> output = wrapper.forward(body_pose=my_pose)
-    >>> joints = output['joints']  # (1, 55, 3) joint positions
+    >>> joints = output['joints']          # (1, 127, 3) joints + landmarks
+    >>> chain = output['model_joints']     # (1, 55, 3) kinematic chain only
 """
 
 import os
+import warnings
 from pathlib import Path
 from typing import Dict, Optional, Union, Any
 import numpy as np
@@ -80,7 +82,9 @@ class SMPLXWrapper:
         Initialize the SMPL-X wrapper.
 
         Args:
-            model_path: Path to SMPL-X model files directory
+            model_path: Directory *containing* the smplx/ model folder
+                (e.g. 'models', not 'models/smplx') -- smplx.create()
+                appends the model type to this path
             gender: 'male', 'female', or 'neutral'
             num_betas: Number of body shape parameters
             num_expression_coeffs: Number of expression parameters
@@ -132,13 +136,52 @@ class SMPLXWrapper:
 
         # Store model info
         self.faces = self.model.faces  # Face indices for mesh
-        self.num_joints = self.model.J_regressor.shape[0]
+
+        # SMPL-X exposes two different joint counts and conflating them is a
+        # silent bug. J_regressor gives the kinematic chain (55 joints);
+        # forward() then appends vertex-derived landmarks to the same tensor,
+        # so its 'joints' output is wider (127 by default, 144 with
+        # use_face_contour=True). Only the first num_model_joints entries are
+        # posed by the kinematic chain -- the appended landmarks are read off
+        # the mesh and are not reproducible by rigid forward kinematics.
+        self.num_model_joints = self.model.J_regressor.shape[0]
+        self.num_output_joints = self._measure_output_joints()
 
         # Hand pose dimension depends on PCA usage
         if use_pca:
             self.hand_pose_dim = num_pca_comps
         else:
             self.hand_pose_dim = self.HAND_POSE_DIM
+
+    def _measure_output_joints(self) -> int:
+        """
+        Determine the width of the 'joints' tensor returned by forward().
+
+        Measured with a single forward pass rather than derived arithmetically:
+        the number of appended landmarks depends on use_face_contour and on the
+        smplx version, so a hardcoded formula silently goes stale.
+        """
+        with torch.no_grad():
+            return int(self.model(return_verts=False).joints.shape[1])
+
+    @property
+    def num_joints(self) -> int:
+        """
+        Deprecated: ambiguous. Use num_model_joints or num_output_joints.
+
+        Kept as an alias for num_model_joints so existing callers keep the
+        value they already had. Note this is NOT the width of
+        forward()['joints'] -- sizing an array from it was the original bug.
+        """
+        warnings.warn(
+            "SMPLXWrapper.num_joints is ambiguous and deprecated: it is the "
+            "kinematic chain size, not the width of forward()['joints']. Use "
+            "num_model_joints (kinematic chain) or num_output_joints "
+            "(forward() output width) instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.num_model_joints
 
     def forward(
         self,
@@ -174,7 +217,10 @@ class SMPLXWrapper:
 
         Returns:
             Dictionary with:
-                - joints: Joint positions (batch, num_joints, 3)
+                - joints: Kinematic joints followed by vertex-derived
+                  landmarks (batch, num_output_joints, 3)
+                - model_joints: The kinematic chain only, i.e. the leading
+                  slice of 'joints' (batch, num_model_joints, 3)
                 - vertices: Mesh vertices (batch, num_verts, 3) if return_vertices
                 - full_pose: Full pose vector
         """
@@ -207,8 +253,12 @@ class SMPLXWrapper:
             output = self.model(return_verts=return_vertices, **kwargs)
 
         # Convert outputs to numpy
+        joints = output.joints.cpu().numpy()
         result = {
-            'joints': output.joints.cpu().numpy(),
+            'joints': joints,
+            # Expose the kinematic chain explicitly so callers never have to
+            # hardcode the 55 boundary to separate it from the landmarks.
+            'model_joints': joints[:, :self.num_model_joints],
         }
 
         if return_vertices:
@@ -257,7 +307,8 @@ class SMPLXWrapper:
             params: Dictionary of SMPL-X parameters
 
         Returns:
-            Joint positions (batch, num_joints, 3)
+            Joint positions (batch, num_output_joints, 3), i.e. the kinematic
+            joints followed by the vertex-derived landmarks.
         """
         output = self.forward(**params, return_vertices=False)
         return output['joints']
@@ -267,7 +318,7 @@ class SMPLXWrapper:
         Get joint positions in rest pose (T-pose).
 
         Returns:
-            Joint positions (1, num_joints, 3)
+            Joint positions (1, num_output_joints, 3)
         """
         params = self.get_default_params(batch_size=1)
         return self.get_joint_positions(params)

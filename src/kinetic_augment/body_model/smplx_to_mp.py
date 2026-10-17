@@ -14,6 +14,7 @@ used automatically — no rotation math required here at all.
 smplx_wrapper is accepted for API compatibility but never called.
 """
 
+import warnings
 from typing import Dict, Optional
 import numpy as np
 
@@ -65,6 +66,14 @@ def _body_pose_slot(smplx_name: str) -> Optional[int]:
 class SMPLXToMediaPipe:
 
     def __init__(self, smplx_wrapper=None):
+        warnings.warn(
+            "SMPLXToMediaPipe re-adds stored displacements to the original landmarks "
+            "rather than evaluating SMPL-X, so it needs `target_mp` to reconstruct "
+            "anything. For reconstruction from parameters alone use "
+            "kinetic_augment.body_model.converter.reconstruct_body.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.smplx = smplx_wrapper  # unused, kept for API compatibility
 
     def project(

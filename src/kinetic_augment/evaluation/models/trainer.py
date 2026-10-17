@@ -175,7 +175,7 @@ class SLRTrainer:
                 x, labels = batch
                 lengths = None
 
-            x = x.to(self.device)
+            x = self._to_device(x)
             labels = labels.to(self.device)
             if lengths is not None:
                 lengths = lengths.to(self.device)
@@ -191,10 +191,10 @@ class SLRTrainer:
             self.optimizer.step()
 
             # Metrics
-            total_loss += loss.item() * x.size(0)
+            total_loss += loss.item() * labels.size(0)
             preds = torch.argmax(logits, dim=-1)
             correct += (preds == labels).sum().item()
-            total += x.size(0)
+            total += labels.size(0)
 
         return total_loss / total, correct / total
 
@@ -222,7 +222,7 @@ class SLRTrainer:
                     x, labels = batch
                     lengths = None
 
-                x = x.to(self.device)
+                x = self._to_device(x)
                 labels = labels.to(self.device)
                 if lengths is not None:
                     lengths = lengths.to(self.device)
@@ -230,7 +230,7 @@ class SLRTrainer:
                 logits = self.model(x, lengths)
                 loss = self.criterion(logits, labels)
 
-                total_loss += loss.item() * x.size(0)
+                total_loss += loss.item() * labels.size(0)
 
                 # Top-1 accuracy
                 preds = torch.argmax(logits, dim=-1)
@@ -242,7 +242,7 @@ class SLRTrainer:
                 _, top_k = torch.topk(logits, k, dim=-1)
                 correct_top5 += (top_k == labels.unsqueeze(1)).any(dim=1).sum().item()
 
-                total += x.size(0)
+                total += labels.size(0)
 
         return {
             'loss': total_loss / total,
@@ -272,7 +272,7 @@ class SLRTrainer:
                     x, labels = batch
                     lengths = None
 
-                x = x.to(self.device)
+                x = self._to_device(x)
                 if lengths is not None:
                     lengths = lengths.to(self.device)
 
@@ -281,6 +281,14 @@ class SLRTrainer:
                 all_labels.append(labels.numpy())
 
         return np.concatenate(all_preds), np.concatenate(all_labels)
+
+    def _to_device(self, value):
+        """Move tensor batches recursively while retaining legacy tensor inputs."""
+        if isinstance(value, dict):
+            return {key: self._to_device(item) for key, item in value.items()}
+        if torch.is_tensor(value):
+            return value.to(self.device)
+        return value
 
     def get_confusion_matrix(self, loader: 'DataLoader') -> np.ndarray:
         """
