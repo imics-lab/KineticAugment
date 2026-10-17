@@ -154,8 +154,17 @@ KineticAugment/
 ├── configs/                 # YAML configuration files
 ├── scripts/                 # Test and utility scripts
 ├── docs/                    # Documentation
+├── demo/round_trip/         # Round-trip web viewer (exported data not in git)
 └── models/                  # SMPL-X models (not in git)
 ```
+
+## Round-Trip Viewer
+
+`demo/round_trip/` is an interactive web page for checking the MediaPipe → SMPL-X → MediaPipe round
+trip (pose, hands and face mesh) clip by clip, with optional landmark smoothing. You can export
+clips with `scripts/export_round_trip_demo.py`, or view a bundle someone shares with
+`python3 -m http.server 8765 --directory round_trip`. See
+[demo/round_trip/README.md](demo/round_trip/README.md) for both.
 
 ## Available Augmentations
 

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Round-Trip Viewer</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>MediaPipe → SMPL-X → MediaPipe</h1>
+    <span class="sub">pose + hands + face mesh round trip, one clip at a time</span>
+  </div>
+  <label class="clip-pick">clip <select id="clip"></select></label>
+  <label class="clip-pick">smoothing <select id="smooth"></select></label>
+  <div id="summary" class="chips"></div>
+</header>
+
+<main>
+  <section class="panels">
+    <figure class="panel">
+      <figcaption>1 · Sign video</figcaption>
+      <canvas id="raw"></canvas>
+    </figure>
+    <figure class="panel">
+      <figcaption>2 · MediaPipe extraction (2-D)
+        <span class="toggles">
+          <label><input type="checkbox" id="t-agree" checked> stream agreement</label>
+          <label><input type="checkbox" id="t-mesh478"> all 478 face pts</label>
+          <label class="if-smoothed"><input type="checkbox" id="t-raw2d" checked> unsmoothed (grey)</label>
+        </span>
+      </figcaption>
+      <canvas id="mp2d"></canvas>
+      <div class="legend">
+        <i style="--c:var(--pose)"></i>pose <i style="--c:var(--handL)"></i>left hand
+        <i style="--c:var(--handR)"></i>right hand <i style="--c:var(--face)"></i>face mesh
+        <i style="--c:var(--gap)"></i>pose ↔ hand / face gap
+      </div>
+    </figure>
+    <figure class="panel">
+      <figcaption>3 · Extraction vs round trip (3-D)
+        <span class="toggles">
+          <label><input type="checkbox" id="t-in" checked> extraction</label>
+          <label><input type="checkbox" id="t-rt" checked> round trip</label>
+          <label><input type="checkbox" id="t-err" checked> error lines</label>
+          <label><input type="checkbox" id="t-ghost"> mesh</label>
+          <label class="if-smoothed"><input type="checkbox" id="t-raw3d" checked> unsmoothed (grey)</label>
+        </span>
+      </figcaption>
+      <div id="view3d" class="three"></div>
+      <div class="legend">
+        <i style="--c:var(--in)"></i>MediaPipe extraction <i style="--c:var(--rt)"></i>read back off SMPL-X
+        <i class="heat"></i>error (round-trip point coloured by size)
+      </div>
+    </figure>
+    <figure class="panel">
+      <figcaption>4 · SMPL-X body, round-trip points on it
+        <span class="toggles">
+          <label><input type="checkbox" id="t-onbody" checked> round-trip pts</label>
+          <label><input type="checkbox" id="t-onbody-in"> extraction</label>
+          <label><input type="checkbox" id="t-wire"> wireframe</label>
+        </span>
+      </figcaption>
+      <div id="viewbody" class="three"></div>
+      <div class="legend">drag to orbit · scroll to zoom · both 3-D views share one camera
+        <button id="reset-cam">front view</button><button id="side-cam">side view</button></div>
+    </figure>
+  </section>
+
+  <section class="timeline">
+    <div class="transport">
+      <button id="play" title="space">▶</button>
+      <button id="prev" title="←">◀︎◀︎</button>
+      <button id="next" title="→">▶︎▶︎</button>
+      <input type="range" id="scrub" min="0" value="0">
+      <span id="frame-label" class="mono"></span>
+      <label>speed <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option></select></label>
+    </div>
+    <div class="strips-wrap">
+      <canvas id="strips"></canvas>
+      <aside id="readout"></aside>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="viewer.js"></script>
+</body>
+</html>
