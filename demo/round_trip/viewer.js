@@ -589,6 +589,7 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('resize', resize);
 window.addEventListener('hashchange', () => {
   const h = new URLSearchParams(location.hash.slice(1));
+  if (!clip || (h.get('clip') && !index.clips[h.get('clip')])) return; // not loaded yet / not exported
   const f = Number(h.get('f') || 1) - 1;
   const sm = h.get('s') || 'off';
   if ((h.get('clip') && h.get('clip') !== clip.clip) || sm !== smoothing) {

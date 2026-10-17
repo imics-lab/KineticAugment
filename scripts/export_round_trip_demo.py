@@ -213,6 +213,17 @@ def read_frames(video: Path, out_dir: Path, n: int, quality=85):
         raise ValueError(f"{video}: decoded {count} frames, landmarks have {n}")
 
 
+def json_safe(obj):
+    """Nested dicts / lists with every non-finite float replaced by None (JSON has no NaN)."""
+    if isinstance(obj, dict):
+        return {k: json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [json_safe(v) for v in obj]
+    if isinstance(obj, float) and not np.isfinite(obj):
+        return None
+    return obj
+
+
 def connections():
     import mediapipe as mp
 
@@ -498,10 +509,12 @@ def export_variant(clip_id, variant, hands, face, raw_hands, raw_face, out: Path
         },
         "summary": summary,
     }
-    (out / "clip.json").write_text(json.dumps(meta, separators=(",", ":")))
+    (out / "clip.json").write_text(
+        json.dumps(json_safe(meta), separators=(",", ":"), allow_nan=False)
+    )
     print(
         f"  {variant:<8} wrote {out} ({offset / 1e6:.1f} MB data, {time.time() - started:.0f} s): "
-        + json.dumps(summary)
+        + json.dumps(json_safe(summary))
     )
     return summary
 
@@ -519,10 +532,10 @@ def update_index(out_root: Path, order):
         variants = {}
         for meta_path in sorted(clip_dir.glob("v/*/clip.json")):
             meta = json.loads(meta_path.read_text())
-            variants[meta["variant"]] = meta["summary"]
+            variants[meta["variant"]] = json_safe(meta["summary"])
         if variants:
             clips[clip_dir.name] = {"n": meta["n"], "variants": variants}
-    index_path.write_text(json.dumps(index, indent=1))
+    index_path.write_text(json.dumps(index, indent=1, allow_nan=False))
 
 
 def sample(video_dir: Path, count: int, seed: int):
