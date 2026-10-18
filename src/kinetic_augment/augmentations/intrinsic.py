@@ -4,13 +4,12 @@ Intrinsic (SMPL-X based) Augmentations for KineticAugment.
 These augmentations operate on SMPL-X body model parameters, guaranteeing:
 - Kinematic chain consistency (moving shoulder affects entire arm)
 - Anatomical plausibility (joint limits from biomechanics)
-- Limb length preservation (unless explicitly modified)
+- Limb length preservation
 
 Key augmentations for Sign Language Recognition:
 - JointAnglePerturbation: Add noise to joint angles within anatomical limits
 - HandPosePerturbation: Perturb hand pose while preserving handshape category
 - JointCoupledNoise: Correlated noise respecting inter-limb coordination
-- LimbLengthScaling: Modify body proportions via shape parameters
 
 Example:
     >>> from kinetic_augment.augmentations.intrinsic import JointAnglePerturbation
@@ -415,79 +414,6 @@ class JointCoupledNoise(SMPLXAugmentation):
         result['body_pose'] = body_pose[0] if squeeze else body_pose
         result = self._clamp_to_limits(result)
 
-        return result
-
-
-@AugmentationRegistry.register("LimbLengthScaling")
-class LimbLengthScaling(SMPLXAugmentation):
-    """
-    Modify body proportions via SMPL-X shape (beta) parameters.
-
-    SMPL-X shape parameters control body proportions in a learned
-    latent space. The first few components roughly correspond to:
-    - beta[0]: Overall size/height
-    - beta[1]: Weight/build
-    - beta[2-3]: Limb proportions
-    - beta[4+]: Finer details
-
-    Parameters:
-        scale_range (Tuple[float, float]): Range for shape parameter modification
-        components (List[int]): Which beta components to modify (default: [0, 1])
-        preserve_height (bool): Scale other components to maintain height
-
-    Example:
-        >>> aug = LimbLengthScaling({
-        ...     'scale_range': (-1.0, 1.0),
-        ...     'components': [0, 1, 2],
-        ... })
-    """
-
-    name = "LimbLengthScaling"
-    category = "intrinsic"
-
-    def __init__(self, config: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(config, **kwargs)
-
-        self.scale_range = self.config.get('scale_range', (-0.5, 0.5))
-        self.components = self.config.get('components', [0, 1])
-
-    def apply(self, params: Dict[str, np.ndarray], **kwargs) -> Dict[str, np.ndarray]:
-        """
-        Apply limb length scaling via shape parameters.
-
-        Args:
-            params: SMPL-X parameter dictionary
-
-        Returns:
-            Modified parameters with scaled shape
-        """
-        result = {k: v.copy() if isinstance(v, np.ndarray) else v
-                  for k, v in params.items()}
-
-        if 'betas' not in result:
-            return result
-
-        betas = result['betas'].copy()
-
-        if betas.ndim == 1:
-            betas = betas[np.newaxis, ...]
-            squeeze = True
-        else:
-            squeeze = False
-
-        batch_size = betas.shape[0]
-        num_betas = betas.shape[1]
-
-        for b in range(batch_size):
-            for comp_idx in self.components:
-                if comp_idx < num_betas:
-                    delta = np.random.uniform(*self.scale_range)
-                    betas[b, comp_idx] += delta
-
-        if squeeze:
-            betas = betas[0]
-
-        result['betas'] = betas
         return result
 
 

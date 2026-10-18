@@ -132,13 +132,6 @@ plan:
       # Aggressively augment speed
       rate_range: [0.8, 1.3] # 20% slower to 30% faster
 
-  - operation: "LimbLengthScaling"
-    probability: 0.5
-    params:
-      # Simulate different body proportions / stride lengths
-      joint_group: "legs"
-      scale_range: [0.95, 1.05]
-
   - operation: "JointAnglePerturbation"
     probability: 0.7
     params:
@@ -156,7 +149,6 @@ plan:
 
 *   **Rationale:**
     *   `RateAlteration` is applied with high probability and a wide range to create variations in running speed.
-    *   `LimbLengthScaling` is used to simulate different stride lengths, a key variable in running.
     *   `JointAnglePerturbation` is much more aggressive (`0.1`) than in the SLR profile, as running styles vary greatly.
     *   A `ground_plane` constraint is enabled to prevent the runner's feet from being augmented to go through the floor.
 

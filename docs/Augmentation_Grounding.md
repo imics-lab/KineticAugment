@@ -100,7 +100,8 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
    about the shoulder centre. Start at 0.85–1.15; practice uses 0.9–1.1 (ST-GCN), 0.8–1.2
    (GISLR) and 0.5–1.0 (Laines) **[M5b, M10, M6]**.
    - Every relative position is kept, so no phonological parameter can change.
-   - This is not body shape (item 8). It is the same body seen from nearer or farther away.
+   - This is not body shape (item 8, dropped). It is the same body seen from nearer or farther
+     away.
 6. **Uncentring (subject position in the frame).** Shift the whole scene by one offset per clip.
    Practice uses ±10 px of 512 (SAM-SLR), ±0.1 normalised (GISLR) and ±0.2 (ST-GCN)
    **[M5b, M10]**.
@@ -135,11 +136,13 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
    - Bounds come from SignAvatars' biomechanical limits.
    - Reject any sample whose classified handshape features change. **[L5.1, L1.8, M7]**
    - This has no published precedent and is the project's opportunity.
-8. **Body shape with location retargeting.** Change `betas`, then re-solve the arm IK so each
-   hand keeps its position relative to the body landmarks it is anchored to (the perceptual-target
-   view **[L2.10]**).
+8. ~~**Body shape with location retargeting.**~~ **Dropped (2026-10-18).** The idea was to change
+   `betas`, then re-solve the arm IK so each hand keeps its position relative to the body
+   landmarks it is anchored to (the perceptual-target view **[L2.10]**).
    - Naive shape change fails this: in the trial it moved the wrists 68–83 mm (§6).
-   - There is no recognition-gain evidence for body shape **[M10]**, so it is lower priority.
+   - There is no recognition-gain evidence for body shape **[M10]**.
+   - Real signers barely differ in MediaPipe's proportions, so there is little variation to
+     reproduce (§6.1). The `LimbLengthScaling` augmentation was removed with this decision.
 9. **Weak drop.** Remove the weak hand only when ASL-LEX Sign Type is symmetrical, contact is
    absent, and the movement is not alternating. Never on asymmetric signs or signs located on
    the weak hand. **[L4.3, L4.5]**
@@ -199,8 +202,36 @@ phonological labels **[M9]**.
 | Scale ×0.85 (added later) | 0.8–1.2 | In range. Bones exactly −15%; shoulder-normalised pose unchanged (0.00%). |
 | Off-centre by (+0.6, +0.2) shoulder widths, about 21 cm (added later) | ±0.1–0.2 of the normalised frame | Shoulder-normalised pose unchanged (0.00%). No camera model yet, so the hands-in-frame check could not be applied. |
 | Elbows +15°, shoulders +10° (wrists moved 94–115 mm) | ±4° per joint, p = 0.3 (SPOTER) | About 3–4× too strong, and it moved the hand between locations. Reduce it and add the location check. |
-| `betas[0]` +2 (arms 11–15% longer, wrists moved 68–83 mm) | No recognition evidence. Location must be kept. | Needs retargeting (Tier 2, item 8). |
+| `betas[0]` +2 (arms 11–15% longer, wrists moved 68–83 mm) | No recognition evidence. Location must be kept. | Dropped (Tier 2, item 8; §6.1). |
 | Non-uniform time warp, k = 0.5 | Uniform rate change only | Replace it. Non-uniform warps can imitate aspect and alter end deceleration. |
+
+### 6.1 Why body shape was dropped
+
+A one-off measurement (2026-10-18; scripts and raw numbers not committed) compared how much arm
+proportions differ between signers in MediaPipe's world landmarks with what sampling SMPL-X
+shapes produces. It used the 5 pilot clips and the 20 random WLASL clips of Week 2
+(seed 20261007). Clip 13630 has no visible left forearm, so the forearm rows cover 24 clips.
+
+| Ratio | MediaPipe, 25 clips: mean / CV (robust CV) | SMPL-X β ~ N(0, I), within the plausibility bound: mean / CV |
+|---|---|---|
+| Upper arm / shoulder width | 0.748 / 5.7% (2.9%) | 0.865 / 7.5% |
+| Forearm / shoulder width | 0.720 / 9.7% | 0.801 / 7.4% |
+| Forearm / upper arm | 0.963 / 9.6% | 0.926 / 2.4% |
+| Left / right forearm | 0.944 / 20.6% | 1.013 / 0.3% |
+
+- **Signer differences are at the noise floor.** Upper arm / shoulder width varies by about
+  3–6% between clips. MediaPipe's own frame-to-frame jitter in the same ratio is 3.7%, and the
+  body round-trip error is 3.1% (P21).
+- **The forearm spread is detector error.** People are left–right symmetric to within a percent
+  or two, yet MediaPipe's left/right forearm ratio varies by 20.6%.
+- **The fitted shapes are not a usable sampling range.** 24 of 25 `fit_shape` fits sit on the
+  plausibility bound. They mostly encode one constant gap between where MediaPipe and SMPL-X put
+  the shoulder joint (P17), not differences between signers.
+- **SMPL-X's population is the wrong distribution.** Its mean is 15% off from MediaPipe's, its
+  spread about 2.5× too wide, and it varies shoulder width by about 10%, against MediaPipe's 3.1%
+  (Finding 10).
+- **Limits.** 25 clips, some sharing a signer, so the real spread may be somewhat wider. Three
+  clips (57641, 63229, 05631) account for most of the gap between the plain and robust CV.
 
 ## 7. Suggested next steps
 

@@ -77,7 +77,6 @@ def test_intrinsic_augmentations():
         JointAnglePerturbation,
         HandPosePerturbation,
         JointCoupledNoise,
-        LimbLengthScaling,
         GlobalOrientPerturbation,
     )
 
@@ -141,22 +140,7 @@ def test_intrinsic_augmentations():
     except Exception as e:
         print(f"✗ JointCoupledNoise failed: {e}")
 
-    # Test 4: LimbLengthScaling
-    tests_total += 1
-    try:
-        aug = LimbLengthScaling({
-            'scale_range': (-1.0, 1.0),
-            'components': [0, 1],
-        })
-        result = aug.apply(test_params)
-
-        assert not np.allclose(result['betas'], test_params['betas'])
-        print(f"✓ LimbLengthScaling works")
-        tests_passed += 1
-    except Exception as e:
-        print(f"✗ LimbLengthScaling failed: {e}")
-
-    # Test 5: GlobalOrientPerturbation
+    # Test 4: GlobalOrientPerturbation
     tests_total += 1
     try:
         aug = GlobalOrientPerturbation({
