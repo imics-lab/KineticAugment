@@ -29,6 +29,7 @@ bone vectors directly (rotate them, scale them, etc.) and the back-projector
 will faithfully reconstruct the new landmark positions.
 """
 
+import warnings
 from typing import Dict
 import numpy as np
 
@@ -86,6 +87,13 @@ class MediaPipeToSMPLX:
     """
 
     def __init__(self):
+        warnings.warn(
+            "MediaPipeToSMPLX stores bone displacements in SMPL-X-shaped slots; its "
+            "output is not valid SMPL-X input. For genuine SMPL-X parameters use "
+            "kinetic_augment.body_model.converter.fit_body on world landmarks.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.mp    = MEDIAPIPE_POSE_LANDMARKS
         self.smplx = SMPLX_BODY_JOINTS
 

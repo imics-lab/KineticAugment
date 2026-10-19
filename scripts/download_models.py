@@ -18,7 +18,42 @@ Usage:
 import argparse
 import os
 import sys
+import urllib.request
 from pathlib import Path
+
+MEDIAPIPE_FACE_ASSETS = {
+    # Apache-2.0, published by Google.
+    "face_landmarker.task": "https://storage.googleapis.com/mediapipe-models/face_landmarker/"
+                            "face_landmarker/float16/1/face_landmarker.task",
+    "canonical_face_model.obj": "https://raw.githubusercontent.com/google-ai-edge/mediapipe/"
+                                "master/mediapipe/modules/face_geometry/data/"
+                                "canonical_face_model.obj",
+}
+FLAME_FILES = ["generic_model.pkl", "mediapipe_landmark_embedding.npz"]
+FLAME_INSTRUCTIONS = """
+FLAME assets (licensed, manual):
+  1. Register at https://flame.is.tue.mpg.de/ and download FLAME 2020;
+     put generic_model.pkl in models/flame/.
+  2. Download mediapipe_landmark_embedding.npz from
+     https://github.com/Zielon/metrical-tracker/tree/master/flame/mediapipe
+     (MPI non-commercial licence) into models/flame/.
+"""
+
+
+def fetch_mediapipe_face_assets(models_dir: Path) -> None:
+    """Download the Apache-2.0 MediaPipe face assets into models/mediapipe/."""
+    target = models_dir / "mediapipe"
+    target.mkdir(parents=True, exist_ok=True)
+    for name, url in MEDIAPIPE_FACE_ASSETS.items():
+        path = target / name
+        if path.exists():
+            print(f"  present: {path}")
+            continue
+        print(f"  fetching {name} ...")
+        urllib.request.urlretrieve(url, path)
+    missing = [f for f in FLAME_FILES if not (models_dir / "flame" / f).exists()]
+    if missing:
+        print(FLAME_INSTRUCTIONS)
 
 
 # Required model files for SMPL-X
@@ -288,7 +323,17 @@ def main():
         help='Show VPoser download instructions'
     )
 
+    parser.add_argument(
+        '--face',
+        action='store_true',
+        help='Fetch MediaPipe face assets and check the FLAME files'
+    )
+
     args = parser.parse_args()
+
+    if args.face:
+        fetch_mediapipe_face_assets(args.model_dir)
+        return
 
     # Default action: show instructions
     if not any([args.check, args.setup_dir, args.vposer_info]):
