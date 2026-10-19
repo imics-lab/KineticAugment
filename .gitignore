@@ -228,3 +228,7 @@ models/vposer/*.pt
 
 # Raw dataset videos (kept local; not redistributed)
 /data/metsis_new_unseen_sign_videos/
+
+# Round-trip viewer data (derived; source frames of signers)
+/demo/round_trip/clips/
+/demo/round_trip/clips.json
