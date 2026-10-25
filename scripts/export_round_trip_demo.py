@@ -539,8 +539,9 @@ def update_index(out_root: Path, order):
 
 
 def sample(video_dir: Path, count: int, seed: int):
+    """The seeded random review order: `count` clips, or every clip if the folder has fewer."""
     clips = sorted(p.stem for p in video_dir.glob("*.mp4"))
-    return random.Random(seed).sample(clips, count)
+    return random.Random(seed).sample(clips, min(count, len(clips)))
 
 
 def main():
