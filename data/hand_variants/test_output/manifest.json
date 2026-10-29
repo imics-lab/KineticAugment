@@ -1,0 +1,50 @@
+{
+  "data_dir": "data/test_output",
+  "backends": [
+    "mano"
+  ],
+  "outputs": [
+    "track_shape",
+    "track_shape_scale",
+    "track_shape_scale_clean"
+  ],
+  "inputs": {
+    "data/test_output/01986_hands.npz": "4337a205b4277db95ae99aa2684ced7713de3dea2341b174996e032787a6b258",
+    "data/test_output/01987_hands.npz": "478183c080ab0f9a828f517d4df6c1f6552e5898c7af3d2c90de3688897d39f4",
+    "data/test_output/01988_hands.npz": "e2b5058626a19c99b600c0ec9415021027028605f9c532e58993e59622a8c02f",
+    "data/test_output/01991_hands.npz": "dff8a85b695d91b5e5e305dab4e75941713227e7a1f883c3e8b317d75949a25b",
+    "data/test_output/01992_hands.npz": "38b9c73a5b0c9e48202e419c4d49aa2d5c9c310e2c8d8377d66fce80119600ff"
+  },
+  "clips": {
+    "01986": {
+      "mano: track_shape": 6.728137213564807,
+      "mano: track_shape_scale": 4.2041085300006875,
+      "mano: track_shape_scale_clean": 11.685932005895522
+    },
+    "01987": {
+      "mano: track_shape": 9.55566823912925,
+      "mano: track_shape_scale": 4.949514929432937,
+      "mano: track_shape_scale_clean": 20.048795854010677
+    },
+    "01988": {
+      "mano: track_shape": 8.023686072009903,
+      "mano: track_shape_scale": 4.265175429655515,
+      "mano: track_shape_scale_clean": 17.34167519553089
+    },
+    "01991": {
+      "mano: track_shape": 3.6096617850128876,
+      "mano: track_shape_scale": 3.404090748410119,
+      "mano: track_shape_scale_clean": 4.226092719112921
+    },
+    "01992": {
+      "mano: track_shape": 7.0421424841550895,
+      "mano: track_shape_scale": 3.758312849210346,
+      "mano: track_shape_scale_clean": 11.327665782077098
+    }
+  },
+  "pooled_mean_mm": {
+    "mano: track_shape": 7.380224331850452,
+    "mano: track_shape_scale": 4.16126335624335,
+    "mano: track_shape_scale_clean": 14.152636332656785
+  }
+}

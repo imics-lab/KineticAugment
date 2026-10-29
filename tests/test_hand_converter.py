@@ -348,3 +348,65 @@ def test_per_frame_shapes_follow_a_hand_that_changes_size(backend):
     radius = plausible_radius(model.num_betas)
     assert all(np.linalg.norm(f.betas) <= radius for f in fits)
     assert len({tuple(np.round(f.betas, 6)) for f in fits}) == 4
+
+
+def scaled_about_the_wrist(observed, scales):
+    """Each frame's hand scaled about its own wrist by the matching factor."""
+    wrist = observed[:, :1]
+    return wrist + np.asarray(scales)[:, None, None] * (observed - wrist)
+
+
+@pytest.mark.parametrize("backend", BACKENDS)
+def test_per_frame_scale_follows_a_hand_that_changes_size(backend):
+    model = hand(backend, "right")
+    scales = np.array([0.75, 1.0, 1.3, 0.9])
+    observed = scaled_about_the_wrist(synthetic_track(model, 4, seed=60), scales)
+    fits = fit_hands(observed, all_valid(observed), model, per_frame_scale=True)
+    assert [f.status for f in fits] == ["ok"] * 4
+    errors = landmark_errors_mm(rebuild(fits, model), observed)
+    assert errors.mean() <= 0.5
+    assert np.percentile(errors, 95) <= 1.0
+    np.testing.assert_allclose([f.scale for f in fits], scales, atol=2e-3)
+
+
+@requires_mano
+def test_without_per_frame_scale_every_fit_keeps_unit_scale():
+    model = hand("mano", "right")
+    observed = synthetic_track(model, 3, seed=61)
+    assert [f.scale for f in fit_hands(observed, all_valid(observed), model)] == [1.0] * 3
+
+
+@pytest.mark.parametrize("backend", BACKENDS)
+def test_a_track_shape_with_per_frame_scale_reproduces_a_drifting_hand(backend):
+    model = hand(backend, "right")
+    scales = np.array([0.8, 0.9, 1.0, 1.1, 1.2, 1.25])
+    track = synthetic_track(model, 6, seed=62, betas=unit_shape(model, 63))
+    observed = scaled_about_the_wrist(track, scales)
+    betas = fit_hand_shape(observed, all_valid(observed), model, per_frame_scale=True)
+    assert np.linalg.norm(betas) <= plausible_radius(model.num_betas)
+    fits = fit_hands(observed, all_valid(observed), model, betas, per_frame_scale=True)
+    errors = landmark_errors_mm(rebuild(fits, model), observed)
+    assert errors.mean() <= 0.5
+    assert np.percentile(errors, 95) <= 1.0
+
+
+@requires_mano
+def test_per_frame_scale_round_trips_through_saved_fits(tmp_path):
+    model = hand("mano", "right")
+    observed = scaled_about_the_wrist(synthetic_track(model, 3, seed=64), [0.8, 1.0, 1.2])
+    fits = fit_hands(observed, all_valid(observed), model, per_frame_scale=True)
+    save_hand_fits(tmp_path / "scaled.npz", fits)
+    loaded = load_hand_fits(tmp_path / "scaled.npz")
+    np.testing.assert_array_equal([f.scale for f in loaded], [f.scale for f in fits])
+    np.testing.assert_allclose(rebuild(loaded, model), rebuild(fits, model), atol=1e-12)
+
+
+@requires_mano
+def test_fits_saved_before_per_frame_scale_load_at_unit_scale(tmp_path):
+    model = hand("mano", "right")
+    observed = synthetic_track(model, 2, seed=65)
+    save_hand_fits(tmp_path / "old.npz", fit_hands(observed, all_valid(observed), model))
+    with np.load(tmp_path / "old.npz") as data:
+        columns = {key: data[key] for key in data.files if key != "scale"}
+    np.savez_compressed(tmp_path / "old.npz", **columns)
+    assert [f.scale for f in load_hand_fits(tmp_path / "old.npz")] == [1.0, 1.0]

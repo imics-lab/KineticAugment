@@ -22,6 +22,7 @@
 - `V1_3_Face_Design.md` — Approved V1.3 design: SMPL-X neck, head and jaw from FaceLandmarker, signed hand-to-face distances with ASL-LEX regions, and the face stream.
 - `V1_3_Implementation_Plan.md` — Task-by-task plan for V1.3: face correspondence, head/neck/jaw fit, hand-to-face geometry, gate, face stream.
 - `Week_2_Findings.md` — Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07).
+- `Hand_Pipeline_Variants.md` — The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29).
 - `media/` — Images and placeholder assets referenced by documentation.
 - `index.md` — Index of the documentation pages and media folder.
 - `research-guide/` — Source-grounded research onboarding, verification status, and practical learning roadmap.

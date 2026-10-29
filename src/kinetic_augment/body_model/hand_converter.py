@@ -24,6 +24,13 @@ Shape is per hand track (`fit_hand_shape`): one plausible betas vector fitted
 jointly with every frame's pose. `fit_hands_per_frame_shape` lets each frame
 take its own plausible shape; it is a diagnostic of how much error comes from
 the detector's frame-to-frame size changes, not the pipeline's contract.
+
+`per_frame_scale` adds one more value per frame: a factor scaling the hand about its
+wrist. It is not a model parameter -- MANO and SMPL-X have no such value -- but a
+residual kept beside the fit, so that MediaPipe's drift of hand size need not be
+absorbed by the shape. When the shape is fitted with it, the track's scales are
+held to a geometric mean of 1, so the shape keeps the hand's size and the scales
+only its drift.
 """
 
 from dataclasses import dataclass
@@ -75,6 +82,9 @@ class HandFit:
     optimiser converged, because the optimiser stops at an iteration cap (see
     `fit_hands`). `rms_mm` is the quality signal: the frame's RMS wrist-relative
     landmark residual in millimetres, over its valid landmarks (the wrist excluded).
+
+    `scale` multiplies the model's hand about its wrist. It is 1 unless the fit was
+    asked for a per-frame scale, and is not a parameter of either model.
     """
 
     backend: str
@@ -85,6 +95,7 @@ class HandFit:
     transl: np.ndarray
     status: str = "ok"
     rms_mm: float = float("nan")
+    scale: float = 1.0
 
 
 def palm_rotation(rest: np.ndarray, observed: np.ndarray,
@@ -166,7 +177,7 @@ def _prepared(observed, valid):
 def _unfitted(model, status: str) -> HandFit:
     return HandFit(
         model.backend, model.side, np.full(3, np.nan), np.full(45, np.nan),
-        np.full(model.num_betas, np.nan), np.full(3, np.nan), status,
+        np.full(model.num_betas, np.nan), np.full(3, np.nan), status, scale=float("nan"),
     )
 
 
@@ -182,7 +193,7 @@ def plausible_radius(num_betas: int, plausibility: float = SHAPE_PLAUSIBILITY) -
 
 
 def _optimise(model, observed, valid, start, betas=None, shape=None,
-              plausibility=SHAPE_PLAUSIBILITY):
+              plausibility=SHAPE_PLAUSIBILITY, per_frame_scale=False, start_scale=None):
     """
     L-BFGS through the real forward pass on the wrist-relative landmark error (mm).
 
@@ -202,14 +213,23 @@ def _optimise(model, observed, valid, start, betas=None, shape=None,
         shape: None, "shared" (one fitted shape for all frames) or "per_frame" (one
             fitted shape per frame). Fitted shapes stay inside |betas| <= plausible_radius
             by construction: betas = r u / sqrt(1 + |u|^2) for unconstrained u.
+        per_frame_scale: also fit one factor per frame scaling the hand about its wrist,
+            as exp of a free log-scale. With a "shared" shape the log-scales are centred
+            on their mean, so the shape carries the hand's size and the scales its drift.
+            Not combined with a "per_frame" shape, which already changes size per frame.
+        start_scale: (F,) starting scales; 1 when omitted.
 
-    Returns (params (F, 48), betas (1 or F, K), rms_mm (F,)).
+    Returns (params (F, 48), betas (1 or F, K), rms_mm (F,), scales (F,)).
     """
+    if per_frame_scale and shape == "per_frame":
+        raise ValueError("a per-frame shape already changes size; it takes no per-frame scale")
     kept = np.where(valid[..., None], observed, 0.0)
     target = torch.as_tensor(1000.0 * (kept - kept[:, :1]), dtype=FIT_DTYPE)
     mask = torch.tensor(valid)
     mask[:, WRIST] = False  # zero by construction
     params = torch.tensor(start, dtype=FIT_DTYPE, requires_grad=True)
+    initial = np.ones(len(start)) if start_scale is None else np.asarray(start_scale, float)
+    log_scale = torch.tensor(np.log(initial), dtype=FIT_DTYPE, requires_grad=per_frame_scale)
 
     if shape is None:
         fixed = torch.as_tensor(betas, dtype=FIT_DTYPE).reshape(1, -1)
@@ -226,6 +246,14 @@ def _optimise(model, observed, valid, start, betas=None, shape=None,
         def current_betas():
             return radius * free / torch.sqrt(1.0 + (free ** 2).sum(dim=1, keepdim=True))
 
+    if per_frame_scale:
+        variables = variables + [log_scale]
+
+    def current_scales():
+        if per_frame_scale and shape == "shared":
+            return torch.exp(log_scale - log_scale.mean())
+        return torch.exp(log_scale)
+
     optimiser = torch.optim.LBFGS(
         variables, lr=1.0, max_iter=iterations, tolerance_grad=1e-12,
         tolerance_change=1e-15, history_size=100, line_search_fn="strong_wolfe",
@@ -233,7 +261,7 @@ def _optimise(model, observed, valid, start, betas=None, shape=None,
 
     def residuals():
         points = 1000.0 * model.points(params[:, :3], params[:, 3:], current_betas())
-        return (points - points[:, :1]) - target
+        return current_scales()[:, None, None] * (points - points[:, :1]) - target
 
     def closure():
         optimiser.zero_grad()
@@ -244,10 +272,11 @@ def _optimise(model, observed, valid, start, betas=None, shape=None,
     optimiser.step(closure)
     with torch.no_grad():
         fitted = params.detach().numpy().copy()
-        return fitted, current_betas().numpy().copy(), _rms_mm(residuals(), mask)
+        return (fitted, current_betas().numpy().copy(), _rms_mm(residuals(), mask),
+                current_scales().numpy().copy())
 
 
-def fit_hands(observed, valid, model, betas=None) -> List[HandFit]:
+def fit_hands(observed, valid, model, betas=None, per_frame_scale=False) -> List[HandFit]:
     """
     Fit every frame of one hand track, each with its own pose, at one fixed shape.
 
@@ -266,6 +295,8 @@ def fit_hands(observed, valid, model, betas=None) -> List[HandFit]:
         valid: (T, 21) bool; invalid or non-finite landmarks never influence a fit.
         model: `HandModel` of the hand's side.
         betas: (K,) shape used for every frame; neutral when omitted.
+        per_frame_scale: also fit each frame's scale about the wrist (`HandFit.scale`),
+            free of any constraint, since the shape is fixed here.
 
     Returns one `HandFit` per frame, in order.
     """
@@ -285,8 +316,9 @@ def fit_hands(observed, valid, model, betas=None) -> List[HandFit]:
     frames = sorted(starts)
     for first in range(0, len(frames), FRAMES_PER_BATCH):
         batch = frames[first:first + FRAMES_PER_BATCH]
-        params, _, rms = _optimise(
-            model, observed[batch], valid[batch], np.stack([starts[t] for t in batch]), betas
+        params, _, rms, scales = _optimise(
+            model, observed[batch], valid[batch], np.stack([starts[t] for t in batch]), betas,
+            per_frame_scale=per_frame_scale,
         )
         for k, t in enumerate(batch):
             if not (np.isfinite(rms[k]) and np.isfinite(params[k]).all()):
@@ -295,6 +327,7 @@ def fit_hands(observed, valid, model, betas=None) -> List[HandFit]:
             fits[t] = HandFit(
                 model.backend, model.side, params[k, :3], params[k, 3:], betas.copy(),
                 observed[t, WRIST] - skeleton.rest_joints[WRIST], "ok", float(rms[k]),
+                float(scales[k]),
             )
     return fits
 
@@ -316,7 +349,8 @@ def reconstruct_hand(fit: HandFit, model) -> np.ndarray:
         return np.full((NUM_HAND_LANDMARKS, 3), np.nan)
     with torch.no_grad():
         points = model.points(fit.wrist_orient, fit.hand_pose, fit.betas)[0].numpy()
-    return points + fit.transl
+    wrist = points[WRIST]
+    return fit.scale * (points - wrist) + wrist + fit.transl
 
 
 def save_hand_fits(path, fits: Sequence[HandFit]) -> None:
@@ -335,16 +369,18 @@ def save_hand_fits(path, fits: Sequence[HandFit]) -> None:
         transl=np.stack([f.transl for f in fits]),
         status=np.array([f.status for f in fits]),
         rms_mm=np.array([f.rms_mm for f in fits], dtype=np.float64),
+        scale=np.array([f.scale for f in fits], dtype=np.float64),
     )
 
 
 def load_hand_fits(path) -> List[HandFit]:
-    """Read fits written by `save_hand_fits`."""
+    """Read fits written by `save_hand_fits`; files from before `scale` load at scale 1."""
     # An NpzFile reads and decompresses a member afresh on every access, so each column is
     # read once here and the fits are views of it.
     with np.load(path) as data:
         columns = {key: data[key] for key in data.files}
     backend, side = str(columns["backend"]), str(columns["side"])
+    scale = columns.get("scale", np.ones(len(columns["status"])))
     return [
         HandFit(
             backend,
@@ -355,6 +391,7 @@ def load_hand_fits(path) -> List[HandFit]:
             columns["transl"][t],
             str(columns["status"][t]),
             float(columns["rms_mm"][t]),
+            float(scale[t]),
         )
         for t in range(len(columns["status"]))
     ]
@@ -364,21 +401,28 @@ def _starts_from(fits, frames) -> np.ndarray:
     return np.stack([np.concatenate([fits[t].wrist_orient, fits[t].hand_pose]) for t in frames])
 
 
-def fit_hand_shape(observed, valid, model, plausibility=SHAPE_PLAUSIBILITY) -> np.ndarray:
+def fit_hand_shape(observed, valid, model, plausibility=SHAPE_PLAUSIBILITY,
+                   per_frame_scale=False) -> np.ndarray:
     """
     One shape for a whole hand track: the plausible betas minimising the summed
     landmark error of every frame, fitted jointly with the frames' poses (started
     from neutral-shape fits). Frames the neutral fit cannot place are left out.
 
+    With `per_frame_scale` every frame also gets a scale about its wrist, held to a
+    geometric mean of 1 over the track, so that the shape is fitted to the hand's
+    size and its proportions while the scales take MediaPipe's drift of size.
+
     Returns (K,) betas; neutral when no frame can be fitted.
     """
     observed, valid = _prepared(observed, valid)
-    neutral = fit_hands(observed, valid, model)
+    neutral = fit_hands(observed, valid, model, per_frame_scale=per_frame_scale)
     frames = [t for t, fit in enumerate(neutral) if fit.status == "ok"]
     if not frames:
         return np.zeros(model.num_betas)
-    _, betas, _ = _optimise(model, observed[frames], valid[frames], _starts_from(neutral, frames),
-                            shape="shared", plausibility=plausibility)
+    _, betas, _, _ = _optimise(model, observed[frames], valid[frames],
+                               _starts_from(neutral, frames), shape="shared",
+                               plausibility=plausibility, per_frame_scale=per_frame_scale,
+                               start_scale=[neutral[t].scale for t in frames])
     return betas[0]
 
 
@@ -403,7 +447,7 @@ def fit_hands_per_frame_shape(observed, valid, model,
     frames = [t for t, fit in enumerate(fits) if fit.status == "ok"]
     if not frames:
         return fits
-    params, betas, rms = _optimise(model, observed[frames], valid[frames],
+    params, betas, rms, _ = _optimise(model, observed[frames], valid[frames],
                                    _starts_from(fits, frames), shape="per_frame",
                                    plausibility=plausibility)
     for k, t in enumerate(frames):

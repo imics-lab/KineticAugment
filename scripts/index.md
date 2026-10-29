@@ -6,10 +6,12 @@
 - `diagnose_residual.py` — Diagnoses round-trip error below the rigid-skeleton floor (MediaPipe non-rigidity).
 - `download_models.py` — Checks required model assets and prints setup or download guidance.
 - `evaluate_round_trip.py` — One-stop body + hand round-trip evaluation on any footage: extracts MediaPipe landmarks, scores SMPL-X body and MANO/SMPL-X hand round trips, writes a JSON report, optionally renders videos.
+- `export_hand_variants.py` — Saves every clip's hands under both hand pipelines (one shape per track, with and without a per-frame scale) for a classifier comparison.
 - `extract_hand_landmarks.py` — Extracts MediaPipe hand world and image landmarks with the paired pose and a geometric left/right assignment.
 - `extract_world_landmarks.py` — Extracts metric MediaPipe world landmarks and visibility, one MediaPipe instance per clip.
 - `measure_detector_agreement.py` — Measures how far MediaPipe's own landmarks move when one setting changes (context for the round trip).
 - `measure_hand_round_trip.py` — Measures the V1.2 hand round trip (MediaPipe hand → MANO / SMPL-X → landmarks) as an error ladder on the pilot clips.
+- `measure_hand_scale_drift.py` — Measures how much of the hand round-trip error a per-frame scale about the wrist removes, and what MediaPipe's size drift follows.
 - `measure_noise_floor.py` — Measures MediaPipe's frame-to-frame noise floor to set the round-trip error budget.
 - `measure_round_trip.py` — Measures the shape-fitted identity round trip against the rigid-skeleton floor (the V1 gate), fitted and held out.
 - `render_augmented_from_yaml.py` — Applies YAML-configured augmentations to videos and renders overlays.
