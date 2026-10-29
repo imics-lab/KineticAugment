@@ -21,6 +21,34 @@ Traditional data augmentation techniques often fail on skeletal time-series data
 *   **Comprehensive Evaluation:** Built-in metrics for quality, smoothness, diversity, and constraint satisfaction.
 *   **Task-Specific Profiles:** Easily configure the augmentation pipeline using YAML configuration files.
 
+## Seeing the augmentations: the round-trip demo
+
+<p align="center">
+  <a href="docs/media/round_trip_demo.mp4">
+    <img src="docs/media/round_trip_demo.gif" alt="Round-trip viewer playing a sign clip: source video, MediaPipe extraction, extraction vs round trip in 3-D, and the fitted SMPL-X body" width="100%">
+  </a>
+  <br>
+  <em>Screen recording of the round-trip viewer (preview; <a href="docs/media/round_trip_demo.mp4">full 42 s recording</a>).</em>
+</p>
+
+This is how we check augmentations visually. Augmentations are not applied to the raw landmarks.
+Each frame's MediaPipe pose, hand and face landmarks are fitted to one SMPL-X body (MANO hands,
+head and jaw). The augmentation edits that body, and MediaPipe-format landmarks are read back off
+the mesh. If the round trip with no augmentation reproduces the original signing, then the
+differences seen after an augmentation come from the augmentation itself.
+
+The viewer shows, for one clip at a time:
+
+1. **Sign video**: the source clip.
+2. **MediaPipe extraction (2-D)**: pose, hand and face-mesh landmarks drawn on the frame.
+3. **Extraction vs round trip (3-D)**: the extracted landmarks against those read back off SMPL-X,
+   coloured by error.
+4. **SMPL-X body**: the fitted body with the round-trip points on it, which you can drag to orbit.
+
+Below the panels, per-frame plots track the body, hand, finger-curl and face errors, the jitter,
+and the gaps between streams. Those plots are what show whether a clip can be augmented safely.
+To run it yourself, see [Round-Trip Viewer](#round-trip-viewer) below.
+
 ## Documentation
 
 The complete documentation provides the theory, architecture, and practical guides for using the framework.
