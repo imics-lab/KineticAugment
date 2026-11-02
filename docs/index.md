@@ -7,7 +7,7 @@
 - `04_Task_Specific_Profiles.md` — Explains how YAML profiles select and configure augmentations.
 - `05_Validation_Framework.md` — Describes checks for physical validity and task-level quality.
 - `06_Development_Roadmap.md` — Records implementation phases, status, and development plans.
-- `Augmentation_Grounding.md` — Research-grounded catalogue of meaning-preserving augmentations (tiers, invariant checks, ASL-LEX gating) and what it means for the first augmentation trial (2026-10-11).
+- `Augmentation_Grounding.md` — Research-grounded catalogue of meaning-preserving augmentations (tiers, invariant checks, ASL-LEX gating) and the augmentation trials: the first (2026-10-11) and its Tier 1 rework (2026-10-29).
 - `augmentation-evidence/` — Source-level evidence notes behind `Augmentation_Grounding.md`: sign linguistics and SLR augmentation literature, each claim with URL and verification label.
 - `GLOSSARY.md` — Defines terminology used throughout the framework documentation.
 - `V1_Findings.md` — Presentation-ready summary of what V1 established: the result, findings, decisions, and open questions.
