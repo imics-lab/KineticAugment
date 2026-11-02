@@ -16,11 +16,11 @@
 <header>
   <div class="title">
     <h1>MediaPipe → SMPL-X → MediaPipe</h1>
-    <span class="sub">pose + hands + face mesh round trip, one clip at a time, with its Tier 1 augmentations</span>
+    <span class="sub">pose + hands + face mesh round trip, one clip at a time</span>
   </div>
+  <nav class="pages"><a class="on" href="index.html">round trip</a><a href="augment.html">augmentations</a></nav>
   <label class="clip-pick">clip <select id="clip"></select></label>
   <label class="clip-pick">smoothing <select id="smooth"></select></label>
-  <label class="clip-pick">augmentation <select id="aug"></select></label>
   <div id="summary" class="chips"></div>
 </header>
 
@@ -36,7 +36,6 @@
           <label><input type="checkbox" id="t-agree" checked> stream agreement</label>
           <label><input type="checkbox" id="t-mesh478"> all 478 face pts</label>
           <label class="if-smoothed"><input type="checkbox" id="t-raw2d" checked> unsmoothed (grey)</label>
-          <label class="if-aug"><input type="checkbox" id="t-aug2d" checked> augmented (projected)</label>
         </span>
       </figcaption>
       <canvas id="mp2d"></canvas>
@@ -44,7 +43,6 @@
         <i style="--c:var(--pose)"></i>pose <i style="--c:var(--handL)"></i>left hand
         <i style="--c:var(--handR)"></i>right hand <i style="--c:var(--face)"></i>face mesh
         <i style="--c:var(--gap)"></i>pose ↔ hand / face gap
-        <span class="if-aug"><i style="--c:var(--aug)"></i>augmented, through the weak camera</span>
       </div>
     </figure>
     <figure class="panel">
@@ -55,23 +53,20 @@
           <label><input type="checkbox" id="t-err" checked> error lines</label>
           <label><input type="checkbox" id="t-ghost"> mesh</label>
           <label class="if-smoothed"><input type="checkbox" id="t-raw3d" checked> unsmoothed (grey)</label>
-          <label class="if-aug"><input type="checkbox" id="t-aug3d" checked> augmented</label>
         </span>
       </figcaption>
       <div id="view3d" class="three"></div>
       <div class="legend">
         <i style="--c:var(--in)"></i>MediaPipe extraction <i style="--c:var(--rt)"></i>read back off SMPL-X
         <i class="heat"></i>error (round-trip point coloured by size)
-        <span class="if-aug"><i style="--c:var(--aug)"></i>augmented, read back off SMPL-X</span>
       </div>
     </figure>
     <figure class="panel">
-      <figcaption><span id="cap4">4 · SMPL-X body, round-trip points on it</span>
+      <figcaption>4 · SMPL-X body, round-trip points on it
         <span class="toggles">
           <label><input type="checkbox" id="t-onbody" checked> round-trip pts</label>
           <label><input type="checkbox" id="t-onbody-in"> extraction</label>
           <label><input type="checkbox" id="t-wire"> wireframe</label>
-          <label class="if-aug"><input type="checkbox" id="t-aug-ghost" checked> unaugmented mesh</label>
         </span>
       </figcaption>
       <div id="viewbody" class="three"></div>

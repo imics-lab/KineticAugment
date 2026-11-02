@@ -11,6 +11,7 @@
   --gap: #ff3b3b;
   --in: #4ea1ff;
   --rt: #3ddc84;
+  --orig: #8fb3ff;
   --aug: #ff8c42;
   --mono: ui-monospace, "SF Mono", Menlo, monospace;
 }
@@ -79,6 +80,17 @@ figcaption { font-weight: 600; font-size: 12.5px; display: flex; flex-wrap: wrap
 .chip .was { margin-left: 4px; }
 .if-smoothed { display: none !important; }
 body.smoothed .if-smoothed { display: inline !important; }
-.if-aug { display: none !important; }
-body.aug .if-aug { display: inline !important; }
-select:disabled { opacity: 0.5; }
+
+/* page switch, and the augmentations page */
+.pages { display: flex; gap: 2px; }
+.pages a {
+  color: var(--muted); text-decoration: none; padding: 3px 10px; border: 1px solid var(--line);
+  border-radius: 4px; font-size: 12px;
+}
+.pages a.on { color: var(--text); border-color: var(--muted); background: var(--panel); }
+.panels.three-up { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .panels.three-up { grid-template-columns: 1fr; } }
+.panels.three-up .three { aspect-ratio: 3 / 4; }
+.aug-info { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; margin-top: 8px; }
+@media (max-width: 900px) { .aug-info { grid-template-columns: 1fr; } }
+.aug-info video, .aug-info canvas { width: 100%; border-radius: 4px; background: #000; display: block; }
