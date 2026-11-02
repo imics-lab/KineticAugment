@@ -11,6 +11,7 @@
   --gap: #ff3b3b;
   --in: #4ea1ff;
   --rt: #3ddc84;
+  --aug: #ff8c42;
   --mono: ui-monospace, "SF Mono", Menlo, monospace;
 }
 * { box-sizing: border-box; }
@@ -78,3 +79,6 @@ figcaption { font-weight: 600; font-size: 12.5px; display: flex; flex-wrap: wrap
 .chip .was { margin-left: 4px; }
 .if-smoothed { display: none !important; }
 body.smoothed .if-smoothed { display: inline !important; }
+.if-aug { display: none !important; }
+body.aug .if-aug { display: inline !important; }
+select:disabled { opacity: 0.5; }

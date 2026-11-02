@@ -1,13 +1,15 @@
-// Round-trip viewer: reads clips/<id>/{frames/, v/<smoothing>/{clip.json, data.bin}} written by
-// scripts/export_round_trip_demo.py and shows the four panels plus the error strips. The
-// unsmoothed ('off') export is always loaded too, as the reference a smoothing setting is compared to.
+// Round-trip viewer: reads clips/<id>/{frames/, v/<smoothing>/, aug/<augmentation>/} (each a
+// clip.json + data.bin) written by scripts/export_round_trip_demo.py and shows the four panels plus
+// the error strips. The unsmoothed ('off') export is always loaded too, as the reference a
+// smoothing setting is compared to. An augmentation is drawn over the round trip it was made from;
+// its own frames map to source frames through its `times` (a duration change re-times the clip).
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const C = {};
-for (const k of ['pose', 'handL', 'handR', 'face', 'gap', 'in', 'rt']) C[k] = css(`--${k}`);
+for (const k of ['pose', 'handL', 'handR', 'face', 'gap', 'in', 'rt', 'aug']) C[k] = css(`--${k}`);
 const HAND_COL = [C.handL, C.handR];
 const SIDES = ['left', 'right'];
 // Where the round-trip colour reaches full red, per stream.
@@ -18,6 +20,17 @@ let clip = null, A = {}, images = [], t = 0, playing = false;
 let base = null, B = {}, index = null, smoothing = 'off', loadedId = null; // B: 'off' arrays
 const smoothed = () => smoothing !== 'off' && base !== clip;
 const GHOST = '#6b7385';
+let aug = null, G = {}, augName = 'none'; // G: the augmentation's arrays
+const augOn = () => aug !== null;
+const nFrames = () => (augOn() ? aug.n : clip.n);
+// The source frame an augmented frame shows (nearest, for a re-timed clip).
+const srcFrame = (k) => (augOn() ? Math.min(Math.max(Math.round(G.times.data[k]), 0), clip.n - 1) : k);
+function augFrameFor(f) { // the augmented frame nearest source frame f
+  if (!augOn()) return f;
+  let best = 0;
+  for (let k = 1; k < aug.n; k++) if (Math.abs(G.times.data[k] - f) < Math.abs(G.times.data[best] - f)) best = k;
+  return best;
+}
 
 // ---------- data ----------
 function view(buf, m) {
@@ -48,13 +61,15 @@ async function loadIndex() {
   const h = new URLSearchParams(location.hash.slice(1));
   select.value = h.get('clip') && index.clips[h.get('clip')] ? h.get('clip') : (order[0] || extra[0]);
   smoothing = h.get('s') || 'off';
+  augName = h.get('a') || 'none';
   select.onchange = () => loadClip(select.value, 0);
-  $('smooth').onchange = () => { smoothing = $('smooth').value; loadClip(clip.clip, t); };
+  $('smooth').onchange = () => { smoothing = $('smooth').value; loadClip(clip.clip, srcFrame(t)); };
+  $('aug').onchange = () => { augName = $('aug').value; loadClip(clip.clip, srcFrame(t)); };
   await loadClip(select.value, Number(h.get('f') || 1) - 1);
 }
 
-async function fetchVariant(id, v) {
-  const dir = `clips/${id}/v/${v}`;
+async function fetchVariant(id, v, kind = 'v') {
+  const dir = `clips/${id}/${kind}/${v}`;
   const [meta, buf] = await Promise.all([
     fetch(`${dir}/clip.json`).then((r) => r.json()),
     fetch(`${dir}/data.bin`).then((r) => r.arrayBuffer()),
@@ -68,7 +83,20 @@ async function loadClip(id, startFrame = 0) {
   playing = false; $('play').textContent = '▶';
   const exported = index.clips[id].variants;
   const variants = Object.keys(index.smoothing).filter((v) => exported[v]);
+  const augExported = index.clips[id].augmentations || {};
+  const augs = Object.keys(index.augmentation || {}).filter((a) => augExported[a]);
+  if (!augs.includes(augName)) augName = 'none';
+  if (augName !== 'none') smoothing = 'off'; // augmentations are made from the unsmoothed fit
   if (!variants.includes(smoothing)) smoothing = 'off';
+  const asel = $('aug');
+  asel.innerHTML = '';
+  asel.add(new Option(augs.length ? 'none' : 'none exported', 'none'));
+  for (const a of augs) {
+    const o = new Option(index.augmentation[a].label, a);
+    o.title = `${augExported[a].title} · ${index.augmentation[a].description}`;
+    asel.add(o);
+  }
+  asel.value = augName; asel.disabled = !augs.length;
   const sel = $('smooth');
   sel.innerHTML = '';
   for (const v of variants) {
@@ -78,12 +106,18 @@ async function loadClip(id, startFrame = 0) {
   }
   sel.value = smoothing;
   sel.title = index.smoothing[smoothing]?.description || '';
+  sel.disabled = augName !== 'none';
   const ref = variants.includes('off') ? 'off' : smoothing;
   const [b, c] = await Promise.all([
     fetchVariant(id, ref), smoothing === ref ? null : fetchVariant(id, smoothing)]);
   base = b.meta; B = b.arrays;
   clip = c ? c.meta : base; A = c ? c.arrays : B;
+  if (augName !== 'none') { const g = await fetchVariant(id, augName, 'aug'); aug = g.meta; G = g.arrays; }
+  else { aug = null; G = {}; }
   document.body.classList.toggle('smoothed', smoothed());
+  document.body.classList.toggle('aug', augOn());
+  $('cap4').textContent = augOn() ? '4 · augmented SMPL-X body, augmented points on it'
+    : '4 · SMPL-X body, round-trip points on it';
   if (loadedId !== id) {
     images = await Promise.all(Array.from({ length: clip.n },
       (_, i) => loadImage(`clips/${id}/frames/${String(i).padStart(4, '0')}.jpg`)));
@@ -91,15 +125,15 @@ async function loadClip(id, startFrame = 0) {
       cv.width = clip.width; cv.height = clip.height;
       cv.style.aspectRatio = `${clip.width} / ${clip.height}`;
     }
-    $('scrub').max = clip.n - 1;
     build3d();
     resetCamera('front');
     loadedId = id;
   } else {
     build3d();
   }
+  $('scrub').max = nFrames() - 1;
   summaryChips();
-  show(Math.min(Math.max(startFrame, 0), clip.n - 1));
+  show(augFrameFor(Math.min(Math.max(startFrame, 0), clip.n - 1)));
 }
 
 function summaryChips() {
@@ -110,7 +144,8 @@ function summaryChips() {
   };
   const pair = (a, d = 1) => `${fmt(a[0], d)} / ${fmt(a[1], d)}`;
   $('summary').innerHTML = [
-    `<span class="chip">frames <b>${clip.n}</b></span>`,
+    augOn() ? `<span class="chip" title="${aug.description}">aug <b>${aug.title}</b></span>` : '',
+    `<span class="chip">frames <b>${clip.n}</b>${augOn() && aug.n !== clip.n ? ` → ${aug.n}` : ''}</span>`,
     chip('body', (m) => `${fmt(m.body_pct_median)}%`),
     chip('hands L/R', (m) => `${pair(m.hand_mm_median)} mm`),
     chip('MANO L/R', (m) => `${pair(m.mano_mm_median)} mm`),
@@ -123,7 +158,7 @@ function summaryChips() {
 }
 
 // ---------- 2-D panels ----------
-function draw2d(f) {
+function draw2d(f, ak = f) {
   const raw = $('raw').getContext('2d');
   raw.drawImage(images[f], 0, 0);
 
@@ -185,6 +220,17 @@ function draw2d(f) {
         g.strokeStyle = C.gap; g.lineWidth = lw; g.beginPath(); g.arc(...pp(p), 3 * lw, 0, 7); g.stroke();
       }
     }
+  }
+  if (augOn() && $('t-aug2d').checked && aug.body_ok[ak]) {
+    // the augmented read-back points, projected by the clip's weak-perspective camera
+    const arm = at('img_arm', ak, G), hd = at('img_hands', ak, G), fc = at('img_face', ak, G);
+    const q = (a, i) => (Number.isFinite(a[2 * i]) && Number.isFinite(a[2 * i + 1]) ? [a[2 * i] * W, a[2 * i + 1] * H] : null);
+    const seg = (a, b, w) => { if (a && b) line(a, b, C.aug, w); };
+    const armIdx = (m) => clip.arm_mp.indexOf(m);
+    for (const [a, b] of ARM_BONES) seg(q(arm, armIdx(a)), q(arm, armIdx(b)), 2.5 * lw);
+    for (let i = 0; i < 6; i++) { const p = q(arm, i); if (p) dot(p, C.aug, 2.5 * lw); }
+    for (let s = 0; s < 2; s++) for (const [a, b] of clip.connections.hand) seg(q(hd, s * 21 + a), q(hd, s * 21 + b), 1.5 * lw);
+    for (const pairs of Object.values(clip.face105.contours)) for (const [a, b] of pairs) seg(q(fc, a), q(fc, b), lw);
   }
 }
 
@@ -283,20 +329,60 @@ function build3d() {
   // panel 4: the mesh with the round-trip points on it
   add(views.b, 'bodyRt', new Dots(6 + 42 + n105, 0.006, C.rt));
   add(views.b, 'bodyIn', new Dots(6 + 42 + n105, 0.005, C.in));
+  augGeom = null;
+  if (!augOn()) return;
+  // the augmented mesh; a mirror reverses the triangles' winding, so the index is reversed back
+  augGeom = new THREE.BufferGeometry();
+  augGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+  const faces = new Uint16Array(A.mesh_faces.data);
+  if (aug.mirrored) for (let i = 0; i < faces.length; i += 3) { const x = faces[i + 1]; faces[i + 1] = faces[i + 2]; faces[i + 2] = x; }
+  augGeom.setIndex(new THREE.BufferAttribute(faces, 1));
+  add(views.b, 'augBody', new THREE.Mesh(augGeom, new THREE.MeshStandardMaterial({ color: '#d9b49a', roughness: 0.85 })));
+  add(views.b, 'augWire', new THREE.Mesh(augGeom, new THREE.MeshBasicMaterial({ color: '#000000', wireframe: true, transparent: true, opacity: 0.15 })));
+  add(views.b, 'bodyGhost', new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ color: '#8a95ad', transparent: true, opacity: 0.22, depthWrite: false, roughness: 0.9 })));
+  add(views.a, 'augBones', new Segs(5 + 42 + nContour, C.aug));
+  add(views.a, 'augDots', new Dots(6 + 42 + n105, 0.005, C.aug));
+  add(views.b, 'augOnBody', new Dots(6 + 42 + n105, 0.006, C.aug));
 }
+let augGeom = null;
 let geom3 = {}, H3 = {};
 const helper = (name) => H3[name];
 
-function update3d(f) {
-  const ok = clip.flags.body_ok[f];
-  const scale = 1 / clip.scale_i16;
-  const verts = at('mesh_verts', f), pos = geom.attributes.position.array;
+function setMesh(g, verts, scale) {
+  const pos = g.attributes.position.array;
   for (let i = 0; i < verts.length; i += 3) {
     pos[i] = verts[i] * scale; pos[i + 1] = -verts[i + 1] * scale; pos[i + 2] = -verts[i + 2] * scale;
   }
-  geom.attributes.position.needsUpdate = true;
-  geom.computeVertexNormals();
-  geom.computeBoundingSphere();
+  g.attributes.position.needsUpdate = true;
+  g.computeVertexNormals();
+  g.computeBoundingSphere();
+}
+
+function updateAug(k) {
+  const ok = aug.body_ok[k];
+  setMesh(augGeom, at('mesh_verts', k, G), 1 / aug.scale_i16);
+  const arm = at('aug_arm', k, G), hd = at('aug_hands', k, G), fc = at('aug_face', k, G);
+  const p3 = (arr, i) => (ok && ok3(arr, i) ? W3(arr, i) : null);
+  const bones = helper('augBones'), dots = helper('augDots'), onBody = helper('augOnBody');
+  bones.reset();
+  const armIdx = (m) => clip.arm_mp.indexOf(m);
+  for (const [a, b] of ARM_BONES) bones.add(p3(arm, armIdx(a)), p3(arm, armIdx(b)));
+  let n = 0;
+  for (let i = 0; i < 6; i++, n++) { const v = p3(arm, i); dots.set(n, v); onBody.set(n, v); }
+  for (let s = 0; s < 2; s++) {
+    for (const [a, b] of clip.connections.hand) bones.add(p3(hd, s * 21 + a), p3(hd, s * 21 + b));
+    for (let j = 0; j < 21; j++, n++) { const v = p3(hd, s * 21 + j); dots.set(n, v); onBody.set(n, v); }
+  }
+  for (const pairs of Object.values(clip.face105.contours)) for (const [a, b] of pairs) bones.add(p3(fc, a), p3(fc, b));
+  for (let r = 0; r < clip.face105.mp_indices.length; r++, n++) { const v = p3(fc, r); dots.set(n, v); onBody.set(n, v); }
+  [bones, dots, onBody].forEach((h) => h.done());
+  return ok;
+}
+
+function update3d(f, ak = f) {
+  const ok = clip.flags.body_ok[f];
+  const scale = 1 / clip.scale_i16;
+  setMesh(geom, at('mesh_verts', f), scale);
 
   const wPose = at('w_pose', f), vis = at('pose_vis', f), hin = at('w_hands_in', f);
   const fin3 = at('w_face_in', f), rtArm = at('rt_arm', f), rtH = at('rt_hands', f), rtF = at('rt_face', f);
@@ -366,11 +452,19 @@ function update3d(f) {
   show('rtBones', $('t-rt').checked); show('rtDots', $('t-rt').checked);
   show('rawBones', smoothed() && $('t-raw3d').checked);
   show('errLines', $('t-err').checked); show('ghost', $('t-ghost').checked && ok);
-  show('body', !!ok); show('wire', $('t-wire').checked && ok);
-  show('bodyRt', $('t-onbody').checked); show('bodyIn', $('t-onbody-in').checked);
+  const augOk = augOn() ? updateAug(ak) : false;
+  show('body', !!ok && !augOn()); show('wire', $('t-wire').checked && ok && !augOn());
+  show('bodyRt', $('t-onbody').checked && !augOn()); show('bodyIn', $('t-onbody-in').checked && !augOn());
+  if (augOn()) {
+    show('augBody', !!augOk); show('augWire', $('t-wire').checked && augOk);
+    show('bodyGhost', $('t-aug-ghost').checked && ok);
+    show('augBones', $('t-aug3d').checked); show('augDots', $('t-aug3d').checked);
+    show('augOnBody', $('t-onbody').checked);
+  }
   const msg = ok ? '' : 'no SMPL-X fit this frame (shoulder not visible)';
-  views.a.note.textContent = msg; views.b.note.textContent = msg;
-  views.a.note.style.display = views.b.note.style.display = msg ? '' : 'none';
+  const msgB = augOn() ? (augOk ? '' : 'no augmented body this frame') : msg;
+  views.a.note.textContent = msg; views.b.note.textContent = msgB;
+  views.a.note.style.display = msg ? '' : 'none'; views.b.note.style.display = msgB ? '' : 'none';
 }
 
 function resetCamera(which) {
@@ -506,17 +600,41 @@ function drawStrips() {
     y += FLAG_H;
   }
   // playhead
-  g.strokeStyle = '#ffffff'; g.lineWidth = 1; g.beginPath(); g.moveTo(x(t), 0); g.lineTo(x(t), Hc); g.stroke();
+  const ph = x(augOn() ? G.times.data[t] : t);
+  g.strokeStyle = '#ffffff'; g.lineWidth = 1; g.beginPath(); g.moveTo(ph, 0); g.lineTo(ph, Hc); g.stroke();
 }
 
 function seekFromStrip(ev) {
   const r = $('strips').getBoundingClientRect();
   const f = Math.round(((ev.clientX - r.left - PAD_L) / (r.width - PAD_L - 4)) * (clip.n - 1));
-  show(Math.min(Math.max(f, 0), clip.n - 1));
+  show(augFrameFor(Math.min(Math.max(f, 0), clip.n - 1)));
 }
 
 // ---------- readout ----------
-function readout(f) {
+function augReadout(k) {
+  if (!augOn()) return '';
+  const m = aug.metrics, d = aug.draw;
+  const row = (label, v) => `<tr><td>${label}</td><td colspan="3" style="text-align:right">${v}</td></tr>`;
+  const mm = (a, b) => (fin(a) ? `${fmt(a, 0)} / ${fmt(b, 0)}` : '–');
+  const joints = d.arm_joints.length
+    ? d.arm_joints.map((j) => `${j.side[0].toUpperCase()} ${j.joint} ${j.angle_deg.toFixed(1)}°`).join(', ') : 'none';
+  return `<table>
+    <tr><th colspan="4">augmentation · ${aug.title}</th></tr>
+    <tr><td colspan="4" style="color:#8b93a7;white-space:normal">${aug.description}</td></tr>
+    ${row('frame', `${k + 1} / ${aug.n} ← source ${fmt(G.times.data[k] + 1, 2)}`)}
+    ${row('wrists moved, med / max mm', mm(m.wrist_moved_mm_median, m.wrist_moved_mm_max))}
+    ${row('hand pts in frame', `${fmt(m.hand_points_in_frame_pct)}% (round trip ${fmt(m.round_trip_hand_points_in_frame_pct)}%)`)}
+    ${row('zero strength, max diff', `${m.identity_max_abs_diff_m.toExponential(1)} m`)}
+    <tr><th colspan="4">this clip's Tier 1 draw${aug.sample ? ` (draw ${aug.sample}, not the default 0)` : ''}</th></tr>
+    ${row('view', `yaw ${d.yaw_deg.toFixed(1)}°, pitch ${d.pitch_deg.toFixed(1)}°`)}
+    ${row('mirror · duration', `${d.mirror ? 'yes' : 'no'} · ×${d.duration.toFixed(3)}`)}
+    ${row('arm joints', joints)}
+    ${row('scale · shift', `×${d.scale.toFixed(3)} · (${aug.uncentre_shift.map((v) => v.toFixed(3)).join(', ')})`)}
+    ${row('camera fit residual', `${fmt(aug.camera.residual_frame_pct)}% of the frame`)}
+  </table>`;
+}
+
+function readout(f, ak = f) {
   const s = clip.series, m = clip.summary, fl = clip.flags, r = base.summary, cmp = smoothed();
   const row = (label, now, med, off = '', note = '') => `<tr><td>${label}</td><td>${now}</td><td>${med}</td>${cmp ? `<td class="was">${off}</td>` : ''}<td class="flag">${note}</td></tr>`;
   const sw = (c) => `<span class="sw" style="background:${c}"></span>`;
@@ -543,16 +661,17 @@ function readout(f) {
     ${row('face pose↔mesh RMS', fmt(s.face_gap_rms_px[f], 0) + pct(s.face_gap_rms_px[f]), fmt(m.face_gap_px_median, 0), fmt(r.face_gap_px_median, 0))}
     <tr><td colspan="${span}" style="color:#8b93a7;white-space:normal">${pairs}</td></tr>
     ${fl.hand_near_face[f] ? `<tr><td colspan="${span}" class="flag">hand near face (2-D)</td></tr>` : ''}
-  </table>`;
+  </table>${augReadout(ak)}`;
 }
 
 // ---------- frame / playback ----------
-function show(f) {
-  t = f;
-  $('scrub').value = f;
-  $('frame-label').textContent = `frame ${f + 1} / ${clip.n}`;
-  draw2d(f); update3d(f); renderAll(); drawStrips(); readout(f);
-  history.replaceState(null, '', `#clip=${clip.clip}&s=${smoothing}&f=${f + 1}`);
+function show(k) {
+  t = k;
+  const f = srcFrame(k);
+  $('scrub').value = k;
+  $('frame-label').textContent = augOn() ? `frame ${k + 1} / ${aug.n} (source ${f + 1})` : `frame ${f + 1} / ${clip.n}`;
+  draw2d(f, k); update3d(f, k); renderAll(); drawStrips(); readout(f, k);
+  history.replaceState(null, '', `#clip=${clip.clip}&s=${smoothing}${augOn() ? `&a=${augName}` : ''}&f=${f + 1}`);
 }
 
 let last = 0, acc = 0;
@@ -560,7 +679,7 @@ function tick(now) {
   if (!playing) return;
   acc += (now - last) / 1000; last = now;
   const step = 1 / (clip.fps * Number($('speed').value));
-  if (acc >= step) { acc %= step; show((t + 1) % clip.n); }
+  if (acc >= step) { acc %= step; show((t + 1) % nFrames()); }
   requestAnimationFrame(tick);
 }
 function toggle() {
@@ -570,11 +689,11 @@ function toggle() {
 
 $('play').onclick = toggle;
 $('prev').onclick = () => show(Math.max(t - 1, 0));
-$('next').onclick = () => show(Math.min(t + 1, clip.n - 1));
+$('next').onclick = () => show(Math.min(t + 1, nFrames() - 1));
 $('scrub').oninput = (e) => show(Number(e.target.value));
 $('reset-cam').onclick = () => resetCamera('front');
 $('side-cam').onclick = () => resetCamera('side');
-for (const id of ['t-agree', 't-mesh478', 't-in', 't-rt', 't-err', 't-ghost', 't-onbody', 't-onbody-in', 't-wire', 't-raw2d', 't-raw3d'])
+for (const id of ['t-agree', 't-mesh478', 't-in', 't-rt', 't-err', 't-ghost', 't-onbody', 't-onbody-in', 't-wire', 't-raw2d', 't-raw3d', 't-aug2d', 't-aug3d', 't-aug-ghost'])
   $(id).onchange = () => show(t);
 let dragging = false;
 $('strips').addEventListener('pointerdown', (e) => { dragging = true; seekFromStrip(e); });
@@ -584,18 +703,18 @@ window.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'range') return;
   if (e.key === ' ') { e.preventDefault(); toggle(); }
   if (e.key === 'ArrowLeft') { e.preventDefault(); show(Math.max(t - 1, 0)); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); show(Math.min(t + 1, clip.n - 1)); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); show(Math.min(t + 1, nFrames() - 1)); }
 });
 window.addEventListener('resize', resize);
 window.addEventListener('hashchange', () => {
   const h = new URLSearchParams(location.hash.slice(1));
   if (!clip || (h.get('clip') && !index.clips[h.get('clip')])) return; // not loaded yet / not exported
   const f = Number(h.get('f') || 1) - 1;
-  const sm = h.get('s') || 'off';
-  if ((h.get('clip') && h.get('clip') !== clip.clip) || sm !== smoothing) {
-    smoothing = sm; $('clip').value = h.get('clip') || clip.clip; loadClip($('clip').value, f);
+  const sm = h.get('s') || 'off', a = h.get('a') || 'none';
+  if ((h.get('clip') && h.get('clip') !== clip.clip) || sm !== smoothing || a !== augName) {
+    smoothing = sm; augName = a; $('clip').value = h.get('clip') || clip.clip; loadClip($('clip').value, f);
   }
-  else if (f !== t) show(Math.min(Math.max(f, 0), clip.n - 1));
+  else if (f !== srcFrame(t)) show(augFrameFor(Math.min(Math.max(f, 0), clip.n - 1)));
 });
 
 loadIndex().then(() => { resize(); show(t); });

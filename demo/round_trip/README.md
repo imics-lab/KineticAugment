@@ -27,9 +27,28 @@ The **smoothing** menu switches between settings exported for the clip: off, Gau
 frames, and a causal One Euro filter. When smoothing is on, the unsmoothed landmarks and error
 curves are drawn underneath in grey for comparison.
 
+The **augmentation** menu shows the clip's Tier 1 augmentations
+([Augmentation_Grounding.md](../../docs/Augmentation_Grounding.md) §3), each drawn once per clip
+from the evidence-based ranges and applied to the unsmoothed round trip: view (yaw ±20°, pitch
+±5°), mirror with the sides swapped, duration (0.8–1.25×), arm joints (shoulder, elbow, wrist,
+each p = 0.3, ±4°), scale (0.85–1.15), uncentre (up to ±0.1 of the frame, hands kept in it), and
+all of them combined. With one selected (in orange):
+
+- panel 2 adds the augmented points, projected into the frame by a weak-perspective camera fitted
+  to the clip;
+- panel 3 adds the augmented points read back off the augmented SMPL-X, beside the extraction and
+  the round trip;
+- panel 4 shows the augmented body, with the unaugmented one as a grey ghost;
+- the readout lists the clip's draw, how far the wrists moved, how many hand points stay in the
+  frame, and the check that the augmentation at zero strength reproduces the round trip.
+
+A duration change re-times the clip, so the transport then steps through the augmented frames
+and the video shows the source frame each one comes from. Augmentations are made from the
+unsmoothed fit, so the smoothing menu is set to off while one is selected.
+
 Keys: space plays and pauses, ← and → step one frame. Click or drag on the strips to seek. The URL
-keeps the clip, smoothing and frame (`#clip=20983&s=gauss2&f=45`), so a link points at an exact
-frame.
+keeps the clip, smoothing, augmentation and frame (`#clip=20983&s=off&a=combined&f=45`), so a
+link points at an exact frame.
 
 The page is plain HTML and JavaScript with no build step. It loads three.js from the jsDelivr CDN,
 so the viewing device needs an internet connection.
@@ -103,6 +122,11 @@ This route runs the full pipeline, so it needs the project installed and the lic
 
    # only some smoothing settings
    python scripts/export_round_trip_demo.py --clips 20983 --smoothing off gauss2 --video-dir path/to/videos
+
+   # only some augmentations, or none; another of the clip's draws (0 is its own)
+   python scripts/export_round_trip_demo.py --clips 20983 --augment view mirror --video-dir path/to/videos
+   python scripts/export_round_trip_demo.py --clips 20983 --augment --video-dir path/to/videos
+   python scripts/export_round_trip_demo.py --clips 20983 --aug-draw 3 --video-dir path/to/videos
    ```
 
    MediaPipe landmarks are cached per clip (`hands.npz`, `face.npz`) and reused; `--reextract`
@@ -134,8 +158,8 @@ From the repo root, pack the page and its data into one archive:
 tar -czf round_trip_demo.tar.gz -C demo round_trip
 ```
 
-Expect about 30 MB per clip with all four smoothing settings, so the 50-clip review set is about
-1.5 GB. Exporting fewer settings (`--smoothing off gauss1`) makes the bundle proportionally
+Expect about 30 MB per clip with all four smoothing settings, plus about 40 MB for the seven
+augmentations, so the 50-clip review set is about 3.5 GB. Exporting fewer settings (`--smoothing off gauss1`) makes the bundle proportionally
 smaller.
 
 ## What gets exported
@@ -148,6 +172,10 @@ For each clip, `clips/<clip>/` holds:
   an index of the arrays in `data.bin`.
 - `v/<smoothing>/data.bin`: little-endian arrays. These are the 2-D and 3-D landmarks, the
   read-back points, per-point errors and the posed SMPL-X mesh (int16, 0.1 mm).
+- `aug/<augmentation>/clip.json`: the clip's Tier 1 draw, the augmentation's title, frame count,
+  camera fit and measurements, and an index of its `data.bin`.
+- `aug/<augmentation>/data.bin`: the source time of each augmented frame, the augmented mesh
+  (int16, 0.1 mm), the augmented read-back points in 3-D and projected into the frame.
 
 ### How the numbers are measured
 
