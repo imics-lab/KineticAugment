@@ -6,7 +6,8 @@
 source URL and a verification label. A bracketed tag such as **[L2.4]** or **[M1]** below points
 to a row or section in those notes (L = linguistics, M = machine learning).
 
-**First trial:** `scripts/augment_trials.py`, run on clips 17083 and 57641 (§6).
+**First trial:** `scripts/augment_trials.py`, run on clips 17083 and 57641 (§6); reworked to
+Tier 1 on 2026-10-29 (§6.2).
 
 The question is which augmentations of a signer's 3-D skeleton (SMPL-X body, MANO hands) keep an
 isolated sign's meaning, and how strong they can be. Two kinds of evidence answer it:
@@ -233,11 +234,65 @@ shapes produces. It used the 5 pilot clips and the 20 random WLASL clips of Week
 - **Limits.** 25 clips, some sharing a signer, so the real spread may be somewhat wider. Three
   clips (57641, 63229, 05631) account for most of the gap between the plain and robust CV.
 
+### 6.2 Tier 1 rework (2026-10-29)
+
+`scripts/augment_trials.py` now runs Tier 1 only, with the §3 ranges. The sampling, transforms
+and re-timing live in `kinetic_augment.augmentations.tier1` (tests: `tests/test_tier1.py`).
+Every value is drawn once per clip, from a generator seeded by the run seed and the clip id:
+
+- **view:** yaw ±20°, pitch ±5°, uniform;
+- **mirror:** p = 0.5;
+- **duration:** 0.8–1.25×, log-uniform, first and last frames kept;
+- **arm joints:** shoulder, elbow and wrist of each arm, each with p = 0.3, ±4°. Shoulder and
+  wrist turn about a random axis fixed in the parent joint's frame. The elbow flexes in its
+  bending plane, since it is a hinge. Each MANO hand turns with its SMPL-X wrist;
+- **scale:** 0.85–1.15, uniform;
+- **uncentre:** up to ±0.1 of the frame on each axis.
+
+Each panel of the video shows one augmentation at the clip's drawn value. A *combined* panel
+chains them: arm joints, mirror if drawn, view, scale, uncentre, duration.
+
+**Hands kept in the frame.** No camera model existed, so the trial fits a weak-perspective
+camera per clip, from the reconstructed arm landmarks to MediaPipe's 2-D pose: one scale per
+axis per clip and one offset per frame. The uncentring shift is then drawn from the part of
+±0.1 that keeps every hand point already inside the frame inside it. Points already outside the
+frame are ignored, because many clips start and end with the hands below it.
+
+Results on the same two clips as before (seed 20261011), from `data/augment_trials/augment_trials.json`:
+
+| | 17083 (62 frames) | 57641 (29 frames) |
+| --- | --- | --- |
+| Draw | no mirror; yaw +2.4°, pitch −3.4°; duration ×0.83 (52 frames); no arm joint; scale ×1.015; shift (+0.051, +0.018) | mirror; yaw −15.9°, pitch +0.6°; duration ×1.22 (35 frames); L elbow −3.5°, R shoulder −1.6°; scale ×0.980; shift (+0.073, +0.088) |
+| Arm joints: wrists moved, median / max | — (none drawn) | 12 / 14 mm |
+| View: wrists moved, median / max | 20 / 34 mm | 72 / 108 mm |
+| Hand points in frame, round trip → each augmentation | 95.4% → 95.4% | 95.7% → 95.7% |
+| Camera fit residual | 2.1% of the frame | 2.3% of the frame |
+
+- **Zero strength reproduces the round trip** for all seven, to at most 3.3 × 10⁻¹⁶ m.
+- **The arm-joint edit is now about 8× smaller.** It moved the wrists 12–14 mm, against 94–115 mm
+  in the first trial (§6), and the shoulder-normalised pose by at most 4.4%. Whether 12 mm stays
+  inside a sign's location region still needs the location check (§7, step 2).
+- **View rotation moves the hands most,** 72 mm median at 16° of yaw. It does so rigidly: bone
+  lengths and every relative position are unchanged. Shoulder normalisation does not undo a 3-D
+  rotation, so the normalised pose changes too (34%).
+- **No in-frame hand point left the frame** under view, arm joints, scale or uncentre. On these
+  two clips the frame limit did not bind: the drawn shifts equal the unconstrained ones.
+- **The weak camera holds up.** In pixels its two axis scales agree to within 6–7% (320 vs
+  341 px/m on 17083, 228 vs 244 on 57641), as they should for square pixels.
+
+**Limits.**
+- Two clips. MediaPipe found no left hand in either, so the frame check covers the right hand and
+  both pose wrists.
+- With p = 0.3 per joint, 0.7⁶ ≈ 12% of clips get no arm-joint edit, as 17083 did.
+- The camera is weak-perspective. It ignores the change of viewing angle that a real sideways
+  move brings (§3, caveats).
+- No classifier has seen these clips yet.
+
 ## 7. Suggested next steps
 
-1. Rework the trial to Tier 1 with the evidence ranges: yaw ±20°, mirror, uniform rate
-   0.8–1.25×, arm joints ±4° at p = 0.3, scale 0.85–1.15, and uncentring with both hands kept in
-   the frame.
+1. ~~Rework the trial to Tier 1 with the evidence ranges.~~ **Done (2026-10-29, §6.2).** Yaw ±20°
+   with pitch ±5°, mirror, uniform duration 0.8–1.25×, arm joints ±4° at p = 0.3, scale
+   0.85–1.15, and uncentring with the hands kept in the frame through a weak-perspective camera.
 2. Implement the location-region and contact invariants (needs the V1.3 face regions) and use
    them to reject augmented clips.
 3. Obtain ASL-LEX 2.0 and the WLASL alignment, and decide the licence question.
