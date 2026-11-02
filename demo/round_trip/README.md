@@ -55,6 +55,107 @@ augmentation and frame (`augment.html#clip=20983&a=combined&f=45`). The same key
 The page is plain HTML and JavaScript with no build step. It loads three.js from the jsDelivr CDN,
 so the viewing device needs an internet connection.
 
+## Quick start: run the viewer for one clip
+
+These steps export one clip and open both pages in a browser. They are written so that a person
+or a coding agent can follow them as they stand. Every command runs **from the repository root**
+(the folder with `pyproject.toml`), in a shell with the project's virtual environment active.
+
+The example clip is `20983`. Replace it with your clip id. The clip's video must be a file named
+`<clip id>.mp4` in one folder: that folder is `--video-dir` below.
+
+### 1. Set up (once)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e '.[smplx,dev]'
+```
+
+The licensed model files are not in git. Put them at these paths (where to get them: step 2 of
+[Option B](#option-b-export-clips-yourself)):
+
+| File | Needed for |
+| --- | --- |
+| `models/smplx/SMPLX_NEUTRAL.npz` | the SMPL-X body |
+| `models/mano/MANO_LEFT.npz`, `models/mano/MANO_RIGHT.npz` | the hands (made by `python scripts/convert_mano.py`) |
+| `models/flame/generic_model.pkl`, `models/flame/mediapipe_landmark_embedding.npz` | the face |
+| `models/mediapipe/face_landmarker.task` | extracting a clip's face mesh (`python scripts/download_models.py --face`) |
+
+`models/mano/SMPL-X__FLAME_vertex_ids.npy` is already in git. Check that every file is in place:
+
+```bash
+python -c "from pathlib import Path; need = ['models/smplx/SMPLX_NEUTRAL.npz', 'models/mano/MANO_LEFT.npz', 'models/mano/MANO_RIGHT.npz', 'models/mano/SMPL-X__FLAME_vertex_ids.npy', 'models/flame/generic_model.pkl', 'models/flame/mediapipe_landmark_embedding.npz', 'models/mediapipe/face_landmarker.task']; missing = [p for p in need if not Path(p).exists()]; print('missing: ' + ', '.join(missing) if missing else 'all model files present')"
+```
+
+It should print `all model files present`.
+
+### 2. Export the clip
+
+```bash
+python scripts/export_round_trip_demo.py --clips 20983 --video-dir path/to/videos
+```
+
+This runs MediaPipe on the video, fits SMPL-X to every frame, exports the four smoothing settings
+and then the seven Tier 1 augmentations. It takes about one to two minutes on a laptop CPU (68 s for
+a 41-frame clip), most of it the four SMPL-X fits; adding `--smoothing off` exports only the
+unsmoothed setting, in about a quarter of the time. It prints one line per smoothing setting (`off`,
+`gauss1`, `gauss2`, `oneeuro`), one line per augmentation (`aug view`, …, `aug combined`), then
+`augmentations done`. It writes `demo/round_trip/clips/20983/` and updates
+`demo/round_trip/clips.json`; re-running it overwrites that clip.
+
+Check what was exported:
+
+```bash
+python -c "import json; c = json.load(open('demo/round_trip/clips.json'))['clips']['20983']; print('smoothing:', sorted(c['variants'])); print('augmentations:', sorted(c.get('augmentations', {})))"
+```
+
+Expected output:
+
+```text
+smoothing: ['gauss1', 'gauss2', 'off', 'oneeuro']
+augmentations: ['arm_joints', 'combined', 'duration', 'mirror', 'scale', 'uncentre', 'view']
+```
+
+### 3. Serve the pages
+
+```bash
+python3 -m http.server 8765 --directory demo/round_trip
+```
+
+The server keeps running in that terminal until you press Ctrl-C. A coding agent should start it
+as a background process and then check that it answers:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8765/clips.json
+```
+
+`200` means it is serving. If port 8765 is taken (`Address already in use`), use another port,
+such as 8777, in both commands and in the addresses below.
+
+### 4. Open the pages
+
+| Page | Address | Shows |
+| --- | --- | --- |
+| Round trip | <http://localhost:8765/#clip=20983> | the source video, MediaPipe's extraction, extraction vs round trip, the fitted SMPL-X body, error strips |
+| Augmentations | <http://localhost:8765/augment.html#clip=20983&a=combined> | what the augmentation changes, then the original, both one over the other, and the augmented body |
+
+On the augmentations page, the **augmentation** menu picks one of the seven (`a=` in the address:
+`view`, `mirror`, `duration`, `arm_joints`, `scale`, `uncentre`, `combined`). The links at the top
+of each page switch between the two. Space plays and pauses; ← and → step one frame.
+
+### If something goes wrong
+
+| What you see | Why, and what to do |
+| --- | --- |
+| A blank page, or nothing loads | The page was opened as a file (`file://`). Serve it (step 3) and open the `http://` address. |
+| The page loads but no 3-D view appears | three.js comes from the jsDelivr CDN, so the browser needs an internet connection. |
+| The augmentations page says no clip has exported augmentations | The clip was exported before augmentations existed, or with `--augment` and no names. Run step 2 again. |
+| The clip is missing from the clip menu | `clips.json` is out of date. Run `python scripts/export_round_trip_demo.py --reindex --video-dir path/to/videos`. |
+| `decoded N frames, landmarks have M` | The cached MediaPipe extraction does not match the video. Add `--reextract` to step 2. |
+| `FileNotFoundError` or `does not exist` naming a file under `models/` | A model file is missing. Run the check in step 1. |
+| `Address already in use` | Another server holds the port. Pick another port (step 3). |
+
 ## Option A: view a shared bundle (no setup)
 
 You only need **Python 3** (any version; it ships with macOS and most Linux distributions) and a
