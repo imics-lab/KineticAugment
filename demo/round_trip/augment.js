@@ -91,6 +91,7 @@ async function loadClip(id, startFrame = 0) {
   if (first) resetCamera('front');
   $('scrub').max = aug.n - 1;
   summaryChips();
+  explain();
   show(augFrameFor(Math.min(Math.max(startFrame, 0), clip.n - 1)));
 }
 
@@ -101,6 +102,88 @@ function summaryChips() {
     `<span class="chip">frames <b>${clip.n}</b>${aug.n !== clip.n ? ` → <b>${aug.n}</b>` : ''}</span>`,
     `<span class="chip" title="the clip's Tier 1 draw; 0 is the clip's own">draw <b>${aug.sample || 0}</b>${d.mirror ? ' · mirrors' : ''}</span>`,
   ].join('');
+}
+
+// ---------- what the augmentation changes ----------
+const pct = (x) => `${(100 * Math.abs(x - 1)).toFixed(1)}%`;
+const deg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}°`;
+const mm = (m) => (fin(m.wrist_moved_mm_median)
+  ? `the wrists moved ${fmt(m.wrist_moved_mm_median, 0)} mm (median) and at most ${fmt(m.wrist_moved_mm_max, 0)} mm` : '');
+const jointList = (d) => (d.arm_joints.length
+  ? d.arm_joints.map((j) => `${j.side} ${j.joint} ${deg(j.angle_deg)}`).join(', ') : 'none (each joint is drawn with p = 0.3)');
+const shiftText = ([dx, dy]) => `${dx < 0 ? 'left' : 'right'} ${(100 * Math.abs(dx)).toFixed(1)}% of the frame width, `
+  + `${dy < 0 ? 'up' : 'down'} ${(100 * Math.abs(dy)).toFixed(1)}% of its height`;
+const EXPLAIN = {
+  view: {
+    does: 'Turns the whole body about the vertical axis through the shoulders (yaw, ±20°) and tilts it slightly forward or back (pitch, ±5°), as if the camera stood at another angle.',
+    changes: (d, m) => ['the body’s orientation to the camera', `every point’s 3-D position: ${mm(m)}`],
+    keeps: ['the pose: every joint angle and bone length', 'the handshapes', 'where the hands are relative to the body and face', 'the timing'],
+    value: (d) => `yaw ${deg(d.yaw_deg)}, pitch ${deg(d.pitch_deg)}`,
+  },
+  mirror: {
+    does: 'Reflects the body left to right about the vertical plane through the shoulders and swaps the sides, so the dominant hand becomes the other hand, as for a left-handed signer.',
+    changes: () => ['which hand does what: the left hand’s motion is now the right hand’s', 'each handshape and the face become their mirror images'],
+    keeps: ['the shape and size of every movement (mirrored)', 'where the hands are relative to the body', 'the timing'],
+    value: (d) => (d.mirror ? 'this clip’s draw mirrors (p = 0.5), so the combined sample is mirrored too'
+      : 'this clip’s draw does not mirror (p = 0.5); this view mirrors anyway, to show it'),
+    note: 'Face points are reflected but keep their MediaPipe indices: the face mesh has no left/right table.',
+  },
+  duration: {
+    does: 'Plays the whole clip faster or slower by one factor (0.8–1.25×), interpolating new frames between neighbouring source frames.',
+    changes: (d) => [`the clip’s length: ${clip.n} → ${aug.n} frames`,
+      `the speed of every movement: ${(1 / d.duration).toFixed(2)}× as fast`],
+    keeps: ['every pose the clip passes through, in the same order', 'the start and the end: nothing is cropped',
+      'the relative timing of every part: the change is uniform, so no hold or repetition is stretched more than the rest'],
+    value: (d) => `duration ×${d.duration.toFixed(3)}`,
+  },
+  arm_joints: {
+    does: 'Rotates a few arm joints by a few degrees, the same for every frame. Each shoulder, elbow and wrist is chosen with p = 0.3 and turned by up to ±4°; an elbow only bends or straightens.',
+    changes: (d, m) => ['the posture of the chosen arm joints, so the hand moves a little and turns with the wrist',
+      d.arm_joints.length ? `the wrists moved at most ${fmt(m.wrist_moved_mm_max, 0)} mm; a wrist whose arm has no chosen joint does not move`
+        : 'no joint was chosen on this clip, so nothing moved'],
+    keeps: ['the finger poses (handshape)', 'the torso, head and face', 'the other joints', 'the timing'],
+    value: (d) => `joints: ${jointList(d)}`,
+    note: 'This is the one Tier 1 augmentation that moves the hand relative to the body. The check that it stays in the sign’s location is not built yet.',
+  },
+  scale: {
+    does: 'Scales the whole scene about the shoulder centre (0.85–1.15), as if the camera were nearer or farther.',
+    changes: (d, m) => [`the overall size: every distance is ${pct(d.scale)} ${d.scale >= 1 ? 'larger' : 'smaller'}`,
+      `the points’ positions: ${mm(m)}`],
+    keeps: ['the proportions: every position relative to every other', 'the pose, handshapes and timing',
+      'what a classifier sees if it centres on the shoulders and divides by shoulder width: nothing changes'],
+    value: (d) => `scale ×${d.scale.toFixed(3)}`,
+    note: 'Scale is not held inside the frame, so a few hand points near an edge can leave it.',
+  },
+  uncentre: {
+    does: 'Moves the whole scene sideways and up or down (up to ±0.1 of the frame), as if the signer stood elsewhere in the frame. The shift is limited so that no hand point inside the frame leaves it.',
+    changes: (d, m) => [`where the signer is: ${shiftText(aug.uncentre_shift)}`, `every point by the same offset: ${fmt(m.wrist_moved_mm_median, 0)} mm`],
+    keeps: ['the pose, size and handshapes', 'every position relative to every other', 'the timing'],
+    value: () => `shift (${aug.uncentre_shift.map((v) => v.toFixed(3)).join(', ')}) of the frame`,
+  },
+  combined: {
+    does: 'Applies all six, in this order: arm joints, mirror (if drawn), view, scale, uncentre, duration. This is one augmented sample of the clip.',
+    changes: (d) => [`arm joints: ${jointList(d)}`, `mirror: ${d.mirror ? 'yes' : 'no'}`,
+      `view: yaw ${deg(d.yaw_deg)}, pitch ${deg(d.pitch_deg)}`, `scale ×${d.scale.toFixed(3)}`,
+      `uncentre: ${shiftText(aug.uncentre_shift)}`, `duration ×${d.duration.toFixed(3)} (${clip.n} → ${aug.n} frames)`],
+    keeps: ['the handshapes (mirrored if the mirror was drawn)', 'where the hands are relative to the body, apart from the few degrees of the arm joints',
+      'the order and path of the movement', 'the start and the end: nothing is cropped'],
+    value: (d) => (d.mirror ? 'mirrored sample' : 'unmirrored sample'),
+  },
+};
+
+function explain() {
+  const e = EXPLAIN[augName], d = aug.draw, m = aug.metrics;
+  if (!e) { $('explain').innerHTML = ''; return; }
+  const list = (items) => `<ul>${items.filter(Boolean).map((x) => `<li>${x}</li>`).join('')}</ul>`;
+  const changes = typeof e.changes === 'function' ? e.changes(d, m) : e.changes;
+  $('explain').innerHTML = `
+    <div><h2>What “${index.augmentation[augName].label}” does</h2>
+      <p>${e.does}</p>
+      <p class="clip-value">On this clip: ${e.value(d)}${aug.sample ? ` (draw ${aug.sample})` : ''}</p>
+      <p class="note">Drawn once for the whole clip and applied to every frame. At zero strength it reproduces the original (largest difference ${m.identity_max_abs_diff_m.toExponential(1)} m).${e.note ? ` ${e.note}` : ''}</p>
+    </div>
+    <div class="changes"><h3>Changes</h3>${list(changes)}</div>
+    <div class="keeps"><h3>Stays the same</h3>${list(e.keeps)}</div>`;
 }
 
 // ---------- 3-D ----------

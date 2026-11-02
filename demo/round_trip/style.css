@@ -94,3 +94,18 @@ body.smoothed .if-smoothed { display: inline !important; }
 .aug-info { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; margin-top: 8px; }
 @media (max-width: 900px) { .aug-info { grid-template-columns: 1fr; } }
 .aug-info video, .aug-info canvas { width: 100%; border-radius: 4px; background: #000; display: block; }
+.explain {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 14px;
+  background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--aug);
+  border-radius: 6px; padding: 10px 14px; margin-bottom: 10px;
+}
+@media (max-width: 1100px) { .explain { grid-template-columns: 1fr; } }
+.explain h2 { font-size: 14px; margin: 0 0 4px; }
+.explain h3 { font-size: 12px; margin: 0 0 4px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.explain p { margin: 0 0 6px; }
+.explain ul { margin: 0; padding-left: 18px; }
+.explain li { margin-bottom: 3px; }
+.explain .clip-value { font-family: var(--mono); font-size: 12px; color: var(--aug); }
+.explain .note { color: var(--muted); font-size: 12px; }
+.explain .changes h3 { color: var(--aug); }
+.explain .keeps h3 { color: var(--orig); }

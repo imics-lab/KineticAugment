@@ -38,7 +38,9 @@ frame.
 from the evidence-based ranges and applied to the unsmoothed round trip: view (yaw ±20°, pitch
 ±5°), mirror with the sides swapped, duration (0.8–1.25×), arm joints (shoulder, elbow, wrist,
 each p = 0.3, ±4°), scale (0.85–1.15), uncentre (up to ±0.1 of the frame, hands kept in it), and
-all of them combined. Pick one from the **augmentation** menu. Three 3-D views share one camera:
+all of them combined. Pick one from the **augmentation** menu. A box at the top says, in plain
+words, what it does, what it changes and what it keeps, with this clip's drawn value and the
+measured movement. Three 3-D views share one camera:
 
 1. **Original**: the round trip with no augmentation, the fitted SMPL-X and its read-back points.
 2. **One over the other**: the original (blue) and the augmented (orange) bodies overlaid.
