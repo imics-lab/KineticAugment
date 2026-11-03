@@ -11,6 +11,7 @@
 | `CONTRIBUTING.md` | Guidance for reporting issues and contributing code. |
 | `LICENSE` | MIT license and copyright terms. |
 | `README.md` | Project overview, installation steps, and usage guidance. |
+| `TODO.md` | Open work items, starting with applying the recommended augmentation ranges. |
 | `configs/` | YAML augmentation profiles for running and sign-language tasks. |
 | `data/` | Example configuration, source clips, and extraction outputs. |
 | `docs/` | Framework concepts, architecture, validation, and roadmap. |

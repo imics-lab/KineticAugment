@@ -234,3 +234,6 @@ models/vposer/*.pt
 
 # Raw dataset videos (kept local; not redistributed)
 /data/metsis_new_unseen_sign_videos/
+
+# WLASL annotations (download from github.com/dxli94/WLASL; not redistributed)
+/data/wlasl/WLASL_v0.3.json

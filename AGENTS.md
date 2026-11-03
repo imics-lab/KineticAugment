@@ -32,10 +32,13 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`data/hand_variants/round_trip_eval/index.md`](data/hand_variants/round_trip_eval/index.md)
 - [`data/hand_variants/test_output/index.md`](data/hand_variants/test_output/index.md)
 - [`data/sign_videos/index.md`](data/sign_videos/index.md)
+- [`data/wlasl/index.md`](data/wlasl/index.md)
 - [`data/test_output/index.md`](data/test_output/index.md)
 - [`data/test_output/videos/index.md`](data/test_output/videos/index.md)
 - [`docs/index.md`](docs/index.md)
 - [`docs/augmentation-evidence/index.md`](docs/augmentation-evidence/index.md)
+- [`docs/augmentation-evidence/reports/index.md`](docs/augmentation-evidence/reports/index.md)
+- [`docs/augmentation-evidence/research_notes/index.md`](docs/augmentation-evidence/research_notes/index.md) — each report's notes subfolder has its own `index.md`
 - [`docs/media/index.md`](docs/media/index.md)
 - [`docs/research-guide/index.md`](docs/research-guide/index.md)
 - [`examples/index.md`](examples/index.md)

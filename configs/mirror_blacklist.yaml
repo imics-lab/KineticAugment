@@ -1,0 +1,18 @@
+# WLASL glosses that must not be mirrored (left-right reflected with the hands swapped).
+# Evidence and categories: docs/Mirror_Unsafe_Signs.md. Glosses are WLASL_v0.3.json names.
+# Every gloss not listed here is category C: whole-body mirroring keeps the sign.
+
+categories:
+  absolute_side:
+    description: >-
+      The meaning is an absolute lateral direction. Left-handed signers keep the direction, so
+      a mirrored clip shows the wrong or an ill-formed sign. Relabelling to the opposite gloss
+      is not valid either: the pairs use different letter handshapes (L/R, E/W).
+    evidence: strong
+    glosses: [left, right, east, west, northwest]
+  caution:
+    description: >-
+      No ASL evidence that mirroring changes the sign, but a lateral organ is named and the
+      Russian Slovo flip blacklist excludes HEART. Excluded because it is cheap.
+    evidence: weak
+    glosses: [heart, heart attack]

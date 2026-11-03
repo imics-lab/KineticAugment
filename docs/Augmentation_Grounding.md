@@ -9,6 +9,12 @@ to a row or section in those notes (L = linguistics, M = machine learning).
 **First trial:** `scripts/augment_trials.py`, run on clips 17083 and 57641 (§6); reworked to
 Tier 1 on 2026-10-29 (§6.2).
 
+**Tolerance follow-up (2026-11-02):**
+[Sign augmentation tolerance evidence](<augmentation-evidence/reports/Sign augmentation tolerance evidence.md>)
+adds millimetre location spreads, human view and speed thresholds, and 2023–2026 ablations. A
+**[T]** tag below points to that report. Its recommended range changes are marked
+*Recommended* and are not yet in `kinetic_augment.augmentations.tier1`.
+
 The question is which augmentations of a signer's 3-D skeleton (SMPL-X body, MANO hands) keep an
 isolated sign's meaning, and how strong they can be. Two kinds of evidence answer it:
 
@@ -50,8 +56,22 @@ isolated sign's meaning, and how strong they can be. Two kinds of evidence answe
   are blocked by alternating movement, continuous contact between the hands, contact between
   analogous hand parts, and signs located on the weak hand **[L4.1–4.4]**.
 
-No source gives numeric tolerances in millimetres or degrees. **Bounds must be set
-empirically.**
+~~No source gives numeric tolerances in millimetres or degrees.~~ **Corrected (2026-11-02).**
+Numbers now exist for location, view and speed, but not for handshape, palm orientation or
+movement size **[T]**:
+
+- **Location spread (motion capture, ASL).** A signer's own repetitions of a forehead sign have a
+  token-to-token SD of 10.8–59.3 mm. A low neighbouring sign or a faster rate lowers it by
+  10–43 mm and shifts it sideways by up to 140 mm, and the sideways rate shifts go only toward the
+  midline (Tyrone & Mauk 2010, 2012).
+- **View (human recognition, BSL).** Accuracy is 95.3% at 0°, 92.8% at 45° (not significantly
+  different) and 89.8% at 90° of yaw (Watkins et al. 2024). There is no data for pitch or roll.
+- **Speed (human recognition, ASL).** Isolated-sign identification breaks down only at about
+  2.5–3× playback (Fischer et al. 1999). The same sign's duration differs about 1.8× between
+  signers.
+
+These are spreads of natural variation and human thresholds, not limits for a classifier.
+**Handshape, orientation and movement-size bounds must still be set empirically.**
 
 ## 2. What sign-recognition practice says
 
@@ -62,7 +82,9 @@ empirically.**
 | In-plane rotation | +2.27 pp WLASL100 | ±13° | **[M1]** SPOTER |
 | Arm-joint rotation down the chain | +2.27 pp WLASL100 | p = 0.3 per joint, ±4° | **[M1]** SPOTER |
 | Squeeze / perspective | +1.88 / +1.50 pp | 0–15% / 0–10% | **[M1]** SPOTER |
-| Mirror with left/right swap | small: −0.69 pp when removed. Handedness normalisation neutral in fingerspelling. Never reported to hurt | p = 0.5 | **[M6]** Laines; Shi 2023 |
+| Mirror with left/right swap | small: −0.69 pp when removed. Handedness normalisation neutral in fingerspelling. **Hurt once:** −1.3 pp on WLASL (RGB); side-dependent signs blacklisted on Slovo | p = 0.5 | **[M6]** Laines; Shi 2023; **[T]** Kvanchiani 2024 |
+| Shoulder / elbow / wrist rotation | ±7.5° at shoulder or wrist hurt pose-based translation; elbow ±7.5° neutral | ±7.5° | **[T]** Železný 2025 |
+| In-plane rotation and scale sweep | flat: rotation 1–32° and scale ≤ 0.32 within ±0.56 pp noise (2-D, WLASL-100) | — | **[T]** Woods & Rana 2023 |
 | Global scale / bone length | about none: −0.22 pp when removed | 0.5–1.0 | **[M6]** Laines |
 | Joint / frame / clip masking | large as a *pretraining* pretext (SignBERT) | ratio 40%, clips ≤ 8 frames | **[M4]** |
 | Axis or channel masking | **hurts** (action recognition, collapse to 3.9%) | — | **[M10]** AS-CAL, STARS |
@@ -89,14 +111,27 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
 1. **3-D view rotation.** Rotate SMPL-X `global_orient` about the vertical axis by ±20°, plus a
    few degrees of pitch. The hand's location relative to the body is unchanged by construction.
    **[M7]**
+   - *Recommended:* keep ±20° as the default and add ±45° as an ablation arm. Deaf viewers lose
+     no significant accuracy up to 45°, but nothing shows the wider range helps on frontal test
+     sets. Keep pitch at ±5° and never add roll **[T]**.
 2. **Mirror with sides swapped.** Swap SMPL-X left/right joints and MANO hands, and mirror the
    face stream too, so the dominant hand becomes the other hand. **[L3.1, M6]**
    - Caveats not tested by anyone: indexing and pointing signs, and the few signs located on a
      lateral body part.
+   - *Recommended:* gate it. Never mirror signs whose meaning depends on absolute side (LEFT,
+     RIGHT, HEART, LIVER, indexing toward a fixed referent), and treat p as a tuned value
+     (ablate 0 vs 0.5). Flip has cost 1.3 pp on WLASL once **[T]**.
 3. **Uniform rate change.** Scale the clip's duration by a single factor. Start at 0.8–1.25×,
    inside the 0.5–1.5 used in practice. Do not crop. **[L6.2, M6, M3]**
+   - *Recommended:* widen to about 0.67–1.5×, log-uniform. The same sign's duration differs about
+     1.8× between signers, and human identification holds well past 1.5×. A 0.5 duration scale
+     hurt once and marks the outer edge **[T]**.
 4. **Small arm-joint rotations.** Shoulder, elbow and wrist each with p = 0.3, ±4° **[M1]**,
    followed by the location check in §4.
+   - The trial's 12–14 mm wrist move (§6.2) is under one token-to-token SD of natural repetition
+     (10.8–59.3 mm) **[T]**.
+   - *Recommended:* keep ±4° for the shoulder and wrist, and let the elbow go to ±7.5°. At ±7.5°,
+     shoulder and wrist rotation hurt pose-based translation and elbow rotation did not **[T]**.
 5. **Whole-scene scale (camera distance).** Scale everything (body, hands, face) by one factor
    about the shoulder centre. Start at 0.85–1.15; practice uses 0.9–1.1 (ST-GCN), 0.8–1.2
    (GISLR) and 0.5–1.0 (Laines) **[M5b, M10, M6]**.
@@ -131,12 +166,26 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
    - Forehead signs: lower only, downward, partially, never to the eyes, and not when a
      lower-location minimal pair exists. Sample the amount from the observed lowering
      distribution **[L2.1–2.6]**.
+   - *Recommended magnitudes* **[T]**, applied in a face- or torso-anchored frame. They are
+     production spreads, used as a realism prior:
+     - jitter with σ ≈ 10 mm per clip, truncated at about 20 mm;
+     - sideways shifts up to about 40–50 mm, toward the body midline only;
+     - forehead lowering of about 10–40 mm, downward only;
+     - tighter jitter, and no lowering, at the chin, mouth and nose;
+     - optionally, for forehead signs, lower by 1.6–21.6 mm per 100 ms removed when the
+       duration is shortened (an inference from the duration–height slopes).
 7. **Within-category handshape jitter in MANO space.** The category comes from the ASL-LEX
    features (selected fingers, flexion, spread, thumb position).
    - The two hands' finger poses stay tied in symmetric signs (SGNify).
    - Bounds come from SignAvatars' biomechanical limits.
    - Reject any sample whose classified handshape features change. **[L5.1, L1.8, M7]**
-   - This has no published precedent and is the project's opportunity.
+   - This has no published precedent and is the project's opportunity. The nearest is the
+     GISLR 2nd-place "finger-tree rotate", with no stated angle and no ablation **[T]**.
+   - *Recommended shape* **[T]**: larger jitter on non-selected fingers and the thumb, smaller on
+     selected fingers, and smallest on their flexion. Keep fingertip paths, which carry sign
+     identity for human viewers.
+   - The Sem-Lex phonology classifier is right only 81% of the time on flexion, so flexion
+     needs a geometric check as well.
 8. ~~**Body shape with location retargeting.**~~ **Dropped (2026-10-18).** The idea was to change
    `betas`, then re-solve the arm IK so each hand keeps its position relative to the body
    landmarks it is anchored to (the perceptual-target view **[L2.10]**).
@@ -149,6 +198,10 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
    the weak hand. **[L4.3, L4.5]**
 10. **Detector-failure simulation.** Mask joints or short runs of frames (≤ 8), or add very small
     noise. Never mask a whole axis. **[M4, M10]**
+    - *Recommended:* model hand-dropout runs on MediaPipe's failure pattern, since it misses about
+      half the hands in WLASL. Keep noise tiny, because heavy noise hurt in two studies. Drop
+      frames no lower than about 10 fps equivalent, where human intelligibility stops improving
+      **[T]**.
 
 ### Excluded
 
@@ -163,6 +216,11 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
   **[L7.3, L1.5]**.
 - **Shear and axis masking.** They distort body geometry and hurt in action recognition
   **[M10]**.
+  - Shear is contested in 2-D: +4.6 pp in a 20-class study, and kept in a translation ablation
+    **[T]**. Keep it excluded on the 3-D skeleton; a small shear on projected 2-D output is a
+    legitimate ablation arm.
+- **Camera roll** (added 2026-11-02). In-plane rotation of ±4.5° hurt pose-based translation,
+  there is no human evidence for it, and yaw and pitch already cover viewpoint **[T]**.
 
 ## 4. Invariant checks after every augmentation
 
@@ -300,3 +358,14 @@ Results on the same two clips as before (seed 20261011), from `data/augment_tria
    check (Tier 2, item 7).
 5. Measure the effect on a classifier, one augmentation at a time, as SPOTER's ablation did
    **[M1]**. That is the only test of whether each augmentation helps.
+   - Use a split where test signers are unseen in training, at large vocabulary, with 3–5
+     seeds: single augmentations sit inside run-to-run noise at 100 classes **[T]**.
+   - Arms: yaw ±20° vs ±45°; duration 0.8–1.25× vs 0.67–1.5×; mirror p = 0 vs 0.5, with per-class
+     deltas to build the blacklist; elbow ±7.5°; pre-training on augmented clips vs mixing them
+     with real ones.
+6. Measure natural spread in the project's own reconstructed clips, per ASL-LEX location and
+   handshape category (location SD, lowering, MANO joint angles, palm normals, path length), and
+   the round-trip noise floor in the same frame. These give the Tier 2 bounds the literature
+   lacks **[T]**.
+7. Apply the *Recommended* ranges to `kinetic_augment.augmentations.tier1` once the ablation in
+   step 5 is set up.
