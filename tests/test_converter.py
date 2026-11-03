@@ -421,6 +421,38 @@ class TestValidity:
         for mp_idx in (11, 12, 13, 14, 16):
             np.testing.assert_allclose(out[mp_idx], landmarks[mp_idx], atol=1e-9)
 
+    @pytest.mark.parametrize("root_deg", [(0, 0, 0), (10, 35, -5)])
+    def test_an_unplaced_arm_hangs_at_the_side(self, skeleton, root_deg):
+        # Left at the rest pose, an unseen arm would stick straight out (SMPL-X rests in a
+        # T-pose). It hangs down the torso instead, tilted slightly outward.
+        from kinetic_augment.body_model.converter import HANG_ABDUCTION_DEG, fit_body
+        from kinetic_augment.body_model.kinematics import forward_kinematics
+
+        truth = random_arm_pose(21)
+        truth[0] = rotvec(root_deg)
+        landmarks, validity = landmarks_from(skeleton, truth, with_nose=True)
+        validity = validity.copy()
+        validity[14] = False   # right elbow: the whole right arm is unplaced
+        validity[15] = False   # left wrist: only the left forearm is unplaced
+
+        fit = fit_body(landmarks, validity, skeleton)
+        rotations = np.zeros((skeleton.num_joints, 3))
+        rotations[0], rotations[1:22] = fit.global_orient, fit.body_pose.reshape(21, 3)
+        posed = forward_kinematics(rotations, skeleton)
+        root = Rotation.from_rotvec(fit.global_orient).as_matrix()
+
+        a = np.radians(HANG_ABDUCTION_DEG)
+        for joint, child, outward in ((17, 19, -1), (19, 21, -1), (18, 20, 1)):
+            d = posed[child] - posed[joint]
+            local = root.T @ (d / np.linalg.norm(d))   # in the rest torso frame
+            np.testing.assert_allclose(local, [outward * np.sin(a), -np.cos(a), 0], atol=1e-9)
+        # The observed left upper arm is untouched.
+        d_obs = landmarks[13] - landmarks[11]
+        d_fit = posed[18] - posed[16]
+        np.testing.assert_allclose(
+            d_fit / np.linalg.norm(d_fit), d_obs / np.linalg.norm(d_obs), atol=1e-9
+        )
+
     def test_refuses_to_fit_without_both_shoulders(self, skeleton):
         # The shoulders anchor the torso frame. Without both, the root rotation is
         # undefined, and guessing it would be silent garbage.

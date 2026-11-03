@@ -3,7 +3,8 @@
 Visualise the body + hand round trip of one clip, stitched into one figure.
 
 Body:  MediaPipe pose world landmarks -> SMPL-X (fit_shape, fit_body) -> reconstruct_body
-Hands: MediaPipe hand world landmarks -> MANO (fit_hand_shape, fit_hands) -> reconstruct_hand
+Hands: MediaPipe hand world landmarks, palm-size normalised -> MANO (fit_hand_shape,
+       fit_hands) -> reconstruct_hand
 
 MediaPipe reports each hand in its own metric frame (origin near the knuckles), with
 axes aligned to the pose's camera-aligned world frame, so a hand is stitched onto the
@@ -47,15 +48,14 @@ import matplotlib  # noqa: E402
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-import torch  # noqa: E402
 from matplotlib.collections import PolyCollection  # noqa: E402
-from scipy.spatial.transform import Rotation  # noqa: E402
 
 from view_round_trip import (  # noqa: E402
     ARM_BONES, CONTEXT_BONES, VideoSink, frame_errors, read_frames, round_trip_clip,
 )
+from kinetic_augment.body_model.assembly import attach_hands, body_rotations, pose_mesh  # noqa: E402
 from kinetic_augment.body_model.hand_converter import (  # noqa: E402
-    fit_hand_shape, fit_hands, landmark_errors_mm, reconstruct_hand,
+    fit_hand_shape, fit_hands, landmark_errors_mm, normalise_palm_size, reconstruct_hand,
 )
 from kinetic_augment.body_model.hand_model import (  # noqa: E402
     HAND_PARENTS, NUM_HAND_LANDMARKS, POSE_SLOT_LANDMARKS, SMPLX_FIRST_FINGER_JOINT, WRIST,
@@ -69,7 +69,6 @@ OUTPUT_DIR = Path("data/test_output/videos")
 VISIBILITY_THRESHOLD = 0.5  # matches measure_round_trip.py
 POSE_WRIST = {"left": 15, "right": 16}
 SMPLX_WRIST = {"left": 20, "right": 21}
-PALM = [0, 5, 9, 13, 17]  # wrist and knuckles: the rigid part that orients the hand
 HAND_BONES = [(int(p), c) for c, p in enumerate(HAND_PARENTS) if p >= 0]
 POSE_2D_BONES = [(11, 12), (11, 13), (13, 15), (12, 14), (14, 16), (11, 23), (12, 24), (23, 24)]
 INPUT, RECON = "#1f5fbf", "#2ca02c"
@@ -83,12 +82,17 @@ def load_observations(landmark_dir: Path, clip: str):
 
 
 def hand_round_trip(hands, model_dir="models"):
-    """MANO fit and reconstruction of each side; per-side fits, landmarks (T, 21, 3), errors."""
+    """
+    MANO fit and reconstruction of each side, on hands scaled to the track's median palm size;
+    per-side fits, landmarks (T, 21, 3), errors against the scaled hands.
+    """
     fits, recon, errors = {}, {}, {}
     for s, side in enumerate(SIDES):
         model = HandModel("mano", side, model_dir=model_dir)
         observed = hands.world[:, s].astype(np.float64)
         valid = np.isfinite(observed).all(axis=-1)
+        # MediaPipe's hand changes size frame to frame; the fit has one shape per track.
+        observed, _ = normalise_palm_size(observed, valid)
         betas = fit_hand_shape(observed, valid, model)
         fits[side] = fit_hands(observed, valid, model, betas)
         recon[side] = np.stack([reconstruct_hand(f, model) for f in fits[side]])
@@ -105,22 +109,6 @@ def anchored(hand, wrist):
     return hand - hand[WRIST] + wrist
 
 
-def _kabsch(source, target):
-    """Rotation R minimising |R source - target| over centred point sets."""
-    u, _, vt = np.linalg.svd((source - source.mean(0)).T @ (target - target.mean(0)))
-    d = np.sign(np.linalg.det(vt.T @ u.T))
-    return vt.T @ np.diag([1.0, 1.0, d]) @ u.T
-
-
-def _global_rotations(rotations, parents):
-    """(J, 3, 3) world rotation of every joint from (J, 3) local axis-angle rotations."""
-    local = Rotation.from_rotvec(rotations).as_matrix()
-    world = np.empty_like(local)
-    for j, parent in enumerate(parents):
-        world[j] = local[j] if parent < 0 else world[parent] @ local[j]
-    return world
-
-
 class BodyFigure:
     """Poses the full SMPL-X mesh from the body and hand round-trip parameters."""
 
@@ -134,38 +122,10 @@ class BodyFigure:
         """
         Vertices (V, 3) in MediaPipe world, model joints (J, 3), and which hands were posed.
         """
-        rotations = np.zeros((self.skeleton.num_joints, 3))
-        rotations[0] = body_fit.global_orient
-        rotations[1:22] = np.asarray(body_fit.body_pose).reshape(21, 3)
-        hand_pose, posed = {}, {}
-        for side in SIDES:
-            fit, target = hand_fits[side], hand_recon[side]
-            posed[side] = fit.status == "ok" and np.isfinite(target).all()
-            hand_pose[side] = fit.hand_pose if posed[side] else np.zeros(45)
-            if not posed[side]:
-                continue
-            # The SMPL-X hand at this finger pose with the wrist unrotated, against the
-            # MANO reconstruction: their palm alignment is the wrist's world rotation.
-            with torch.no_grad():
-                rest = self.hand_models[side].points(np.zeros(3), fit.hand_pose,
-                                                     np.zeros(10))[0].numpy()
-            world_wrist = _kabsch(rest[PALM], target[PALM])
-            wrist = SMPLX_WRIST[side]
-            parent = self.skeleton.parents[wrist]
-            parent_world = _global_rotations(rotations, self.skeleton.parents)[parent]
-            rotations[wrist] = Rotation.from_matrix(parent_world.T @ world_wrist).as_rotvec()
-
-        def tensor(x):
-            return torch.as_tensor(np.asarray(x, dtype=np.float32)).reshape(1, -1)
-
-        with torch.no_grad():
-            out = self.model(
-                betas=tensor(body_fit.betas), global_orient=tensor(rotations[0]),
-                body_pose=tensor(rotations[1:22]), transl=tensor(body_fit.transl),
-                left_hand_pose=tensor(hand_pose["left"]),
-                right_hand_pose=tensor(hand_pose["right"]),
-            )
-        return out.vertices[0].numpy(), out.joints[0].numpy(), posed
+        rotations, posed = attach_hands(body_rotations(body_fit), self.skeleton.parents,
+                                        hand_fits, hand_recon, self.hand_models)
+        mesh = pose_mesh(self.skeleton, rotations, body_fit.betas, body_fit.transl)
+        return mesh.vertices, mesh.joints, posed
 
 
 def _project(points, view):

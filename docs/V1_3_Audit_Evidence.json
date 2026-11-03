@@ -1,0 +1,1282 @@
+{
+  "audit_date": "2026-10-11",
+  "synthetic": {
+    "crossing_polygon": {
+      "expected_overlap": true,
+      "reported_near": false
+    },
+    "constant_45_degree_head_bias": {
+      "relative_gate_error_deg": {
+        "n": 30,
+        "median": 1.3144544442267811e-14,
+        "p95": 2.1617652086602176e-14,
+        "min": 8.588280392571407e-15,
+        "max": 2.2055592606502348e-14
+      }
+    },
+    "depth_sensitivity": [
+      {
+        "hand_metric_scale_factor": 1,
+        "head_metric_scale_factor": 1,
+        "assumed_fov_deg": 63,
+        "wrist_z_m": -0.09999999999999976,
+        "delta_from_baseline_m": 0.0
+      },
+      {
+        "hand_metric_scale_factor": 0.95,
+        "head_metric_scale_factor": 1,
+        "assumed_fov_deg": 63,
+        "wrist_z_m": -0.14500000000000035,
+        "delta_from_baseline_m": 0.04530176596999343
+      },
+      {
+        "hand_metric_scale_factor": 1.05,
+        "head_metric_scale_factor": 1,
+        "assumed_fov_deg": 63,
+        "wrist_z_m": -0.05500000000000016,
+        "delta_from_baseline_m": 0.04530176596999242
+      },
+      {
+        "hand_metric_scale_factor": 1,
+        "head_metric_scale_factor": 0.95,
+        "assumed_fov_deg": 63,
+        "wrist_z_m": -0.04999999999999971,
+        "delta_from_baseline_m": 0.050000000000000044
+      },
+      {
+        "hand_metric_scale_factor": 1,
+        "head_metric_scale_factor": 1.05,
+        "assumed_fov_deg": 63,
+        "wrist_z_m": -0.1499999999999998,
+        "delta_from_baseline_m": 0.050000000000000044
+      },
+      {
+        "hand_metric_scale_factor": 1,
+        "head_metric_scale_factor": 1,
+        "assumed_fov_deg": 45,
+        "wrist_z_m": -0.14794319737603434,
+        "delta_from_baseline_m": 0.047943197376034585
+      },
+      {
+        "hand_metric_scale_factor": 1,
+        "head_metric_scale_factor": 1,
+        "assumed_fov_deg": 80,
+        "wrist_z_m": -0.07303075408103255,
+        "delta_from_baseline_m": 0.02696924591896721
+      }
+    ]
+  },
+  "cache_snapshots": {
+    "data/test_output/_face_features.npz": {
+      "files": [
+        {
+          "file": "data/test_output/01986_face_features.npz",
+          "sha256": "175d0f067281da6f3358fd0aa1cfae33e082a5d0567cfd3647fbcf75abf86d94",
+          "frames": 83,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/test_output/01987_face_features.npz",
+          "sha256": "b31d1d8a4771a2b2b53a6b5c4fcd24095bd90dd241f31c249f3aaac83c6dd4c6",
+          "frames": 75,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 5,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/test_output/01988_face_features.npz",
+          "sha256": "ac8e04732466230c4030f0873d50a251e7004107e8f324539fc487e393cf91a2",
+          "frames": 144,
+          "invalid": 1,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 47,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/test_output/01991_face_features.npz",
+          "sha256": "43877af2008c5c326a19c8aadd1c453ea42249db02a5420ed0bee4e463e26657",
+          "frames": 49,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/test_output/01992_face_features.npz",
+          "sha256": "3821c5fb73c679773e804b1921e9cd6a4ceed071a0a1f7b4bcc19d044d4d5c9c",
+          "frames": 59,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 5,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        }
+      ],
+      "totals": {
+        "frames": 410,
+        "invalid": 1,
+        "invalid_with_geometry": 0,
+        "unreliable_with_geometry": 0,
+        "contact_frames": 0,
+        "near_frames": 57,
+        "corrected_hands": 0,
+        "reached_hands": 0,
+        "contact_hands": 0,
+        "contact_hands_unreached": 0,
+        "contact_hands_reached": 0
+      },
+      "all_point_distance_m": {
+        "n": 3745,
+        "median": 0.29317019663595545,
+        "p95": 0.44293160631648376,
+        "min": 0.12390409848657956,
+        "max": 0.6157336719719794
+      },
+      "corrected_wrist_residual_m": {
+        "n": 0
+      },
+      "wrist_shift_m": {
+        "n": 0
+      }
+    },
+    "data/test_output/_face_features_dc.npz": {
+      "files": [
+        {
+          "file": "data/test_output/01986_face_features_dc.npz",
+          "sha256": "18b56f6f3b4ca4706e9b5710970d492712874a428a10e90187ef595cd8a3b6a2",
+          "frames": 83,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 9,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 98,
+          "reached_hands": 11,
+          "contact_hands": 9,
+          "contact_hands_unreached": 9,
+          "contact_hands_reached": 0
+        },
+        {
+          "file": "data/test_output/01987_face_features_dc.npz",
+          "sha256": "887e4ad3ac4df4a84bafdc6ee006c322134baa99ee9c13ee168c00aaf143d42f",
+          "frames": 75,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 5,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 74,
+          "reached_hands": 8,
+          "contact_hands": 0,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 0
+        },
+        {
+          "file": "data/test_output/01988_face_features_dc.npz",
+          "sha256": "d6bd123686c92798d5d571182f0cbe7677de6bbcf0ab508939bda0a93e82eda1",
+          "frames": 144,
+          "invalid": 1,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 47,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 186,
+          "reached_hands": 52,
+          "contact_hands": 0,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 0
+        },
+        {
+          "file": "data/test_output/01991_face_features_dc.npz",
+          "sha256": "33250d618dd4b9fda6da8c545fade60e7264ed4df1d6f7e1d862d0e70fb6ea93",
+          "frames": 49,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 49,
+          "reached_hands": 24,
+          "contact_hands": 0,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 0
+        },
+        {
+          "file": "data/test_output/01992_face_features_dc.npz",
+          "sha256": "074d35e66b635ec24fa29e863191f4e2ad502dbe4916820bee7e5134bfc4b068",
+          "frames": 59,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 5,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 117,
+          "reached_hands": 36,
+          "contact_hands": 0,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 0
+        }
+      ],
+      "totals": {
+        "frames": 410,
+        "invalid": 1,
+        "invalid_with_geometry": 0,
+        "unreliable_with_geometry": 0,
+        "contact_frames": 9,
+        "near_frames": 57,
+        "corrected_hands": 524,
+        "reached_hands": 131,
+        "contact_hands": 9,
+        "contact_hands_unreached": 9,
+        "contact_hands_reached": 0
+      },
+      "all_point_distance_m": {
+        "n": 3745,
+        "median": 0.2360801885320037,
+        "p95": 0.37860685251161347,
+        "min": -0.07267005871007445,
+        "max": 0.5419201526019282
+      },
+      "corrected_wrist_residual_m": {
+        "n": 524,
+        "median": 0.054459108591503574,
+        "p95": 0.15540228745964393,
+        "min": 0.003921332766724354,
+        "max": 0.27449973762590113
+      },
+      "wrist_shift_m": {
+        "n": 524,
+        "median": 0.11761249439711663,
+        "p95": 0.24634495633515666,
+        "min": 0.012860334392098008,
+        "max": 0.4015501410922153
+      }
+    },
+    "data/round_trip_eval/_face_features.npz": {
+      "files": [
+        {
+          "file": "data/round_trip_eval/05631_face_features.npz",
+          "sha256": "d2599e2446fa800734b361826460b96f18e3d7a6bd02d642d2f86a96903e02b2",
+          "frames": 24,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 13,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/07389_face_features.npz",
+          "sha256": "94c884372cbeb3ece77377abd4ef55aac0ca4a4683a4d90a9cf3835b72e7e80a",
+          "frames": 82,
+          "invalid": 10,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/08917_face_features.npz",
+          "sha256": "1ba9ee99d00bb470565184a4f316273200deec3f72fc6a3f63156dca419d2ee5",
+          "frames": 32,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 18,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/08918_face_features.npz",
+          "sha256": "b1025b7071f817a4138dad85b8c91ad1205adf218e807d986b9526d994bd524b",
+          "frames": 30,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 12,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/08938_face_features.npz",
+          "sha256": "fd6320ef11ad51534965a111039729bbc9994d23c10a76dfdc047a38fc978b2b",
+          "frames": 56,
+          "invalid": 1,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/09849_face_features.npz",
+          "sha256": "8035918660921e76773db25653422884d36580edfdc2460e25fc33b3f01eaa20",
+          "frames": 81,
+          "invalid": 81,
+          "invalid_with_geometry": 61,
+          "unreliable_with_geometry": 61,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/12328_face_features.npz",
+          "sha256": "ff8c23bd61a211225d79f9bbb70a232203d22ff2a06cbb293604bc7a57b8d445",
+          "frames": 88,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 6,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/13630_face_features.npz",
+          "sha256": "ea2c6c278fada7dae258684cd7cf9ea8880eda98e0c4f195431ac8ccef5b0479",
+          "frames": 106,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 4,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/17083_face_features.npz",
+          "sha256": "1f3f622732caeae04ba528f4720cf18167e3388050315ebb4dcab507716ac71b",
+          "frames": 62,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/21871_face_features.npz",
+          "sha256": "c4df259543a3c5079c229997a73bc5ea3d9d3b7f4dbc4b6525245d23b7fc6120",
+          "frames": 79,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/21942_face_features.npz",
+          "sha256": "acc7cd3838b638e502bba2726286f0356d5cea4aca167b7182ba4af907bc47a1",
+          "frames": 68,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 3,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/28111_face_features.npz",
+          "sha256": "22cea890fe7df82e493db691ea2534be62470a428f6e1e833843b8e883c76c70",
+          "frames": 35,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 7,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/57641_face_features.npz",
+          "sha256": "652f196fa1779042a031ed4d4ade6ab10a8f789f088760051c080e30426d5e90",
+          "frames": 29,
+          "invalid": 2,
+          "invalid_with_geometry": 2,
+          "unreliable_with_geometry": 3,
+          "contact_frames": 0,
+          "near_frames": 8,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/57949_face_features.npz",
+          "sha256": "bbf876ba807aebea1a0c704ddf1b95a2416a295e3ae5d33764781e62e5382a8f",
+          "frames": 53,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 29,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/63229_face_features.npz",
+          "sha256": "311190b70d9f4cf51cf71805bb0a069c0ef9118c9c6b7d0082c78571b3acbda7",
+          "frames": 47,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 17,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/63665_face_features.npz",
+          "sha256": "6290c5f2c5465b094aeb88ec41fadff5e1add69a44dedaffcafa1d337ef5e72e",
+          "frames": 72,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 11,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/63669_face_features.npz",
+          "sha256": "574aee38954c74dbdbdba8cf6e67175ff94cebde4c7de9069a6177a2769339c4",
+          "frames": 94,
+          "invalid": 1,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 15,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/69257_face_features.npz",
+          "sha256": "f0720ba1475401db436b478e44c70449d411f5cec82a22932e9c3ca45fcec8d4",
+          "frames": 56,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/69364_face_features.npz",
+          "sha256": "4b52f64ec99dba335c7848047a58975d9dee1f7cc7cbd1cf7d11b2be848bfc2d",
+          "frames": 75,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        },
+        {
+          "file": "data/round_trip_eval/69411_face_features.npz",
+          "sha256": "642cf3430bf717ff20a27094790dfd155d3bc2478750d3c47dd6129446fc76b4",
+          "frames": 67,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 0,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ]
+        }
+      ],
+      "totals": {
+        "frames": 1236,
+        "invalid": 95,
+        "invalid_with_geometry": 63,
+        "unreliable_with_geometry": 64,
+        "contact_frames": 0,
+        "near_frames": 143,
+        "corrected_hands": 0,
+        "reached_hands": 0,
+        "contact_hands": 0,
+        "contact_hands_unreached": 0,
+        "contact_hands_reached": 0
+      },
+      "all_point_distance_m": {
+        "n": 7308,
+        "median": 0.3094325791868314,
+        "p95": 0.49885127305521926,
+        "min": 0.13678685762042558,
+        "max": 0.6214784416508748
+      },
+      "corrected_wrist_residual_m": {
+        "n": 0
+      },
+      "wrist_shift_m": {
+        "n": 0
+      }
+    },
+    "data/round_trip_eval/_face_features_dc.npz": {
+      "files": [
+        {
+          "file": "data/round_trip_eval/05631_face_features_dc.npz",
+          "sha256": "aa65905676730933efcc2a55997776ef25aefab614df568f527be0dfade3329d",
+          "frames": 24,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 13,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 17,
+          "reached_hands": 2,
+          "contact_hands": 0,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 0
+        },
+        {
+          "file": "data/round_trip_eval/08917_face_features_dc.npz",
+          "sha256": "a1767bc76c3078b50ab5e9061f2f7f4047e00d90c6d65005db4d887d3bd7239c",
+          "frames": 32,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 1,
+          "near_frames": 18,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 23,
+          "reached_hands": 22,
+          "contact_hands": 1,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 1
+        },
+        {
+          "file": "data/round_trip_eval/12328_face_features_dc.npz",
+          "sha256": "46827ac5fa639ea96e653e3b17107bbf555a67a9827c200dc132cb0a4eb2bcbf",
+          "frames": 88,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 0,
+          "near_frames": 6,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 176,
+          "reached_hands": 3,
+          "contact_hands": 0,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 0
+        },
+        {
+          "file": "data/round_trip_eval/57949_face_features_dc.npz",
+          "sha256": "1367ac20a94d23f1d2dec3372703911e80f66362d05803eaff99bfd1d0920e71",
+          "frames": 53,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 14,
+          "near_frames": 29,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 53,
+          "reached_hands": 30,
+          "contact_hands": 14,
+          "contact_hands_unreached": 1,
+          "contact_hands_reached": 13
+        },
+        {
+          "file": "data/round_trip_eval/63229_face_features_dc.npz",
+          "sha256": "4966bbe62d78fee909c443cd223bc9db55038cb1107142323ef4db3886dd021f",
+          "frames": 47,
+          "invalid": 0,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 1,
+          "near_frames": 17,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 16,
+          "reached_hands": 8,
+          "contact_hands": 1,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 1
+        },
+        {
+          "file": "data/round_trip_eval/63669_face_features_dc.npz",
+          "sha256": "5f178a216181c28cfd680e6f6f286f5a7d528349ae5aa0c9b9828b7b7a8e6dd5",
+          "frames": 94,
+          "invalid": 1,
+          "invalid_with_geometry": 0,
+          "unreliable_with_geometry": 0,
+          "contact_frames": 14,
+          "near_frames": 15,
+          "has_face_stream_local": false,
+          "has_timestamp": false,
+          "metadata_keys": [
+            "blendshape_names",
+            "hand_points",
+            "neck_modes",
+            "regions",
+            "subregions"
+          ],
+          "corrected_hands": 53,
+          "reached_hands": 20,
+          "contact_hands": 14,
+          "contact_hands_unreached": 0,
+          "contact_hands_reached": 14
+        }
+      ],
+      "totals": {
+        "frames": 338,
+        "invalid": 1,
+        "invalid_with_geometry": 0,
+        "unreliable_with_geometry": 0,
+        "contact_frames": 30,
+        "near_frames": 98,
+        "corrected_hands": 338,
+        "reached_hands": 85,
+        "contact_hands": 30,
+        "contact_hands_unreached": 1,
+        "contact_hands_reached": 29
+      },
+      "all_point_distance_m": {
+        "n": 2401,
+        "median": 0.1564708114807575,
+        "p95": 0.27575912685175163,
+        "min": -0.016739197505680897,
+        "max": 0.5620522862633801
+      },
+      "corrected_wrist_residual_m": {
+        "n": 338,
+        "median": 0.04546893717548697,
+        "p95": 0.09781444112623479,
+        "min": 0.0023230253395023306,
+        "max": 0.12957206145089967
+      },
+      "wrist_shift_m": {
+        "n": 338,
+        "median": 0.11970021523551949,
+        "p95": 0.2990439520612753,
+        "min": 0.04443722666286978,
+        "max": 0.44161493351386805
+      }
+    }
+  },
+  "fresh_runs": [
+    {
+      "clip": "01986",
+      "frames": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "depth_corrected": false,
+      "face_valid_frames": 8,
+      "invalid_with_geometry": 0,
+      "contact_hands": 0,
+      "corrected_hands": 0,
+      "reached_hands": 0,
+      "contact_hands_unreached": 0,
+      "residual_m": {
+        "n": 0
+      },
+      "head_camera_rotation_deg": {
+        "n": 8,
+        "median": 0.6562875574900295,
+        "p95": 0.6914138001085458,
+        "min": 0.6339065621794266,
+        "max": 0.6969085079023745
+      }
+    },
+    {
+      "clip": "01986",
+      "frames": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "depth_corrected": true,
+      "face_valid_frames": 8,
+      "invalid_with_geometry": 0,
+      "contact_hands": 8,
+      "corrected_hands": 16,
+      "reached_hands": 0,
+      "contact_hands_unreached": 8,
+      "residual_m": {
+        "n": 16,
+        "median": 0.09554381556974714,
+        "p95": 0.11339465362637109,
+        "min": 0.05046575207051523,
+        "max": 0.11839368728698102
+      },
+      "head_camera_rotation_deg": {
+        "n": 8,
+        "median": 1.1254589288514767,
+        "p95": 1.2426781163296337,
+        "min": 1.0376192034591938,
+        "max": 1.251943587974219
+      }
+    },
+    {
+      "clip": "01991",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "depth_corrected": false,
+      "face_valid_frames": 20,
+      "invalid_with_geometry": 0,
+      "contact_hands": 0,
+      "corrected_hands": 0,
+      "reached_hands": 0,
+      "contact_hands_unreached": 0,
+      "residual_m": {
+        "n": 0
+      },
+      "head_camera_rotation_deg": {
+        "n": 20,
+        "median": 0.822762357446186,
+        "p95": 0.8454324759883277,
+        "min": 0.7201274470271377,
+        "max": 0.8614384236640985
+      }
+    },
+    {
+      "clip": "01991",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "depth_corrected": true,
+      "face_valid_frames": 20,
+      "invalid_with_geometry": 0,
+      "contact_hands": 0,
+      "corrected_hands": 20,
+      "reached_hands": 19,
+      "contact_hands_unreached": 0,
+      "residual_m": {
+        "n": 20,
+        "median": 0.01342683006554066,
+        "p95": 0.026059052677726978,
+        "min": 0.006654817790647226,
+        "max": 0.1023597371350022
+      },
+      "head_camera_rotation_deg": {
+        "n": 20,
+        "median": 0.8122329218938162,
+        "p95": 0.834836640703368,
+        "min": 0.7665430878981386,
+        "max": 0.8383673928755441
+      }
+    },
+    {
+      "clip": "09849",
+      "frames": [
+        0,
+        20,
+        40,
+        60,
+        80
+      ],
+      "depth_corrected": false,
+      "face_valid_frames": 0,
+      "invalid_with_geometry": 3,
+      "contact_hands": 0,
+      "corrected_hands": 0,
+      "reached_hands": 0,
+      "contact_hands_unreached": 0,
+      "residual_m": {
+        "n": 0
+      },
+      "head_camera_rotation_deg": {
+        "n": 0
+      }
+    },
+    {
+      "clip": "09849",
+      "frames": [
+        0,
+        20,
+        40,
+        60,
+        80
+      ],
+      "depth_corrected": true,
+      "face_valid_frames": 0,
+      "invalid_with_geometry": 3,
+      "contact_hands": 0,
+      "corrected_hands": 0,
+      "reached_hands": 0,
+      "contact_hands_unreached": 0,
+      "residual_m": {
+        "n": 0
+      },
+      "head_camera_rotation_deg": {
+        "n": 0
+      }
+    },
+    {
+      "clip": "63665",
+      "frames": [
+        0,
+        6,
+        12,
+        19,
+        25,
+        32,
+        38,
+        45,
+        51,
+        58,
+        64,
+        71
+      ],
+      "depth_corrected": false,
+      "face_valid_frames": 12,
+      "invalid_with_geometry": 0,
+      "contact_hands": 0,
+      "corrected_hands": 0,
+      "reached_hands": 0,
+      "contact_hands_unreached": 0,
+      "residual_m": {
+        "n": 0
+      },
+      "head_camera_rotation_deg": {
+        "n": 12,
+        "median": 0.8251934034178297,
+        "p95": 0.8533048177849945,
+        "min": 0.5418683456115934,
+        "max": 0.8658585983871362
+      }
+    },
+    {
+      "clip": "63665",
+      "frames": [
+        0,
+        6,
+        12,
+        19,
+        25,
+        32,
+        38,
+        45,
+        51,
+        58,
+        64,
+        71
+      ],
+      "depth_corrected": true,
+      "face_valid_frames": 12,
+      "invalid_with_geometry": 0,
+      "contact_hands": 1,
+      "corrected_hands": 7,
+      "reached_hands": 2,
+      "contact_hands_unreached": 1,
+      "residual_m": {
+        "n": 7,
+        "median": 0.036457097269760014,
+        "p95": 0.07180254057106099,
+        "min": 0.005006077144049851,
+        "max": 0.07353751261579726
+      },
+      "head_camera_rotation_deg": {
+        "n": 12,
+        "median": 0.8277999423816479,
+        "p95": 1.161430306026346,
+        "min": 0.6032504244389584,
+        "max": 1.1813978786993475
+      }
+    }
+  ],
+  "provenance": {
+    "git_head": "2205f16b65ec4c53596420a9bb9875840b4c213d",
+    "package_import": "/Users/bemnetbeshah/Workspace/cv-research/KineticAugment/.claude/worktrees/face-v1.3/src/kinetic_augment/__init__.py",
+    "versions": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "torch": "2.14.1",
+      "smplx": "0.1.28",
+      "mediapipe": "0.10.21",
+      "pytest": "9.1.1"
+    },
+    "sha256": {
+      "/Users/bemnetbeshah/Workspace/cv-research/KineticAugment/.claude/worktrees/face-v1.3/scripts/audit_face_training.py": "b526c3da6946ddf92eb29f529c9600c05653cad3bdaf3d124ff8981cabe9429b",
+      "src/kinetic_augment/body_model/kinematics.py": "d5d9f0d3f39869fc29a15802a9950c6ba4573cfa2984da8f996a3131aa64844b",
+      "src/kinetic_augment/body_model/joint_mapping.py": "759c4691f6b668353288b60d255ce6f8e2732a35c6321d84dfb77d6eef80c054",
+      "src/kinetic_augment/body_model/head_converter.py": "d3fccb59dddd6e30c5a7b78818cddd8ca440e12ea69d8099302ef5bb83817b85",
+      "src/kinetic_augment/body_model/alignment.py": "d820527973969323668b52131550c4d7f14257206568ebc4bfe66cdbff4284c3",
+      "src/kinetic_augment/body_model/skeleton.py": "39720bed2db168c161e278522e54b35160ffae7166a6f2a80051f8570bc6270c",
+      "src/kinetic_augment/body_model/face_observations.py": "d22277986b577f25ff78f5d63e0b7e92765e1f0991e2667743e7175959b982a4",
+      "src/kinetic_augment/body_model/face_pipeline.py": "f79cb89b38636fc50c69360833abfaa2a237e3b1c4c1b437d3936614769b5ab8",
+      "src/kinetic_augment/body_model/mp_to_smplx.py": "bb075cd12262f80d20eccf29ba5c5daa9282a8352e46d7ab793a84f44f55336b",
+      "src/kinetic_augment/body_model/smplx_to_mp.py": "464224f73e7ec78dbdce3751c59bc8a8f3e6e0eb5e188503cba22f4f66f174cb",
+      "src/kinetic_augment/body_model/converter.py": "f72378eb59852226dbf4590ffbd4cc068a0f4d906c0388a2584470e39a595a63",
+      "src/kinetic_augment/body_model/__init__.py": "4083e14ad3f5b6582a672c9d8f4cb0356386884dd62e32e317eb74dd124ead95",
+      "src/kinetic_augment/body_model/face_regions.py": "2ccc2e557058b1dec66677846f73ff02aa4b3afb756701befeb7bc8d4a9cde71",
+      "src/kinetic_augment/body_model/image_proximity.py": "e220fc43ae680dbe9de8dd5f87a1e227b40d25a5089cb34c07d3fbe576655848",
+      "src/kinetic_augment/body_model/swing_ik.py": "21a532e1e59fda794c6383c38922168dc731ae5f893f6c5578e06758f86249fa",
+      "src/kinetic_augment/body_model/face_correspondence.py": "a1ebcbcec4c163ea872b8e2156b96fe9787e6d5fd6c6a0a1aab8c7ecadddfe33",
+      "src/kinetic_augment/body_model/assembly.py": "b99c9a7a7d66a619b0ed0c9da0eb2ced1a9b46e0789fa4dbde1f38fb2417303b",
+      "src/kinetic_augment/body_model/hand_observations.py": "5753746e9c7f03ab9565464c10ecdc1f79a3c261cfdbf0a7782d103f93bdc4d9",
+      "src/kinetic_augment/body_model/shape.py": "a4a41cb4b74bcf083170a199c944d4e412a81c86acba23fa167e6e1337a9d563",
+      "src/kinetic_augment/body_model/hand_depth.py": "a52b251b5e2b73bd55f6f73458f4c12fb94c967328ee1d7b80bb1eef058adc61",
+      "src/kinetic_augment/body_model/face_metrics.py": "b364c04137cea436bc09ba091ada918bc95233029f3feeb727c0e5db2f7a0ab1",
+      "src/kinetic_augment/body_model/hand_face_geometry.py": "412571392546e70c8b900f56cf81b0f0c45447055908c7e0f4493f41910fd195",
+      "src/kinetic_augment/body_model/smplx_wrapper.py": "0e46bd0093171d155c1e93c96c00348f182eb24e9e93bfd87faed3ea8ce38da2",
+      "src/kinetic_augment/body_model/hand_model.py": "cfa154118c880b9c5ca512d1481a0e5b43333d5327e37da6cd219885a8fbd200",
+      "src/kinetic_augment/body_model/hand_converter.py": "54ae712afcbbef4ea809994d09c9a59c357e0fe4cc84e2afdf2e94a432ef9e61",
+      "data/test_output/01986_face.npz": "be1fbbf4f0d0e12941b8ac1a55335abe388b85612e63189b07c989ce6ed08b06",
+      "data/test_output/01986_hands.npz": "4337a205b4277db95ae99aa2684ced7713de3dea2341b174996e032787a6b258",
+      "data/test_output/01991_face.npz": "ef33cf933b1f5d038068426dda78693967d2f89228af1f8ba3913bd47423c7ed",
+      "data/test_output/01991_hands.npz": "dff8a85b695d91b5e5e305dab4e75941713227e7a1f883c3e8b317d75949a25b",
+      "data/round_trip_eval/09849_face.npz": "a42a99852c8f2f82b30567a8a49ce4432c8c46a4c1dd29951e96a748e3dce5ca",
+      "data/round_trip_eval/09849_hands.npz": "3aeeeaad397b5076db69317f311cb620d94a1542619e019b1dabd108e0e7ba35",
+      "data/round_trip_eval/63665_face.npz": "c4cef35e5babe94aee6ca3e569263bcb3fdf22d98286b59e8ab2cee3c7fb6f8f",
+      "data/round_trip_eval/63665_hands.npz": "d64dab27d452f4ab8d7d2a469ae94912ce9b679d544dc6a294a6e7692a81d9b7"
+    }
+  },
+  "test_runs": [
+    {
+      "scope": "full suite, sandboxed, PYTHONPATH=src",
+      "passed": 252,
+      "xfailed": 1,
+      "failed": 3,
+      "errors": 3,
+      "seconds": 85.53,
+      "reason_for_six_unsuccessful_checks": "MediaPipe could not create NSOpenGLPixelFormat"
+    },
+    {
+      "scope": "six extraction checks rerun outside sandbox, PYTHONPATH=src",
+      "passed": 6,
+      "seconds": 17.83
+    }
+  ],
+  "historical_report_sha256": "e537fe8f1b3e4e294477c1b550ff5c27cd4b659e4d415991c6bffcaa3b502499"
+}

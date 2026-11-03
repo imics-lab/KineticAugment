@@ -5,6 +5,8 @@
 *.pth
 *.onnx
 *.h5
+*.task
+*.obj
 
 # Keep the directory structure
 !.gitignore

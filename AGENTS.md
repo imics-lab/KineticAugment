@@ -35,6 +35,8 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`data/wlasl/index.md`](data/wlasl/index.md)
 - [`data/test_output/index.md`](data/test_output/index.md)
 - [`data/test_output/videos/index.md`](data/test_output/videos/index.md)
+- [`demo/index.md`](demo/index.md)
+- [`demo/round_trip/index.md`](demo/round_trip/index.md)
 - [`docs/index.md`](docs/index.md)
 - [`docs/augmentation-evidence/index.md`](docs/augmentation-evidence/index.md)
 - [`docs/augmentation-evidence/reports/index.md`](docs/augmentation-evidence/reports/index.md)

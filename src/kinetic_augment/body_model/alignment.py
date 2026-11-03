@@ -9,13 +9,16 @@ preserve, so measuring round-trip error without removing them would report
 nuisance rather than loss.
 """
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 
 
 def similarity_transform(
-    source: np.ndarray, target: np.ndarray, allow_scale: bool = True
+    source: np.ndarray,
+    target: np.ndarray,
+    allow_scale: bool = True,
+    weights: Optional[np.ndarray] = None,
 ) -> Tuple[float, np.ndarray, np.ndarray]:
     """
     Least-squares similarity carrying `source` onto `target`.
@@ -32,6 +35,8 @@ def similarity_transform(
             translation are fitted. Use this whenever both spaces are already
             metric: a free scale absorbs systematic correspondence error into a
             parameter that looks like a fit, hiding it from the residual.
+        weights: (N,) non-negative per-point weights; None weights all points equally. Points
+            with zero weight do not influence the fit.
 
     Returns:
         (scale, rotation (3, 3), translation (3,)).
@@ -46,12 +51,22 @@ def similarity_transform(
     if source.shape[0] < 3:
         raise ValueError(f"need at least 3 points, got {source.shape[0]}")
 
-    src_mean = source.mean(axis=0)
-    tgt_mean = target.mean(axis=0)
+    if weights is None:
+        w = np.full(source.shape[0], 1.0 / source.shape[0])
+    else:
+        w = np.asarray(weights, dtype=np.float64).ravel()
+        if w.shape != (source.shape[0],) or (w < 0).any() or not np.isfinite(w).all():
+            raise ValueError("weights must be (N,), finite and non-negative")
+        if (w > 0).sum() < 3:
+            raise ValueError("need at least 3 positively weighted points")
+        w = w / w.sum()
+
+    src_mean = w @ source
+    tgt_mean = w @ target
     src_centred = source - src_mean
     tgt_centred = target - tgt_mean
 
-    covariance = tgt_centred.T @ src_centred / source.shape[0]
+    covariance = (tgt_centred * w[:, None]).T @ src_centred
     u, singular_values, vt = np.linalg.svd(covariance)
 
     # Flip the least-significant axis if the raw solution is a reflection.
@@ -64,7 +79,7 @@ def similarity_transform(
     rotation = u @ correction @ vt
 
     if allow_scale:
-        source_variance = (src_centred ** 2).sum() / source.shape[0]
+        source_variance = float(w @ (src_centred ** 2).sum(axis=1))
         scale = 1.0 if source_variance == 0 else singular_values.sum() / source_variance
     else:
         scale = 1.0

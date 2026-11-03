@@ -31,6 +31,10 @@ residual kept beside the fit, so that MediaPipe's drift of hand size need not be
 absorbed by the shape. When the shape is fitted with it, the track's scales are
 held to a geometric mean of 1, so the shape keeps the hand's size and the scales
 only its drift.
+
+The pipeline's callers (`face_pipeline._fit_hands`, `scripts/view_body_hand_round_trip.py`)
+fit tracks that `normalise_palm_size` has brought to one palm size, since the detector's size
+changes would otherwise be absorbed as finger curl.
 """
 
 from dataclasses import dataclass
@@ -50,6 +54,7 @@ from kinetic_augment.body_model.hand_model import (
 from kinetic_augment.body_model.swing_ik import solve_swing_ik
 
 PALM_LANDMARKS = (1, 5, 9, 13, 17)
+PALM_SIZE_LANDMARKS = (5, 9, 13, 17)  # the four finger MCPs; palm size is their mean wrist distance
 
 # (driven node, child node, observed parent, observed child): each finger joint's
 # rotation aims the bone to its child. Bones leaving the wrist form the palm,
@@ -172,6 +177,43 @@ def _prepared(observed, valid):
     """float64 observations, and validity that also excludes non-finite landmarks."""
     observed = np.asarray(observed, dtype=np.float64)
     return observed, np.asarray(valid, dtype=bool) & np.isfinite(observed).all(axis=-1)
+
+
+def palm_sizes(observed) -> np.ndarray:
+    """(T,) palm size per frame (mean wrist -> MCP distance, metres); NaN where any is missing."""
+    observed = np.asarray(observed, dtype=np.float64)
+    reach = observed[:, list(PALM_SIZE_LANDMARKS)] - observed[:, WRIST:WRIST + 1]
+    return np.linalg.norm(reach, axis=-1).mean(axis=-1)
+
+
+def normalise_palm_size(observed, valid) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Each frame scaled about its wrist so its palm size is the track's median palm size.
+
+    MediaPipe's world hand changes metric size from frame to frame with the handshape, while
+    the hand is fitted with one shape per track, so the pose fit would bend the fingers to
+    absorb the size gap. The palm is rigid, so its size should be constant: scaling every
+    frame to the median palm size removes the gap without touching the finger directions.
+
+    Args:
+        observed: (T, 21, 3) world landmarks of one hand, metres.
+        valid: (T, 21) bool; invalid or non-finite landmarks do not count.
+
+    Returns (scaled, scale): a (T, 21, 3) copy and the (T,) factor each frame was scaled by
+    (median / its palm size). A frame whose wrist or any of PALM_SIZE_LANDMARKS is invalid or
+    non-finite, or whose palm has no size, has scale NaN and is returned unchanged; with no
+    measurable frame the track comes back unchanged and every scale is NaN.
+    """
+    observed, valid = _prepared(observed, valid)
+    sizes = palm_sizes(observed)
+    measurable = valid[:, [WRIST, *PALM_SIZE_LANDMARKS]].all(axis=1) & (sizes > 0)
+    scale = np.full(len(observed), np.nan)
+    scaled = observed.copy()
+    if measurable.any():
+        scale[measurable] = np.median(sizes[measurable]) / sizes[measurable]
+        wrist = observed[measurable, WRIST:WRIST + 1]
+        scaled[measurable] = wrist + (observed[measurable] - wrist) * scale[measurable, None, None]
+    return scaled, scale
 
 
 def _unfitted(model, status: str) -> HandFit:

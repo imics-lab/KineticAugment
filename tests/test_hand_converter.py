@@ -27,7 +27,9 @@ from kinetic_augment.body_model.hand_converter import (  # noqa: E402
     landmark_errors_mm,
     load_hand_fits,
     node_rotations,
+    normalise_palm_size,
     palm_rotation,
+    palm_sizes,
     plausible_radius,
     reconstruct_hand,
     save_hand_fits,
@@ -280,6 +282,108 @@ def test_a_track_with_gaps_round_trips_and_loads_into_shared_columns(tmp_path):
         bases = [getattr(f, name).base for f in loaded]
         assert bases[0] is not None and bases[0].shape[0] == len(loaded), name
         assert all(base is bases[0] for base in bases), name
+
+
+CURL_TRIPLES = [
+    (a, b, c)
+    for finger in ((1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16), (17, 18, 19, 20))
+    for a, b, c in zip((0,) + finger[:-1], finger, finger[1:])
+]
+
+
+def curl_error_deg(fitted, observed):
+    """Mean over the 15 finger joints of |bend angle (fitted) - bend angle (observed)|, degrees."""
+
+    def bends(points):
+        a, b, c = (points[list(i)] for i in zip(*CURL_TRIPLES))
+        u, v = b - a, c - b
+        cos = (u * v).sum(-1) / (np.linalg.norm(u, axis=-1) * np.linalg.norm(v, axis=-1))
+        return np.degrees(np.arccos(np.clip(cos, -1.0, 1.0)))
+
+    return np.abs(bends(fitted) - bends(observed)).mean()
+
+
+class TestNormalisePalmSize:
+    def test_every_frame_gets_the_median_palm_size_about_its_wrist(self):
+        factors = np.array([1.0, 0.75, 1.2, 1.0])
+        reference = posed_synthetic(3)
+        track = reference[0] + (reference - reference[0]) * factors[:, None, None]
+        track = track + np.arange(4)[:, None, None] * 0.1  # each frame has its own wrist
+        sizes = palm_sizes(track)
+        np.testing.assert_allclose(sizes, factors * palm_sizes(reference[None])[0], atol=1e-12)
+        frozen = track.copy()
+
+        scaled, scale = normalise_palm_size(track, np.ones((4, 21), dtype=bool))
+
+        np.testing.assert_array_equal(track, frozen)
+        median = np.median(sizes)
+        np.testing.assert_allclose(scale, median / sizes, atol=1e-12)
+        np.testing.assert_allclose(palm_sizes(scaled), median, atol=1e-12)
+        np.testing.assert_array_equal(scaled[:, 0], track[:, 0])
+        common = median / palm_sizes(reference[None])[0]
+        expected = (reference - reference[0]) * common
+        for t in range(4):
+            np.testing.assert_allclose(scaled[t] - scaled[t, 0], expected, atol=1e-12)
+
+    def test_unmeasurable_frames_are_unchanged_and_out_of_the_median(self):
+        reference = posed_synthetic(4)
+        track = np.stack([reference, reference[0] + (reference - reference[0]) * 0.8,
+                          reference[0] + (reference - reference[0]) * 1.3])
+        valid = np.ones((3, 21), dtype=bool)
+        valid[2, 9] = False
+        scaled, scale = normalise_palm_size(track, valid)
+        assert np.isnan(scale[2])
+        np.testing.assert_array_equal(scaled[2], track[2])
+        sizes = palm_sizes(track)
+        np.testing.assert_allclose(scale[:2], np.mean(sizes[:2]) / sizes[:2], atol=1e-12)
+        # A non-finite landmark counts as invalid, whatever `valid` says.
+        broken = track.copy()
+        broken[1, 17] = np.nan
+        scaled, scale = normalise_palm_size(broken, np.ones((3, 21), dtype=bool))
+        assert np.isnan(scale[1])
+        np.testing.assert_array_equal(scaled[1], broken[1])
+
+    def test_a_track_with_no_measurable_palm_comes_back_unchanged(self):
+        track = np.stack([posed_synthetic(5), posed_synthetic(6)])
+        valid = np.ones((2, 21), dtype=bool)
+        valid[:, 0] = False
+        scaled, scale = normalise_palm_size(track, valid)
+        np.testing.assert_array_equal(scaled, track)
+        assert np.isnan(scale).all()
+        assert scaled is not track
+
+
+# Measured on this track: 40.3 deg raw against 0.38 deg normalised. Half that gap leaves wide
+# room for optimiser noise while still failing if the normalisation stops working.
+MARGIN_DEG = 20.0
+
+
+@requires_mano
+def test_normalising_palm_size_stops_the_fit_curling_fingers_to_absorb_a_size_gap():
+    """
+    MediaPipe's world hand changes metric size with the handshape, but one shape is fitted
+    per track, so the pose fit bends the fingers to close the gap. Every other frame of a
+    near-open MANO hand is shrunk 0.75x about the wrist; its true curl is the unshrunk hand's.
+    """
+    model = hand("mano", "right")
+    truth = synthetic_track(model, 6, seed=60, spread=0.05)
+    observed = truth.copy()
+    observed[1::2] = truth[1::2, :1] + (truth[1::2] - truth[1::2, :1]) * 0.75
+    valid = all_valid(observed)
+
+    def mean_curl_error(track):
+        betas = fit_hand_shape(track, valid, model)
+        fits = fit_hands(track, valid, model, betas)
+        assert [f.status for f in fits] == ["ok"] * len(fits)
+        rebuilt = rebuild(fits, model)
+        return np.mean([curl_error_deg(r, t) for r, t in zip(rebuilt, truth)])
+
+    scaled, _ = normalise_palm_size(observed, valid)
+    with_normalising = mean_curl_error(scaled)
+    without = mean_curl_error(observed)
+    print(f"curl error: normalised {with_normalising:.2f} deg, raw {without:.2f} deg")
+    assert with_normalising < 5.0
+    assert without > with_normalising + MARGIN_DEG
 
 
 def test_plausible_radius_is_the_chi_square_quantile():

@@ -1,7 +1,8 @@
 # V1.3 design: the face — head pose, jaw, hand-to-face geometry, and the face stream
 
-**Date:** 2026-10-07. **Branch:** `feat/kinematics-and-ik`. **Status:** design approved, not yet
-implemented. **Earlier results:** [V1 findings](V1_Findings.md) (body),
+**Date:** 2026-10-07. **Branch:** `feat/kinematics-and-ik`.
+**Status:** phase A implemented; gate results in [V1.3 findings](V1_3_Findings.md).
+**Earlier results:** [V1 findings](V1_Findings.md) (body),
 [V1.2 findings](V1_2_Findings.md) (hands), [Week 2 findings](Week_2_Findings.md) (unseen clips).
 
 V1 and V1.2 fit the arms and hands and copy MediaPipe's 468 face landmarks through untouched

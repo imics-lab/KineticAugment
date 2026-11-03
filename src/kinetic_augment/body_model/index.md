@@ -2,7 +2,12 @@
 
 - `__init__.py` — Provides lazy accessors for SMPL-X and MediaPipe conversion classes.
 - `alignment.py` — Fits the similarity between two coordinate spaces for comparing poses.
+- `assembly.py` — Poses one SMPL-X body from the body, hand and head fits.
 - `converter.py` — Converts world body landmarks to SMPL-X parameters and back.
+- `face_correspondence.py` — MediaPipe face-mesh groups and their positions on the SMPL-X surface, via the FLAME embedding.
+- `face_observations.py` — Holds per-clip MediaPipe FaceLandmarker observations (478 landmarks, 52 blendshapes, head matrix) and their `_face.npz` file format.
+- `face_stream.py` — Reversibly attaches observed 478-point face streams to posed head frames using rigid-point similarity alignment.
+- `face_features.py` — Validates aligned hand and face inputs and reads/writes versioned feature archives with provenance metadata.
 - `joint_mapping.py` — Defines SMPL-X/MediaPipe joint indices, chains, and angle limits.
 - `kinematics.py` — Composes local joint rotations down the chain into world joint positions.
 - `shape.py` — Fits one plausible SMPL-X body shape per clip by minimising the round-trip error.
@@ -11,7 +16,15 @@
 - `smplx_to_mp.py` — Converts SMPL-X pose parameters back to MediaPipe landmarks.
 - `swing_ik.py` — Solves SMPL-X joint rotations analytically from observed bone directions.
 - `smplx_wrapper.py` — Loads SMPL-X assets and runs model inference and parameter handling.
+- `face_regions.py` — SMPL-X head and neck surface labelled with ASL-LEX location regions and subregions from landmark, normal and skinning rules (V1.3).
 - `hand_model.py` — Evaluates MediaPipe's 21 hand landmarks on MANO or SMPL-X (joints plus fingertip vertices).
 - `hand_converter.py` — Fits MANO / SMPL-X hand parameters to MediaPipe hand landmarks and rebuilds them from parameters alone; optionally keeps a per-frame scale residual for MediaPipe's size drift.
+- `hand_face_geometry.py` — Signed distances from each hand's wrist, fingertips and palm centre to the head and neck surface, with region labels and contact (V1.3).
+- `head_converter.py` — Fits the SMPL-X neck, head and jaw to MediaPipe face landmarks.
+- `image_proximity.py` — Projects the fitted head into the image and measures hand points against it in 2-D: overlap, distance at head depth, region, near; Neck is excluded on purpose, so these describe the face and head (V1.3).
+- `hand_depth.py` — Estimates each wrist's 3-D position relative to the nose from the image (pinhole depth from the head and hand scales) so the body can be re-fitted (V1.3).
+- `face_pipeline.py` — Runs one clip end to end (body, hands, head, hand-to-face geometry) and writes the per-frame `_face_features.npz` (V1.3).
+- `face_metrics.py` — Gate metrics that need more than a mean: fitted head rotation vs FaceLandmarker's head pose, and the correspondence floor (V1.3).
+- `hand_converter.py` — Fits MANO / SMPL-X hand parameters to MediaPipe hand landmarks and rebuilds them from parameters alone.
 - `hand_observations.py` — Holds per-clip MediaPipe hand observations and assigns each detected hand its anatomical side.
 - `index.md` — Index of body-model mappings, converters, and wrapper code.

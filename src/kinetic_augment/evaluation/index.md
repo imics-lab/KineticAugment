@@ -5,5 +5,5 @@
 - `benchmark/` — Experiment definitions, benchmark execution, and report generation.
 - `datasets/` — Base evaluation dataset interface and WLASL loader.
 - `metrics/` — Motion quality, temporal coherence, diversity, and constraint metrics.
-- `models/` — SLR classifier interfaces, LSTM/GRU models, and trainer.
+- `models/` — SLR classifier interfaces, LSTM/GRU and masked face-stream models, and trainer.
 - `index.md` — Index of evaluation APIs and subpackages.

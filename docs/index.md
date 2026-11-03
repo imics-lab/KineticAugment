@@ -22,6 +22,12 @@
 - `V1_2_Implementation_Evidence.md` — Measurements taken while implementing V1.2 (synthetic gates, batch coupling, extraction determinism), kept with their provenance.
 - `V1_3_Face_Design.md` — Approved V1.3 design: SMPL-X neck, head and jaw from FaceLandmarker, signed hand-to-face distances with ASL-LEX regions, and the face stream.
 - `V1_3_Implementation_Plan.md` — Task-by-task plan for V1.3: face correspondence, head/neck/jaw fit, hand-to-face geometry, gate, face stream.
+- `V1_3_Findings.md` — Phase-A gate results for the V1.3 face fit: head pose, jaw, ear placement, hand-to-head distances, the depth-gap diagnostic, and the F1–F6 verdicts (2026-10-07).
+- `V1_3_Training_Data_Audit.md` — Independent audit of face features for landmark-based recognition, including tests, geometry risks, research comparisons and proposed training gates (2026-10-11).
+- `V1_3_Audit_Evidence.json` — Cache fingerprints, synthetic counterexamples and fresh fitting measurements supporting the training-data audit.
+- `V1_3_Face_Integration_Plan.md` — Implementation contract for reversible face attachment, quality masks, synchronized training samples and a masked facial classifier.
+- `V1_3_Face_Integration_Results.md` — Real-cache coverage, geometric and masking regressions, reproduction commands, and recognition-data limitations for the V1.3 integration.
+- `V1_3_Face_Integration_Evidence.json` — Compact machine-readable aggregate and per-clip evidence from the real-cache validation.
 - `Week_2_Findings.md` — Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07).
 - `Hand_Pipeline_Variants.md` — The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29).
 - `media/` — Images and placeholder assets referenced by documentation.

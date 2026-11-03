@@ -14,6 +14,7 @@ from kinetic_augment.evaluation.models.lstm_classifier import (
     LSTMClassifier,
     GRUClassifier,
 )
+from kinetic_augment.evaluation.models.face_classifier import FaceStreamClassifier
 
 from kinetic_augment.evaluation.models.trainer import SLRTrainer
 
@@ -21,6 +22,7 @@ __all__ = [
     'BaseSLRClassifier',
     'LSTMClassifier',
     'GRUClassifier',
+    'FaceStreamClassifier',
     'SLRTrainer',
     'check_torch_available',
     'TORCH_AVAILABLE',

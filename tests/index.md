@@ -2,16 +2,35 @@
 
 - `__init__.py` — Marks the automated test directory as a Python package.
 - `test_alignment.py` — Tests least-squares similarity alignment between coordinate spaces.
+- `test_assembly.py` — Tests assembling one SMPL-X pose from the body, hand and head fits: palm alignment, layout, mesh joints.
 - `test_body_model.py` — Tests joint mappings, SMPL-X wrapper, and both landmark converters.
 - `test_converter.py` — Tests the V1 converter contract and its round trip through SMPL-X.
 - `test_extract_world_landmarks.py` — Tests that a clip's extracted landmarks do not depend on the clip processed before it.
+- `face_assets.py` — Skip marks and paths for the licensed FLAME assets and the MediaPipe face assets.
+- `test_face_correspondence.py` — Tests the MediaPipe → SMPL-X face correspondence, including the F1 eye-corner and nose-tip check.
+- `test_face_observations.py` — Tests FaceClip pixel conversion, file round trip and schema check.
+- `test_face_stream.py` — Tests reversible similarity attachment of observed full-face landmarks to head-local coordinates.
+- `test_face_features.py` — Tests feature archive schema, stream preflight validation, geometry masks, and crossing hand outlines.
+- `test_face_training_dataset.py` — Tests face feature training streams, synchronized temporal operations, WLASL split mapping, and mixed batches with unnamed no-face blendshape channels.
+- `test_face_classifier.py` — Tests masked temporal encoding, trainer integration, and synthetic facial signal learning.
+- `test_face_integration_validation.py` — Tests that attachment on/off comparisons reject validity or finite-value mask loss.
 - `test_kinematics.py` — Tests skeleton sources and forward kinematics against the real SMPL-X model.
 - `test_shape.py` — Tests the per-clip shape fit against the converter's own round-trip error and SMPL-X's shape prior.
+- `test_smoothing.py` — Tests the gap-aware landmark smoothing filters: gaps stay NaN and do not leak, constants pass through, noise drops, One Euro is causal.
 - `test_swing_ik.py` — Tests analytic swing inverse kinematics against known synthetic ground truth.
 - `hand_assets.py` — Shared model-asset paths, skip marks and a cached hand-model loader for the hand tests.
 - `test_hand_model.py` — Tests the 21-point hand operator against the full MANO/SMPL-X forward pass and hand anatomy.
 - `test_hand_converter.py` — Tests the hand fit: analytic start, real-model refinement, decoder, serialisation, shape and per-frame scale.
 - `test_tier1.py` — Tests the Tier 1 augmentations: sampling ranges, transforms, re-timing, the camera fit and the hands-in-frame limit.
+- `test_head_converter.py` — Tests head occlusion and robust head rotation.
+- `test_face_regions.py` — Tests vertex normals, full labelling of the head surface, and anchor points landing in their ASL-LEX regions.
+- `test_hand_face_geometry.py` — Tests exact closest-point-on-triangle, signed distance (forehead), and unposed-hand NaN and contact rules.
+- `test_image_proximity.py` — Tests image-space hand-to-head overlap, distance, region choice (front-most, back-facing ignored), hand point order and the head projection's scale and rotation.
+- `test_hand_depth.py` — Tests focal length, back-projection, hand scale, wrist targets on a synthetic perspective scene, and the depth-corrected pipeline on 20 pilot frames.
+- `test_face_pipeline.py` — Tests hand-near-face and the clip pipeline on 20 frames of a real pilot clip (valid head fits, residual, feature-file shapes).
+- `test_hand_converter.py` — Tests the hand fit: analytic start, real-model refinement, decoder, serialisation and shape.
 - `test_hand_observations.py` — Tests the left/right assignment and the hand clip file format.
 - `test_extract_hand_landmarks.py` — Runs the hand extractor on pilot clips: clip-order independence, units, sides.
+- `test_extract_face_landmarks.py` — Integration test: real FaceLandmarker on a pilot clip (face found, frames align with hands, head-matrix layout).
+- `test_face_metrics.py` — Tests the gate metrics: matrix rotation scale removal, head-pose agreement, correspondence floor.
 - `index.md` — Index of automated test files.
