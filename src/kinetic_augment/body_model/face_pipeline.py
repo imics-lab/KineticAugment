@@ -3,7 +3,8 @@ One clip end to end: body, hands and head fitted per frame, assembled into one S
 and hand-to-face geometry measured on it (V1.3 design §3).
 
 The body is fitted to the pose landmarks stored in the hand clip, so every stream shares the
-same decoded frames. Hands are fitted with MANO and attached as the V1.2 viewer attaches them.
+same decoded frames. Hands are scaled to one palm size per track, fitted with MANO and attached
+as the V1.2 viewer attaches them.
 """
 
 from dataclasses import dataclass, field, replace
@@ -30,7 +31,7 @@ from .face_correspondence import (
 from .face_regions import build_head_surface
 from .face_stream import attach_face
 from .face_features import save_face_features as _save_face_features, validate_face_inputs
-from .hand_converter import fit_hand_shape, fit_hands, reconstruct_hand
+from .hand_converter import fit_hand_shape, fit_hands, normalise_palm_size, reconstruct_hand
 from .hand_depth import DEFAULT_VERTICAL_FOV_DEG, REACH_TOLERANCE, wrist_targets
 from .hand_face_geometry import HAND_POINTS, HandFaceGeometry, hand_face_geometry
 from .hand_model import HandModel
@@ -165,6 +166,8 @@ def _fit_hands(hands, mano, frames):
     for s, side in enumerate(SIDES):
         observed = hands.world[frames, s].astype(np.float64)
         valid = np.isfinite(observed).all(axis=-1)
+        # MediaPipe's hand changes size frame to frame; the fit has one shape per track.
+        observed, _ = normalise_palm_size(observed, valid)
         betas = fit_hand_shape(observed, valid, mano[side])
         fits[side] = fit_hands(observed, valid, mano[side], betas)
         recon[side] = np.stack([reconstruct_hand(f, mano[side]) for f in fits[side]])

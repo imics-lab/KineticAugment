@@ -12,7 +12,8 @@ Per clip it:
      joints, both hands' 21 points from the hand joints and fingertip vertices, the 105 embedded
      face points from the FLAME correspondence -- and scores them against the extraction:
         body   % of shoulder width, per arm landmark (MediaPipe pose world)
-        hands  mm, wrist-relative landmarks 1-20 (SMPL-X hand; the MANO hand alone for reference)
+        hands  mm, wrist-relative landmarks 1-20 (SMPL-X hand; the MANO hand alone for reference),
+               against the palm-size-normalised hand the fit saw, not the raw MediaPipe hand
         face   mm RMS, rigid / non-rigid points, observed face carried onto the SMPL-X head
   4. Measures how well the three MediaPipe streams agree with each other in the image, before
      any fitting: pose wrist vs hand wrist, and pose face points vs the face mesh's equivalents.
@@ -87,7 +88,10 @@ from kinetic_augment.body_model.face_observations import (  # noqa: E402
 )
 from kinetic_augment.body_model import face_pipeline  # noqa: E402
 from kinetic_augment.body_model.face_pipeline import SIDES, load_face_models  # noqa: E402
-from kinetic_augment.body_model.hand_converter import landmark_errors_mm  # noqa: E402
+from kinetic_augment.body_model.hand_converter import (  # noqa: E402
+    landmark_errors_mm,
+    normalise_palm_size,
+)
 from kinetic_augment.body_model.hand_model import (  # noqa: E402
     POSE_SLOT_LANDMARKS,
     SMPLX_TIP_VERTICES,
@@ -404,10 +408,20 @@ def export_variant(clip_id, variant, hands, face, raw_hands, raw_face, out: Path
     mano_mm = np.full((n, 2), np.nan)
     shoulder_m = np.full(n, np.nan)
     head_reliable = np.zeros(n, bool)
+    # The hands as the fit saw them: each frame rescaled to the track's median palm size.
+    hands_n = np.stack(
+        [
+            normalise_palm_size(
+                hands.world[:, s].astype(np.float64), np.isfinite(hands.world[:, s]).all(-1)
+            )[0]
+            for s in range(2)
+        ],
+        axis=1,
+    )
     for t in range(n):
         for s, side in enumerate(SIDES):
             wrist = POSE_WRISTS[s]
-            observed = hands.world[t, s].astype(np.float64)
+            observed = hands_n[t, s]
             if np.isfinite(observed).all() and ok[t, wrist]:
                 in_hands[t, s] = observed - observed[0] + pose_w[t, wrist]
             if np.isfinite(observed).all():
@@ -426,7 +440,7 @@ def export_variant(clip_id, variant, hands, face, raw_hands, raw_face, out: Path
                         100 * np.linalg.norm(rt_arm[t, k] - pose_w[t, mp_id]) / shoulder_m[t]
                     )
         for s, side in enumerate(SIDES):
-            observed = hands.world[t, s].astype(np.float64)
+            observed = hands_n[t, s]
             if not np.isfinite(observed).all():
                 continue  # no hand: the SMPL-X hand stays flat, nothing to compare
             rt_hands[t, s] = mesh_hand_points(mesh, side)

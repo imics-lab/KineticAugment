@@ -3,7 +3,8 @@
 Visualise the body + hand round trip of one clip, stitched into one figure.
 
 Body:  MediaPipe pose world landmarks -> SMPL-X (fit_shape, fit_body) -> reconstruct_body
-Hands: MediaPipe hand world landmarks -> MANO (fit_hand_shape, fit_hands) -> reconstruct_hand
+Hands: MediaPipe hand world landmarks, palm-size normalised -> MANO (fit_hand_shape,
+       fit_hands) -> reconstruct_hand
 
 MediaPipe reports each hand in its own metric frame (origin near the knuckles), with
 axes aligned to the pose's camera-aligned world frame, so a hand is stitched onto the
@@ -54,7 +55,7 @@ from view_round_trip import (  # noqa: E402
 )
 from kinetic_augment.body_model.assembly import attach_hands, body_rotations, pose_mesh  # noqa: E402
 from kinetic_augment.body_model.hand_converter import (  # noqa: E402
-    fit_hand_shape, fit_hands, landmark_errors_mm, reconstruct_hand,
+    fit_hand_shape, fit_hands, landmark_errors_mm, normalise_palm_size, reconstruct_hand,
 )
 from kinetic_augment.body_model.hand_model import (  # noqa: E402
     HAND_PARENTS, NUM_HAND_LANDMARKS, POSE_SLOT_LANDMARKS, SMPLX_FIRST_FINGER_JOINT, WRIST,
@@ -81,12 +82,17 @@ def load_observations(landmark_dir: Path, clip: str):
 
 
 def hand_round_trip(hands, model_dir="models"):
-    """MANO fit and reconstruction of each side; per-side fits, landmarks (T, 21, 3), errors."""
+    """
+    MANO fit and reconstruction of each side, on hands scaled to the track's median palm size;
+    per-side fits, landmarks (T, 21, 3), errors against the scaled hands.
+    """
     fits, recon, errors = {}, {}, {}
     for s, side in enumerate(SIDES):
         model = HandModel("mano", side, model_dir=model_dir)
         observed = hands.world[:, s].astype(np.float64)
         valid = np.isfinite(observed).all(axis=-1)
+        # MediaPipe's hand changes size frame to frame; the fit has one shape per track.
+        observed, _ = normalise_palm_size(observed, valid)
         betas = fit_hand_shape(observed, valid, model)
         fits[side] = fit_hands(observed, valid, model, betas)
         recon[side] = np.stack([reconstruct_hand(f, model) for f in fits[side]])
