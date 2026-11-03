@@ -43,6 +43,7 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`docs/augmentation-evidence/reports/index.md`](docs/augmentation-evidence/reports/index.md)
 - [`docs/augmentation-evidence/research_notes/index.md`](docs/augmentation-evidence/research_notes/index.md) — each report's notes subfolder has its own `index.md`
 - [`docs/media/index.md`](docs/media/index.md)
+- [`docs/media/v1_2_hands/index.md`](docs/media/v1_2_hands/index.md)
 - [`docs/research-guide/index.md`](docs/research-guide/index.md)
 - [`examples/index.md`](examples/index.md)
 - [`models/index.md`](models/index.md)

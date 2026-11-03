@@ -40,4 +40,5 @@
 - `view_pose_face_proximity.py` — Spike (08925 head placement): renders hand-to-face proximity from pose-only landmarks (closest hand/face pair: 3-D, depth, image distance, CONTACT/NEAR) as video, front/side world views and a distance strip, plus stills.
 - `view_proximity_round_trip.py` — Renders the hand-to-face proximity comparison video of a clip (V1.3): video with the projected SMPL-X head and per-hand readouts of image, original 3-D and depth-corrected 3-D distance, front and side views with original and corrected wrists, the corrected SMPL-X figure, and a strip of the three closest distances; saves stills where image near / corrected contact first occur.
 - `view_round_trip.py` — Renders per-clip videos of the V1 round trip: input vs SMPL-X reconstruction, joints coloured by error, error-over-time strip.
+- `visualize_hand_round_trip.py` — Fits the V1.2 hands on the pilot clips and draws how they are detected and how the MANO / SMPL-X round trip looks.
 - `index.md` — Index of setup, rendering, and phase-check scripts.
