@@ -63,13 +63,6 @@ plan:
       joint_group: "all"
       noise_stddev_rad: 0.15 # Much higher than SLR profile
 
-  - operation: "LimbLengthScaling"
-    probability: 0.6
-    params:
-      # Simulate different body proportions, which directly affects stride length.
-      joint_group: "legs"
-      scale_range: [0.9, 1.1] # Allow for +/- 10% variation
-
   # --- 3. Temporal Augmentations ---
   - operation: "RateAlteration"
     probability: 0.9

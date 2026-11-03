@@ -1572,6 +1572,7 @@ Update it whenever a step proves or retracts something.
 | P22 | The MANO hand round trip holds on the same 20 clips (26 tracks): in-sample 5.10 mm mean, 2.53 tips, 14.59 p95; held out (time halves) 5.62 and 16.50. The pilot's hands (7.38 / 3.28 / 20.89) were harder than typical, not easier | Same run |
 | P23 | The MediaPipe→FLAME embedding transfers to SMPL-X: eye corners 1.25-1.48 mm and nose tip 3.89 mm from smplx's own landmarks (F1; five points compared; the rest rely on the triangle check) | V1.3 Task 1, [V1.3 findings](V1_3_Findings.md) §6 |
 | P24 | FaceLandmarker's facial-transformation-matrix convention and the OpenGL-to-image axis flip match the fit's: head-rotation agreement median 0.58° near / 0.57° far; 3.2-10.6° without the flip and 7.8-12.6° inverted on three clips. Not the face-to-pose-world axis match, and agreement is not independence (both rotations come from the same landmarks) (F2, matrix part) | V1.3 findings §3.2, §6 |
+| P25 | Signers differ too little in MediaPipe's arm proportions for a body-shape augmentation to add anything: upper arm / shoulder width CV is 5.7% (2.9% robust) across 25 clips, no larger than MediaPipe's frame-to-frame jitter in the same ratio (3.7%), and the 20.6% left/right forearm spread is detector error. Sampling SMPL-X's shape prior is 15% off in mean and about 2.5× too wide. Body-shape augmentation is dropped | [Augmentation grounding §6.1](Augmentation_Grounding.md#61-why-body-shape-was-dropped) (2026-10-18) |
 
 ### Disproven, retracted or superseded
 

@@ -188,11 +188,30 @@ KineticAugment/
 
 ## Round-Trip Viewer
 
-`demo/round_trip/` is an interactive web page for checking the MediaPipe → SMPL-X → MediaPipe round
-trip (pose, hands and face mesh) clip by clip, with optional landmark smoothing. You can export
-clips with `scripts/export_round_trip_demo.py`, or view a bundle someone shares with
-`python3 -m http.server 8765 --directory round_trip`. See
-[demo/round_trip/README.md](demo/round_trip/README.md) for both.
+`demo/round_trip/` is an interactive web page, in two pages:
+
+- **Round trip** (`index.html`): checks the MediaPipe → SMPL-X → MediaPipe round trip (pose, hands
+  and face mesh) clip by clip, with optional landmark smoothing.
+- **Augmentations** (`augment.html`): shows a clip's Tier 1 augmentations as the original, the
+  original and augmented bodies one over the other, and the augmented body, with a note on what
+  each augmentation changes.
+
+To run it for one clip, from the repository root, after the one-time setup (install and model
+files):
+
+```bash
+python scripts/export_round_trip_demo.py --clips 20983 --video-dir path/to/videos
+```
+
+```bash
+python3 -m http.server 8765 --directory demo/round_trip
+```
+
+Then open <http://localhost:8765/#clip=20983> (round trip) or
+<http://localhost:8765/augment.html#clip=20983&a=combined> (augmentations).
+[demo/round_trip/README.md](demo/round_trip/README.md#quick-start-run-the-viewer-for-one-clip)
+gives every step, the model files needed, how to check each step worked, and fixes for common
+problems.
 
 ## Available Augmentations
 

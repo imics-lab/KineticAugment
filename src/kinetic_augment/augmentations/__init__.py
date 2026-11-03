@@ -48,7 +48,6 @@ try:
     from kinetic_augment.augmentations.intrinsic import (
         JointAnglePerturbation,
         HandPosePerturbation,
-        LimbLengthScaling,
         JointCoupledNoise,
     )
 except ImportError:
@@ -78,7 +77,6 @@ __all__ = [
     # Intrinsic
     "JointAnglePerturbation",
     "HandPosePerturbation",
-    "LimbLengthScaling",
     "JointCoupledNoise",
     # Temporal
     "TimeWarping",

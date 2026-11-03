@@ -6,7 +6,8 @@
 source URL and a verification label. A bracketed tag such as **[L2.4]** or **[M1]** below points
 to a row or section in those notes (L = linguistics, M = machine learning).
 
-**First trial:** `scripts/augment_trials.py`, run on clips 17083 and 57641 (§6).
+**First trial:** `scripts/augment_trials.py`, run on clips 17083 and 57641 (§6); reworked to
+Tier 1 on 2026-10-29 (§6.2).
 
 The question is which augmentations of a signer's 3-D skeleton (SMPL-X body, MANO hands) keep an
 isolated sign's meaning, and how strong they can be. Two kinds of evidence answer it:
@@ -100,7 +101,8 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
    about the shoulder centre. Start at 0.85–1.15; practice uses 0.9–1.1 (ST-GCN), 0.8–1.2
    (GISLR) and 0.5–1.0 (Laines) **[M5b, M10, M6]**.
    - Every relative position is kept, so no phonological parameter can change.
-   - This is not body shape (item 8). It is the same body seen from nearer or farther away.
+   - This is not body shape (item 8, dropped). It is the same body seen from nearer or farther
+     away.
 6. **Uncentring (subject position in the frame).** Shift the whole scene by one offset per clip.
    Practice uses ±10 px of 512 (SAM-SLR), ±0.1 normalised (GISLR) and ±0.2 (ST-GCN)
    **[M5b, M10]**.
@@ -135,11 +137,13 @@ Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
    - Bounds come from SignAvatars' biomechanical limits.
    - Reject any sample whose classified handshape features change. **[L5.1, L1.8, M7]**
    - This has no published precedent and is the project's opportunity.
-8. **Body shape with location retargeting.** Change `betas`, then re-solve the arm IK so each
-   hand keeps its position relative to the body landmarks it is anchored to (the perceptual-target
-   view **[L2.10]**).
+8. ~~**Body shape with location retargeting.**~~ **Dropped (2026-10-18).** The idea was to change
+   `betas`, then re-solve the arm IK so each hand keeps its position relative to the body
+   landmarks it is anchored to (the perceptual-target view **[L2.10]**).
    - Naive shape change fails this: in the trial it moved the wrists 68–83 mm (§6).
-   - There is no recognition-gain evidence for body shape **[M10]**, so it is lower priority.
+   - There is no recognition-gain evidence for body shape **[M10]**.
+   - Real signers barely differ in MediaPipe's proportions, so there is little variation to
+     reproduce (§6.1). The `LimbLengthScaling` augmentation was removed with this decision.
 9. **Weak drop.** Remove the weak hand only when ASL-LEX Sign Type is symmetrical, contact is
    absent, and the movement is not alternating. Never on asymmetric signs or signs located on
    the weak hand. **[L4.3, L4.5]**
@@ -199,14 +203,96 @@ phonological labels **[M9]**.
 | Scale ×0.85 (added later) | 0.8–1.2 | In range. Bones exactly −15%; shoulder-normalised pose unchanged (0.00%). |
 | Off-centre by (+0.6, +0.2) shoulder widths, about 21 cm (added later) | ±0.1–0.2 of the normalised frame | Shoulder-normalised pose unchanged (0.00%). No camera model yet, so the hands-in-frame check could not be applied. |
 | Elbows +15°, shoulders +10° (wrists moved 94–115 mm) | ±4° per joint, p = 0.3 (SPOTER) | About 3–4× too strong, and it moved the hand between locations. Reduce it and add the location check. |
-| `betas[0]` +2 (arms 11–15% longer, wrists moved 68–83 mm) | No recognition evidence. Location must be kept. | Needs retargeting (Tier 2, item 8). |
+| `betas[0]` +2 (arms 11–15% longer, wrists moved 68–83 mm) | No recognition evidence. Location must be kept. | Dropped (Tier 2, item 8; §6.1). |
 | Non-uniform time warp, k = 0.5 | Uniform rate change only | Replace it. Non-uniform warps can imitate aspect and alter end deceleration. |
+
+### 6.1 Why body shape was dropped
+
+A one-off measurement (2026-10-18; scripts and raw numbers not committed) compared how much arm
+proportions differ between signers in MediaPipe's world landmarks with what sampling SMPL-X
+shapes produces. It used the 5 pilot clips and the 20 random WLASL clips of Week 2
+(seed 20261007). Clip 13630 has no visible left forearm, so the forearm rows cover 24 clips.
+
+| Ratio | MediaPipe, 25 clips: mean / CV (robust CV) | SMPL-X β ~ N(0, I), within the plausibility bound: mean / CV |
+|---|---|---|
+| Upper arm / shoulder width | 0.748 / 5.7% (2.9%) | 0.865 / 7.5% |
+| Forearm / shoulder width | 0.720 / 9.7% | 0.801 / 7.4% |
+| Forearm / upper arm | 0.963 / 9.6% | 0.926 / 2.4% |
+| Left / right forearm | 0.944 / 20.6% | 1.013 / 0.3% |
+
+- **Signer differences are at the noise floor.** Upper arm / shoulder width varies by about
+  3–6% between clips. MediaPipe's own frame-to-frame jitter in the same ratio is 3.7%, and the
+  body round-trip error is 3.1% (P21).
+- **The forearm spread is detector error.** People are left–right symmetric to within a percent
+  or two, yet MediaPipe's left/right forearm ratio varies by 20.6%.
+- **The fitted shapes are not a usable sampling range.** 24 of 25 `fit_shape` fits sit on the
+  plausibility bound. They mostly encode one constant gap between where MediaPipe and SMPL-X put
+  the shoulder joint (P17), not differences between signers.
+- **SMPL-X's population is the wrong distribution.** Its mean is 15% off from MediaPipe's, its
+  spread about 2.5× too wide, and it varies shoulder width by about 10%, against MediaPipe's 3.1%
+  (Finding 10).
+- **Limits.** 25 clips, some sharing a signer, so the real spread may be somewhat wider. Three
+  clips (57641, 63229, 05631) account for most of the gap between the plain and robust CV.
+
+### 6.2 Tier 1 rework (2026-10-29)
+
+`scripts/augment_trials.py` now runs Tier 1 only, with the §3 ranges. The sampling, transforms
+and re-timing live in `kinetic_augment.augmentations.tier1` (tests: `tests/test_tier1.py`).
+Every value is drawn once per clip, from a generator seeded by the run seed and the clip id:
+
+- **view:** yaw ±20°, pitch ±5°, uniform;
+- **mirror:** p = 0.5;
+- **duration:** 0.8–1.25×, log-uniform, first and last frames kept;
+- **arm joints:** shoulder, elbow and wrist of each arm, each with p = 0.3, ±4°. Shoulder and
+  wrist turn about a random axis fixed in the parent joint's frame. The elbow flexes in its
+  bending plane, since it is a hinge. Each MANO hand turns with its SMPL-X wrist;
+- **scale:** 0.85–1.15, uniform;
+- **uncentre:** up to ±0.1 of the frame on each axis.
+
+Each panel of the video shows one augmentation at the clip's drawn value. A *combined* panel
+chains them: arm joints, mirror if drawn, view, scale, uncentre, duration.
+
+**Hands kept in the frame.** No camera model existed, so the trial fits a weak-perspective
+camera per clip, from the reconstructed arm landmarks to MediaPipe's 2-D pose: one scale per
+axis per clip and one offset per frame. The uncentring shift is then drawn from the part of
+±0.1 that keeps every hand point already inside the frame inside it. Points already outside the
+frame are ignored, because many clips start and end with the hands below it.
+
+Results on the same two clips as before (seed 20261011), from `data/augment_trials/augment_trials.json`:
+
+| | 17083 (62 frames) | 57641 (29 frames) |
+| --- | --- | --- |
+| Draw | no mirror; yaw +2.4°, pitch −3.4°; duration ×0.83 (52 frames); no arm joint; scale ×1.015; shift (+0.051, +0.018) | mirror; yaw −15.9°, pitch +0.6°; duration ×1.22 (35 frames); L elbow −3.5°, R shoulder −1.6°; scale ×0.980; shift (+0.073, +0.088) |
+| Arm joints: wrists moved, median / max | — (none drawn) | 12 / 14 mm |
+| View: wrists moved, median / max | 20 / 34 mm | 72 / 108 mm |
+| Hand points in frame, round trip → each augmentation | 95.4% → 95.4% | 95.7% → 95.7% |
+| Camera fit residual | 2.1% of the frame | 2.3% of the frame |
+
+- **Zero strength reproduces the round trip** for all seven, to at most 3.3 × 10⁻¹⁶ m.
+- **The arm-joint edit is now about 8× smaller.** It moved the wrists 12–14 mm, against 94–115 mm
+  in the first trial (§6), and the shoulder-normalised pose by at most 4.4%. Whether 12 mm stays
+  inside a sign's location region still needs the location check (§7, step 2).
+- **View rotation moves the hands most,** 72 mm median at 16° of yaw. It does so rigidly: bone
+  lengths and every relative position are unchanged. Shoulder normalisation does not undo a 3-D
+  rotation, so the normalised pose changes too (34%).
+- **No in-frame hand point left the frame** under view, arm joints, scale or uncentre. On these
+  two clips the frame limit did not bind: the drawn shifts equal the unconstrained ones.
+- **The weak camera holds up.** In pixels its two axis scales agree to within 6–7% (320 vs
+  341 px/m on 17083, 228 vs 244 on 57641), as they should for square pixels.
+
+**Limits.**
+- Two clips. MediaPipe found no left hand in either, so the frame check covers the right hand and
+  both pose wrists.
+- With p = 0.3 per joint, 0.7⁶ ≈ 12% of clips get no arm-joint edit, as 17083 did.
+- The camera is weak-perspective. It ignores the change of viewing angle that a real sideways
+  move brings (§3, caveats).
+- No classifier has seen these clips yet.
 
 ## 7. Suggested next steps
 
-1. Rework the trial to Tier 1 with the evidence ranges: yaw ±20°, mirror, uniform rate
-   0.8–1.25×, arm joints ±4° at p = 0.3, scale 0.85–1.15, and uncentring with both hands kept in
-   the frame.
+1. ~~Rework the trial to Tier 1 with the evidence ranges.~~ **Done (2026-10-29, §6.2).** Yaw ±20°
+   with pitch ±5°, mirror, uniform duration 0.8–1.25×, arm joints ±4° at p = 0.3, scale
+   0.85–1.15, and uncentring with the hands kept in the frame through a weak-perspective camera.
 2. Implement the location-region and contact invariants (needs the V1.3 face regions) and use
    them to reject augmented clips.
 3. Obtain ASL-LEX 2.0 and the WLASL alignment, and decide the licence question.
