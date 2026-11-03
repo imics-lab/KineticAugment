@@ -28,6 +28,7 @@
 - `V1_3_Face_Integration_Plan.md` — Implementation contract for reversible face attachment, quality masks, synchronized training samples and a masked facial classifier.
 - `V1_3_Face_Integration_Results.md` — Real-cache coverage, geometric and masking regressions, reproduction commands, and recognition-data limitations for the V1.3 integration.
 - `V1_3_Face_Integration_Evidence.json` — Compact machine-readable aggregate and per-clip evidence from the real-cache validation.
+- `V1_3_Head_Placement_Spike_08925.md` — One-clip spike: pose-only proximity, 11-point pose-face head placement, depth correction, and a roll traced to pose-world face points (2026-10-18).
 - `Week_2_Findings.md` — Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07).
 - `Hand_Pipeline_Variants.md` — The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29).
 - `media/` — Images and placeholder assets referenced by documentation.

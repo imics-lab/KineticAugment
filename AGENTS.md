@@ -31,6 +31,7 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`data/hand_variants/index.md`](data/hand_variants/index.md)
 - [`data/hand_variants/round_trip_eval/index.md`](data/hand_variants/round_trip_eval/index.md)
 - [`data/hand_variants/test_output/index.md`](data/hand_variants/test_output/index.md)
+- [`data/augment_trials/index.md`](data/augment_trials/index.md)
 - [`data/sign_videos/index.md`](data/sign_videos/index.md)
 - [`data/wlasl/index.md`](data/wlasl/index.md)
 - [`data/test_output/index.md`](data/test_output/index.md)

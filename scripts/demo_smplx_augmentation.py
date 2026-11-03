@@ -118,7 +118,8 @@ def elbow_flex(fit, body, degrees):
             axis = _unit(np.cross(upper, rot[SPINE3] @ np.array([0.0, 0.0, 1.0])))
         if axis is None:
             continue
-        step = np.clip(bend + degrees, MIN_BEND, MAX_BEND) - bend
+        # A bend already outside the range is left there, so zero strength is the identity.
+        step = np.clip(bend + degrees, min(MIN_BEND, bend), max(MAX_BEND, bend)) - bend
         delta = Rotation.from_rotvec(axis * np.radians(step)).as_matrix()
         rotate_in_world(rotations, rot, ELBOW[side], SHOULDER[side], delta)
     return dataclasses.replace(fit, body_pose=rotations[1:22].reshape(63).copy())
@@ -136,7 +137,7 @@ def shoulder_raise(fit, body, degrees):
             axis = _unit(np.cross(down, pos[SHOULDER[side]] - pos[SPINE3]))
         if axis is None:
             continue
-        step = np.clip(elevation + degrees, 0.0, MAX_ELEVATION) - elevation
+        step = np.clip(elevation + degrees, 0.0, max(MAX_ELEVATION, elevation)) - elevation
         delta = Rotation.from_rotvec(axis * np.radians(step)).as_matrix()
         rotate_in_world(rotations, rot, SHOULDER[side], COLLAR[side], delta)
     return dataclasses.replace(fit, body_pose=rotations[1:22].reshape(63).copy())
