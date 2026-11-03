@@ -34,7 +34,7 @@ A whole-body rigid rotation preserves pairwise distances in a common Euclidean c
 | Kind | Intuition | Local example | Qualification |
 | --- | --- | --- | --- |
 | **Extrinsic** | Change how the entire motion is situated or observed. | `GlobalRotation`, `GlobalScaling`, `PoseFlipping` in [extrinsic.py](../../src/kinetic_augment/augmentations/extrinsic.py). | Coordinate rotation is a simplified viewpoint model; it does not render perspective or occlusion. Reflection needs semantic review. |
-| **Intrinsic** | Change articulated configuration or body shape. | `JointAnglePerturbation`, `HandPosePerturbation`, `LimbLengthScaling` in [intrinsic.py](../../src/kinetic_augment/augmentations/intrinsic.py). | Parameter names and sizes do not establish valid rotation or shape contents. |
+| **Intrinsic** | Change articulated configuration or body shape. | `JointAnglePerturbation`, `HandPosePerturbation`, `JointCoupledNoise` in [intrinsic.py](../../src/kinetic_augment/augmentations/intrinsic.py). | Parameter names and sizes do not establish valid rotation or shape contents. |
 | **Temporal** | Change when motion is sampled or how quickly it unfolds. | `TimeWarping`, `SpeedVariation`, `FrameDropping` in [temporal.py](../../src/kinetic_augment/augmentations/temporal.py). | Smooth resampling can alter timing cues; interpolation depends on representation. |
 
 Think of filming a dance: move the camera for extrinsic variation, change the dancer's arm pose for intrinsic variation, and retime the recording for temporal variation. Here transforms operate on arrays instead of generating new video pixels.

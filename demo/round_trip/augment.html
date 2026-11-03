@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Augmentation Viewer</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>Tier 1 augmentations</h1>
+    <span class="sub">the SMPL-X round trip, augmented: drawn once per clip, applied to every frame</span>
+  </div>
+  <nav class="pages"><a href="index.html">round trip</a><a class="on" href="augment.html">augmentations</a></nav>
+  <label class="clip-pick">clip <select id="clip"></select></label>
+  <label class="clip-pick">augmentation <select id="aug"></select></label>
+  <div id="summary" class="chips"></div>
+</header>
+
+<main>
+  <section id="explain" class="explain"></section>
+  <section class="panels three-up">
+    <figure class="panel">
+      <figcaption>1 · Original (round trip, no augmentation)
+        <span class="toggles">
+          <label><input type="checkbox" id="t-mesh1" checked> mesh</label>
+          <label><input type="checkbox" id="t-pts1" checked> points</label>
+        </span>
+      </figcaption>
+      <div id="view-orig" class="three"></div>
+      <div class="legend"><i style="--c:var(--orig)"></i>read back off the fitted SMPL-X</div>
+    </figure>
+    <figure class="panel">
+      <figcaption>2 · Original and augmented, one over the other
+        <span class="toggles">
+          <label><input type="checkbox" id="t-mesh2" checked> meshes</label>
+          <label><input type="checkbox" id="t-pts2" checked> points</label>
+        </span>
+      </figcaption>
+      <div id="view-both" class="three"></div>
+      <div class="legend"><i style="--c:var(--orig)"></i>original <i style="--c:var(--aug)"></i>augmented</div>
+    </figure>
+    <figure class="panel">
+      <figcaption>3 · Augmented
+        <span class="toggles">
+          <label><input type="checkbox" id="t-mesh3" checked> mesh</label>
+          <label><input type="checkbox" id="t-pts3" checked> points</label>
+        </span>
+      </figcaption>
+      <div id="view-aug" class="three"></div>
+      <div class="legend"><i style="--c:var(--aug)"></i>read back off the augmented SMPL-X
+        · drag to orbit · scroll to zoom · the three views share one camera
+        <button id="reset-cam">front view</button><button id="side-cam">side view</button></div>
+    </figure>
+  </section>
+
+  <section class="timeline">
+    <div class="transport">
+      <button id="play" title="space">▶</button>
+      <button id="prev" title="←">◀︎◀︎</button>
+      <button id="next" title="→">▶︎▶︎</button>
+      <input type="range" id="scrub" min="0" value="0">
+      <span id="frame-label" class="mono"></span>
+      <label>speed <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option></select></label>
+    </div>
+    <div class="aug-info">
+      <aside id="readout"></aside>
+      <figure class="panel">
+        <figcaption>source frame</figcaption>
+        <canvas id="raw"></canvas>
+      </figure>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="augment.js"></script>
+</body>
+</html>

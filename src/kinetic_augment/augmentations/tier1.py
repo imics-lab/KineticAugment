@@ -225,34 +225,41 @@ class WeakCamera:
         return np.array([image_shift[0] / self.scale[0], image_shift[1] / self.scale[1], 0.0])
 
 
-def fit_weak_camera(world: np.ndarray, image: np.ndarray) -> WeakCamera:
+def fit_weak_camera(
+    world: np.ndarray, image: np.ndarray, pixel_size: Optional[Tuple[int, int]] = None
+) -> WeakCamera:
     """
     Least-squares weak-perspective camera from (T, N, 3) world to (T, N, 2) image points.
+
+    Without `pixel_size` each axis gets its own scale. With the frame's (width, height) in
+    pixels, one scale serves both axes, as it should for square pixels; that holds up better
+    when the camera is used far from the points it was fitted on.
 
     Points not finite in both are ignored. A frame with fewer than two usable points gets the
     offset of the nearest frame that has them.
     """
     world = np.asarray(world, dtype=np.float64)[..., :2]
     image = np.asarray(image, dtype=np.float64)[..., :2]
+    size = np.ones(2) if pixel_size is None else np.asarray(pixel_size, dtype=np.float64)
+    image_px = image * size
     ok = np.isfinite(world).all(-1) & np.isfinite(image).all(-1)
     usable = ok.sum(axis=1) >= 2
     if not usable.any():
         raise ValueError("no frame has two points visible in both world and image")
-    scale = []
-    for a in range(2):
-        num = den = 0.0
-        for t in np.flatnonzero(usable):
-            w, i = world[t, ok[t], a], image[t, ok[t], a]
-            num += np.dot(w - w.mean(), i - i.mean())
-            den += np.dot(w - w.mean(), w - w.mean())
-        scale.append(num / den)
-    scale = np.array(scale)
+    num, den = np.zeros(2), np.zeros(2)
+    for t in np.flatnonzero(usable):
+        w, i = world[t, ok[t]], image_px[t, ok[t]]
+        w, i = w - w.mean(axis=0), i - i.mean(axis=0)
+        num += (w * i).sum(axis=0)
+        den += (w * w).sum(axis=0)
+    scale_px = num / den if pixel_size is None else np.full(2, num.sum() / den.sum())
     offset = np.full((len(world), 2), np.nan)
     for t in np.flatnonzero(usable):
-        offset[t] = (image[t, ok[t]] - scale * world[t, ok[t]]).mean(axis=0)
+        offset[t] = (image_px[t, ok[t]] - scale_px * world[t, ok[t]]).mean(axis=0) / size
     have = np.flatnonzero(usable)
     for t in np.flatnonzero(~usable):
         offset[t] = offset[have[np.argmin(np.abs(have - t))]]
+    scale = scale_px / size
     projected = scale * world + offset[:, None]
     residual = float(np.median(np.linalg.norm(projected - image, axis=-1)[ok]))
     return WeakCamera((float(scale[0]), float(scale[1])), offset, residual)
@@ -291,3 +298,79 @@ def frame_loss(uv_before: np.ndarray, uv_after: np.ndarray) -> Optional[float]:
     if not before.any():
         return None
     return float((before & ~after).sum() / before.sum())
+
+
+# --------------------------------------------------------------------------- arm joints
+
+# SMPL-X joint indices of the arm joints the draw can rotate, and the torso joint used when an
+# arm is straight. The first 22 joints are the body; every arm joint's chain lies inside them.
+SMPLX_ARM = {
+    "left": {"shoulder": 16, "elbow": 18, "wrist": 20},
+    "right": {"shoulder": 17, "elbow": 19, "wrist": 21},
+}
+SMPLX_SPINE3 = 9
+NUM_BODY_JOINTS = 22
+MIN_BEND, MAX_BEND = 5.0, 150.0  # degrees between upper arm and forearm; kept anatomical
+
+
+def _world(rotations, rest_joints, parents):
+    """World rotations and positions of the body joints (rest pose at the origin)."""
+    local = Rotation.from_rotvec(rotations[:NUM_BODY_JOINTS]).as_matrix()
+    rest = np.asarray(rest_joints, dtype=np.float64)[:NUM_BODY_JOINTS]
+    rot, pos = np.zeros_like(local), np.zeros_like(rest)
+    for j in range(NUM_BODY_JOINTS):
+        p = parents[j]
+        if p < 0:
+            rot[j], pos[j] = local[j], rest[j]
+        else:
+            rot[j] = rot[p] @ local[j]
+            pos[j] = rot[p] @ (rest[j] - rest[p]) + pos[p]
+    return rot, pos
+
+
+def _angle_deg(a, b):
+    cos = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    return float(np.degrees(np.arccos(np.clip(cos, -1.0, 1.0))))
+
+
+def _unit(v):
+    n = np.linalg.norm(v)
+    return v / n if n > 1e-9 else None
+
+
+def perturb_arm_joints(
+    rotations: np.ndarray, rest_joints: np.ndarray, parents, joints: Sequence[ArmJointDraw]
+) -> np.ndarray:
+    """
+    One frame's SMPL-X local rotations (J, 3), J >= 22, with the arm-joint draw applied.
+
+    A shoulder or wrist turns about its drawn axis, fixed in the parent joint's frame, so it sits
+    the same few degrees differently relative to its parent in every frame. An elbow bends within
+    its current bending plane, kept between 5° and 150°. Joints below the wrist (the hand) keep
+    their local rotations, so the hand turns with the wrist. `rest_joints` and `parents` are the
+    shaped body's; only the first 22 are read.
+    """
+    out = np.array(rotations, dtype=np.float64, copy=True)
+    parents = np.asarray(parents, dtype=int)
+    for j in joints:
+        index = SMPLX_ARM[j.side][j.joint]
+        if j.joint != "elbow":
+            delta = Rotation.from_rotvec(np.asarray(j.axis) * np.radians(j.angle_deg))
+            out[index] = (delta * Rotation.from_rotvec(out[index])).as_rotvec()
+            continue
+        arm = SMPLX_ARM[j.side]
+        rot, pos = _world(out, rest_joints, parents)
+        upper = pos[arm["elbow"]] - pos[arm["shoulder"]]
+        fore = pos[arm["wrist"]] - pos[arm["elbow"]]
+        axis = _unit(np.cross(upper, fore))
+        if axis is None:  # straight arm: bend toward the body's front
+            axis = _unit(np.cross(upper, rot[SMPLX_SPINE3] @ np.array([0.0, 0.0, 1.0])))
+        if axis is None:
+            continue
+        bend = _angle_deg(upper, fore)
+        step = np.clip(bend + j.angle_deg, MIN_BEND, MAX_BEND) - bend
+        delta = Rotation.from_rotvec(axis * np.radians(step)).as_matrix()
+        parent = rot[arm["shoulder"]]
+        local = Rotation.from_rotvec(out[index]).as_matrix()
+        out[index] = Rotation.from_matrix(parent.T @ delta @ parent @ local).as_rotvec()
+    return out

@@ -4,6 +4,10 @@ import numpy as np
 import pytest
 
 from kinetic_augment.augmentations.tier1 import (
+    SMPLX_ARM,
+    ArmJointDraw,
+    _world,
+    perturb_arm_joints,
     POSE_MIRROR,
     TIER1,
     WeakCamera,
@@ -133,6 +137,15 @@ class TestCamera:
         assert camera.residual == pytest.approx(0.0, abs=1e-12)
         assert camera.project(world) == pytest.approx(image)
 
+    def test_square_pixels_share_one_scale(self):
+        world, _, _, offset = synthetic_camera()
+        size = (640, 480)
+        px_per_m = 700.0
+        image = (px_per_m * world[..., :2]) / np.array(size) + offset[:, None]
+        camera = fit_weak_camera(world, image, pixel_size=size)
+        assert np.array(camera.scale) * size == pytest.approx([px_per_m, px_per_m])
+        assert camera.project(world) == pytest.approx(image)
+
     def test_frames_without_points_borrow_the_nearest_offset(self):
         world, image, _, offset = synthetic_camera()
         world[2] = np.nan
@@ -171,3 +184,99 @@ class TestFrameCheck:
         before = np.array([[0.5, 0.5], [0.5, 0.95], [0.5, 1.5]])
         assert frame_loss(before, before + [0.0, 0.1]) == pytest.approx(0.5)
         assert frame_loss(before[2:], before[2:]) is None
+
+
+# SMPL-X's first 22 parents, and a rest pose with arms out to the sides (y up).
+PARENTS = [-1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 12, 13, 14, 16, 17, 18, 19]
+
+
+def rest_pose():
+    rest = np.zeros((22, 3))
+    for j in range(1, 22):
+        rest[j] = rest[PARENTS[j]] + [0.0, 0.1, 0.0]
+    for side, sign in (("left", 1.0), ("right", -1.0)):
+        arm = SMPLX_ARM[side]
+        collar = PARENTS[arm["shoulder"]]
+        rest[arm["shoulder"]] = rest[collar] + [sign * 0.15, 0.0, 0.0]
+        rest[arm["elbow"]] = rest[arm["shoulder"]] + [sign * 0.28, 0.0, 0.0]
+        rest[arm["wrist"]] = rest[arm["elbow"]] + [sign * 0.25, 0.0, 0.0]
+    return rest
+
+
+def bent(degrees=60.0):
+    """55 rotations with both elbows bent forward by `degrees`."""
+    rotations = np.zeros((55, 3))
+    rotations[18] = [0.0, np.radians(degrees), 0.0]
+    rotations[19] = [0.0, -np.radians(degrees), 0.0]
+    return rotations
+
+
+def arm_angle(rotations, side):
+    _, pos = _world(rotations, rest_pose(), PARENTS)
+    arm = SMPLX_ARM[side]
+    upper = pos[arm["elbow"]] - pos[arm["shoulder"]]
+    fore = pos[arm["wrist"]] - pos[arm["elbow"]]
+    return np.degrees(np.arccos(np.dot(upper, fore) / np.linalg.norm(upper) / np.linalg.norm(fore)))
+
+
+class TestArmJoints:
+    def test_zero_angles_change_nothing(self):
+        joints = [
+            ArmJointDraw(s, j, 0.0, (1.0, 0.0, 0.0))
+            for s in ("left", "right")
+            for j in ("shoulder", "elbow", "wrist")
+        ]
+        out = perturb_arm_joints(bent(), rest_pose(), PARENTS, joints)
+        assert out == pytest.approx(bent(), abs=1e-12)
+
+    def test_the_elbow_bends_by_the_drawn_angle(self):
+        out = perturb_arm_joints(
+            bent(60.0), rest_pose(), PARENTS, [ArmJointDraw("left", "elbow", 3.5, (1.0, 0.0, 0.0))]
+        )
+        assert arm_angle(out, "left") == pytest.approx(63.5)
+        assert arm_angle(out, "right") == pytest.approx(60.0)
+
+    def test_the_elbow_bend_is_kept_anatomical(self):
+        out = perturb_arm_joints(
+            bent(148.0),
+            rest_pose(),
+            PARENTS,
+            [ArmJointDraw("right", "elbow", 4.0, (1.0, 0.0, 0.0))],
+        )
+        assert arm_angle(out, "right") == pytest.approx(150.0)
+
+    def test_a_straight_elbow_still_bends(self):
+        out = perturb_arm_joints(
+            np.zeros((55, 3)),
+            rest_pose(),
+            PARENTS,
+            [ArmJointDraw("left", "elbow", 4.0, (1.0, 0.0, 0.0))],
+        )
+        assert arm_angle(out, "left") == pytest.approx(5.0)  # 0° + 4° lifted to the minimum
+
+    def test_a_shoulder_turn_moves_the_arm_rigidly_by_the_angle(self):
+        rotations = bent()
+        out = perturb_arm_joints(
+            rotations,
+            rest_pose(),
+            PARENTS,
+            [ArmJointDraw("left", "shoulder", 4.0, (0.0, 0.0, 1.0))],
+        )
+        _, before = _world(rotations, rest_pose(), PARENTS)
+        _, after = _world(out, rest_pose(), PARENTS)
+        arm = SMPLX_ARM["left"]
+        old = before[arm["elbow"]] - before[arm["shoulder"]]
+        new = after[arm["elbow"]] - after[arm["shoulder"]]
+        assert np.linalg.norm(new) == pytest.approx(np.linalg.norm(old))
+        angle = np.degrees(np.arccos(np.dot(old, new) / np.linalg.norm(old) ** 2))
+        assert angle == pytest.approx(4.0)
+        assert arm_angle(out, "left") == pytest.approx(60.0)  # the elbow keeps its bend
+
+    def test_joints_below_the_wrist_keep_their_rotations(self):
+        rotations = bent()
+        rotations[25:40] = 0.1
+        out = perturb_arm_joints(
+            rotations, rest_pose(), PARENTS, [ArmJointDraw("left", "wrist", -3.0, (0.0, 1.0, 0.0))]
+        )
+        assert np.array_equal(out[22:], rotations[22:])
+        assert not np.allclose(out[20], rotations[20])

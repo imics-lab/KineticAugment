@@ -47,7 +47,7 @@ The viewer shows, for one clip at a time:
 
 Below the panels, per-frame plots track the body, hand, finger-curl and face errors, the jitter,
 and the gaps between streams. Those plots are what show whether a clip can be augmented safely.
-The viewer lives in `demo/round_trip/` on `main` and is filled by `scripts/export_round_trip_demo.py`.
+To run it yourself, see [Round-Trip Viewer](#round-trip-viewer) below.
 
 ## Documentation
 
@@ -186,6 +186,33 @@ KineticAugment/
 ├── docs/                    # Documentation
 └── models/                  # SMPL-X models (not in git)
 ```
+
+## Round-Trip Viewer
+
+`demo/round_trip/` is an interactive web page, in two pages:
+
+- **Round trip** (`index.html`): checks the MediaPipe → SMPL-X → MediaPipe round trip (pose, hands
+  and face mesh) clip by clip, with optional landmark smoothing.
+- **Augmentations** (`augment.html`): shows a clip's Tier 1 augmentations as the original, the
+  original and augmented bodies one over the other, and the augmented body, with a note on what
+  each augmentation changes.
+
+To run it for one clip, from the repository root, after the one-time setup (install and model
+files):
+
+```bash
+python scripts/export_round_trip_demo.py --clips 20983 --video-dir path/to/videos
+```
+
+```bash
+python3 -m http.server 8765 --directory demo/round_trip
+```
+
+Then open <http://localhost:8765/#clip=20983> (round trip) or
+<http://localhost:8765/augment.html#clip=20983&a=combined> (augmentations).
+[demo/round_trip/README.md](demo/round_trip/README.md#quick-start-run-the-viewer-for-one-clip)
+gives every step, the model files needed, how to check each step worked, and fixes for common
+problems.
 
 ## Available Augmentations
 
