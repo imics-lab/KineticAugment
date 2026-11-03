@@ -77,8 +77,7 @@ Of everything tried on this clip, depth correction is the only approach that rec
   roll about the camera axis (axis ≈ (0.08, −0.09, −0.99)).
 - The 2-D similarity from pose-world (x, y) to pose image pixels over the same face points
   rotates by a constant 7.5 ± 0.8°.
-- **Corrected by the cross-clip measurement** (`docs/O11_Frame_Alignment.md`, branch
-  `claude/keen-almeida-22d42e`). Fitted over the whole body, the same similarity is +1.1° on
+- **Corrected by the cross-clip measurement** ([O11 frame alignment](O11_Frame_Alignment.md)). Fitted over the whole body, the same similarity is +1.1° on
   08925, and its per-clip median is 1.3° over 21 clips. So the pose-world frame is not rolled
   against the image. The face points are: pose-world's eye line is 5.7° off the image (median,
   p95 15°), while R_head's matches FaceLandmarker within 0.3°. The 10° comes from pose-world
