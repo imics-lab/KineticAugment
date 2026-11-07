@@ -15,8 +15,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any, Tuple, Union
 import numpy as np
+
+REGIONS: Tuple[str, ...] = ("face", "body", "fingers", "temporal", "scene")
 
 
 @dataclass
@@ -49,6 +51,7 @@ class BaseAugmentation(ABC):
     name: str = "BaseAugmentation"
     category: str = "base"
     requires_smplx: bool = False
+    regions: Tuple[str, ...] = ()
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
@@ -303,6 +306,15 @@ class AugmentationRegistry:
     def register(cls, name: str):
         """Decorator to register an augmentation class."""
         def decorator(aug_class: type):
+            existing = cls._registry.get(name)
+            if existing is not None and (existing.__module__, existing.__qualname__) != (
+                aug_class.__module__,
+                aug_class.__qualname__,
+            ):
+                raise ValueError(
+                    f"Augmentation name {name!r} is already registered to "
+                    f"{existing.__module__}.{existing.__qualname__}"
+                )
             cls._registry[name] = aug_class
             return aug_class
         return decorator
@@ -332,3 +344,51 @@ class AugmentationRegistry:
             name for name, aug_cls in cls._registry.items()
             if getattr(aug_cls, 'category', None) == category
         ]
+
+    @classmethod
+    def list_by_region(cls, region: str) -> List[str]:
+        """List augmentations tagged with a body region."""
+        return [
+            name for name, aug_cls in cls._registry.items()
+            if region in getattr(aug_cls, 'regions', ())
+        ]
+
+
+class ClipAugmentation(BaseAugmentation):
+    """
+    Base class for per-clip augmentations tagged by body region.
+
+    Subclasses define DEFAULT_RANGES (and optionally DISTRIBUTIONS), and implement
+    sample() (one draw per clip), apply() and identity_draw() (zero-strength draw).
+    """
+
+    key: str = ""
+    stage: str = "clip"
+    DEFAULT_RANGES: Dict[str, Any] = {}
+    DISTRIBUTIONS: Dict[str, str] = {}
+
+    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
+        if not 0 <= probability <= 1:
+            raise ValueError(f"Probability must be in [0, 1], got {probability}")
+        given = dict(ranges or {})
+        for k in given:
+            if k not in self.DEFAULT_RANGES:
+                raise ValueError(f"Unknown range key {k!r} for {type(self).__name__}")
+        merged = dict(self.DEFAULT_RANGES)
+        merged.update(given)
+        self.ranges = merged
+        self.probability = probability
+        self.defaulted = [k for k in self.DEFAULT_RANGES if k not in given]
+        super().__init__({"ranges": given, "probability": probability})
+
+    @abstractmethod
+    def sample(self, rng: np.random.Generator, clip: Any, ctx: Any) -> Dict[str, Any]:
+        """Draw this augmentation's parameters once for a clip."""
+
+    @abstractmethod
+    def apply(self, target: Any, draw: Dict[str, Any], ctx: Any) -> Any:
+        """Apply a draw to the target."""
+
+    @abstractmethod
+    def identity_draw(self) -> Dict[str, Any]:
+        """Return the zero-strength draw that reproduces the input exactly."""

@@ -21,6 +21,7 @@
 - `hand_assets.py` — Shared model-asset paths, skip marks and a cached hand-model loader for the hand tests.
 - `test_hand_model.py` — Tests the 21-point hand operator against the full MANO/SMPL-X forward pass and hand anatomy.
 - `test_hand_converter.py` — Tests the hand fit: analytic start, real-model refinement, decoder, serialisation, shape and per-frame scale.
+- `test_week4_base.py` — Tests region tags, the registry clash check, ClipAugmentation, and range sampling helpers.
 - `test_tier1.py` — Tests the Tier 1 augmentations: sampling ranges, transforms, re-timing, the camera fit and the hands-in-frame limit.
 - `test_head_converter.py` — Tests head occlusion and robust head rotation.
 - `test_head_placement.py` — Tests the 11-point neck fit: synthetic recovery of the head joint under 1 mm with the head rotation reproduced exactly.
