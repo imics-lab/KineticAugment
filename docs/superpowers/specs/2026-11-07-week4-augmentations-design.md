@@ -270,8 +270,9 @@ authoritative where they differ.
   (`mode_weights: {none: 1, varied: 0, segment: 0}` in the default profile; `{none: 1, varied:
   1, segment: 1}` in `ambitious`). `varied` keeps the uniform factor's total
   duration; `segment` multiplies the uniform factor inside its window.
-- Resampling reuses Tier 1's `resample` / `resample_points`, which interpolate SMPL-X rotations
-  properly and handle missing frames.
+- Resampling uses spherical interpolation (slerp) for SMPL-X rotations and Tier 1's
+  `resample_points` for points; both handle missing frames. (`tier1.resample` is linear, so it is
+  not used for rotations.)
 
 **5.8 Frame dropping (motion slicing)** — `temporal`, **on by default** (Tier 2 item 10)
 - Mode `rate`: lower the frame rate by keeping frames on a coarser grid, for example 30 → 20 or
@@ -291,7 +292,7 @@ authoritative where they differ.
   that hand's 21 output landmarks (world and image space), and its validity mask false. The
   SMPL-X parameters are left alone. Whole axes are never masked.
 - The run rate and length distribution come from the project's cached MediaPipe output
-  (`*_hands.npz`, 25 clips in `data/round_trip_eval`), which misses about half of WLASL's hands. The builder measures it once,
+  (`*_hands.npz`: 20 clips in `data/round_trip_eval`, 5 in `data/test_output`), which misses about half of WLASL's hands. The builder measures it once,
   writes the fitted values into the YAML with a comment saying where they came from, and keeps
   the measurement script in `scripts/`.
 - Only frames where the hand was actually detected can be dropped.
