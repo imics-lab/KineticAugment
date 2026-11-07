@@ -35,3 +35,4 @@
 - `media/` — Images and placeholder assets referenced by documentation.
 - `index.md` — Index of the documentation pages and media folder.
 - `research-guide/` — Source-grounded research onboarding, verification status, and practical learning roadmap.
+- `superpowers/` — Design specs and implementation plans (`specs/`, `plans/`).
