@@ -3,6 +3,8 @@
 - `__init__.py` — Exports augmentation interfaces and concrete transformation classes.
 - `base.py` — Defines augmentation configuration, base classes (incl. `ClipAugmentation`, region tags), and registry.
 - `ranges.py` — Seeded per-clip RNG, range parsing (uniform and log-uniform), truncated-normal sampling.
+- `clip.py` — Week-4 clip container (`ClipData`, `SceneTransform`, `ChainContext`), building it from a `run_clip` result, slerp re-timing and frame selection.
+- `outputs.py` — MediaPipe-layout outputs from a `ClipData`: SMPL-X skinning on edited rest joints (`pose_mesh_rest`), pose arms, hands, carried face, scene transform, mirroring and camera projection.
 - `extrinsic.py` — Implements global landmark-space transforms and noise.
 - `intrinsic.py` — Implements SMPL-X joint, hand, limb, and orientation perturbations.
 - `temporal.py` — Implements time warping, speed variation, and frame dropping.
