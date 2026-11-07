@@ -212,7 +212,6 @@ __marimo__/
 .claude_index/
 .claude_cache/
 .claudeignore
-CLAUDE.md
 
 .fuse_hidden*
 

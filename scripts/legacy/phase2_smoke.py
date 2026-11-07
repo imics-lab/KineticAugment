@@ -11,14 +11,12 @@ Tests the new augmentation architecture and constraint system:
 6. End-to-end test with sign language video
 
 Usage:
-    CUDA_VISIBLE_DEVICES="" python scripts/test_phase2.py
+    CUDA_VISIBLE_DEVICES="" python scripts/legacy/phase2_smoke.py
 """
 
 import os
 import sys
 from pathlib import Path
-
-from kinetic_augment.body_model.mp_to_smplx import MediaPipeToSMPLX
 
 # Set up headless environment
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
@@ -26,7 +24,9 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 import numpy as np
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
+
+from kinetic_augment.legacy.mp_to_smplx import MediaPipeToSMPLX  # noqa: E402
 
 
 def test_augmentation_base():
@@ -433,10 +433,10 @@ def test_end_to_end():
     tests_total = 0
 
     # Check if we have cached landmarks from Phase 1
-    landmarks_path = Path(__file__).parent.parent / 'data' / 'test_output' / '01986_landmarks.npy'
+    landmarks_path = Path(__file__).resolve().parents[2] / 'data' / 'test_output' / '01986_landmarks.npy'
 
     if not landmarks_path.exists():
-        print("⊘ Skipping end-to-end test (run test_phase1.py first)")
+        print("⊘ Skipping end-to-end test (run scripts/legacy/phase1_smoke.py first)")
         return True
 
     # Load cached landmarks
@@ -464,7 +464,7 @@ def test_end_to_end():
     # Test 2: Fit SMPL-X and apply intrinsic augmentations
     tests_total += 1
     try:
-        import kinetic_augment.body_model.mp_to_smplx
+        import kinetic_augment.legacy.mp_to_smplx
         from kinetic_augment.augmentations.intrinsic import JointAnglePerturbation
 
         fitter = MediaPipeToSMPLX()

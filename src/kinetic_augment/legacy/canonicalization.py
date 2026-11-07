@@ -1,8 +1,7 @@
-# --- START OF FILE src/kinetic_augment/canonicalization.py ---
 
 import numpy as np
 from scipy.spatial.transform import Rotation
-from .utils.data_formats import LEFT_SHOULDER, RIGHT_SHOULDER, NOSE, POSE_START, POSE_END
+from ..utils.data_formats import LEFT_SHOULDER, RIGHT_SHOULDER, NOSE, POSE_START, POSE_END
 
 def to_canonical_space_frame(frame_landmarks: np.ndarray) -> tuple[np.ndarray, dict]:
     """

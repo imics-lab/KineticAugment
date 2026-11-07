@@ -85,7 +85,7 @@ New modules under `src/kinetic_augment/body_model/`. Each has one job and can be
 | `assembly.py` | Poses one SMPL-X model from `BodyFit`, `HandFit` and `HeadFit`. The body + hand part moves here unchanged from `scripts/view_body_hand_round_trip.py` (wrist placement and the palm Kabsch); the script then calls it. |
 | `face_regions.py` | Builds the head and neck surface and the per-vertex region labels once per shape (§5). |
 | `hand_face_geometry.py` | Signed distance, nearest region and contact flag for each hand point, per frame (§5). |
-| `face_stream.py` | Phase C (§6). |
+| `face_stream.py` | `attach_face(...)` fits one similarity from the rigid anchor points to the posed head and applies it to all 478 observed face points, giving them in head-local coordinates (`FaceAttachment`) with the transforms that recover them. Returns an invalid all-NaN attachment when fewer than three usable non-collinear anchors exist (§6). |
 
 `scripts/extract_face_features.py` writes `<clip>_face_features.npz` with the fitted neck, head and
 jaw, all flags, the distances, regions and contact, and (phase C) the face stream and blendshapes.

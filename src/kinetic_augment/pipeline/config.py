@@ -126,8 +126,10 @@ class PipelineConfig:
     constraints: ConstraintConfig = field(default_factory=ConstraintConfig)
 
     # Processing options
-    canonicalize: bool = False  # Apply canonicalization
-    output_space: str = 'canonical'  # 'canonical' or 'original'
+    # NOTE: `canonicalize` and `output_space` are accepted and validated but currently ignored
+    # by Pipeline (only the legacy AugmentationPipeline canonicalizes).
+    canonicalize: bool = False  # Apply canonicalization (not implemented in Pipeline)
+    output_space: str = 'canonical'  # 'canonical' or 'original' (not implemented in Pipeline)
 
     # Reproducibility
     seed: Optional[int] = None

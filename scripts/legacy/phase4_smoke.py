@@ -20,7 +20,7 @@ import numpy as np
 import tempfile
 
 # Add project root to path
-project_root = Path(__file__).parent.parent
+project_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_root / "src"))
 
 
@@ -486,7 +486,7 @@ def test_legacy_deprecation() -> int:
     # Test 1: Import triggers no error
     total += 1
     try:
-        from kinetic_augment.pipeline_legacy import AugmentationPipeline
+        from kinetic_augment.legacy.pipeline import AugmentationPipeline
         print_test("Legacy module imports without error", True)
         passed += 1
     except Exception as e:
@@ -495,7 +495,7 @@ def test_legacy_deprecation() -> int:
     # Test 2: Deprecation warning is in the module docstring
     total += 1
     try:
-        import kinetic_augment.pipeline_legacy as legacy
+        import kinetic_augment.legacy.pipeline as legacy
         assert "DEPRECATED" in legacy.__doc__ or "deprecated" in legacy.__doc__.lower()
         print_test("Legacy module has deprecation notice in docstring", True)
         passed += 1

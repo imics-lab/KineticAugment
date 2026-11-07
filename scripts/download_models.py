@@ -249,8 +249,9 @@ def setup_directory(model_dir: Path):
 # Keep the directory structure
 !.gitignore
 """
-    with open(gitignore_path, 'w') as f:
-        f.write(gitignore_content)
+    if not gitignore_path.exists():  # never overwrite the tracked models/.gitignore
+        with open(gitignore_path, 'w') as f:
+            f.write(gitignore_content)
 
     # Create README with instructions
     readme_path = model_dir / 'README.md'
@@ -283,12 +284,13 @@ Run the download script to check installation:
 python scripts/download_models.py --check
 ```
 """
-    with open(readme_path, 'w') as f:
-        f.write(readme_content)
+    if not readme_path.exists():  # never overwrite the tracked models/README.md
+        with open(readme_path, 'w') as f:
+            f.write(readme_content)
 
     print(f"✓ Created directory structure at {model_dir}")
-    print(f"✓ Created .gitignore to prevent committing model files")
-    print(f"✓ Created README.md with instructions")
+    print(f"✓ .gitignore present at {gitignore_path}")
+    print(f"✓ README.md present at {readme_path}")
 
 
 def main():

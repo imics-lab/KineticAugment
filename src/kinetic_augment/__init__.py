@@ -65,7 +65,7 @@ except ImportError:
 from kinetic_augment.utils.data_formats import load_and_reshape_json, save_to_json
 
 # Backwards compatibility: AugmentationPipeline (deprecated)
-from kinetic_augment.pipeline_legacy import AugmentationPipeline
+from kinetic_augment.legacy.pipeline import AugmentationPipeline
 
 # Evaluation module (Phase 5) - lazy import to avoid heavy dependencies
 def _get_evaluation():

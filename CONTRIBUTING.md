@@ -55,12 +55,18 @@ The process for submitting a code contribution is as follows:
     ```
 3.  **Make your changes.** Add your new feature or fix the bug.
 4.  **Add tests.** If you are adding a new feature, please include tests that cover it. If you are fixing a bug, add a test that demonstrates the bug and shows that your fix works.
-5.  **Ensure your code is clean and well-documented.** Follow the existing coding style and add comments where necessary.
-6.  **Push your branch** to your forked repository on GitHub.
+5.  **Run the tests.** Install the dev extras and run the suite from the repository root:
+    ```bash
+    pip install -e '.[dev]'
+    pytest tests/
+    ```
+    The older print-based smoke scripts in `scripts/legacy/` are not part of the test suite.
+6.  **Ensure your code is clean and well-documented.** Follow the existing coding style and add comments where necessary.
+7.  **Push your branch** to your forked repository on GitHub.
     ```bash
     git push origin your-branch-name
     ```
-7.  **Open a Pull Request** to the `main` branch of the original `KineticAugment` repository.
-8.  **Provide a clear title and description** for your pull request, explaining the changes you have made and referencing any relevant issues.
+8.  **Open a Pull Request** to the `main` branch of the original `KineticAugment` repository.
+9.  **Provide a clear title and description** for your pull request, explaining the changes you have made and referencing any relevant issues.
 
 Your pull request will be reviewed by the maintainers. We may ask for changes before it is merged. We appreciate your contribution!

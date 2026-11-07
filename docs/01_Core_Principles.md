@@ -67,4 +67,4 @@ These principles ensure that the physically possible motion is also valid within
 
 These six principles form the theoretical foundation. The next section describes the software architecture designed to implement and enforce them.
 
-➡️ **Next: [02 - Framework Architecture](./02_Framework_Architecture.md)**
+➡️ **Next: [02 - Framework Architecture](./legacy/02_Framework_Architecture.md)**

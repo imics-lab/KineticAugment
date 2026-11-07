@@ -1,3 +1,6 @@
+> **Legacy:** This is the original development plan and status checklist ("v0.1 prototype"). It is out of date: it claims every phase is complete and the framework production-ready, and it lists files that do not exist.
+> For the current scope and results see [V1_Problem_Scope](../V1_Problem_Scope.md) and the `V1_*_Findings` logs; for the API see the [README](../../README.md).
+
 # 06: KineticAugment Development Roadmap
 
 ## Executive Summary
