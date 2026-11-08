@@ -1,15 +1,18 @@
 """
 Week-4 temporal augmentations: time warping, frame dropping and hand dropout.
 
-Time warping builds fractional source times and resamples the clip with `resample_clip`.
+Time warping builds fractional source times and resamples the clip with `resample_clip`, then
+puts the result on the clip's clock (frame index / fps, see `ClipData`): factor > 1 is slower, so
+the warped clip lasts longer in seconds.
 `times_from_rates` turns per-interval output durations into those times: `durations[i]` is how
 many output frames source interval `i` lasts. The output grid is 0..round(total) with the last
 point pinned to `total`, so the first and last source frames are always kept and the grid steps
 are exactly one output frame (only the final step can differ, shorter or longer).
 
-Frame dropping keeps a subset of frames (nearest to a fps grid, or random with a gap limit in
-real time from `clip.times_s`), optionally filling the dropped ones by holding or interpolating.
-Hand dropout works on the outputs: runs of NaN hand rows, drawn only on detected frames.
+Frame dropping keeps a subset of frames (nearest to a fps grid, or random), never leaving a gap
+longer than `max_gap_ms` on `clip.times_s`, optionally filling the dropped ones by holding or
+interpolating. Hand dropout works on the outputs: runs of NaN hand rows, drawn only on detected
+frames.
 """
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -204,7 +207,11 @@ class TimeWarp(ClipAugmentation):
         draw["output_frames"] = int(len(times))
         if len(times) == target.frames and np.array_equal(times, np.arange(target.frames)):
             return target
-        return resample_clip(target, times)
+        warped = resample_clip(target, times)
+        # `resample_clip` interpolates `times_s` on the source clock (frame drop's interpolate
+        # fill needs that). A warped clip is played at `fps`, so it gets the frame clock instead.
+        clock = float(target.times_s[0]) + np.arange(warped.frames) / float(target.fps)
+        return warped.replace(times_s=clock)
 
     def identity_draw(self) -> Dict[str, Any]:
         return {
@@ -248,11 +255,12 @@ class FrameDrop(ClipAugmentation):
         p = float(parse_range(self.ranges["p"]).draw(rng))
         uniforms = rng.random(clip.frames)
         times = np.asarray(clip.times_s, dtype=np.float64)
+        max_gap = float(self.ranges["max_gap_ms"]) / 1000
         if mode == "rate":
             fps = min(max(target, float(self.ranges["min_fps"])), float(clip.fps))
-            keep = self._rate_keep(times, fps)
+            keep = self._close_gaps(times, self._rate_keep(times, fps), max_gap)
         else:
-            keep = self._random_keep(times, p, uniforms, float(self.ranges["max_gap_ms"]) / 1000)
+            keep = self._random_keep(times, p, uniforms, max_gap)
         return {
             "mode": mode,
             "target_fps": target,
@@ -272,6 +280,28 @@ class FrameDrop(ClipAugmentation):
         nearer_left = (grid - times[index - 1]) <= (times[index] - grid)
         index = np.where(nearer_left, index - 1, index)
         return np.unique(np.concatenate([[0], index, [count - 1]]))
+
+    @staticmethod
+    def _close_gaps(times: np.ndarray, keep: np.ndarray, max_gap: float) -> np.ndarray:
+        """
+        `keep` with frames added so no gap exceeds `max_gap` seconds where the source allows it.
+
+        Greedy, as in random mode: from each kept frame, the next frame kept inside a too-long gap
+        is the furthest one still within `max_gap` (or the very next frame if even that is too
+        far, i.e. the source itself has the gap).
+        """
+        keep = [int(i) for i in keep]
+        out = keep[:1]
+        for k in keep[1:]:
+            while times[k] - times[out[-1]] > max_gap + 1e-9:
+                last = out[-1]
+                reach = int(np.searchsorted(times, times[last] + max_gap + 1e-9, side="right")) - 1
+                out.append(min(max(reach, last + 1), k))
+                if out[-1] == k:
+                    break
+            if out[-1] != k:
+                out.append(k)
+        return np.array(out, dtype=int)
 
     @staticmethod
     def _random_keep(times: np.ndarray, p: float, uniforms: np.ndarray, max_gap: float):
@@ -312,11 +342,17 @@ class FrameDrop(ClipAugmentation):
 
 @AugmentationRegistry.register("temporal.hand_dropout")
 class HandDropout(ClipAugmentation):
-    """Runs of missing hand detections: NaN hand rows and `hand_valid` false."""
+    """
+    Runs of missing hand detections: NaN hand rows and `hand_valid` false.
+
+    `start_rate` is the chance a run starts at each output frame, so it is per frame, not per
+    second: after a time warp or frame drop has changed the frame count, the same rate gives a
+    different number of runs per second of signing.
+    """
 
     key = "hand_dropout"
     stage = "outputs"
-    regions = ("temporal", "fingers")
+    regions = ("temporal",)
     DEFAULT_RANGES = {"start_rate": [0.0, 0.05], "run_length_mean": 1.9, "max_run_frames": 10}
 
     def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):

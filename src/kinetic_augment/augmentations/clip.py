@@ -72,6 +72,13 @@ class ClipData:
 
     T is the frame count. Rotations are NaN where the body was not fitted (`body_ok` false);
     `face_local` is NaN where no face was attached (`face_valid` false).
+
+    Time base: frame index / `fps` is the clip's clock, and `times_s[t]` is frame t's time on it
+    in seconds. A clip straight from `clip_from_result` has `times_s[t] = t / fps` (plus any
+    gaps in the source frame numbers). Time warping re-times every frame onto
+    `times_s[0] + t / fps`, so a slower (factor > 1) clip lasts longer. Frame dropping with
+    `fill="none"` keeps the surviving frames' timestamps, so `diff(times_s)` shows the gaps the
+    drop opened; `hold` and `interpolate` restore the original timestamps.
     """
 
     clip_id: str
@@ -186,7 +193,9 @@ def resample_clip(clip: ClipData, times: np.ndarray) -> ClipData:
 
     Rotations by `slerp_resample`; translation, blendshapes (as whole vectors) and face points
     by `tier1.resample_points`; the boolean masks from the nearest frame; `times_s` by linear
-    interpolation; the camera by `WeakCamera.resampled`.
+    interpolation on the source clock (so fractional times recover the original timestamps, as
+    frame drop's `fill="interpolate"` needs); the camera by `WeakCamera.resampled`. A caller that
+    changes the playback duration (`TimeWarp`) sets the new clock itself.
 
     Raises:
         ValueError: a time is NaN/inf or outside `[0, frames - 1]`.

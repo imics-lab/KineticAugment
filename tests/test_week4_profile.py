@@ -250,3 +250,31 @@ def test_probability_zero_skips_every_entry():
         e.probability = 0.0
     result = AugmentationChain(profile, get_skeleton()).run(synthetic_clip(frames=12))
     assert result.applied == [] and result.draws == {}
+
+
+@requires_smplx
+@pytest.mark.parametrize(
+    "drop",
+    [{}, {"p": [1.0, 1.0]}, {"mode_weights": {"rate": 1, "random": 0}, "target_fps": [8, 8]}],
+    ids=["default", "p1", "rate8"],
+)
+def test_chain_warp_then_drop_on_frame_clock(drop):
+    """A 1.65x warp then frame drop: gaps, fps and timestamps all on the frame-index clock."""
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    profile = load_profile(default_path())
+    warp, frame_drop = profile.entry("temporal.time_warp"), profile.entry("temporal.frame_drop")
+    warp.ranges["duration"] = [1.65, 1.65]
+    frame_drop.ranges.update(drop)
+    warp.probability = frame_drop.probability = 1.0
+    clip = synthetic_clip(frames=60)
+    result = AugmentationChain(profile, get_skeleton()).run(clip)
+    assert result.draws["temporal.time_warp"]["output_frames"] == 98
+    times = result.outputs.times_s
+    max_gap_s = frame_drop.ranges["max_gap_ms"] / 1000.0
+    gaps = np.diff(times)
+    assert gaps.max() <= max_gap_s + 1e-9
+    assert (len(times) - 1) / (times[-1] - times[0]) >= frame_drop.ranges["min_fps"]
+    steps = gaps * result.clip.fps
+    np.testing.assert_allclose(steps, np.round(steps), atol=1e-9)
+    assert np.all(np.round(steps) >= 1)

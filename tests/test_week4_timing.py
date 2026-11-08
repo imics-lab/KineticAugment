@@ -48,7 +48,31 @@ def test_uniform_matches_tier1():
     draw = aug.sample(np.random.default_rng(0), clip, make_ctx(1.25))
     assert draw["mode"] == "none"
     np.testing.assert_array_equal(aug.times(30, draw), tier1.duration_times(30, 1.25))
-    assert aug.apply(clip, draw, make_ctx(1.25)).frames == len(tier1.duration_times(30, 1.25))
+    out = aug.apply(clip, draw, make_ctx(1.25))
+    assert out.frames == len(tier1.duration_times(30, 1.25))
+    # factor > 1 is slower: the clip is longer in seconds, one frame per 1 / fps
+    np.testing.assert_allclose(np.diff(out.times_s), 1.0 / clip.fps, atol=1e-12)
+    assert out.times_s[-1] > clip.times_s[-1]
+
+
+@requires_smplx
+def test_time_warp_then_drop_keeps_gap_limit():
+    """Frame drop measures gaps on the warped clip's own clock (frame index / fps)."""
+    from tests.clip_fixtures import synthetic_clip
+
+    clip = synthetic_clip(frames=60)
+    warp = TimeWarp()
+    warped = warp.apply(clip, warp.sample(np.random.default_rng(0), clip, make_ctx(1.65)), None)
+    assert warped.frames == 98
+    for ranges in (
+        {"p": [1.0, 1.0]},
+        {"mode_weights": {"rate": 1, "random": 0}, "target_fps": [8, 8]},
+    ):
+        drop = FrameDrop(ranges)
+        out = drop.apply(warped, drop.sample(np.random.default_rng(1), warped, None), None)
+        gaps = np.diff(out.times_s)
+        assert gaps.max() <= 0.125 + 1e-9
+        np.testing.assert_allclose(gaps * warped.fps, np.round(gaps * warped.fps), atol=1e-9)
 
 
 @requires_smplx
@@ -150,8 +174,9 @@ def test_time_warp_modes_apply_and_registered():
         draw = aug.sample(np.random.default_rng(3), clip, ctx)
         out = aug.apply(clip, draw, ctx)
         assert out.frames == draw["output_frames"]
-        assert out.times_s[0] == clip.times_s[0]
-        np.testing.assert_allclose(out.times_s[-1], clip.times_s[-1])
+        # frame index / fps is the clip's clock: the warped clip is re-timed on it
+        expected = clip.times_s[0] + np.arange(out.frames) / clip.fps
+        np.testing.assert_allclose(out.times_s, expected, atol=1e-12)
 
 
 def test_time_warp_validation():
@@ -206,6 +231,22 @@ def test_frame_drop_rate_mode():
     draw = aug.sample(np.random.default_rng(0), clip, None)
     out = aug.apply(clip, draw, None)
     assert 18 <= out.frames <= 22 and draw["keep"][0] == 0 and draw["keep"][-1] == 59
+
+
+@requires_smplx
+def test_frame_drop_rate_mode_keeps_gap_limit():
+    """At min_fps 8 on a 30 fps grid the nearest frames can sit 158 ms apart; the gap check
+    adds frames so no gap exceeds max_gap_ms."""
+    from tests.clip_fixtures import synthetic_clip
+
+    clip = synthetic_clip(frames=90)
+    aug = FrameDrop({"mode_weights": {"rate": 1, "random": 0}, "target_fps": [8, 8]})
+    draw = aug.sample(np.random.default_rng(0), clip, None)
+    out = aug.apply(clip, draw, None)
+    assert np.diff(out.times_s).max() <= 0.125 + 1e-9
+    assert out.frames < clip.frames
+    loose = FrameDrop._rate_keep(clip.times_s, 8.0)
+    assert np.diff(clip.times_s[loose]).max() > 0.125  # without the check it would exceed it
 
 
 @requires_smplx
