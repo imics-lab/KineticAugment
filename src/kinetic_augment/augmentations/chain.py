@@ -6,13 +6,17 @@ The week-4 augmentation chain: every enabled profile entry, in one fixed order.
 enabled entry samples and applies on the clip as it stands at that point, from its own stream
 `ranges.clip_rng(seed, clip_id, "region.key")`, so adding or removing one entry never changes
 another's draw. The first number of that stream is the probability gate (`< probability` keeps
-the entry); a gated-out entry records nothing. The scene entries read their values from the
-Tier 1 draw and count as applied only when that value is not the identity. `scene.uncentre`
-needs the clip's camera: without one it is skipped and recorded in `fallbacks` as "no_camera".
-After the clip stages, `build_outputs` runs and the `stage == "outputs"` entries (hand dropout)
-edit those outputs.
+the entry); a gated-out entry records `{"gated": True}` in `draws` and is not applied. The scene
+entries read their values from the Tier 1 draw and count as applied only when that value is not
+the identity. `scene.uncentre` needs the clip's camera: without one it is skipped and recorded in
+`fallbacks` as "no_camera". After the clip stages, `build_outputs` runs and the
+`stage == "outputs"` entries (hand dropout) edit those outputs.
 
-Every draw dict is recorded after `apply`, so it holds the diagnostics `apply` added.
+Every draw dict is recorded after `apply`, so it holds the diagnostics `apply` added. A
+`"fallback"` in it is also copied to `ChainResult.fallbacks`. Each clip-stage entry that keeps
+the frame count (every one but the temporal ones) also gets `"wrist_moved_mm_max"`: the largest
+movement of either wrist over the fitted frames, in mm, from forward kinematics before and after
+it (body frame, before the scene transform, so the scene entries record 0.0).
 """
 
 import zlib
@@ -22,6 +26,7 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 
 from .base import AugmentationRegistry
+from .body import wrist_world
 from .clip import ChainContext, ClipData
 from .outputs import ClipOutputs, build_outputs
 from .profile import Profile, tier1_ranges
@@ -49,6 +54,13 @@ ORDER: Tuple[str, ...] = (
 _LEFT_SHOULDER, _RIGHT_SHOULDER = 11, 12
 
 
+def _wrist_moved_mm_max(before: np.ndarray, after: np.ndarray) -> float:
+    """Largest per-frame wrist movement between two (T, 2, 3) `wrist_world` arrays, in mm."""
+    move = np.linalg.norm(np.asarray(after) - np.asarray(before), axis=-1)
+    move = move[np.isfinite(move)]
+    return float(move.max() * 1000.0) if move.size else 0.0
+
+
 @dataclass
 class ChainResult:
     clip: ClipData
@@ -74,6 +86,14 @@ def _non_identity(name: str, draw: Dict[str, Any]) -> bool:
 
 
 class AugmentationChain:
+    """
+    Run a profile's enabled entries on clips, in `ORDER` (see the module docstring).
+
+    Set `clip.camera` first, with `scene.fit_clip_camera(clip, hands, skeleton,
+    frames=result.frames)`: without a camera `scene.uncentre` is skipped (fallback "no_camera")
+    and the image-space outputs are None.
+    """
+
     def __init__(self, profile: Profile, skeleton):
         self.profile = profile
         self.skeleton = skeleton
@@ -109,6 +129,12 @@ class AugmentationChain:
         applied: List[str] = []
         fallbacks: Dict[str, str] = {}
         target: Any = clip
+        wrists: Dict[str, Any] = {"clip": None, "world": None}
+
+        def wrists_of(c: ClipData) -> np.ndarray:
+            if wrists["clip"] is not c:  # cached: the next step's "before" is this one's "after"
+                wrists["clip"], wrists["world"] = c, wrist_world(c, ctx.parents)
+            return wrists["world"]
 
         def step(name: str, target: Any) -> Any:
             aug = self.augmentations[name]
@@ -117,13 +143,20 @@ class AugmentationChain:
                 return target
             rng = clip_rng(seed, clip.clip_id, name)
             if not rng.random() < aug.probability:
+                draws[name] = {"gated": True}
                 return target
             draw = aug.sample(rng, target, ctx)
-            target = aug.apply(target, draw, ctx)
+            measure = aug.stage == "clip" and "temporal" not in aug.regions
+            before = wrists_of(target) if measure else None
+            out = aug.apply(target, draw, ctx)
+            if measure and out.frames == target.frames:
+                draw["wrist_moved_mm_max"] = _wrist_moved_mm_max(before, wrists_of(out))
             draws[name] = draw
+            if draw.get("fallback"):
+                fallbacks[name] = str(draw["fallback"])
             if _non_identity(name, draw):
                 applied.append(name)
-            return target
+            return out
 
         for name in ORDER:
             if name in self.augmentations and self.augmentations[name].stage == "clip":

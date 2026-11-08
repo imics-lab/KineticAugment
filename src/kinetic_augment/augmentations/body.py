@@ -126,7 +126,8 @@ class ArmCoupledNoise(ClipAugmentation):
             joints.append(_draw_dict(side, "wrist", _clamp_norm(wrist, limit)))
         return {"joints": joints, "drift": self._drift(rng, clip)}
 
-    def _drift(self, rng: np.random.Generator, clip: ClipData) -> Optional[np.ndarray]:
+    def _drift(self, rng: np.random.Generator, clip: ClipData) -> Optional[List[List[float]]]:
+        """(T, 6) slow per-frame angle drift in degrees as nested lists, or None if off."""
         std = float(self.ranges["drift_deg"])
         if std <= 0:
             return None
@@ -139,7 +140,7 @@ class ArmCoupledNoise(ClipAugmentation):
         # Scale by the filter's noise gain (|H|^4 averaged over frequency), so the std is exact.
         _, h = freqz(b, a, worN=4096)
         gain = float(np.sqrt(np.mean(np.abs(h) ** 4)))
-        return filtfilt(b, a, noise, axis=0)[pad : pad + frames] / gain * std
+        return (filtfilt(b, a, noise, axis=0)[pad : pad + frames] / gain * std).tolist()
 
     def apply(self, target: ClipData, draw: Dict[str, Any], ctx: ChainContext) -> ClipData:
         base = [ArmJointDraw(**{**j, "axis": tuple(j["axis"])}) for j in draw["joints"]]

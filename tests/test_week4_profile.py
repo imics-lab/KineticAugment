@@ -251,7 +251,9 @@ def test_probability_zero_skips_every_entry():
     for e in profile.entries:
         e.probability = 0.0
     result = AugmentationChain(profile, get_skeleton()).run(synthetic_clip(frames=12))
-    assert result.applied == [] and result.draws == {}
+    assert result.applied == []
+    # gated out is recorded, so a report can tell it from disabled
+    assert result.draws == {e.name: {"gated": True} for e in profile.entries if e.enabled}
 
 
 @requires_smplx
@@ -361,3 +363,60 @@ def test_wrong_distribution_fails_at_load(tmp_path):
     )
     with pytest.raises(ValueError, match="distribution"):
         load_profile(path)
+
+
+def only(*names):
+    profile = all_disabled()
+    for name in names:
+        profile.entry(name).enabled = True
+        profile.entry(name).probability = 1.0
+    return profile
+
+
+@requires_smplx
+def test_chain_records_wrist_movement():
+    """Spec section 6: every clip-stage entry reports how far it moved the wrists."""
+    import json
+
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    clip = synthetic_clip(frames=12)
+    names = (
+        "body.joint_coupled_noise",
+        "fingers.joint_coupled_noise",
+        "body.limb_length_scaling",
+        "temporal.time_warp",
+    )
+    profile = only(*names)
+    profile.entry("body.limb_length_scaling").ranges["retarget"] = False
+    result = AugmentationChain(profile, get_skeleton()).run(clip)
+    moved = {n: result.draws[n].get("wrist_moved_mm_max") for n in names}
+    assert isinstance(moved["body.joint_coupled_noise"], float)
+    assert moved["body.joint_coupled_noise"] > 1.0
+    assert moved["body.limb_length_scaling"] > 1.0  # retarget off: the wrists move, and say so
+    assert moved["fingers.joint_coupled_noise"] == 0.0  # fingers sit below the wrist
+    assert moved["temporal.time_warp"] is None  # frame count changes: not measured
+    json.dumps(result.draws)
+
+
+@requires_smplx
+def test_chain_copies_draw_fallbacks():
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    clip = synthetic_clip(frames=12)  # fewer face frames than min_face_frames (30)
+    result = AugmentationChain(only("face.expression_jitter"), get_skeleton()).run(clip)
+    assert result.fallbacks == {"face.expression_jitter": "too_few_face_frames"}
+
+
+@requires_smplx
+def test_arm_noise_drift_draw_is_json():
+    import json
+
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    profile = only("body.joint_coupled_noise")
+    profile.entry("body.joint_coupled_noise").ranges["drift_deg"] = 1.0
+    result = AugmentationChain(profile, get_skeleton()).run(synthetic_clip(frames=12))
+    drift = result.draws["body.joint_coupled_noise"]["drift"]
+    assert isinstance(drift, list) and len(drift) == 12
+    json.dumps(result.draws)
