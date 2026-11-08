@@ -5,7 +5,7 @@ Time warping builds fractional source times and resamples the clip with `resampl
 `times_from_rates` turns per-interval output durations into those times: `durations[i]` is how
 many output frames source interval `i` lasts. The output grid is 0..round(total) with the last
 point pinned to `total`, so the first and last source frames are always kept and the grid steps
-are exactly one output frame (only the final step can be shorter).
+are exactly one output frame (only the final step can differ, shorter or longer).
 
 Frame dropping keeps a subset of frames (nearest to a fps grid, or random with a gap limit in
 real time from `clip.times_s`), optionally filling the dropped ones by holding or interpolating.
@@ -109,15 +109,18 @@ def segment_durations(
     """
     Per-interval output durations, shape (count-1,): `uniform` everywhere and
     `uniform * factor` inside the window `[start_frac, start_frac + width_frac]` of the clip,
-    with a linear blend over `blend_frames` at each edge.
+    with a linear blend over the first and last `blend_frames` intervals inside the window.
+    Intervals whose centre lies outside the window keep exactly `uniform`.
     """
     n = count - 1
     if n < 1:
         raise ValueError("need at least 2 frames")
     lo, hi = start_frac * n, (start_frac + width_frac) * n
     centres = np.arange(n) + 0.5
-    outside = np.maximum(np.maximum(lo - centres, centres - hi), 0.0)
-    weight = np.clip(1.0 - outside / max(float(blend_frames), 1e-9), 0.0, 1.0)
+    blend = max(float(blend_frames), 1e-9)
+    # ramp inward: 0 at the window edges, 1 after `blend_frames` intervals inside (or lower at
+    # the centre of a window narrower than twice the blend); exactly 0 outside the window
+    weight = np.clip(np.minimum(centres - lo, hi - centres) / blend, 0.0, 1.0)
     return uniform * (1.0 + (factor - 1.0) * weight)
 
 

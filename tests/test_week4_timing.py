@@ -91,14 +91,22 @@ def test_segment_only_changes_window():
     durations = segment_durations(count, 0.3, 0.3, factor, uniform, blend_frames=3)
     centres = np.arange(count - 1) + 0.5
     lo, hi = 0.3 * (count - 1), 0.6 * (count - 1)
-    outside = (centres < lo - 3) | (centres > hi + 3)
+    outside = (centres < lo) | (centres > hi)
     np.testing.assert_allclose(durations[outside], uniform, atol=1e-12)
-    inside = (centres > lo) & (centres < hi)
-    np.testing.assert_allclose(durations[inside], uniform * factor, atol=1e-12)
-    times = times_from_rates(durations)
-    steps = np.diff(times)
-    first = int(np.floor(lo - 3 - 1) / uniform) - 1
-    np.testing.assert_allclose(steps[: max(first, 1)], 1.0 / uniform, atol=1e-9)
+    core = (centres > lo + 3) & (centres < hi - 3)
+    np.testing.assert_allclose(durations[core], uniform * factor, atol=1e-12)
+    edge = (centres > lo) & (centres < hi) & ~core
+    assert np.all(durations[edge] != uniform) and np.all(durations[edge] > uniform * factor)
+    # before the window, consecutive output frames are exactly 1 / uniform apart in source time
+    steps = np.diff(times_from_rates(durations))
+    uniform_steps = int(np.floor(np.floor(lo) * uniform))
+    assert uniform_steps > 10
+    np.testing.assert_allclose(steps[:uniform_steps], 1.0 / uniform, atol=1e-9)
+
+
+def test_segment_narrow_window_peaks_below_full():
+    durations = segment_durations(30, 0.4, 0.1, 0.5, 1.0, blend_frames=3)
+    assert durations.min() > 0.5 and durations.min() < 1.0
 
 
 @requires_smplx
@@ -217,7 +225,7 @@ def test_frame_drop_fill_modes():
     assert frames["none"] < 40
     keep = np.array(draw["keep"])
     held = FrameDrop({"p": [0.6, 0.6], "fill": "hold"})
-    out = held.apply(clip, draw | {"fill": "hold"} if False else dict(draw, fill="hold"), None)
+    out = held.apply(clip, dict(draw, fill="hold"), None)
     dropped = np.setdiff1d(np.arange(40), keep)[0]
     previous = keep[keep < dropped].max()
     np.testing.assert_array_equal(out.rotations[dropped], clip.rotations[previous])
