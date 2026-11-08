@@ -2,14 +2,17 @@
 Week-4 YAML profiles: the loader and the Tier 1 range mapping.
 
 A profile file (see `configs/slr_week4_*.yaml`) holds `profile_name`, `seed`, `schema_version: 1`
-and `regions: {region: {key: {enabled, probability, ranges}}}`. `load_profile` checks every entry
-against the registered augmentation, so an unknown region, key or range key is a `ValueError`, not
-something silently ignored. A range key a profile leaves out takes the augmentation's code default
+and `regions: {region: {key: {enabled, probability, ranges}}}`; `seed` is required. `load_profile`
+checks every entry against the registered augmentation, so an unknown top-level key, region,
+entry key (`enable:` for `enabled:`) or range key is a `ValueError`, not something silently
+ignored. A range key a profile leaves out takes the augmentation's code default
 and the loader prints it. `enable` / `disable` override single entries (`"region.key"`), which is
 how one ablation arm is made from the default profile without a file of its own.
 
 `tier1_ranges` turns the scene entries, the uniform duration of `temporal.time_warp` and
-`body.tier1_arm_joints` into the `tier1.Tier1Ranges` the chain samples its shared draw from.
+`body.tier1_arm_joints` into the `tier1.Tier1Ranges` the chain samples its shared draw from. Tier 1
+draws the scale uniform and the duration log-uniform, so a profile asking for another
+`distribution:` on either is refused.
 `body.tier1_arm_joints` has `shoulder_wrist_deg` and `elbow_deg`, but `Tier1Ranges` has one
 `arm_joint_deg`: it takes `shoulder_wrist_deg` and the separate elbow value is ignored in the
 Tier 1 draw.
@@ -27,6 +30,8 @@ from .ranges import parse_range
 from .tier1 import TIER1, Tier1Ranges
 
 SCHEMA_VERSION = 1
+TOP_KEYS = ("profile_name", "seed", "schema_version", "regions")
+ENTRY_KEYS = ("enabled", "probability", "ranges")
 ARM_NOISES = ("body.joint_coupled_noise", "body.tier1_arm_joints")
 
 
@@ -69,7 +74,15 @@ def _parse_entries(regions: Any) -> List[ProfileEntry]:
             cls = AugmentationRegistry.get(name)
             if cls is None:
                 raise ValueError(f"Unknown augmentation {key!r} in region {region!r}")
-            body_ = body_ or {}
+            body_ = {} if body_ is None else body_
+            if not isinstance(body_, dict):
+                raise ValueError(f"Entry {name!r} must be a mapping, got {body_!r}")
+            unknown = [k for k in body_ if k not in ENTRY_KEYS]
+            if unknown:
+                raise ValueError(
+                    f"Unknown key(s) {', '.join(repr(k) for k in unknown)} in entry {name!r}; "
+                    f"expected {list(ENTRY_KEYS)}"
+                )
             ranges = dict(body_.get("ranges") or {})
             probability = float(body_.get("probability", 1.0))
             # Building the instance validates the range keys (and their values) right now.
@@ -91,18 +104,30 @@ def load_profile(
     Read a profile file, apply the `enable` / `disable` overrides and validate it.
 
     Raises:
-        ValueError: schema_version is not 1; an unknown region, key or range key; an override
-            that names an entry the profile does not have; or both arm-noise entries enabled.
+        ValueError: schema_version is not 1; `seed` missing; an unknown top-level key, region,
+            entry key or range key; an override that names an entry the profile does not have;
+            both arm-noise entries enabled; or a Tier 1 range with a distribution Tier 1 does
+            not draw (see `tier1_ranges`).
     """
     with open(path, "r") as handle:
         data = yaml.safe_load(handle) or {}
+    if not isinstance(data, dict):
+        raise ValueError(f"A profile must be a mapping, got {type(data).__name__}")
+    unknown = [k for k in data if k not in TOP_KEYS]
+    if unknown:
+        raise ValueError(
+            f"Unknown top-level key(s) {', '.join(repr(k) for k in unknown)}; "
+            f"expected {list(TOP_KEYS)}"
+        )
     if data.get("schema_version") != SCHEMA_VERSION:
         raise ValueError(
             f"schema_version must be {SCHEMA_VERSION}, got {data.get('schema_version')!r}"
         )
+    if "seed" not in data:
+        raise ValueError("Missing required key 'seed'")
     profile = Profile(
         name=str(data.get("profile_name", Path(path).stem)),
-        seed=int(data.get("seed", 0)),
+        seed=int(data["seed"]),
         schema_version=SCHEMA_VERSION,
         entries=_parse_entries(data.get("regions")),
     )
@@ -117,6 +142,7 @@ def load_profile(
     on = [n for n in ARM_NOISES if (profile.entry(n) is not None and profile.entry(n).enabled)]
     if len(on) == len(ARM_NOISES):
         raise ValueError(f"{ARM_NOISES[0]} and {ARM_NOISES[1]} cannot both be enabled")
+    tier1_ranges(profile)  # refuses a scale / duration distribution Tier 1 does not draw
     return profile
 
 
@@ -130,12 +156,26 @@ def resolved_ranges(profile: Profile, name: str) -> Optional[Dict[str, Any]]:
     return merged
 
 
+def _tier1_spec(value: Any, distribution: str, label: str):
+    spec = parse_range(value, distribution)
+    if spec.distribution != distribution:
+        raise ValueError(
+            f"{label}: Tier 1 draws it {distribution}, so distribution {spec.distribution!r} "
+            "would be ignored"
+        )
+    return spec
+
+
 def tier1_ranges(profile: Profile) -> Tier1Ranges:
     """
     The `Tier1Ranges` the profile's scene, duration and arm-joint entries describe.
 
     A field whose entry is missing keeps `tier1.TIER1`'s value. `arm_joint_deg` is the entry's
     `shoulder_wrist_deg`; its `elbow_deg` is not used by the Tier 1 draw.
+
+    Raises:
+        ValueError: `scene.scale.factor` asks for a distribution other than uniform, or
+            `temporal.time_warp.duration` for one other than log-uniform (Tier 1 hard-codes both).
     """
     fields: Dict[str, Any] = {}
     r = resolved_ranges(profile, "scene.mirror")
@@ -147,14 +187,14 @@ def tier1_ranges(profile: Profile) -> Tier1Ranges:
         fields["pitch_deg"] = float(r["pitch_deg"])
     r = resolved_ranges(profile, "scene.scale")
     if r is not None:
-        spec = parse_range(r["factor"])
+        spec = _tier1_spec(r["factor"], "uniform", "scene.scale.factor")
         fields["scale"] = (spec.lo, spec.hi)
     r = resolved_ranges(profile, "scene.uncentre")
     if r is not None:
         fields["uncentre"] = float(r["limit"])
     r = resolved_ranges(profile, "temporal.time_warp")
     if r is not None:
-        spec = parse_range(r["duration"], "log_uniform")
+        spec = _tier1_spec(r["duration"], "log_uniform", "temporal.time_warp.duration")
         fields["duration"] = (spec.lo, spec.hi)
     r = resolved_ranges(profile, "body.tier1_arm_joints")
     if r is not None:

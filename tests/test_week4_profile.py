@@ -35,7 +35,7 @@ def test_shipped_profiles_load():
 def test_unknown_key_fails(tmp_path):
     bad = tmp_path / "bad.yaml"
     bad.write_text(
-        "schema_version: 1\nregions:\n  body:\n    joint_coupled_noise:\n"
+        "seed: 0\nschema_version: 1\nregions:\n  body:\n    joint_coupled_noise:\n"
         "      enabled: true\n      ranges:\n        bogus: 1\n"
     )
     with pytest.raises(ValueError):
@@ -44,9 +44,9 @@ def test_unknown_key_fails(tmp_path):
 
 def test_schema_region_and_override_errors(tmp_path):
     for text in (
-        "schema_version: 2\nregions: {}\n",
-        "schema_version: 1\nregions:\n  legs: {}\n",
-        "schema_version: 1\nregions:\n  body:\n    nope: {enabled: true}\n",
+        "seed: 0\nschema_version: 2\nregions: {}\n",
+        "seed: 0\nschema_version: 1\nregions:\n  legs: {}\n",
+        "seed: 0\nschema_version: 1\nregions:\n  body:\n    nope: {enabled: true}\n",
     ):
         path = tmp_path / "p.yaml"
         path.write_text(text)
@@ -72,7 +72,7 @@ def test_both_arm_noises_rejected():
 def test_defaulted_keys_are_printed(tmp_path, capsys):
     path = tmp_path / "p.yaml"
     path.write_text(
-        "schema_version: 1\nregions:\n  scene:\n    view:\n      enabled: true\n"
+        "seed: 0\nschema_version: 1\nregions:\n  scene:\n    view:\n      enabled: true\n"
         "      ranges:\n        yaw_deg: 10\n"
     )
     load_profile(path)
@@ -297,4 +297,65 @@ def test_bad_strength_fails_at_load(tmp_path, region, key, ranges):
         f"      enabled: true\n      ranges:\n        {ranges}\n"
     )
     with pytest.raises(ValueError):
+        load_profile(path)
+
+
+@pytest.mark.parametrize(
+    "text, key",
+    [
+        ("seed: 0\nschema_version: 1\nregions:\n  scene:\n    view: {enable: true}\n", "enable"),
+        ("seed: 0\nschema_version: 1\nregions:\n  scene:\n    view: {range: {}}\n", "range"),
+        ("sed: 3\nseed: 0\nschema_version: 1\nregions: {}\n", "sed"),
+        ("seed: 0\nschema_version: 1\nprofile: x\nregions: {}\n", "profile"),
+        ("schema_version: 1\nregions: {}\n", "seed"),
+        ("seed: 0\nschema_version: 1\nregions:\n  scene:\n    view: true\n", "scene.view"),
+    ],
+    ids=["entry-typo", "entry-range", "top-typo", "top-unknown", "no-seed", "entry-not-mapping"],
+)
+def test_loader_rejects_unknown_or_missing_keys(tmp_path, text, key):
+    path = tmp_path / "p.yaml"
+    path.write_text(text)
+    with pytest.raises(ValueError, match=f"'{key}'"):
+        load_profile(path)
+
+
+def test_minimal_profile_loads(tmp_path):
+    path = tmp_path / "p.yaml"
+    path.write_text("seed: 7\nschema_version: 1\nregions:\n  scene:\n    view: {enabled: true}\n")
+    profile = load_profile(path)
+    assert profile.seed == 7 and profile.entry("scene.view").enabled
+
+
+@pytest.mark.parametrize(
+    "entry, ranges",
+    [
+        ("scene.scale", {"factor": {"range": [0.8, 1.2], "distribution": "log_uniform"}}),
+        ("temporal.time_warp", {"duration": {"range": [0.6, 1.65], "distribution": "uniform"}}),
+    ],
+)
+def test_tier1_ranges_rejects_other_distribution(entry, ranges):
+    profile = load_profile(default_path())
+    profile.entry(entry).ranges.update(ranges)
+    with pytest.raises(ValueError, match="distribution"):
+        tier1_ranges(profile)
+
+
+def test_tier1_ranges_accepts_its_own_distribution():
+    profile = load_profile(default_path())
+    profile.entry("scene.scale").ranges["factor"] = {"range": [0.8, 1.2], "distribution": "uniform"}
+    profile.entry("temporal.time_warp").ranges["duration"] = {
+        "range": [0.7, 1.4],
+        "distribution": "log_uniform",
+    }
+    r = tier1_ranges(profile)
+    assert r.scale == (0.8, 1.2) and r.duration == (0.7, 1.4)
+
+
+def test_wrong_distribution_fails_at_load(tmp_path):
+    path = tmp_path / "p.yaml"
+    path.write_text(
+        "seed: 0\nschema_version: 1\nregions:\n  scene:\n    scale:\n      enabled: true\n"
+        "      ranges:\n        factor: {range: [0.8, 1.2], distribution: log_uniform}\n"
+    )
+    with pytest.raises(ValueError, match="distribution"):
         load_profile(path)
