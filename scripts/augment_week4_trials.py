@@ -6,7 +6,7 @@ For each clip the V1.3 round trip runs on the signing span (`face_pipeline.run_c
 becomes a `ClipData` with its weak camera fitted (`scene.fit_clip_camera`), and the profile is run
 through `AugmentationChain` once per enabled entry (only that entry on, probability forced to 1)
 and once as a whole ("combined"). Every run is measured against the unaugmented clip with
-`report.measure`.
+`report.measure`, and records its timestamp steps in frames (`times_s_step_frames`).
 
 Video: <output-dir>/<clip>_week4_augmentations.mp4 is a grid with one panel per run: a front view
 (the image projection of the clip's camera, y down) of the arm bones (pose 11-16), both hands
@@ -24,7 +24,6 @@ Reads <landmark-dir>/<clip>_hands.npz and <clip>_face.npz. Writes
 
 import argparse
 import copy
-import dataclasses
 import json
 import math
 import os
@@ -242,10 +241,15 @@ def run_clip_trial(clip_id, args, profile, models, output_dir):
                 a.startswith("temporal.") for a in res.applied
             )
             aligned = res.clip.frames == clip.frames and not temporal
+            steps = np.diff(res.outputs.times_s) * float(res.clip.fps)
             entry = {
                 "applied": list(res.applied),
                 "fallbacks": dict(res.fallbacks),
                 "frames": int(res.clip.frames),
+                # timestamp steps in frames of 1 / fps: whole numbers, 1 unless frames were dropped
+                "times_s_step_frames": (
+                    [float(steps.min()), float(steps.max())] if len(steps) else []
+                ),
                 "aligned": bool(aligned),
                 "draws": res.draws,
                 "measure": measure(base_out, res.outputs, aligned),
@@ -264,11 +268,12 @@ def run_clip_trial(clip_id, args, profile, models, output_dir):
         report[name] = entry
         print(f"[{clip_id}] {name}: {entry.get('applied', 'error')}")
     video = output_dir / f"{clip_id}_week4_augmentations.mp4"
-    render(video, float(clip.fps), base_out, panels, clip.frames)
+    if panels:  # every run failed: still write the clip's JSON entry, just no video
+        render(video, float(clip.fps), base_out, panels, clip.frames)
     return {
         "frames": int(clip.frames),
         "fps": float(clip.fps),
-        "video": str(video),
+        "video": str(video) if panels else None,
         "runs": report,
         "seconds": round(time.time() - started, 1),
     }

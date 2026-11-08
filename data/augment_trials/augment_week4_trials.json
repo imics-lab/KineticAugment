@@ -13,6 +13,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "body.joint_coupled_noise": {
@@ -78,7 +82,8 @@
                   ]
                 }
               ],
-              "drift": null
+              "drift": null,
+              "wrist_moved_mm_max": 32.34188775453887
             }
           },
           "measure": {
@@ -89,7 +94,7 @@
             "hand_face_cm_min": 18.120697399485056,
             "in_frame_pct": 99.92527554642257
           },
-          "seconds": 0.06
+          "seconds": 0.07
         },
         "body.limb_length_scaling": {
           "applied": [
@@ -97,6 +102,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "body.limb_length_scaling": {
@@ -104,7 +113,8 @@
                 "upper_arm": 0.9322669019488448,
                 "forearm": 1.0460068021265416
               },
-              "residual_m": 2.3551386880256624e-16
+              "residual_m": 2.3551386880256624e-16,
+              "wrist_moved_mm_max": 4.4754520913118095e-13
             }
           },
           "measure": {
@@ -115,7 +125,7 @@
             "hand_face_cm_min": 16.30624994961954,
             "in_frame_pct": 99.95142910517467
           },
-          "seconds": 0.13
+          "seconds": 0.14
         },
         "body.movement_size": {
           "applied": [
@@ -123,6 +133,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "body.movement_size": {
@@ -137,7 +151,8 @@
                   0.6574828219125474,
                   1.404424824698161
                 ]
-              }
+              },
+              "wrist_moved_mm_max": 1.4119959571537801
             }
           },
           "measure": {
@@ -148,7 +163,7 @@
             "hand_face_cm_min": 16.36430981746099,
             "in_frame_pct": 99.95142910517467
           },
-          "seconds": 0.12
+          "seconds": 0.14
         },
         "body.location_jitter": {
           "applied": [
@@ -156,6 +171,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "body.location_jitter": {
@@ -174,7 +193,8 @@
                   26.08319150143384,
                   26.083191501433785
                 ]
-              }
+              },
+              "wrist_moved_mm_max": 26.0831915014344
             }
           },
           "measure": {
@@ -193,6 +213,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "fingers.joint_coupled_noise": {
@@ -210,7 +234,8 @@
                 -0.8378315168478454,
                 4.99569023512066
               ],
-              "dip_ratio": 0.667
+              "dip_ratio": 0.667,
+              "wrist_moved_mm_max": 0.0
             }
           },
           "measure": {
@@ -221,7 +246,7 @@
             "hand_face_cm_min": 16.157071023820542,
             "in_frame_pct": 99.95142910517467
           },
-          "seconds": 0.05
+          "seconds": 0.06
         },
         "fingers.handshape_jitter": {
           "applied": [
@@ -229,6 +254,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "fingers.handshape_jitter": {
@@ -398,7 +427,8 @@
                   false
                 ]
               },
-              "redraws": 1
+              "redraws": 1,
+              "wrist_moved_mm_max": 0.0
             }
           },
           "measure": {
@@ -409,7 +439,7 @@
             "hand_face_cm_min": 16.32793992252616,
             "in_frame_pct": 99.95142910517467
           },
-          "seconds": 0.05
+          "seconds": 0.07
         },
         "face.expression_jitter": {
           "applied": [
@@ -417,6 +447,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "face.expression_jitter": {
@@ -473,7 +507,8 @@
                 -0.0073885256964197205,
                 0.009508025226645995
               ],
-              "noise": null
+              "noise": null,
+              "wrist_moved_mm_max": 0.0
             }
           },
           "measure": {
@@ -484,7 +519,7 @@
             "hand_face_cm_min": 16.376093920550492,
             "in_frame_pct": 99.95142910517467
           },
-          "seconds": 0.05
+          "seconds": 0.07
         },
         "temporal.time_warp": {
           "applied": [
@@ -492,6 +527,10 @@
           ],
           "fallbacks": {},
           "frames": 69,
+          "times_s_step_frames": [
+            0.9999999999999908,
+            1.000000000000004
+          ],
           "aligned": false,
           "draws": {
             "temporal.time_warp": {
@@ -515,7 +554,7 @@
             "hand_face_cm_min": 15.518959105280242,
             "in_frame_pct": 99.94834266035299
           },
-          "seconds": 0.27
+          "seconds": 0.24
         },
         "temporal.frame_drop": {
           "applied": [
@@ -523,6 +562,10 @@
           ],
           "fallbacks": {},
           "frames": 48,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            2.0000000000000013
+          ],
           "aligned": false,
           "draws": {
             "temporal.frame_drop": {
@@ -597,6 +640,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": false,
           "draws": {
             "temporal.hand_dropout": {
@@ -610,7 +657,7 @@
             "hand_face_cm_min": 16.31862445547778,
             "in_frame_pct": 99.95142910517467
           },
-          "seconds": 0.04
+          "seconds": 0.05
         },
         "scene.mirror": {
           "applied": [
@@ -618,10 +665,15 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "scene.mirror": {
-              "mirror": true
+              "mirror": true,
+              "wrist_moved_mm_max": 0.0
             }
           },
           "measure": {
@@ -641,11 +693,16 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "scene.view": {
               "yaw_deg": -11.979148774579729,
-              "pitch_deg": -2.305486306158318
+              "pitch_deg": -2.305486306158318,
+              "wrist_moved_mm_max": 0.0
             }
           },
           "measure": {
@@ -657,7 +714,7 @@
             "in_frame_pct": 99.95516532785354,
             "bone_length_change_scene_adjusted_mm": 8.326672684688674e-14
           },
-          "seconds": 0.05
+          "seconds": 0.07
         },
         "scene.scale": {
           "applied": [
@@ -665,10 +722,15 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "scene.scale": {
-              "factor": 0.9908358841359524
+              "factor": 0.9908358841359524,
+              "wrist_moved_mm_max": 0.0
             }
           },
           "measure": {
@@ -688,6 +750,10 @@
           ],
           "fallbacks": {},
           "frames": 53,
+          "times_s_step_frames": [
+            0.9999999999999973,
+            1.000000000000004
+          ],
           "aligned": true,
           "draws": {
             "scene.uncentre": {
@@ -699,7 +765,8 @@
               "image_shift": [
                 0.057500823059865314,
                 -0.11464130331576577
-              ]
+              ],
+              "wrist_moved_mm_max": 0.0
             }
           },
           "measure": {
@@ -732,6 +799,10 @@
           ],
           "fallbacks": {},
           "frames": 63,
+          "times_s_step_frames": [
+            0.9999999999999908,
+            2.0000000000000013
+          ],
           "aligned": false,
           "draws": {
             "fingers.joint_coupled_noise": {
@@ -749,7 +820,8 @@
                 -0.8378315168478454,
                 4.99569023512066
               ],
-              "dip_ratio": 0.667
+              "dip_ratio": 0.667,
+              "wrist_moved_mm_max": 0.0
             },
             "fingers.handshape_jitter": {
               "offsets_deg": {
@@ -918,7 +990,8 @@
                   false
                 ]
               },
-              "redraws": 0
+              "redraws": 0,
+              "wrist_moved_mm_max": 0.0
             },
             "body.joint_coupled_noise": {
               "joints": [
@@ -983,14 +1056,16 @@
                   ]
                 }
               ],
-              "drift": null
+              "drift": null,
+              "wrist_moved_mm_max": 32.34188775453887
             },
             "body.limb_length_scaling": {
               "factors": {
                 "upper_arm": 0.9322669019488448,
                 "forearm": 1.0460068021265416
               },
-              "residual_m": 2.0206364052201326e-16
+              "residual_m": 2.0206364052201326e-16,
+              "wrist_moved_mm_max": 3.8559277963506346e-13
             },
             "body.movement_size": {
               "factor": 0.9683460659993148,
@@ -1004,7 +1079,8 @@
                   0.6417918972260728,
                   1.403438549415792
                 ]
-              }
+              },
+              "wrist_moved_mm_max": 1.4109427059742117
             },
             "body.location_jitter": {
               "offset_mm": [
@@ -1022,7 +1098,8 @@
                   26.083191501434094,
                   26.083191501433692
                 ]
-              }
+              },
+              "wrist_moved_mm_max": 26.083191501434094
             },
             "face.expression_jitter": {
               "offsets": [
@@ -1078,17 +1155,21 @@
                 -0.0073885256964197205,
                 0.009508025226645995
               ],
-              "noise": null
+              "noise": null,
+              "wrist_moved_mm_max": 0.0
             },
             "scene.mirror": {
-              "mirror": true
+              "mirror": true,
+              "wrist_moved_mm_max": 0.0
             },
             "scene.view": {
               "yaw_deg": -11.979148774579729,
-              "pitch_deg": -2.305486306158318
+              "pitch_deg": -2.305486306158318,
+              "wrist_moved_mm_max": 0.0
             },
             "scene.scale": {
-              "factor": 0.9908358841359524
+              "factor": 0.9908358841359524,
+              "wrist_moved_mm_max": 0.0
             },
             "scene.uncentre": {
               "u": [
@@ -1099,7 +1180,8 @@
               "image_shift": [
                 0.057500823059865314,
                 -0.11425429147264762
-              ]
+              ],
+              "wrist_moved_mm_max": 0.0
             },
             "temporal.time_warp": {
               "mode": "segment",
@@ -1205,10 +1287,10 @@
             "hand_face_cm_min": 15.723333302319404,
             "in_frame_pct": 100.0
           },
-          "seconds": 0.52
+          "seconds": 0.58
         }
       },
-      "seconds": 13.9
+      "seconds": 14.4
     }
   }
 }
