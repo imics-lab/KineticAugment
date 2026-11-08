@@ -9,6 +9,7 @@
 - `body.py` — Week-4 body augmentations: coupled arm-joint noise (`body.joint_coupled_noise`) the Tier 1 arm-joint wrapper (`body.tier1_arm_joints`), limb length scaling with wrist retargeting (`body.limb_length_scaling`), movement-size scaling (`body.movement_size`) and location jitter (`body.location_jitter`), plus the shared `retarget_wrists` helper.
 - `handshape.py` — Handshape features (signed finger bend, finger states, spread, thumb abduction), `features_changed`, per-joint flexion axes and the mirrored finger-offset helper.
 - `fingers.py` — Week-4 finger augmentations: coupled finger flexion noise (`fingers.joint_coupled_noise`) and handshape-preserving per-joint jitter (`fingers.handshape_jitter`).
+- `face.py` — Week-4 face augmentation: blendshape groups, the per-clip ridge expression map (`fit_expression_map`) and expression jitter (`face.expression_jitter`).
 - `extrinsic.py` — Implements global landmark-space transforms and noise.
 - `intrinsic.py` — Implements SMPL-X joint, hand, limb, and orientation perturbations.
 - `temporal.py` — Implements time warping, speed variation, and frame dropping.
