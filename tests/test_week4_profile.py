@@ -96,6 +96,7 @@ def test_default_ranges_match_spec_table():
     on = {e.name for e in profile.entries if e.enabled}
     assert on == {
         "body.joint_coupled_noise",
+        "fingers.joint_coupled_noise",
         "temporal.time_warp",
         "temporal.frame_drop",
         "scene.mirror",
@@ -122,6 +123,7 @@ def test_literature_and_ambitious_profiles():
     assert (arms["elbow_sigma_deg"], arms["elbow_truncate_deg"]) == (3.75, 7.5)
     drop = ranges_of(lit, "temporal.frame_drop")
     assert (drop["min_fps"], drop["max_gap_ms"]) == (10, 100)
+    assert not lit.entry("fingers.joint_coupled_noise").enabled  # no proven range
     amb = load_profile(CONFIGS / "slr_week4_ambitious.yaml")
     off = {e.name for e in amb.entries if not e.enabled}
     assert off == {"body.tier1_arm_joints"}

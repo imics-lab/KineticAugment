@@ -62,9 +62,9 @@ one for every augmentation, so a reader can see how far past the evidence each o
 
 | Profile | What it contains |
 |---|---|
-| `slr_week4_default.yaml` | Scene augmentations (mirror, view, scale, uncentre), uniform duration, arm joint coupled noise and random frame dropping at the used ranges. Everything else is present but off. |
+| `slr_week4_default.yaml` | Scene augmentations (mirror, view, scale, uncentre), uniform duration, joint coupled noise on the arms and the fingers, and random frame dropping at the used ranges. Everything else is present but off. |
 | `slr_week4_ambitious.yaml` | Everything on at the used ranges, with all three time-warp modes and both frame-drop modes (mouth/jaw and the Tier 1 arm joints stay off). |
-| `slr_week4_literature.yaml` | The default profile's augmentations at the proven ranges. Augmentations with no proven range are off. |
+| `slr_week4_literature.yaml` | The default profile's augmentations at the proven ranges. Augmentations with no proven range are off, so finger joint coupled noise is off here. |
 
 A single ablation arm is made by overriding `enabled` on the default profile:
 `load_profile(path, enable=["face.expression_jitter"])`.

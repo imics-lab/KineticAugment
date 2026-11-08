@@ -75,6 +75,8 @@ The week-4 profiles set every range about 25% beyond the widest range the litera
 | Frame dropping | ≥ 10 fps, where human intelligibility stops improving **[T]**; masked runs ≤ 8 frames **[M4, M10]** | ≥ 8 fps; max gap 125 ms; p = 0–0.2; target 12–25 fps |
 | Hand-dropout runs | runs ≤ 8 frames **[M4, M10]**; start rate none, measured 0.039 per detected interior hand-frame (`scripts/measure_hand_dropout.py`) | runs of 1–10 frames; start rate 0–0.05 |
 
+`configs/slr_week4_default.yaml` turns on the scene augmentations, uniform duration, joint coupled noise on the arms and the fingers, and random frame dropping; everything else is present but off. To run a profile, load it with `load_profile` and pass each clip to `AugmentationChain(profile, skeleton).run(clip)`. Set the clip's camera first with `clip.replace(camera=scene.fit_clip_camera(clip, hands, skeleton, frames=result.frames))`: without it, uncentre is skipped (fallback `no_camera`) and the image-space outputs are `None`.
+
 ## Documentation
 
 *   **[Research onboarding guide](./docs/research-guide/index.md)**: Source walkthroughs, geometry, data/training, evidence-based status and a newcomer learning plan.

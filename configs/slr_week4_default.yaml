@@ -1,4 +1,4 @@
-# Week-4 default profile: the Tier 1 scene augmentations, uniform duration, arm joint noise and frame dropping.
+# Week-4 default profile: the Tier 1 scene augmentations, uniform duration, arm and finger joint coupled noise and frame dropping.
 # Used ranges are about 25% past the proven ones. Everything else is present but off, so every range is visible here.
 # Each range leaf carries "# proven: <range> (<source>)" or "# proven: none — <reason>"; each
 # setting leaf carries "# setting: <what it is>". Proven vs used ranges: docs/Augmentation_Ranges.md.
@@ -47,7 +47,7 @@ regions:
         truncate_mm: 25.0  # proven: 20 mm (production spread [T]); default/ambitious use 25
   fingers:
     joint_coupled_noise:
-      enabled: false  # setting: on/off switch for this augmentation
+      enabled: true  # setting: on/off switch for this augmentation
       probability: 1.0  # setting: chance the augmentation runs on a clip
       ranges:
         sigma_deg: 3.75  # proven: none — no published range; estimate 3° widened 25%
