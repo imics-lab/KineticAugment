@@ -12,12 +12,12 @@ The draws apply to every frame whose body was fitted; unfitted (NaN) frames are 
 """
 
 import dataclasses
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from scipy.signal import butter, filtfilt, freqz
 
-from .arm_ik import two_bone_ik, world_pose
+from .arm_ik import torso_frame, two_bone_ik, world_pose
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
 from .ranges import parse_range, truncated_normal
@@ -240,19 +240,136 @@ class LimbLengthScaling(ClipAugmentation):
         if not self.ranges["retarget"]:
             return target.replace(rest_joints=rest)
 
-        rotations = np.array(target.rotations, dtype=np.float64, copy=True)
-        residual = 0.0
-        for t in range(rotations.shape[0]):
-            if not target.body_ok[t] or not np.isfinite(rotations[t]).all():
-                continue
-            _, pos = world_pose(rotations[t], original, parents)
-            frame = rotations[t]
-            for side, wrist in _WRISTS.items():
-                frame, r = two_bone_ik(frame, rest, parents, side, pos[wrist])
-                residual = max(residual, r)
-            rotations[t] = frame
+        targets = wrist_world(target, parents)
+        out, residual = retarget_wrists(target.replace(rest_joints=rest), targets, parents)
         draw["residual_m"] = float(residual)
-        return target.replace(rest_joints=rest, rotations=rotations)
+        return out
 
     def identity_draw(self) -> Dict[str, Any]:
         return {"factors": {}}
+
+
+def _fitted(clip: ClipData) -> np.ndarray:
+    return np.asarray(clip.body_ok, dtype=bool) & np.isfinite(clip.rotations).all(axis=(1, 2))
+
+
+def wrist_world(clip: ClipData, parents) -> np.ndarray:
+    """(T, 2, 3) world wrist positions (left, right) from `clip.rest_joints`; NaN if unfitted."""
+    out = np.full((clip.frames, 2, 3), np.nan)
+    for t in np.flatnonzero(_fitted(clip)):
+        _, pos = world_pose(clip.rotations[t], clip.rest_joints, parents)
+        out[t] = pos[[_WRISTS["left"], _WRISTS["right"]]]
+    return out
+
+
+def wrist_paths_torso(clip: ClipData, parents) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Each fitted frame's wrists in its own torso frame: (T, 2, 3) coordinates, (T, 3) frame
+    origins and (T, 3, 3) axes (rows x, y, z). Rows of unfitted frames are NaN.
+    """
+    paths = np.full((clip.frames, 2, 3), np.nan)
+    origins = np.full((clip.frames, 3), np.nan)
+    axes = np.full((clip.frames, 3, 3), np.nan)
+    for t in np.flatnonzero(_fitted(clip)):
+        _, pos = world_pose(clip.rotations[t], clip.rest_joints, parents)
+        origins[t], axes[t] = torso_frame(pos)
+        wrists = pos[[_WRISTS["left"], _WRISTS["right"]]]
+        paths[t] = (wrists - origins[t]) @ axes[t].T
+    return paths, origins, axes
+
+
+def retarget_wrists(clip: ClipData, targets_world: np.ndarray, parents) -> Tuple[ClipData, float]:
+    """
+    Aim both arms at `targets_world` (T, 2, 3) in every fitted frame with two-bone IK, using
+    `clip.rest_joints`. Returns the edited clip and the largest IK residual in metres.
+    """
+    rotations = np.array(clip.rotations, dtype=np.float64, copy=True)
+    residual = 0.0
+    for t in np.flatnonzero(_fitted(clip)):
+        frame = rotations[t]
+        for i, side in enumerate(SIDES):
+            frame, r = two_bone_ik(frame, clip.rest_joints, parents, side, targets_world[t, i])
+            residual = max(residual, r)
+        rotations[t] = frame
+    return clip.replace(rotations=rotations), float(residual)
+
+
+def _record_displacement(before: ClipData, after: ClipData, parents, draw: Dict[str, Any]) -> None:
+    """Write the wrists' movement at the first and last fitted frame (mm, per side) to `draw`."""
+    fitted = np.flatnonzero(_fitted(before))
+    if len(fitted) == 0:
+        draw["start_end_displacement_mm"] = {"start": [0.0, 0.0], "end": [0.0, 0.0]}
+        return
+    move = wrist_world(after, parents) - wrist_world(before, parents)
+    mm = np.linalg.norm(move, axis=2) * 1000.0
+    draw["start_end_displacement_mm"] = {
+        "start": [float(v) for v in mm[fitted[0]]],
+        "end": [float(v) for v in mm[fitted[-1]]],
+    }
+
+
+def _edit_paths(target: ClipData, parents, edit, draw: Dict[str, Any]) -> ClipData:
+    """Retarget the wrists to `edit(paths (T,2,3) in torso coords, fitted mask)` and record it."""
+    paths, origins, axes = wrist_paths_torso(target, parents)
+    fitted = _fitted(target)
+    new_paths = edit(paths, fitted)
+    targets = np.full_like(paths, np.nan)
+    for t in np.flatnonzero(fitted):
+        targets[t] = origins[t] + new_paths[t] @ axes[t]
+    out, residual = retarget_wrists(target, targets, parents)
+    draw["residual_m"] = residual
+    _record_displacement(target, out, parents, draw)
+    return out
+
+
+@AugmentationRegistry.register("body.movement_size")
+class MovementSizeScaling(ClipAugmentation):
+    """Scale both wrists' torso-frame paths about their own centroids by one shared factor."""
+
+    key = "movement_size"
+    regions = ("body",)
+    DEFAULT_RANGES = {"factor": [0.8, 1.2]}
+    DISTRIBUTIONS = {"factor": "log_uniform"}
+
+    def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
+        spec = parse_range(self.ranges["factor"], self.DISTRIBUTIONS["factor"])
+        return {"factor": float(spec.draw(rng))}
+
+    def apply(self, target: ClipData, draw: Dict[str, Any], ctx: ChainContext) -> ClipData:
+        factor = float(draw["factor"])
+        if factor == 1.0:
+            return target
+        parents = np.asarray(ctx.parents, dtype=int)
+
+        def edit(paths, fitted):
+            centroid = paths[fitted].mean(axis=0)  # (2, 3)
+            return centroid + factor * (paths - centroid)
+
+        return _edit_paths(target, parents, edit, draw)
+
+    def identity_draw(self) -> Dict[str, Any]:
+        return {"factor": 1.0}
+
+
+@AugmentationRegistry.register("body.location_jitter")
+class LocationJitter(ClipAugmentation):
+    """Shift both wrists, in every frame, by one torso-frame offset."""
+
+    key = "location_jitter"
+    regions = ("body",)
+    DEFAULT_RANGES = {"sigma_mm": 12.5, "truncate_mm": 25.0}
+
+    def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
+        sigma, limit = float(self.ranges["sigma_mm"]), float(self.ranges["truncate_mm"])
+        offset = truncated_normal(rng, sigma, limit, size=3)
+        return {"offset_mm": [float(v) for v in offset]}
+
+    def apply(self, target: ClipData, draw: Dict[str, Any], ctx: ChainContext) -> ClipData:
+        offset = np.asarray(draw["offset_mm"], dtype=np.float64) / 1000.0
+        if not offset.any():
+            return target
+        parents = np.asarray(ctx.parents, dtype=int)
+        return _edit_paths(target, parents, lambda paths, fitted: paths + offset, draw)
+
+    def identity_draw(self) -> Dict[str, Any]:
+        return {"offset_mm": [0.0, 0.0, 0.0]}
