@@ -253,6 +253,8 @@ def test_build_outputs_identity_scene():
 def test_build_outputs_unfitted_frames_stay_nan():
     from tests.clip_fixtures import get_skeleton, synthetic_clip
 
+    from tests.clip_fixtures import synthetic_clip
+
     clip = synthetic_clip(frames=6)
     rotations, body_ok = clip.rotations.copy(), clip.body_ok.copy()
     rotations[3] = np.nan
@@ -325,3 +327,14 @@ def test_build_outputs_mirror_swaps_sides(monkeypatch):
     left = clip.blendshape_names.index("eyeBlinkLeft")
     right = clip.blendshape_names.index("eyeBlinkRight")
     np.testing.assert_array_equal(mirrored.blendshapes[:, left], base.blendshapes[:, right])
+
+
+@requires_smplx
+def test_resample_clip_rejects_bad_times():
+    from tests.clip_fixtures import synthetic_clip
+
+    clip = synthetic_clip(frames=6)
+    for bad in ([0.0, 5.5], [-0.1, 2.0], [0.0, float("nan")], [0.0, float("inf")]):
+        with pytest.raises(ValueError, match="times"):
+            resample_clip(clip, np.array(bad))
+    resample_clip(clip, np.array([0.0, 5.0]))

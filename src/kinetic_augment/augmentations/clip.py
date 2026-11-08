@@ -187,9 +187,14 @@ def resample_clip(clip: ClipData, times: np.ndarray) -> ClipData:
     Rotations by `slerp_resample`; translation, blendshapes (as whole vectors) and face points
     by `tier1.resample_points`; the boolean masks from the nearest frame; `times_s` by linear
     interpolation; the camera by `WeakCamera.resampled`.
+
+    Raises:
+        ValueError: a time is NaN/inf or outside `[0, frames - 1]`.
     """
     times = np.asarray(times, dtype=np.float64)
     count = clip.frames
+    if not np.all(np.isfinite(times)) or np.any(times < 0) or np.any(times > count - 1):
+        raise ValueError(f"times must be finite and within [0, {count - 1}]")
     nearest = np.clip(np.rint(times), 0, count - 1).astype(int)
     source = np.arange(count, dtype=np.float64)
     return clip.replace(
