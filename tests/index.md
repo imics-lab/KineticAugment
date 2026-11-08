@@ -26,6 +26,7 @@
 - `test_week4_clip.py` — Tests the clip container, slerp re-timing, frame selection, skinning on edited rest joints and the MediaPipe-layout outputs (unfitted frames, no face, mirroring).
 - `test_week4_arm_ik.py` — Tests the two-bone arm IK (reachable, unreachable, zero-move, swivel side, straight-arm pole) and the torso frame on the real SMPL-X skeleton.
 - `test_week4_body_noise.py` — Tests coupled arm-joint noise (limits, side coupling, constant/drift, NaN frames, bone lengths) and the Tier 1 arm-joint wrapper.
+- `test_week4_limb_length.py` — Tests limb length scaling: bone lengths, identity, wrist retargeting (reachable and unreachable), draw ranges.
 - `test_tier1.py` — Tests the Tier 1 augmentations: sampling ranges, transforms, re-timing, the camera fit and the hands-in-frame limit.
 - `test_head_converter.py` — Tests head occlusion and robust head rotation.
 - `test_head_placement.py` — Tests the 11-point neck fit: synthetic recovery of the head joint under 1 mm with the head rotation reproduced exactly.
