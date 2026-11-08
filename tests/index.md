@@ -46,4 +46,5 @@
 - `test_extract_face_landmarks.py` — Integration test: real FaceLandmarker on a pilot clip (face found, frames align with hands, head-matrix layout).
 - `test_face_metrics.py` — Tests the gate metrics: matrix rotation scale removal, head-pose agreement, correspondence floor.
 - `test_week4_profile.py` — Tests the week-4 profile loader, the proven-range comments in the shipped YAMLs, the chain's determinism, identity and stream independence.
+- `test_week4_report.py` — Tests `report.measure`: identity gives zeros, a 1 cm wrist shift reads 10 mm, unaligned runs skip the frame-by-frame keys.
 - `index.md` — Index of automated test files.

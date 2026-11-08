@@ -19,4 +19,5 @@
 - `temporal.py` — Implements time warping, speed variation, and frame dropping.
 - `timing.py` — Week-4 temporal augmentations: time warp modes (uniform, varied speed, slowed segment), frame dropping (rate or random with a gap limit; none/hold/interpolate fill) and hand-dropout runs.
 - `tier1.py` — Tier 1 augmentations (Augmentation_Grounding.md §3): per-clip sampling from the evidence ranges, view/mirror/scale transforms, uniform duration change, and a weak-perspective camera that keeps the hands in frame when uncentring.
+- `report.py` — `measure(base, aug, aligned)`: wrist movement, bone-length change, wrist jitter ratio, face rigidity, closest hand-to-face distance and in-frame share for one augmented run.
 - `index.md` — Index of modular augmentation implementations.

@@ -43,4 +43,5 @@
 - `view_proximity_round_trip.py` — Renders the hand-to-face proximity comparison video of a clip (V1.3): video with the projected SMPL-X head and per-hand readouts of image, original 3-D and depth-corrected 3-D distance, front and side views with original and corrected wrists, the corrected SMPL-X figure, and a strip of the three closest distances; saves stills where image near / corrected contact first occur.
 - `view_round_trip.py` — Renders per-clip videos of the V1 round trip: input vs SMPL-X reconstruction, joints coloured by error, error-over-time strip.
 - `visualize_hand_round_trip.py` — Fits the V1.2 hands on the pilot clips and draws how they are detected and how the MANO / SMPL-X round trip looks.
+- `augment_week4_trials.py` — Week-4 visual trial: runs each enabled profile entry alone (probability 1) plus the whole profile on cached clips, renders one front-view panel per run over the base in grey, and writes the per-run draws, fallbacks and `report.measure` values to JSON.
 - `index.md` — Index of setup, rendering, and phase-check scripts.
