@@ -145,7 +145,12 @@ class ExpressionJitter(ClipAugmentation):
             return target
         delta = np.asarray(draw["offsets"], dtype=np.float64)[None, :]
         if draw.get("noise") is not None:
-            delta = delta + np.asarray(draw["noise"], dtype=np.float64)
+            noise = np.asarray(draw["noise"], dtype=np.float64)
+            if noise.shape[0] != target.blendshapes.shape[0]:
+                raise ValueError(
+                    f"draw noise has {noise.shape[0]} frames, clip has {target.blendshapes.shape[0]}"
+                )
+            delta = delta + noise
         old = np.asarray(target.blendshapes, dtype=np.float64)
         new = old.copy()
         new[valid, 1:] = np.clip(

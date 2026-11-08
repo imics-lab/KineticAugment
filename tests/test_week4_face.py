@@ -8,7 +8,10 @@ from kinetic_augment.augmentations.face import (
     ExpressionJitter,
     fit_expression_map,
 )
+from kinetic_augment.augmentations.clip import ClipData
 from kinetic_augment.body_model.face_correspondence import RIGID
+from tests.clip_fixtures import synthetic_clip
+from tests.hand_assets import requires_smplx
 
 NAMES = (
     "_neutral", "browDownLeft", "browDownRight", "browInnerUp", "browOuterUpLeft",
@@ -164,9 +167,42 @@ def test_frame_noise_varies_over_time_and_validates_fps():
     assert noise.std(axis=0).max() > 0
     mouth = [i for i, n in enumerate(NAMES[1:]) if BLENDSHAPE_GROUPS["mouth_jaw"](n)]
     assert not noise[:, mouth].any()
-    clip.fps = 4.0
+
+
+@requires_smplx
+def test_frame_noise_fps_guard_real_clip():
+    aug = ExpressionJitter(ranges={"frame_noise": 0.05})
+    clip = synthetic_clip(frames=40).replace(fps=4.0)
     with pytest.raises(ValueError, match="fps"):
         aug.sample(np.random.default_rng(0), clip, None)
+
+
+@requires_smplx
+def test_real_clip_round_trip():
+    aug = ExpressionJitter(ranges={"mouth_jaw": {"enabled": True}})
+    clip = synthetic_clip(frames=40)
+    before = (clip.face_local.copy(), clip.blendshapes.copy(), clip.face_valid.copy())
+    draw = aug.sample(np.random.default_rng(5), clip, None)
+    out = aug.apply(clip, draw, None)
+    assert isinstance(out, ClipData)
+    assert _same(clip.face_local, before[0]) and _same(clip.blendshapes, before[1])
+    assert _same(clip.face_valid, before[2])
+    assert out.face_local.shape == clip.face_local.shape
+    assert out.blendshapes.shape == clip.blendshapes.shape
+    idx = list(RIGID)
+    assert _same(out.face_local[:, idx], clip.face_local[:, idx])
+    assert not _same(out.face_local, clip.face_local)
+    same = aug.apply(clip, aug.identity_draw(), None)
+    assert isinstance(same, ClipData)
+    assert _same(same.face_local, clip.face_local) and _same(same.blendshapes, clip.blendshapes)
+
+
+def test_noise_frame_count_mismatch_raises():
+    aug = ExpressionJitter(ranges={"frame_noise": 0.05})
+    clip = _clip(frames=60)
+    draw = aug.sample(np.random.default_rng(0), clip, None)
+    with pytest.raises(ValueError, match="frames"):
+        aug.apply(_clip(frames=50), draw, None)
 
 
 def test_unknown_group_keys_raise():
