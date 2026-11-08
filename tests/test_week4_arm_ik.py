@@ -63,13 +63,30 @@ def test_ik_reaches_reachable_target(side):
     assert abs(np.linalg.norm(pos1[arm["elbow"]] - pos1[arm["shoulder"]]) - a) < 1e-9
     assert abs(np.linalg.norm(pos1[arm["wrist"]] - pos1[arm["elbow"]]) - b) < 1e-9
     assert np.allclose(rot1[arm["wrist"]], rot0[arm["wrist"]], atol=1e-9)
-    # The shoulder itself does not move, and the fingers keep their local rotations.
+    # The shoulder itself does not move, and every joint outside this arm (the fingers, the
+    # other arm, the torso and head) keeps its local rotation bit for bit.
     assert np.allclose(pos1[arm["shoulder"]], pos0[arm["shoulder"]], atol=1e-12)
-    assert np.array_equal(out[25:], rotations[25:])
-    # The other arm is untouched.
-    other = SMPLX_ARM["right" if side == "left" else "left"]
-    for joint in other.values():
-        assert np.array_equal(out[joint], rotations[joint])
+    others = np.setdiff1d(np.arange(55), list(arm.values()))
+    assert np.array_equal(out[others], rotations[others])
+
+
+@pytest.mark.parametrize("side", SIDES)
+def test_ik_elbow_stays_a_hinge(side):
+    """The elbow's local rotation only turns further about its own local flexion axis."""
+    rotations, rest, parents = _setup()
+    arm = SMPLX_ARM[side]
+    _, pos0 = world_pose(rotations, rest, parents)
+    target = pos0[arm["wrist"]] + np.array([0.03, -0.02, 0.04])  # about 5.4 cm
+
+    out, residual = two_bone_ik(rotations, rest, parents, side, target)
+
+    assert residual < 1e-6
+    old = Rotation.from_rotvec(rotations[arm["elbow"]])
+    axis = rotations[arm["elbow"]] / np.linalg.norm(rotations[arm["elbow"]])
+    change = (Rotation.from_rotvec(out[arm["elbow"]]) * old.inv()).as_rotvec()
+    off_hinge = change - np.dot(change, axis) * axis
+    assert np.linalg.norm(off_hinge) < 1e-6
+    assert abs(np.dot(change, axis)) > np.radians(1.0)  # the elbow did bend
 
 
 @pytest.mark.parametrize("side", SIDES)
@@ -105,9 +122,20 @@ def test_ik_unreachable_target_extends(side):
     out, residual = two_bone_ik(rotations, rest, parents, side, target)
     _, pos1 = world_pose(out, rest, parents)
 
+    # The elbow is a hinge about its own local axis, and the SMPL-X rest arm is not straight, so
+    # its full extension falls a few millimetres short of a + b (8.6 mm left, under 1 mm right).
+    # The arm straightens toward the target as far as the hinge allows, and the residual is the
+    # distance left over.
     assert np.all(np.isfinite(out))
-    assert abs(residual - 1.0) < 1e-3
-    assert abs(np.linalg.norm(pos1[arm["wrist"]] - target) - 1.0) < 1e-3
+    wrist = pos1[arm["wrist"]]
+    reach = np.linalg.norm(wrist - shoulder)
+    assert a + b - 0.01 < reach <= a + b
+    assert np.allclose((wrist - shoulder) / reach, direction, atol=1e-9)
+    assert abs(residual - np.linalg.norm(wrist - target)) < 1e-9
+    assert abs(residual - 1.0) < 0.01
+    # Fully extended: a target further along the same line leaves the arm where it is.
+    further, _ = two_bone_ik(rotations, rest, parents, side, shoulder + direction * (a + b + 2.0))
+    assert np.allclose(further, out, atol=1e-9)
 
 
 @pytest.mark.parametrize("side", SIDES)
@@ -149,12 +177,24 @@ def test_torso_frame_is_orthonormal():
 
 @pytest.mark.parametrize("side", SIDES)
 def test_ik_straight_arm_uses_torso_pole(side):
-    """A straight arm has no swivel plane; the torso's z axis (behind the body) is the pole."""
+    """
+    A straight arm has no swivel plane, so the torso's z axis (behind the body) is the pole.
+
+    The SMPL-X rest arm is not straight (the elbow sits 1.6-5.1 cm off the shoulder-wrist line),
+    so this copy of the rest joints moves the elbow onto that line, keeping the wrist where it is.
+    """
     _, rest, parents = _setup()
-    rotations = np.zeros((55, 3))
     arm = SMPLX_ARM[side]
+    rest = rest.copy()
+    s_rest, w_rest = rest[arm["shoulder"]], rest[arm["wrist"]]
+    a, b = _bone_lengths(rest, side)
+    rest[arm["elbow"]] = s_rest + (w_rest - s_rest) * a / (a + b)
+    rotations = np.zeros((55, 3))
     _, pos0 = world_pose(rotations, rest, parents)
-    shoulder = pos0[arm["shoulder"]]
+    shoulder, elbow = pos0[arm["shoulder"]], pos0[arm["elbow"]]
+    line = (pos0[arm["wrist"]] - shoulder) / np.linalg.norm(pos0[arm["wrist"]] - shoulder)
+    off = (elbow - shoulder) - np.dot(elbow - shoulder, line) * line
+    assert np.linalg.norm(off) < 1e-9  # truly collinear: the pole falls back to the torso
     target = shoulder + 0.7 * (pos0[arm["wrist"]] - shoulder)
 
     out, residual = two_bone_ik(rotations, rest, parents, side, target)
@@ -164,4 +204,9 @@ def test_ik_straight_arm_uses_torso_pole(side):
     assert residual < 1e-6
     assert np.linalg.norm(pos1[arm["wrist"]] - target) < 1e-6
     _, axes = torso_frame(pos0)
-    assert np.dot(pos1[arm["elbow"]] - pos0[arm["elbow"]], axes[2]) > 0
+    z = axes[2] - np.dot(axes[2], line) * line
+    z /= np.linalg.norm(z)
+    moved = pos1[arm["elbow"]] - shoulder
+    moved_off = moved - np.dot(moved, line) * line
+    assert np.linalg.norm(moved_off) > 0.05  # the elbow left the line
+    assert np.allclose(moved_off / np.linalg.norm(moved_off), z, atol=1e-9)  # straight back

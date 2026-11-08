@@ -66,13 +66,16 @@ def two_bone_ik(rotations, rest_joints, parents, side: str, target) -> Tuple[np.
     """
     One frame's rotations (55, 3) with the `side` wrist moved to `target`, and the residual (m).
 
-    The shoulder–target distance is clipped to what the arm can reach (rest bone lengths a, b,
-    kept 1e-6 m from full extension and full fold), so an unreachable target straightens the arm
-    toward it and the residual is the distance left over. The elbow stays on the same side of the
-    shoulder–target line as before (the torso's z axis is the pole when it lies on the line). The
-    shoulder swings the upper arm onto the solved elbow, the elbow swings the forearm onto the
-    solved wrist, and the wrist's local rotation is reset so its world rotation is unchanged.
-    Only the three joints of that arm change.
+    The elbow is a hinge. Its local rotation only turns further about its own local axis (the
+    axis of its current axis-angle rotation; for an unbent elbow, the normal of the arm's plane,
+    or a bend toward the torso's z axis when the arm is straight). That turn sets the
+    shoulder–wrist distance to |target − shoulder|, clipped to what the arm can reach (rest bone
+    lengths a, b, kept 1e-6 m from full extension and full fold, and the hinge's own range). The
+    shoulder then turns the now-rigid arm so the wrist lies on the shoulder–target line and the
+    elbow stays on the same side of that line as before (the torso's z axis is the pole when the
+    elbow lies on the line). Finally the wrist's local rotation is reset so its world rotation is
+    unchanged; the fingers keep their local rotations. Only the three joints of that arm change.
+    An unreachable target straightens the arm toward it, and the residual is the distance left.
     """
     arm = SMPLX_ARM[side]
     shoulder, elbow, wrist = arm["shoulder"], arm["elbow"], arm["wrist"]
@@ -93,21 +96,28 @@ def two_bone_ik(rotations, rest_joints, parents, side: str, target) -> Tuple[np.
     if u is None:  # target and wrist both on the shoulder: keep the upper-arm direction
         u = _unit(e - s)
     length = np.clip(distance, abs(a - b) + REACH_MARGIN, a + b - REACH_MARGIN)
-
     p = _pole(e - s, u, pos)
-    cos_alpha = np.clip((a * a + length * length - b * b) / (2.0 * a * length), -1.0, 1.0)
-    sin_alpha = np.sqrt(1.0 - cos_alpha * cos_alpha)
-    e_new = s + a * (cos_alpha * u + sin_alpha * p)
-    w_new = s + length * u
 
-    delta = _swing(e - s, e_new - s)
-    _rotate_in_world(out, rot, shoulder, parents[shoulder], delta)
+    # Elbow: turn about its hinge until the shoulder–wrist distance is `length`.
+    hinge = _hinge(out[elbow], rot[shoulder], e - s, w - e, p)
+    theta = _hinge_angle(e - s, w - e, hinge, (length * length - a * a - b * b) / 2.0)
+    turn = Rotation.from_rotvec(rot[shoulder].T @ hinge * theta)
+    out[elbow] = (turn * Rotation.from_rotvec(out[elbow])).as_rotvec()
+
+    # Shoulder: carry the rigid arm's frame (wrist direction, elbow side) onto (u, p).
     rot, pos = world_pose(out, rest, parents)
-    delta = _swing(pos[wrist] - pos[elbow], w_new - pos[elbow])
-    _rotate_in_world(out, rot, elbow, parents[elbow], delta)
+    reach = pos[wrist] - s
+    along = _unit(reach)
+    side_dir = _unit((pos[elbow] - s) - np.dot(pos[elbow] - s, along) * along)
+    if side_dir is None:  # arm straight after the hinge turn: any perpendicular will do
+        side_dir = _unit(np.cross(hinge, along))
+    old = np.stack([along, side_dir, np.cross(along, side_dir)], axis=1)
+    new = np.stack([u, p, np.cross(u, p)], axis=1)
+    _rotate_in_world(out, rot, shoulder, parents[shoulder], new @ old.T)
+
     rot, _ = world_pose(out, rest, parents)
     out[wrist] = Rotation.from_matrix(rot[parents[wrist]].T @ wrist_world).as_rotvec()
-    return out, float(np.linalg.norm(w_new - target))
+    return out, float(np.linalg.norm(s + np.linalg.norm(reach) * u - target))
 
 
 def _unit(v):
@@ -128,22 +138,45 @@ def _pole(upper, u, pos):
     raise ValueError("torso frame is degenerate")  # pragma: no cover - axes are orthonormal
 
 
-def _swing(d_from, d_to) -> np.ndarray:
-    """The smallest rotation (3, 3) turning direction `d_from` onto `d_to`."""
-    f, t = _unit(d_from), _unit(d_to)
-    if f is None or t is None:
-        return np.eye(3)
-    axis = np.cross(f, t)
-    sin = np.linalg.norm(axis)
-    cos = float(np.dot(f, t))
-    if sin < 1e-12:
-        if cos > 0:
-            return np.eye(3)
-        # Opposite directions: half a turn about any axis perpendicular to f.
-        helper = np.eye(3)[int(np.argmin(np.abs(f)))]
-        axis = np.cross(f, helper)
-        return Rotation.from_rotvec(axis / np.linalg.norm(axis) * np.pi).as_matrix()
-    return Rotation.from_rotvec(axis / sin * np.arctan2(sin, cos)).as_matrix()
+def _hinge(elbow_rotvec, shoulder_world, upper, fore, pole):
+    """
+    The elbow's hinge axis in world coordinates (unit, (3,)).
+
+    A bent elbow keeps the axis of its local rotation (in the shoulder's frame), so further
+    flexion stays about that one local axis. An unbent elbow uses the normal of the arm's plane,
+    and a straight arm bends in the plane holding the pole (the torso's z axis on the line).
+    """
+    angle = np.linalg.norm(elbow_rotvec)
+    if angle > DEGENERATE:
+        return shoulder_world @ (np.asarray(elbow_rotvec) / angle)
+    normal = np.cross(_unit(upper), _unit(fore))
+    if np.linalg.norm(normal) > DEGENERATE:
+        return normal / np.linalg.norm(normal)
+    return _unit(np.cross(upper, pole))
+
+
+def _hinge_angle(upper, fore, hinge, target_dot) -> float:
+    """
+    The smallest turn of `fore` about `hinge` that makes upper · fore equal `target_dot`.
+
+    upper · R(θ)fore = C + A cos θ + B sin θ; when `target_dot` lies outside the reachable range
+    the turn goes to the nearest end of it (the arm straightens or folds as far as it can).
+    """
+    parallel = np.dot(fore, hinge) * hinge
+    c0 = np.dot(upper, parallel)
+    a_coef = np.dot(upper, fore - parallel)
+    b_coef = np.dot(upper, np.cross(hinge, fore))
+    radius = np.hypot(a_coef, b_coef)
+    if radius < 1e-12:  # the forearm lies on the hinge axis: turning changes nothing
+        return 0.0
+    phi = np.arctan2(b_coef, a_coef)
+    spread = np.arccos(np.clip((target_dot - c0) / radius, -1.0, 1.0))
+    options = [_wrap(phi + spread), _wrap(phi - spread)]
+    return float(min(options, key=abs))
+
+
+def _wrap(angle) -> float:
+    return float((angle + np.pi) % (2.0 * np.pi) - np.pi)
 
 
 def _rotate_in_world(rotations, world_rot, joint, parent, delta):
