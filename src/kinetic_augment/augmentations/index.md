@@ -10,6 +10,8 @@
 - `handshape.py` — Handshape features (signed finger bend, finger states, spread, thumb abduction), `features_changed`, per-joint flexion axes and the mirrored finger-offset helper.
 - `fingers.py` — Week-4 finger augmentations: coupled finger flexion noise (`fingers.joint_coupled_noise`) and handshape-preserving per-joint jitter (`fingers.handshape_jitter`).
 - `face.py` — Week-4 face augmentation: blendshape groups, the per-clip ridge expression map (`fit_expression_map`) and expression jitter (`face.expression_jitter`).
+- `face_mirror.py` — Generated 478-point MediaPipe face mirror table (`FACE_MIRROR`, an involution); produced by `scripts/make_face_mirror.py`.
+- `scene.py` — Week-4 scene augmentations composed into `clip.scene`: mirror, view, scale, uncentre (`scene.*`), plus `fit_clip_camera` and the re-exported `blendshape_mirror`.
 - `extrinsic.py` — Implements global landmark-space transforms and noise.
 - `intrinsic.py` — Implements SMPL-X joint, hand, limb, and orientation perturbations.
 - `temporal.py` — Implements time warping, speed variation, and frame dropping.

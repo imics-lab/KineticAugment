@@ -30,6 +30,7 @@
 - `test_week4_limb_length.py` — Tests limb length scaling: bone lengths, identity, wrist retargeting (reachable and unreachable), draw ranges.
 - `test_week4_face.py` — Tests blendshape groups, the expression map fit, expression jitter (identity, mouth off, unit-interval scores, rigid points, fallbacks, frame noise, key validation).
 - `test_week4_fingers.py` — Tests handshape features, feature-change margins, flexion axes and mirroring, coupled finger noise (identity, DIP follows PIP, limits, coupling) and handshape jitter (preserved features, fallback, missing hand).
+- `test_week4_scene.py` — Tests the face mirror table, blendshape mirror, scene composition (view, scale, mirror, shift), identity, hand swap, view distances, camera fit and uncentre keeping hands in frame.
 - `test_tier1.py` — Tests the Tier 1 augmentations: sampling ranges, transforms, re-timing, the camera fit and the hands-in-frame limit.
 - `test_head_converter.py` — Tests head occlusion and robust head rotation.
 - `test_head_placement.py` — Tests the 11-point neck fit: synthetic recovery of the head joint under 1 mm with the head rotation reproduced exactly.

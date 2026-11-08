@@ -20,6 +20,7 @@
 - `exp_frame_alignment.py` — O11 check across clips: per-frame world→image roll (2-D similarity, orthographic and 3-D fits), pose-face Kabsch vs R_head angle split into roll and swing, shoulder and eye-line tilts; prints the per-clip table behind `docs/O11_Frame_Alignment.md`.
 - `extract_world_landmarks.py` — Extracts metric MediaPipe world landmarks and visibility, one MediaPipe instance per clip.
 - `map_clip_glosses.py` — Maps every local WLASL clip to its gloss (from WLASL_v0.3.json) and marks whether it may be mirrored, using configs/mirror_blacklist.yaml; writes data/wlasl/clip_glosses.csv.
+- `make_face_mirror.py` — Generates `src/kinetic_augment/augmentations/face_mirror.py` (the 478-point face mirror table) from the canonical face model by reflect-x Hungarian assignment.
 - `measure_detector_agreement.py` — Measures how far MediaPipe's own landmarks move when one setting changes (context for the round trip).
 - `measure_hand_round_trip.py` — Measures the V1.2 hand round trip (MediaPipe hand → MANO / SMPL-X → landmarks) as an error ladder on the pilot clips.
 - `measure_hand_scale_drift.py` — Measures how much of the hand round-trip error a per-frame scale about the wrist removes, and what MediaPipe's size drift follows.
