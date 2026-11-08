@@ -94,3 +94,11 @@ def test_list_by_region(cleanup_registry):
     assert set(("face",)) <= set(REGIONS)
     assert "face.dummy" in AugmentationRegistry.list_by_region("face")
     assert "face.dummy" not in AugmentationRegistry.list_by_region("body")
+
+
+def test_truncated_normal_rejects_bad_sigma_or_limit():
+    rng = np.random.default_rng(0)
+    for sigma, limit in ((-1.0, 5.0), (1.0, 0.0), (1.0, -2.0)):
+        with pytest.raises(ValueError):
+            truncated_normal(rng, sigma, limit, size=3)
+    assert np.array_equal(truncated_normal(rng, 0.0, 0.0, size=2), np.zeros(2))

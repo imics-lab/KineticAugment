@@ -57,10 +57,30 @@ def parse_range(value: Any, default_distribution: str = "uniform") -> RangeSpec:
     return RangeSpec(lo, hi, distribution)
 
 
+def check_truncation(sigma: Any, limit: Any, label: str) -> None:
+    """
+    Raise unless `sigma >= 0` and, when `sigma > 0`, `limit > 0`.
+
+    A zero (or negative) limit with a positive sigma would make `truncated_normal` reject every
+    sample forever, so the augmentations call this when they are built (at profile load).
+    """
+    sigma, limit = float(sigma), float(limit)
+    if not np.isfinite(sigma) or sigma < 0:
+        raise ValueError(f"{label}: sigma must be finite and >= 0, got {sigma!r}")
+    if sigma > 0 and not limit > 0:
+        raise ValueError(f"{label}: truncation must be > 0 when sigma > 0, got {limit!r}")
+
+
 def truncated_normal(
     rng: np.random.Generator, sigma: float, limit: float, size: Optional[Union[int, tuple]] = None
 ) -> np.ndarray:
-    """Normal(0, sigma) by rejection resampling until ``|x| <= limit``."""
+    """
+    Normal(0, sigma) by rejection resampling until ``|x| <= limit``.
+
+    Raises:
+        ValueError: `sigma < 0`, or `sigma > 0` with `limit <= 0` (which would never finish).
+    """
+    check_truncation(sigma, limit, "truncated_normal")
     shape = () if size is None else size
     if sigma == 0:
         return np.zeros(shape)

@@ -171,3 +171,28 @@ def test_tier1_wrapper_requires_draw():
     clip = synthetic_clip(frames=3)
     with pytest.raises(ValueError, match="tier1_draw"):
         Tier1ArmJoints().sample(clip_rng(0, "clip", "x"), clip, make_ctx(None))
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"chain_coupling": 1.5},
+        {"chain_coupling": -0.1},
+        {"side_coupling": 1.2},
+        {"side_coupling": -0.5},
+        {"sigma_deg": -1.0},
+        {"elbow_truncate_deg": -1.0},
+        {"drift_deg": -0.5},
+        {"side_mode": "sideways"},
+    ],
+)
+def test_arm_noise_validates_ranges(bad):
+    with pytest.raises(ValueError):
+        ArmCoupledNoise(bad)
+
+
+def test_arm_noise_coupling_bounds_allowed():
+    for c in (0.0, 1.0):
+        aug = ArmCoupledNoise({"chain_coupling": c, "side_coupling": c})
+        draw = aug.sample(np.random.default_rng(0), None, None)
+        assert all(np.isfinite(j["angle_deg"]) for j in draw["joints"])

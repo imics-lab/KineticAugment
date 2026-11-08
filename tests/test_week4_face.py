@@ -210,3 +210,11 @@ def test_unknown_group_keys_raise():
         ExpressionJitter(ranges={"nose": {"enabled": True}})
     with pytest.raises(ValueError):
         ExpressionJitter(ranges={"brows": {"scale": 1.0}})
+
+
+def test_expression_group_rejects_zero_truncation():
+    with pytest.raises(ValueError, match="brows"):
+        ExpressionJitter({"brows": {"truncate": 0.0}})
+    with pytest.raises(ValueError):
+        ExpressionJitter({"eyes": {"sigma": -0.1}})
+    ExpressionJitter({"brows": {"sigma": 0.0, "truncate": 0.0}})

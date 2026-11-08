@@ -278,3 +278,23 @@ def test_chain_warp_then_drop_on_frame_clock(drop):
     steps = gaps * result.clip.fps
     np.testing.assert_allclose(steps, np.round(steps), atol=1e-9)
     assert np.all(np.round(steps) >= 1)
+
+
+@pytest.mark.parametrize(
+    "region, key, ranges",
+    [
+        ("body", "location_jitter", "sigma_mm: 12.5\n        truncate_mm: 0"),
+        ("fingers", "handshape_jitter", "truncate_sigmas: 0"),
+        ("face", "expression_jitter", "brows: {enabled: true, sigma: 0.06, truncate: 0}"),
+        ("body", "joint_coupled_noise", "chain_coupling: 1.5"),
+    ],
+)
+def test_bad_strength_fails_at_load(tmp_path, region, key, ranges):
+    """A value that would hang or turn NaN at sample time is refused when the profile loads."""
+    path = tmp_path / "p.yaml"
+    path.write_text(
+        f"seed: 0\nschema_version: 1\nregions:\n  {region}:\n    {key}:\n"
+        f"      enabled: true\n      ranges:\n        {ranges}\n"
+    )
+    with pytest.raises(ValueError):
+        load_profile(path)

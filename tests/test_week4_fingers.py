@@ -281,3 +281,16 @@ def test_unknown_range_key_rejected():
         FingerCoupledNoise(ranges={"nope": 1.0})
     with pytest.raises(ValueError):
         HandshapeJitter(ranges={"nope": 1.0})
+
+
+def test_handshape_jitter_rejects_zero_truncation():
+    with pytest.raises(ValueError, match="truncate_sigmas"):
+        HandshapeJitter({"truncate_sigmas": 0.0})
+    HandshapeJitter(
+        {
+            "truncate_sigmas": 0.0,
+            "nonselected_sigma_deg": 0.0,
+            "selected_sigma_deg": 0.0,
+            "selected_flexion_sigma_deg": 0.0,
+        }
+    )

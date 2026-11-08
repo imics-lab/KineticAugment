@@ -30,7 +30,7 @@ from .handshape import (
     handshape_features,
     selected_fingers,
 )
-from .ranges import truncated_normal
+from .ranges import check_truncation, truncated_normal
 
 SIDES = ("left", "right")
 _NEIGHBOUR_CHAIN = (1, 2, 3, 4)  # index -> middle -> ring -> pinky in FINGERS order
@@ -136,6 +136,10 @@ class HandshapeJitter(ClipAugmentation):
             "max_redraws",
             "feature_margin_deg",
         )
+        trunc = float(self.ranges["truncate_sigmas"])
+        for k in ("nonselected_sigma_deg", "selected_sigma_deg", "selected_flexion_sigma_deg"):
+            sigma = float(self.ranges[k])
+            check_truncation(sigma, trunc * sigma, f"{k} with truncate_sigmas")
 
     def _draw_hand(self, rng: np.random.Generator, selected) -> np.ndarray:
         """(15, 3) offsets in degrees. The thumb always gets the non-selected sigma."""

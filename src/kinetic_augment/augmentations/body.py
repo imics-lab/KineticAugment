@@ -20,7 +20,7 @@ from scipy.signal import butter, filtfilt, freqz
 from .arm_ik import torso_frame, two_bone_ik, world_pose
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
-from .ranges import parse_range, truncated_normal
+from .ranges import check_truncation, parse_range, truncated_normal
 from .tier1 import ARM_JOINTS, SIDES, ArmJointDraw, perturb_arm_joints
 
 SIDE_MODES = ("mirror", "synchronous", "independent")
@@ -70,6 +70,25 @@ class ArmCoupledNoise(ClipAugmentation):
         "side_mode": "mirror",
         "drift_deg": 0.0,
     }
+
+    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
+        super().__init__(ranges=ranges, probability=probability)
+        r = self.ranges
+        for k in ("chain_coupling", "side_coupling"):
+            # outside [0, 1] the sqrt(1 - c) / sqrt(1 - k^2) weights are NaN
+            if not 0.0 <= float(r[k]) <= 1.0:
+                raise ValueError(f"{k} must be in [0, 1], got {r[k]!r}")
+        for k in (
+            "sigma_deg",
+            "truncate_deg",
+            "elbow_sigma_deg",
+            "elbow_truncate_deg",
+            "drift_deg",
+        ):
+            if not float(r[k]) >= 0:
+                raise ValueError(f"{k} must be >= 0, got {r[k]!r}")
+        if r["side_mode"] not in SIDE_MODES:
+            raise ValueError(f"side_mode must be one of {SIDE_MODES}, got {r['side_mode']!r}")
 
     def _side(self, rng: np.random.Generator):
         """One side's shoulder vector, elbow scalar and wrist vector, before side coupling."""
@@ -358,6 +377,10 @@ class LocationJitter(ClipAugmentation):
     key = "location_jitter"
     regions = ("body",)
     DEFAULT_RANGES = {"sigma_mm": 12.5, "truncate_mm": 25.0}
+
+    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
+        super().__init__(ranges=ranges, probability=probability)
+        check_truncation(self.ranges["sigma_mm"], self.ranges["truncate_mm"], "location_jitter")
 
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         sigma, limit = float(self.ranges["sigma_mm"]), float(self.ranges["truncate_mm"])

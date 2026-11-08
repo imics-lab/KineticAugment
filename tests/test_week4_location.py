@@ -132,3 +132,10 @@ def test_unfitted_frames_untouched():
         assert np.isnan(out.rotations[3]).all()
         assert np.isfinite(np.delete(out.rotations, 3, axis=0)).all()
         assert np.array_equal(out.transl, clip.transl)
+
+
+def test_location_jitter_validates_sigma_and_truncation():
+    for bad in ({"sigma_mm": -1.0}, {"truncate_mm": 0.0}, {"sigma_mm": 5.0, "truncate_mm": -1}):
+        with pytest.raises(ValueError):
+            LocationJitter(bad)
+    LocationJitter({"sigma_mm": 0.0, "truncate_mm": 0.0})  # zero strength stays allowed

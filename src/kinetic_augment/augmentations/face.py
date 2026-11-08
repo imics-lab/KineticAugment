@@ -17,7 +17,7 @@ from scipy.signal import butter, filtfilt, freqz
 from ..body_model.face_correspondence import RIGID
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
-from .ranges import truncated_normal
+from .ranges import check_truncation, truncated_normal
 
 BLENDSHAPE_GROUPS: Dict[str, Callable[[str], bool]] = {
     "brows": lambda n: n.startswith("brow"),
@@ -97,8 +97,7 @@ class ExpressionJitter(ClipAugmentation):
         super().__init__(ranges=given, probability=probability)
         for group in BLENDSHAPE_GROUPS:
             g = self.ranges[group]
-            if float(g["sigma"]) < 0 or float(g["truncate"]) < 0:
-                raise ValueError(f"{group}: sigma and truncate must be >= 0")
+            check_truncation(g["sigma"], g["truncate"], group)
         for k in ("frame_noise", "ridge_alpha"):
             if float(self.ranges[k]) < 0:
                 raise ValueError(f"{k} must be >= 0, got {self.ranges[k]!r}")
@@ -168,8 +167,6 @@ class ExpressionJitter(ClipAugmentation):
             shift = (new[valid, 1:] - old[valid, 1:]) @ w
             face[valid] += shift.reshape(-1, _NUM_POINTS, 3)
             changes["face_local"] = face
-        elif not draw.get("fallback"):
-            draw["fallback"] = "too_few_face_frames"
         return target.replace(**changes)
 
     def identity_draw(self) -> Dict[str, Any]:
