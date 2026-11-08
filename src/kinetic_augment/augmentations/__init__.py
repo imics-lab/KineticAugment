@@ -61,6 +61,14 @@ try:
 except ImportError:
     pass
 
+try:
+    from kinetic_augment.augmentations.chain import AugmentationChain
+    from kinetic_augment.augmentations.clip import ClipData
+    from kinetic_augment.augmentations.outputs import build_outputs
+    from kinetic_augment.augmentations.profile import load_profile
+except ImportError:
+    pass
+
 __all__ = [
     # Base classes
     "BaseAugmentation",
@@ -81,4 +89,9 @@ __all__ = [
     # Temporal
     "TimeWarping",
     "SpeedVariation",
+    # Week 4
+    "AugmentationChain",
+    "load_profile",
+    "ClipData",
+    "build_outputs",
 ]

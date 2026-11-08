@@ -106,6 +106,8 @@ The tiers below combine both kinds of evidence:
 
 Every augmentation draws its parameters once per clip (V1 Problem Scope §11).
 
+The week-4 profile ranges, with the proven range next to each used one, are in [Augmentation_Ranges.md](Augmentation_Ranges.md).
+
 ### Tier 1: safe for every sign
 
 1. **3-D view rotation.** Rotate SMPL-X `global_orient` about the vertical axis by ±20°, plus a

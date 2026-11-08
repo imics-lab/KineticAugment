@@ -12,6 +12,8 @@
 - `face.py` — Week-4 face augmentation: blendshape groups, the per-clip ridge expression map (`fit_expression_map`) and expression jitter (`face.expression_jitter`).
 - `face_mirror.py` — Generated 478-point MediaPipe face mirror table (`FACE_MIRROR`, an involution); produced by `scripts/make_face_mirror.py`.
 - `scene.py` — Week-4 scene augmentations composed into `clip.scene`: mirror, view, scale, uncentre (`scene.*`), plus `fit_clip_camera` and the re-exported `blendshape_mirror`.
+- `profile.py` — Week-4 YAML profile loader (`load_profile`, with enable/disable overrides and range-key validation) and `tier1_ranges`.
+- `chain.py` — `AugmentationChain`: runs the enabled profile entries in a fixed `ORDER` with per-entry seeded draws; returns `ChainResult`.
 - `extrinsic.py` — Implements global landmark-space transforms and noise.
 - `intrinsic.py` — Implements SMPL-X joint, hand, limb, and orientation perturbations.
 - `temporal.py` — Implements time warping, speed variation, and frame dropping.

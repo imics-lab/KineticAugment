@@ -32,6 +32,7 @@
 - `O11_Frame_Alignment.md` — Cross-clip test of O11 (2026-10-18): pose-world vs image roll is ~1-2°, so no roll correction is needed; the pose-face Kabsch vs R_head gap comes from pose-world face distortion; pitch/yaw still open.
 - `Week_2_Findings.md` — Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07).
 - `Hand_Pipeline_Variants.md` — The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29).
+- `Augmentation_Ranges.md` — Proven against used range for every week-4 augmentation, the 25% rule, and the three week-4 profiles.
 - `media/` — Images and placeholder assets referenced by documentation.
 - `index.md` — Index of the documentation pages and media folder.
 - `research-guide/` — Source-grounded research onboarding, verification status, and practical learning roadmap.

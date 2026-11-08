@@ -317,7 +317,7 @@ class HandDropout(ClipAugmentation):
     key = "hand_dropout"
     stage = "outputs"
     regions = ("temporal", "fingers")
-    DEFAULT_RANGES = {"start_rate": [0.0, 0.04], "run_length_mean": 1.9, "max_run_frames": 10}
+    DEFAULT_RANGES = {"start_rate": [0.0, 0.05], "run_length_mean": 1.9, "max_run_frames": 10}
 
     def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
         super().__init__(ranges=ranges, probability=probability)
