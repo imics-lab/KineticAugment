@@ -299,9 +299,20 @@ problems.
 ## Augmentation Lab
 
 The Lab is a web page for comparing augmentations side by side with live or precomputed knobs.
-Run it with `kinetic-lab` after `pip install -e '.[smplx,lab]'`, or send the shareable zip, which
-needs only a browser. [docs/augmentation-lab.md](docs/augmentation-lab.md) covers both modes,
-building the zip and using saved settings.
+The shareable zip needs only a browser: unzip it and double-click `index.html`. Full mode runs the
+pipeline live on your machine:
+
+```sh
+python3 -m venv .venv               # once; Python 3.9 to 3.12
+source .venv/bin/activate           # every new terminal
+pip install -e '.[smplx,lab]'       # once
+kinetic-lab                         # opens http://127.0.0.1:8770
+```
+
+Full mode also needs the licensed SMPL-X, MANO and FLAME model files in `models/`. If `kinetic-lab`
+says "command not found", the virtual environment is not switched on.
+[docs/augmentation-lab.md](docs/augmentation-lab.md) has the step-by-step setup (which model files,
+where to get them, adding clips), building the zip and using saved settings.
 
 ## Available Augmentations
 

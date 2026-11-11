@@ -69,6 +69,7 @@ lab = [
     "python-multipart>=0.0.9",
     "trimesh>=3.10.0",
     "fast-simplification>=0.1.7",
+    "mediapipe==0.10.21",  # "+ add video" extracts landmarks from the new clip
 ]
 # Development dependencies
 dev = [

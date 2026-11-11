@@ -39,22 +39,64 @@ rerolls are cut before meshes. It takes about ten minutes for three clips.
 
 ### Full mode
 
+Full mode runs the whole pipeline on your machine, so every knob takes any value and you can add
+your own videos. It needs Python 3.9 to 3.12 (MediaPipe has no wheels for newer versions) and the
+licensed model files.
+
+**1. Get the code and make a virtual environment** (once):
+
 ```sh
+git clone https://github.com/imics-lab/KineticAugment.git
+cd KineticAugment
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e '.[smplx,lab]'
-kinetic-lab
 ```
 
-`python -m kinetic_augment.lab.cli` does the same. Flags: `--port` (default 8770), `--host`
-(`127.0.0.1` only), `--clips-dir` (default `demo/round_trip/clips`), `--model-dir`, `--no-browser`.
-With no saved folder the server uses the repository's `models/` when it is complete; otherwise it
-shows the setup page, where you enter the model folder once (remembered in
-`~/.kinetic_lab/config.json`). The model files and where to get them are on that page
-(`src/kinetic_augment/lab/static/setup.html`, also reachable at `/setup.html`).
+**2. Put the model files in `models/`** (once). The Lab needs these seven files, laid out like this
+under `models/` (or under any folder with the same layout):
+
+| File | What it is | Where to get it |
+| --- | --- | --- |
+| `smplx/SMPLX_NEUTRAL.npz` | the body | <https://smpl-x.is.tue.mpg.de/> (free account, accept the licence) |
+| `mano/MANO_LEFT.npz`, `mano/MANO_RIGHT.npz` | the hands | comes with the SMPL-X download as `MANO_LEFT.pkl` / `MANO_RIGHT.pkl`; see the MANO note below |
+| `mano/SMPL-X__FLAME_vertex_ids.npy` | links the head to the face model | already in the repository |
+| `flame/generic_model.pkl` | the face shape | <https://flame.is.tue.mpg.de/> (free account, accept the licence) |
+| `flame/mediapipe_landmark_embedding.npz` | ties MediaPipe face points to the face model | <https://github.com/Zielon/metrical-tracker/tree/master/flame/mediapipe> |
+| `mediapipe/face_landmarker.task` | reads the face out of a video | `python scripts/download_models.py --face` |
 
 MANO note: put `MANO_LEFT.pkl` and `MANO_RIGHT.pkl` in `<repo>/models/mano` and run
 `python scripts/convert_mano.py` from the repository root (it always reads `models/mano`). If you
 keep your models in another folder, convert inside the repo first, then copy the two `.npz` files
 over.
+
+The licensed model files are git-ignored, so they are never committed.
+
+**3. Start the Lab** (every time). Open a terminal in the repository folder, switch the virtual
+environment on, then run the command:
+
+```sh
+cd KineticAugment
+source .venv/bin/activate
+kinetic-lab
+```
+
+It opens `http://127.0.0.1:8770` in your browser; stop it with Ctrl+C. If the terminal says
+`command not found: kinetic-lab`, the virtual environment is not switched on (the prompt starts
+with `(.venv)` when it is); run `source .venv/bin/activate`, or start it without activating as
+`.venv/bin/kinetic-lab`.
+
+**4. Add clips.** A fresh clone has no clips, because the clip folder (`demo/round_trip/clips`) is
+git-ignored. Press "＋ add video" in the Lab and pick a signing `.mp4`, or export clips in bulk with
+`python scripts/export_round_trip_demo.py --clips <id> ... --video-dir <folder of <id>.mp4 files>`.
+Either way each clip is fitted once and cached.
+
+`python -m kinetic_augment.lab.cli` does the same as `kinetic-lab`. Flags: `--port` (default 8770), `--host`
+(`127.0.0.1` only), `--clips-dir` (default `demo/round_trip/clips`), `--model-dir`, `--no-browser`.
+With no saved folder the server uses the repository's `models/` when it is complete; otherwise it
+shows the setup page, where you enter the model folder once (remembered in
+`~/.kinetic_lab/config.json`). The model files and where to get them are on that page
+(`src/kinetic_augment/lab/static/setup.html`, also reachable at `/setup.html`).
 
 "＋ add video" takes an `.mp4`, runs extraction and the SMPL-X fit once (one to two minutes on a
 laptop CPU) and caches it, so reopening the clip is instant.

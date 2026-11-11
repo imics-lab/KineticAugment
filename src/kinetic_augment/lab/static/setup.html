@@ -77,7 +77,14 @@ pip install -e '.[smplx,lab]'</pre>
 <pre>python scripts/download_models.py --check</pre>
 
     <h2>3. Start the Lab</h2>
-<pre>kinetic-lab</pre>
+    <p>Each time, in a terminal opened in the repository folder:</p>
+<pre>source .venv/bin/activate
+kinetic-lab</pre>
+    <p>
+      If the terminal says <code>command not found: kinetic-lab</code>, the virtual environment is
+      not switched on (the prompt starts with <code>(.venv)</code> when it is). Stop the Lab with
+      Ctrl+C.
+    </p>
     <p>
       This opens <code>http://127.0.0.1:8770</code> in your browser. The server only listens on your
       own machine. If the repository's <code>models/</code> folder is already complete, it is used
