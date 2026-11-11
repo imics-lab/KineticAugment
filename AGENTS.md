@@ -2,6 +2,8 @@
 
 KineticAugment is a Python framework for geometry-aware augmentation of human skeletal motion data. Source code lives under `src/kinetic_augment`, YAML profiles live in `configs`, and the phase scripts in `scripts` provide the main project checks.
 
+The downstream sign classifier reads **raw MediaPipe landmarks as a time series**, in both MediaPipe's normalised image coordinates and unnormalised coordinates. It does not centre on the shoulders or divide by shoulder width, so augmentations are judged in that output format. See [README § Classifier input](README.md#classifier-input).
+
 ## Getting started
 
 ```sh

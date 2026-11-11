@@ -6,11 +6,13 @@
 - `03_Augmentation_Catalogue.md` — Catalogues extrinsic, intrinsic, and temporal transformations.
 - `04_Task_Specific_Profiles.md` — Explains how YAML profiles select and configure augmentations.
 - `05_Validation_Framework.md` — Describes checks for physical validity and task-level quality.
+- `Augmentation_Validation_Proposal.md` — Claude-reviewed design for raw MediaPipe validation: missingness, per-part coverage, mathematical tests, compatibility inventory, and implementation gates.
 - `06_Development_Roadmap.md` — Records implementation phases, status, and development plans.
 - `Augmentation_Grounding.md` — Research-grounded catalogue of meaning-preserving augmentations (tiers, invariant checks, ASL-LEX gating), the augmentation trials (2026-10-11, Tier 1 rework 2026-10-29), and recommended ranges from the 2026-11-02 tolerance report.
 - `augmentation-evidence/` — Source-level evidence notes behind `Augmentation_Grounding.md` (sign linguistics, SLR augmentation literature) and the tolerance report with its notes, each claim with URL and verification label.
 - `GLOSSARY.md` — Defines terminology used throughout the framework documentation.
 - `Mirror_Unsafe_Signs.md` — Which signs cannot be mirrored (absolute-direction glosses, HEART by caution), the blacklist, and a check of our 334 clips (all 39 glosses safe).
+- `Week4_Decisions_and_Questions.md` — Brief week-4 decisions and open questions for the advisor (2026-11-11).
 - `V1_Findings.md` — Presentation-ready summary of what V1 established: the result, findings, decisions, and open questions.
 - `V1_Problem_Scope.md` — Scopes the MediaPipe ↔ SMPL-X round-trip conversion task and its success criteria.
 - `V1_Review_Assessment.md` — Empirical test of the external V1 approach review: claim verdicts, missed errors, and recommended next steps (2026-10-05).
@@ -30,6 +32,7 @@
 - `V1_3_Face_Integration_Evidence.json` — Compact machine-readable aggregate and per-clip evidence from the real-cache validation.
 - `V1_3_Head_Placement_Spike_08925.md` — One-clip spike: pose-only proximity, 11-point pose-face head placement, depth correction, and a roll traced to pose-world face points (2026-10-18).
 - `O11_Frame_Alignment.md` — Cross-clip test of O11 (2026-10-18): pose-world vs image roll is ~1-2°, so no roll correction is needed; the pose-face Kabsch vs R_head gap comes from pose-world face distortion; pitch/yaw still open.
+- `Resume_Handoff.md` — Résumé-writing brief with Bemnet’s contributions, measured results, and source links.
 - `Week_2_Findings.md` — Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07).
 - `Hand_Pipeline_Variants.md` — The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29).
 - `Augmentation_Ranges.md` — Proven against used range for every week-4 augmentation, the 25% rule, and the three week-4 profiles.

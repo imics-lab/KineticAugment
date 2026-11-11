@@ -49,6 +49,27 @@ Below the panels, per-frame plots track the body, hand, finger-curl and face err
 and the gaps between streams. Those plots are what show whether a clip can be augmented safely.
 To run it yourself, see [Round-Trip Viewer](#round-trip-viewer) below.
 
+## Classifier input
+
+The sign classifier this framework feeds is a sequence model over **MediaPipe landmarks**. Each
+clip is a time series of pose, hand and face landmarks, given to the classifier in two forms:
+
+- **Normalised**: MediaPipe's image coordinates, x divided by frame width and y by frame height
+  (0 to 1), with MediaPipe's relative z.
+- **Unnormalised**: the same landmarks in absolute image units.
+
+The classifier does **not** centre on the shoulders or scale by shoulder width. That shapes the
+augmentations:
+
+- Scene augmentations (scale, uncentre, view) are not cancelled by the classifier, so they matter
+  more here than in the papers that normalise first ([Grounding §3](./docs/Augmentation_Grounding.md)).
+- Output must look like MediaPipe, noise and failures included. The round trip returns clean
+  SMPL-X/MANO geometry, which is a domain gap of its own.
+- Anything tied to the frame (aspect ratio, resolution, how much of the body is in view) is part
+  of the input and can vary between datasets.
+
+Candidate augmentations aimed at this input format are listed in [TODO.md](./TODO.md).
+
 ## Augmentation ranges
 
 The week-4 profiles set every range about 25% beyond the widest range the literature supports, so the augmentation is deliberately more varied than what has been proven. The proven range is recorded next to each used one below, and in the YAML comments. See [Augmentation ranges](./docs/Augmentation_Ranges.md) for the 25% rule, the sources and per-row notes.

@@ -152,6 +152,9 @@ The week-4 profile ranges, with the proven range next to each used one, are in [
   and scales by shoulder width undoes them exactly (OpenHands, ASL Citizen) **[M2, M3]**. That is
   why removing scale cost only 0.22 pp in Laines **[M6]**. They pay off for models that see raw
   frame coordinates, and as protection against normalisation errors.
+  - **This project's classifier sees raw MediaPipe coordinates** (normalised and unnormalised,
+    no shoulder centring; see the README's *Classifier input*), so scale and uncentring are not
+    cancelled and are expected to matter.
 - **Apply them last, in output space.** Never feed a scaled body back into the SMPL-X fit, which
   would read it as a different person.
 - **In a real camera, a subject moved sideways is also seen from a slightly different angle.** A
