@@ -1,5 +1,6 @@
 """The lab knob schema: knobs.yaml merged with a profile's values (lab, task 4)."""
 
+import re
 from pathlib import Path
 
 import pytest
@@ -140,3 +141,63 @@ def test_limits_accepted_by_augmentation(lab_id):
                 cls(ranges=ranges)
             except Exception as exc:  # pragma: no cover - failure message only
                 raise AssertionError(f"{lab_id} {knob['key']}={value!r}: {exc}") from exc
+
+
+JARGON = ["slerp", "IK", "MCP", "PIP", "DIP", "NaN", "blendshape", "σ"]
+
+
+def _outside_parentheses(text):
+    out, depth = [], 0
+    for ch in text:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            out.append(ch)
+    return "".join(out)
+
+
+def test_no_jargon_outside_parentheses():
+    for entry in _schema()["entries"]:
+        texts = [entry["does"], entry["note"]] + entry["changes"] + entry["keeps"]
+        texts += [k["plain"] for k in entry["knobs"]]
+        for text in texts:
+            outside = _outside_parentheses(text)
+            for term in JARGON:
+                pattern = r"(?<!\w)" + re.escape(term) + r"s?(?!\w)"
+                assert not re.search(pattern, outside), (entry["id"], term, text)
+
+
+def test_jargon_check_catches_bare_terms():
+    assert "slerp" in _outside_parentheses("blend by slerp")
+    assert "slerp" not in _outside_parentheses("blend (slerp)")
+
+
+def test_built_schemas_share_no_lists():
+    first = _schema()
+    by_id = {e["id"]: e for e in first["entries"]}
+    scale = by_id["scene.scale"]["knobs"][0]
+    scale["limits"][1] = 999
+    scale["proven"][0] = 999
+    by_id["scene.view"]["knobs"][0]["limits"][0] = -999
+    by_id["scene.mirror"]["overrides"]["p"] = 5
+    again = {e["id"]: e for e in _schema()["entries"]}
+    assert again["scene.scale"]["knobs"][0]["limits"] == [0.5, 1.5]
+    assert again["scene.scale"]["knobs"][0]["proven"] == [0.8, 1.2]
+    assert again["scene.view"]["knobs"][0]["limits"][0] == 0
+    assert again["scene.mirror"]["overrides"] == {"p": 1.0}
+    assert load_knobs()["scene.scale"]["knobs"][0]["limits"] == [0.5, 1.5]
+    assert RUNS["scene.mirror"].overrides == {"p": 1.0}
+
+
+def test_no_yaml_aliases():
+    text = (Path(__file__).resolve().parents[1] / "src/kinetic_augment/lab/knobs.yaml").read_text()
+    assert "&id" not in text and "*id" not in text
+
+
+def test_caps_sit_on_truncation_knobs():
+    knobs = {k["key"]: k for k in _entries()["body.joint_coupled_noise"]["knobs"]}
+    assert knobs["sigma_deg"]["proven"] is None and knobs["elbow_sigma_deg"]["proven"] is None
+    assert knobs["truncate_deg"]["proven"] == [0, 4]
+    assert knobs["elbow_truncate_deg"]["proven"] == [0, 7.5]

@@ -15,6 +15,7 @@ the run's mode does not use (for instance `segment_width` in the uniform time wa
 
 from __future__ import annotations
 
+import copy
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -58,7 +59,7 @@ def build_schema(profile: Profile) -> Dict[str, Any]:
     for lab_id, run in RUNS.items():
         if run.entry is None:
             continue
-        text = knobs[lab_id]
+        text = copy.deepcopy(knobs[lab_id])  # no list is shared between entries or with the cache
         ranges = _entry_ranges(profile, run.entry, run.overrides)
         entry = {
             "id": lab_id,
@@ -72,7 +73,7 @@ def build_schema(profile: Profile) -> Dict[str, Any]:
             "used": text["used"],
             "note": text.get("note", ""),
             "extreme": bool(text["extreme"]),
-            "overrides": dict(run.overrides),
+            "overrides": copy.deepcopy(run.overrides),
             "knobs": [dict(k, default=_dig(ranges, k["key"])) for k in text["knobs"]],
         }
         entries.append(entry)
