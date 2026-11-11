@@ -76,6 +76,10 @@ The **Constraint System** is the intelligent layer that enforces the [Core Princ
 
 This layer provides the "rules" of our augmentation language, turning a potentially chaotic process into a controlled one.
 
+*   **Planned extensions:**
+    *   **Objects, floor, and scene:** penetration and contact against object meshes ([07 - Object-Aware Constraints](./07_Object_Aware_Constraints.md)).
+    *   **Losses and a dense report:** every constraint also offered as a differentiable loss and as a per-frame, per-joint violation report, so that the rules can be used outside the augmentation pipeline, for example to train or to check a generative model ([08 - Differentiable Losses and the Violation Report](./08_Differentiable_Losses_and_Violation_Report.md)).
+
 ### Layer 3: Task-Specific Profiles
 
 A **Task-Specific Profile** is a human-readable configuration file (e.g., in YAML or JSON format) that tells the augmentation pipeline *what* to do, *how often*, and *with what intensity*. It is the user-facing control panel for the entire framework.

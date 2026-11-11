@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the development plan for KineticAugment. **All phases are now complete**, and the framework is production-ready. The key architectural decision was to integrate **SMPL-X** as the internal body representation, enabling true kinematic chain consistency and anatomically plausible augmentations.
+This document outlines the development plan for KineticAugment. **Phases 1 to 5 are complete**, and the framework is production-ready for augmenting the motion of the body on its own. **Phases 6 to 9 are planned**; they add objects, the floor, and the scene to the constraint system and offer the constraints as differentiable losses and as a dense report (see [Planned Phases](#planned-phases-6-to-9)). The key architectural decision was to integrate **SMPL-X** as the internal body representation, enabling true kinematic chain consistency and anatomically plausible augmentations.
 
 ### Implementation Status
 
@@ -13,6 +13,10 @@ This document outlines the development plan for KineticAugment. **All phases are
 | Phase 3 | Constraint System (PyBullet) | ✅ **COMPLETE** | 25/25 passed |
 | Phase 4 | Pipeline Integration | ✅ **COMPLETE** | 36/36 passed |
 | Phase 5 | Evaluation & Benchmarks | ✅ **COMPLETE** | 10/10 groups passed |
+| Phase 6 | Hardening and Generalization | Planned | |
+| Phase 7 | Object-Aware Constraints | Planned | |
+| Phase 8 | Differentiable Losses and Violation Report | Planned | |
+| Phase 9 | Plausibility Metrics and Validation | Planned | |
 
 ---
 
@@ -338,6 +342,42 @@ results = aggregator.evaluate(augmented_samples)
 
 ---
 
+## Planned Phases (6 to 9)
+
+Phases 1 to 5 built a framework for the body in isolation. The next four phases extend it to the body in the world (objects, floor, scene) and make its constraints usable beyond the augmentation pipeline. They also remove what is left of the framework's origin as a sign language tool from its core. The companion project [KineticSynth](https://github.com/imics-lab/KineticSynth), which generates human motion, depends on Phases 7 to 9.
+
+| Phase | Description | Status | Specification |
+|-------|-------------|--------|---------------|
+| Phase 6 | Hardening and generalization | Planned | This section |
+| Phase 7 | Object-aware constraints | Planned | [07](./07_Object_Aware_Constraints.md) |
+| Phase 8 | Differentiable losses and the violation report | Planned | [08](./08_Differentiable_Losses_and_Violation_Report.md) |
+| Phase 9 | Plausibility metrics and validation on recorded grasps | Planned | [09](./09_Plausibility_Metrics_and_Validation.md) |
+
+### Phase 6: Hardening and Generalization
+
+Other code is about to depend on the constraint system, so it has to be tested automatically and free of assumptions that hold for one task only.
+
+#### 6.1 Tests under pytest
+- [ ] Move the checks in `scripts/test_phase1.py` to `scripts/test_phase5.py` into `tests/` as pytest tests, so that one command runs them
+- [ ] Add unit tests for each constraint on its own: joint limits, velocity limits, self-collision, for both checking and enforcing
+- [ ] Mark tests that need the body-model files or PyBullet so that they are skipped, not failed, where those are missing
+
+#### 6.2 Continuous integration
+- [ ] A workflow that runs the tests on every pull request, on CPU
+
+#### 6.3 Explicit frame rate
+- [ ] The velocity code assumes a time step of 1/30 s by default. Make the frame rate an explicit argument wherever a sequence is processed, and test that the same motion at two frame rates gives the same violations
+
+#### 6.4 Generality audit
+- [ ] Find defaults, names, example paths, and documentation in the core package that assume sign language, and move task-specific values into task profiles. A known example: the higher velocity limit for hands used for signing
+- [ ] Add at least one worked example that is not sign language (the `har_running_profile.yaml` profile is a starting point)
+
+#### 6.5 Packaging
+- [ ] Replace the placeholder author email in `pyproject.toml` and the placeholder clone address in the README
+- [ ] Decide how the optional dependencies of Phases 7 and 8 are grouped into extras
+
+---
+
 ## File Structure (Target v1.0)
 
 ```
@@ -415,9 +455,11 @@ KineticAugment/
 
 ---
 
-## Priority Order for Sign Language Recognition
+## Case Study: Priorities for Sign Language Recognition
 
-Given your focus on SLR, prioritize:
+Sign language recognition was the first application of the framework, and this section records how the work was prioritized for it. It is kept as an example of how to order the work for one task; another task will weigh the same components differently (for activity recognition, for example, the feet and the floor matter more than the fingers). The phase numbers in the list below refer to an earlier numbering of this plan.
+
+For SLR, the priorities were:
 
 1. **Hand pose accuracy** - SMPL-X with MANO hands
 2. **Handshape preservation** - Semantic validation for fingers
@@ -436,7 +478,7 @@ Given your focus on SLR, prioritize:
 
 ## Implementation Summary
 
-All phases have been completed. The framework is now production-ready with:
+Phases 1 to 5 have been completed. The framework is production-ready for the body on its own, with:
 
 | Phase | Description | Status |
 |-------|-------------|--------|

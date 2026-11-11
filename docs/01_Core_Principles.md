@@ -59,7 +59,7 @@ These principles ensure that the physically possible motion is also valid within
     *   **Ground Plane:** For activities like walking, running, or sitting, the feet or pelvis cannot be augmented to pass through the floor.
     *   **Object Interaction:** If the motion involves an object (e.g., lifting a box), the hands must maintain a plausible relationship with that object.
     *   **Self-Collision:** A more advanced constraint ensuring limbs do not pass through the torso or each other in an unnatural way.
-*   **Implementation:** Defining geometric primitives (planes, boxes) in the scene and adding constraints or penalties for intersection during augmentation.
+*   **Implementation:** Defining geometric primitives (planes, boxes) in the scene and adding constraints or penalties for intersection during augmentation. The planned extension replaces primitives with the actual meshes of objects, through signed distance grids, and adds contact as a constraint of its own; see [07 - Object-Aware Constraints](./07_Object_Aware_Constraints.md).
 
 ---
 
