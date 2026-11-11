@@ -32,7 +32,9 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     [52, 53], [53, 54], [54, 55], [55, 56], [56, 57], [58, 59], [59, 60], [60, 61], [61, 62], [62, 63],
     [63, 64],
   ];
-  var DOT_SIZE = 0.009; // metres
+  // Dots are drawn in screen pixels, a little larger in the close-up (hands, face) cameras.
+  var DOT_PX = { wide: 3.5, close: 6 };
+  var SKIN = '#c9a58f';
   var TOGGLE_KEYS = ['video', 'original', 'augmented', 'mesh', 'points', 'skeleton', 'face', 'hands'];
 
   var css = function (name, fallback) {
@@ -54,9 +56,10 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
     this.geometry.setDrawRange(0, 0);
   }
-  LineBuf.prototype.fill = function (p, ok) {
+  // Draw every bone whose two ends exist; skip the rest.
+  LineBuf.prototype.fill = function (p) {
     var n = 0;
-    if (ok && p) {
+    if (p) {
       for (var s = 0; s < this.pairs.length; s++) {
         var a = this.pairs[s][0], b = this.pairs[s][1];
         if (!finite3(p, a) || !finite3(p, b)) continue;
@@ -76,9 +79,9 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
     this.geometry.setDrawRange(0, 0);
   }
-  DotBuf.prototype.fill = function (p, ok, first, count) {
+  DotBuf.prototype.fill = function (p, first, count) {
     var n = 0;
-    if (ok && p) {
+    if (p) {
       for (var i = first; i < first + count; i++) {
         if (!finite3(p, i)) continue;
         put(this.pos, n * 3, p, i);
@@ -132,12 +135,14 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     var arm = src.arrays.aug_arm ? at(src.arrays.aug_arm, f) : null;
     var hands = src.arrays.aug_hands ? at(src.arrays.aug_hands, f) : null;
     var face = src.arrays.aug_face ? at(src.arrays.aug_face, f) : null;
-    this.lines.arm.fill(arm, this.ok);
-    this.lines.hands.fill(hands, this.ok);
-    this.lines.face.fill(face, this.ok);
-    this.dots.arm.fill(arm, this.ok, 0, 6);
-    this.dots.hands.fill(hands, this.ok, 0, 42);
-    this.dots.face.fill(face, this.ok, 0, this.nFace);
+    // Only the mesh needs the body fit (`ok`); the points come from the pose, hand and face
+    // outputs, so whatever is finite is drawn.
+    this.lines.arm.fill(arm);
+    this.lines.hands.fill(hands);
+    this.lines.face.fill(face);
+    this.dots.arm.fill(arm, 0, 6);
+    this.dots.hands.fill(hands, 0, 42);
+    this.dots.face.fill(face, 0, this.nFace);
   };
   Figure.prototype.dispose = function () {
     this.mesh.dispose();
@@ -145,15 +150,26 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     ['arm', 'hands', 'face'].forEach(function (k) { self.lines[k].geometry.dispose(); self.dots[k].geometry.dispose(); });
   };
 
-  // The scene objects drawing one Figure, all in one colour.
-  function Drawn(scene, fig, color, opacity, order) {
+  // The pane colour mixed into the skin tone: the augmented body reads as solid and tinted.
+  function tinted(color) { return new THREE.Color(SKIN).lerp(new THREE.Color(color), 0.4); }
+
+  // The scene objects drawing one Figure. `style` 'ghost' (the original): a faint see-through
+  // mesh pushed slightly behind, so it shows only where it sticks out of the augmented body;
+  // 'solid' (a pane's augmented version): an opaque skin-tone mesh tinted toward the pane colour.
+  // Lines and dots are drawn on top of every mesh, in the stream's own colour.
+  function Drawn(scene, fig, color, style, order) {
     this.scene = scene;
     this.fig = fig;
-    this.meshMat = new THREE.MeshStandardMaterial({
-      color: color, transparent: true, opacity: opacity, depthWrite: false, roughness: 0.9, flatShading: true,
-    });
-    this.lineMat = new THREE.LineBasicMaterial({ color: color });
-    this.dotMat = new THREE.PointsMaterial({ color: color, size: DOT_SIZE, sizeAttenuation: true });
+    this.style = style;
+    this.meshMat = style === 'solid'
+      ? new THREE.MeshStandardMaterial({ color: tinted(color), roughness: 0.85, flatShading: true })
+      : new THREE.MeshStandardMaterial({
+        color: color, transparent: true, opacity: 0.2, depthWrite: false, roughness: 0.9, flatShading: true,
+        polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+      });
+    var overlay = { color: color, transparent: true, depthTest: false, depthWrite: false };
+    this.lineMat = new THREE.LineBasicMaterial(overlay);
+    this.dotMat = new THREE.PointsMaterial(Object.assign({ size: DOT_PX.wide, sizeAttenuation: false }, overlay));
     this.mesh = new THREE.Mesh(fig.mesh, this.meshMat);
     this.lines = {}; this.dots = {};
     var self = this, objs = [this.mesh];
@@ -162,14 +178,15 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       self.dots[k] = new THREE.Points(fig.dots[k].geometry, self.dotMat);
       objs.push(self.lines[k], self.dots[k]);
     });
-    // ghosts are drawn in a fixed order: meshes first (original under augmented), then lines, dots
+    // a fixed order: meshes (the solid one first, then the ghost), then lines and dots on top
     objs.forEach(function (o, i) { o.frustumCulled = false; o.renderOrder = order + (i === 0 ? 0 : 10); scene.add(o); });
     this.objs = objs;
   }
-  Drawn.prototype.visible = function (on, t, opacity) {
+  // `alone`: the other stream's mesh is hidden, so a ghost is drawn stronger to stay readable.
+  Drawn.prototype.visible = function (on, t, alone) {
     var ok = this.fig.ok;
     this.mesh.visible = on && t.mesh && ok && this.fig.hasMesh;
-    if (opacity !== undefined) this.meshMat.opacity = opacity;
+    if (this.style === 'ghost') this.meshMat.opacity = alone ? 0.5 : 0.2;
     var region = { arm: true, hands: t.hands, face: t.face };
     var self = this;
     ['arm', 'hands', 'face'].forEach(function (k) {
@@ -177,6 +194,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       self.dots[k].visible = on && t.points && region[k];
     });
   };
+  Drawn.prototype.dotSize = function (px) { this.dotMat.size = px; };
   Drawn.prototype.remove = function () {
     var self = this;
     this.objs.forEach(function (o) { self.scene.remove(o); });
@@ -200,7 +218,8 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     this.container = container;
     this.onCameraChange = opts.onCameraChange || function () {};
     this.colors = { orig: css('--orig', '#4a8fe7'), A: css('--pane-a', '#e8913a'), B: css('--pane-b', '#b56cf0') };
-    this.toggles = { video: true, original: true, augmented: true, mesh: true, points: false, skeleton: true, face: true, hands: true };
+    this.toggles = { video: true, original: true, augmented: true, mesh: true, points: true, skeleton: true, face: true, hands: true };
+    this.dotPx = DOT_PX.wide;
     this.base = null; this.baseFig = null;
     this.frames = { A: 0, B: 0, base: 0 };
     this.ended = { A: false, B: false };
@@ -293,7 +312,8 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     this.nVerts = verts ? verts.shape[1] : 0;
     this.baseFig = new Figure(base, this.faces, this.nVerts);
     ['A', 'B'].forEach(function (w) {
-      self.drawn[w].orig = new Drawn(self.scenes[w], self.baseFig, self.colors.orig, 0.28, 0);
+      self.drawn[w].orig = new Drawn(self.scenes[w], self.baseFig, self.colors.orig, 'ghost', 1);
+      self.drawn[w].orig.dotSize(self.dotPx);
     });
     this.frames.base = 0;
     this.baseFig.update(0);
@@ -310,7 +330,8 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     if (pane && this.base) {
       var fig = new Figure(pane, this.faces, this.nVerts);
       this.figs[which] = fig;
-      d.aug = new Drawn(this.scenes[which], fig, this.colors[which], 0.34, 1);
+      d.aug = new Drawn(this.scenes[which], fig, this.colors[which], 'solid', 0);
+      d.aug.dotSize(this.dotPx);
       fig.update(Math.min(this.frames[which], pane.meta.n - 1));
     }
     this._apply();
@@ -332,8 +353,9 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     var baseTimes = this.base && this.base.arrays.times ? this.base.arrays.times.data : null;
     ['A', 'B'].forEach(function (w) {
       var d = self.drawn[w], fig = self.figs[w], cell = self.cells[w];
-      if (d.orig) d.orig.visible(t.original, t);
-      if (d.aug) d.aug.visible(t.augmented, t, t.original ? 0.34 : 0.55);
+      var augMesh = !!(d.aug && t.augmented && t.mesh && fig && fig.ok && fig.hasMesh);
+      if (d.orig) d.orig.visible(t.original, t, !augMesh);
+      if (d.aug) d.aug.visible(t.augmented, t);
       cell.el.classList.toggle('ended', !!(fig && self.ended[w]));
       if (fig) {
         var k = fig.frame, n = fig.source.meta.n, times = fig.source.arrays.times;
@@ -387,11 +409,23 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       }
     }
     if (count) this.target.copy(sum.divideScalar(count));
+    this.setDotSize(d === 2.4 ? DOT_PX.wide : DOT_PX.close);
     if (d === 2.4) this.target.y -= 0.15;
     var offset = name === 'side' ? new THREE.Vector3(-d, 0, 0) : new THREE.Vector3(0, 0, d);
     this.camera.position.copy(this.target).add(offset);
     this.camera.lookAt(this.target);
     this.controls.forEach(function (c) { c.update(); });
+    this.requestRender();
+  };
+
+  // Dot size in screen pixels for every stream (camera presets set it).
+  Panes.prototype.setDotSize = function (px) {
+    var self = this;
+    this.dotPx = px;
+    ['A', 'B'].forEach(function (w) {
+      if (self.drawn[w].orig) self.drawn[w].orig.dotSize(px);
+      if (self.drawn[w].aug) self.drawn[w].aug.dotSize(px);
+    });
     this.requestRender();
   };
 
@@ -407,6 +441,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   Lab.Panes = Panes;
   Lab.PANE_TOGGLES = TOGGLE_KEYS;
   Lab.Panes.Figure = Figure; // exposed for the Node tests
+  Lab.Panes.Drawn = Drawn;
 })();
 
 if (typeof module !== 'undefined') module.exports = Lab;

@@ -42,6 +42,41 @@ class PaneRequest:
     def whole(self) -> bool:
         return self.entry_id.startswith(WHOLE_PREFIXES)
 
+    def share_key(self, defaults: Dict[str, Any]) -> str:
+        """
+        The share-manifest key: `key()` of this request with what cannot change the pane removed.
+
+        The rule (the share zip's `LAB_DATA.panes` keys, and `ShareSource._looseKey` in
+        `static/sources.js`, which must stay in step with it):
+
+        1. every `PaneRequest` field is present, with its default when not set;
+        2. a `values` entry equal to its knob's default (`defaults[key]`, the schema entry's knob
+           `default`) is dropped, since `pane_profile` would set the same value; equality is
+           numeric (`1 == 1.0`, lists element by element);
+        3. in random mode `edge` is `"high"` (the edge only matters in extreme mode);
+        4. canonical JSON: keys sorted, no spaces (the browser re-serialises keys it reads, so
+           Python's `1.0` and JavaScript's `1` meet).
+
+        `defaults` is `{knob key: default}` for the entry (`schema_defaults`); empty for a whole
+        profile.
+        """
+        values = {
+            k: v
+            for k, v in jsonable(self.values).items()
+            if k not in defaults or jsonable(defaults[k]) != v
+        }
+        edge = "high" if self.mode == "random" else self.edge
+        data = dict(self.__dict__, values=values, edge=edge)
+        return json.dumps(jsonable(data), sort_keys=True, separators=(",", ":"))
+
+
+def schema_defaults(schema: Dict[str, Any], entry_id: str) -> Dict[str, Any]:
+    """`{knob key: default}` for `entry_id` in a `build_schema` result (empty if not listed)."""
+    for entry in schema.get("entries", []):
+        if entry["id"] == entry_id:
+            return {k["key"]: k["default"] for k in entry["knobs"]}
+    return {}
+
 
 @dataclass
 class PreparedClip:

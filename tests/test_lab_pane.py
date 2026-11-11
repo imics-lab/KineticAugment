@@ -1,5 +1,6 @@
 """The Lab pane runner and clip store."""
 
+import json
 import pickle
 import shutil
 import threading
@@ -13,7 +14,13 @@ from kinetic_augment.augmentations.chain import AugmentationChain
 from kinetic_augment.augmentations.profile import load_profile
 from kinetic_augment.lab.bundle import decode_pane, encode_pane
 from kinetic_augment.lab.clipstore import ClipStore
-from kinetic_augment.lab.pane import PaneRequest, pane_profile, prepare_clip, run_pane
+from kinetic_augment.lab.pane import (
+    PaneRequest,
+    pane_profile,
+    prepare_clip,
+    run_pane,
+    schema_defaults,
+)
 from kinetic_augment.lab.runs import RUNS, run_profile
 from tests.clip_fixtures import REAL_CLIP, signing_span
 from tests.hand_assets import MODEL_DIR, requires_smplx
@@ -59,6 +66,32 @@ def test_request_key_is_canonical():
     b = _req(values={"b": 2, "a": 1})
     assert a.key() == b.key()
     assert a.key() != _req(values={"a": 1, "b": 3}).key()
+
+
+def test_share_key_drops_defaults_and_random_edge():
+    defaults = {"sigma_deg": 2.5, "factor": [0.9, 1.1]}
+    plain = _req(entry="body.joint_coupled_noise")
+    at_default = _req(
+        entry="body.joint_coupled_noise", values={"sigma_deg": 2.5, "factor": [0.9, 1.1]}
+    )
+    assert at_default.share_key(defaults) == plain.share_key(defaults)
+    assert _req(values={"sigma_deg": 2}).share_key({"sigma_deg": 2.0}) == _req().share_key({})
+    moved = _req(values={"sigma_deg": 4.0, "factor": [0.9, 1.1]})
+    assert json.loads(moved.share_key(defaults))["values"] == {"sigma_deg": 4.0}
+    assert _req(edge="low").share_key({}) == _req(edge="high").share_key({})
+    assert _req(mode="extreme", edge="low").share_key({}) != _req(mode="extreme").share_key({})
+    key = json.loads(_req(values={"brows.sigma": 1}).share_key({}))
+    assert list(key) == sorted(key) and key["values"] == {"brows.sigma": 1}
+
+
+def test_schema_defaults_reads_knob_defaults():
+    schema = {
+        "entries": [
+            {"id": "e", "knobs": [{"key": "a", "default": 1}, {"key": "b.c", "default": [0, 1]}]}
+        ]
+    }
+    assert schema_defaults(schema, "e") == {"a": 1, "b.c": [0, 1]}
+    assert schema_defaults(schema, "combined.default") == {}
 
 
 def test_clipstore_lists_adds_and_serves_frames(tmp_path):

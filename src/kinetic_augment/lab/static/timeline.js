@@ -2,7 +2,7 @@
 // Clock "playback": frame t of each pane plays at the clip's frame rate, so a time warp runs ahead
 // of or behind the original and the shorter pane holds its last frame, marked "ended".
 // Clock "source": each pane shows its frame nearest the current source frame (its `times`).
-// Classic script: adds Lab.Timeline, Lab.frameMap, Lab.nearestFrames (module.exports for Node).
+// Classic script: adds Lab.Timeline, Lab.frameMap, Lab.nearestFrames, Lab.playFrame (and module.exports).
 var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
 (typeof window !== 'undefined' ? window : globalThis).Lab = Lab;
 
@@ -23,6 +23,12 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       out[f] = best;
     }
     return out;
+  };
+
+  // Playback by wall-clock time: the frame `elapsed` seconds after `start`, wrapping at `length`.
+  Lab.playFrame = function playFrame(start, elapsed, fps, speed, length) {
+    if (!length) return 0;
+    return (start + Math.floor(elapsed * fps * speed + 1e-9)) % length;
   };
 
   // Frames on the clock: the base length in source time, the longest stream in playback.
@@ -90,13 +96,14 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     play.onclick = function () { self.toggle(); };
     prev.onclick = function () { self.pause(); self.show(self.t - 1); };
     next.onclick = function () { self.pause(); self.show(self.t + 1); };
-    scrub.oninput = function () { self.show(Number(scrub.value)); };
+    scrub.oninput = function () { self.show(Number(scrub.value)); self._anchor(); };
     clock.onchange = function () { self.setClock(clock.value); };
-    speed.onchange = function () { self.speed = Number(speed.value); };
+    speed.onchange = function () { self.speed = Number(speed.value); self._anchor(); };
     window.addEventListener('keydown', function (e) {
       var tag = e.target && e.target.tagName;
       if (tag === 'SELECT' || tag === 'TEXTAREA' || (tag === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'range')) return;
       if (e.target && e.target.isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return; // leave browser shortcuts (Cmd+←) alone
       if (e.key === ' ' && tag !== 'BUTTON') { e.preventDefault(); self.toggle(); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); self.pause(); self.show(self.t - 1); }
       if (e.key === 'ArrowRight') { e.preventDefault(); self.pause(); self.show(self.t + 1); }
@@ -156,23 +163,27 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     this.els.play.textContent = '❚❚';
     this.els.play.setAttribute('aria-label', 'pause');
     if (this.t >= this.length() - 1) this.show(0);
-    var last = performance.now(), acc = 0;
+    this._anchor();
+    // A token per loop: a pause then a quick play must not leave two loops running.
+    var token = this._loop = {};
     var loop = function (now) {
-      if (!self.playing) return;
-      acc += (now - last) / 1000;
-      last = now;
-      var step = 1 / (self.fps * self.speed);
-      if (acc >= step) {
-        acc %= step;
-        self.show((self.t + 1) % self.length());
-      }
+      if (!self.playing || self._loop !== token) return;
+      var elapsed = Math.max(0, now - self._start.time) / 1000;
+      var t = Lab.playFrame(self._start.t, elapsed, self.fps, self.speed, self.length());
+      if (t !== self.t) self.show(t);
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
   };
 
+  // Restart the wall clock from the current frame (on play, scrub and speed change).
+  Timeline.prototype._anchor = function () {
+    this._start = { t: this.t, time: performance.now() };
+  };
+
   Timeline.prototype.pause = function () {
     this.playing = false;
+    this._loop = null;
     this.els.play.textContent = '▶';
     this.els.play.setAttribute('aria-label', 'play');
   };

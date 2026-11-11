@@ -1,13 +1,161 @@
 {
- "panes": {
-  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"face.expression_jitter\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"brows.sigma\":1.0,\"mouth.sigma\":0.5}}": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
-  "{\"clip_id\":\"fx\",\"edge\":\"low\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{}}": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
-  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"combined.default\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":2,\"values\":{}}": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3"
+ "schema": {
+  "profile": "slr_week4_default",
+  "seed": 7,
+  "entries": [
+   {
+    "id": "face.expression_jitter",
+    "knobs": [
+     {
+      "key": "brows.sigma",
+      "default": 1.0
+     },
+     {
+      "key": "mouth.sigma",
+      "default": 0.5
+     }
+    ]
+   },
+   {
+    "id": "body.joint_coupled_noise",
+    "knobs": [
+     {
+      "key": "sigma_deg",
+      "default": 2.5
+     },
+     {
+      "key": "elbow_sigma_deg",
+      "default": 4.75
+     }
+    ]
+   }
+  ]
  },
+ "panes": {
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"face.expression_jitter\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"mouth.sigma\":0.8}}": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":2,\"values\":{}}": "case1",
+  "{\"clip_id\":\"fx\",\"edge\":\"low\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"elbow_sigma_deg\":10.0}}": "case2",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{}}": "case3",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"combined.default\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":1,\"values\":{}}": "case4"
+ },
+ "cases": [
+  {
+   "id": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
+   "key": "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"face.expression_jitter\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"mouth.sigma\":0.8}}",
+   "lookups": [
+    {
+     "entry_id": "face.expression_jitter",
+     "values": {
+      "mouth.sigma": 0.8
+     }
+    },
+    {
+     "entry_id": "face.expression_jitter",
+     "values": {
+      "brows.sigma": 1,
+      "mouth.sigma": 0.8
+     },
+     "edge": "low"
+    }
+   ]
+  },
+  {
+   "id": "case1",
+   "key": "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":2,\"values\":{}}",
+   "lookups": [
+    {
+     "entry_id": "body.joint_coupled_noise",
+     "reroll": 2
+    },
+    {
+     "entry_id": "body.joint_coupled_noise",
+     "reroll": 2,
+     "values": {
+      "sigma_deg": 2.5
+     },
+     "edge": "low"
+    }
+   ]
+  },
+  {
+   "id": "case2",
+   "key": "{\"clip_id\":\"fx\",\"edge\":\"low\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"elbow_sigma_deg\":10.0}}",
+   "lookups": [
+    {
+     "entry_id": "body.joint_coupled_noise",
+     "mode": "extreme",
+     "edge": "low",
+     "values": {
+      "elbow_sigma_deg": 10
+     }
+    },
+    {
+     "entry_id": "body.joint_coupled_noise",
+     "mode": "extreme",
+     "edge": "low",
+     "values": {
+      "elbow_sigma_deg": 10,
+      "sigma_deg": 2.5
+     }
+    }
+   ]
+  },
+  {
+   "id": "case3",
+   "key": "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{}}",
+   "lookups": [
+    {
+     "entry_id": "body.joint_coupled_noise",
+     "mode": "extreme"
+    },
+    {
+     "entry_id": "body.joint_coupled_noise",
+     "mode": "extreme",
+     "edge": "high",
+     "values": {
+      "sigma_deg": 2.5
+     }
+    }
+   ]
+  },
+  {
+   "id": "case4",
+   "key": "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"combined.default\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":1,\"values\":{}}",
+   "lookups": [
+    {
+     "entry_id": "combined.default",
+     "reroll": 1
+    }
+   ]
+  }
+ ],
+ "misses": [
+  {
+   "entry_id": "body.joint_coupled_noise",
+   "mode": "extreme",
+   "edge": "low"
+  },
+  {
+   "entry_id": "body.joint_coupled_noise",
+   "values": {
+    "sigma_deg": 3.1
+   }
+  },
+  {
+   "entry_id": "body.joint_coupled_noise",
+   "reroll": 1
+  },
+  {
+   "entry_id": "face.expression_jitter",
+   "values": {}
+  }
+ ],
  "keys": [
-  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"face.expression_jitter\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"brows.sigma\":1.0,\"mouth.sigma\":0.5}}",
-  "{\"clip_id\":\"fx\",\"edge\":\"low\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{}}",
-  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"combined.default\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":2,\"values\":{}}"
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"face.expression_jitter\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"brows.sigma\":1.0,\"mouth.sigma\":0.8}}",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":2,\"values\":{}}",
+  "{\"clip_id\":\"fx\",\"edge\":\"low\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"elbow_sigma_deg\":10.0}}",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{}}",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"combined.default\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":1,\"values\":{}}"
  ],
  "sha1": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
  "stops": {

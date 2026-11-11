@@ -37,8 +37,9 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     ['face', 'face', 'face points and contour lines'],
     ['hands', 'hands', 'hand points and finger lines'],
   ];
-  var DEFAULT_TOGGLES = { video: true, original: true, augmented: true, mesh: true, points: false, skeleton: true, face: true, hands: true };
+  var DEFAULT_TOGGLES = { video: true, original: true, augmented: true, mesh: true, points: true, skeleton: true, face: true, hands: true };
 
+  var TOGGLES_KEY = 'labToggles.v2';
   var safeGet = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
   var safeSet = function (k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } };
   var esc = function (s) {
@@ -50,7 +51,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
 
   function loadToggles() {
     var t = Object.assign({}, DEFAULT_TOGGLES);
-    try { Object.assign(t, JSON.parse(safeGet('labToggles') || '{}')); } catch (e) { /* ignore */ }
+    try { Object.assign(t, JSON.parse(safeGet(TOGGLES_KEY) || '{}')); } catch (e) { /* ignore */ }
     return t;
   }
 
@@ -245,14 +246,17 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   // ---- clips and entries ------------------------------------------------------------------
   app.selectClip = function (id) {
     if (!id) return Promise.resolve();
-    app.state.clipId = id;
+    // state.clipId changes only once the clip's base has loaded, so pane requests made meanwhile
+    // (and after a failure) stay on the clip whose base is shown.
+    var previous = app.state.clipId;
     markSelected(app.mounts.clipList, id);
-    writeHash();
     app.timeline.pause();
     app.setStatus('loading clip ' + id + '… (the first time a clip opens, the server fits the body: about 10 s)', 'busy');
     var token = ++app._clipSeq;
     return app.source.base(id).then(function (base) {
       if (token !== app._clipSeq) return;
+      app.state.clipId = id;
+      writeHash();
       app.base = base;
       app.last = { A: null, B: null };
       loadFrames(id, base.meta.n); // before the timeline shows frame 0, so its image is awaited
@@ -263,6 +267,8 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       return app.refreshPanes();
     }, function (err) {
       if (token !== app._clipSeq) return;
+      app.state.clipId = previous;
+      markSelected(app.mounts.clipList, previous);
       app.setStatus('could not load clip ' + id + ': ' + err.message, 'error');
     });
   };
@@ -371,7 +377,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   // ---- toggles and camera -----------------------------------------------------------------
   app.setToggles = function (patch) {
     Object.assign(app.state.toggles, patch || {});
-    safeSet('labToggles', JSON.stringify(app.state.toggles));
+    safeSet(TOGGLES_KEY, JSON.stringify(app.state.toggles));
     applyToggles();
   };
 
@@ -474,7 +480,13 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       return Promise.resolve();
     }
     var hash = readHash();
-    app.panes = new Lab.Panes(app.mounts.panes, { onCameraChange: function () { app.emit('camera', app.panes.camera); } });
+    try {
+      app.panes = new Lab.Panes(app.mounts.panes, { onCameraChange: function () { app.emit('camera', app.panes.camera); } });
+    } catch (err) {
+      console.error(err);
+      app.setStatus('This browser can\'t draw 3-D (WebGL is off): ' + (err && err.message ? err.message : err), 'error');
+      return Promise.resolve();
+    }
     app.timeline = new Lab.Timeline(app.mounts.timeline, {
       clock: hash.clock, onFrame: onFrame,
     });

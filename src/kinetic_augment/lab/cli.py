@@ -11,7 +11,7 @@ from typing import List, Optional
 import uvicorn
 
 from kinetic_augment.lab.clipstore import DEFAULT_ROOT, ClipStore
-from kinetic_augment.lab.models import LabConfig
+from kinetic_augment.lab.models import LabConfig, check_models, repo_model_dir
 from kinetic_augment.lab.server import create_app
 
 LOCAL_HOST = "127.0.0.1"
@@ -30,12 +30,24 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     return args
 
 
-def build_app(args: argparse.Namespace):
+def startup_config(model_dir: Optional[str] = None) -> LabConfig:
+    """
+    The Lab settings for this run. `--model-dir` is saved; with no folder given or saved, the
+    repo's own `models/` is used when it is complete (for this run only, never saved).
+    """
     config = LabConfig.load()
-    if args.model_dir:
-        config.model_dir = str(args.model_dir)
+    if model_dir:
+        config.model_dir = str(model_dir)
         config.save()
-    return create_app(ClipStore(args.clips_dir), config)
+    elif config.model_dir is None:
+        repo = repo_model_dir()
+        if repo.is_dir() and not check_models(repo):
+            config.model_dir = str(repo)
+    return config
+
+
+def build_app(args: argparse.Namespace):
+    return create_app(ClipStore(args.clips_dir), startup_config(args.model_dir))
 
 
 def _open_browser(url: str) -> None:

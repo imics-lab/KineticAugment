@@ -140,8 +140,9 @@ if (!Lab.decodePane && typeof require !== 'undefined') require('./bundle.js');
     });
   }
 
-  // A key that ignores what cannot change the pane: values equal to the schema default, and the
-  // extreme edge in random mode.
+  // The share key: what cannot change the pane is ignored (values equal to the schema default;
+  // the edge in random mode). The one definition of this rule is PaneRequest.share_key in
+  // src/kinetic_augment/lab/pane.py, which writes the manifest keys; keep the two in step.
   ShareSource.prototype._looseKey = function (req) {
     var r = fullRequest(req);
     var entry = ((this.data.schema || {}).entries || []).filter(function (e) { return e.id === r.entry_id; })[0];
@@ -192,8 +193,12 @@ if (!Lab.decodePane && typeof require !== 'undefined') require('./bundle.js');
     if (!sha1) return Promise.reject(new Error('clip ' + clipId + ' is not in the shared version'));
     return this._blob(sha1);
   };
+  // The blob id (sha1) of a request's pane, or null when it was not precomputed.
+  ShareSource.prototype.paneId = function (request) {
+    return this._index[Lab.requestKey(request)] || this._index[this._looseKey(request)] || null;
+  };
   ShareSource.prototype.pane = function (request) {
-    var sha1 = this._index[Lab.requestKey(request)] || this._index[this._looseKey(request)];
+    var sha1 = this.paneId(request);
     if (!sha1) return Promise.reject(new Error('this setting is not in the shared version'));
     return this._blob(sha1);
   };

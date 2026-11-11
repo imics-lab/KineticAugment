@@ -33,6 +33,11 @@ def check_models(model_dir: Path) -> List[str]:
     return [rel for rel in REQUIRED_MODELS if not (root / rel).is_file()]
 
 
+def repo_model_dir() -> Path:
+    """`<repo root>/models` (the repo root found from this file, as `server.CONFIGS_DIR` is)."""
+    return Path(__file__).resolve().parents[3] / "models"
+
+
 def lab_home() -> Path:
     """`$KINETIC_LAB_HOME`, else `~/.kinetic_lab`."""
     override = os.environ.get("KINETIC_LAB_HOME")

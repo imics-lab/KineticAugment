@@ -1,6 +1,6 @@
 """
 Write the Node test fixtures for the Lab frontend: a pane blob from `bundle.encode_pane`, its
-decoded values, and a share manifest keyed by `PaneRequest.key()`.
+decoded values, and a share manifest keyed by `PaneRequest.share_key()`.
 
 Usage: `python tests/js/make_fixture.py [out_dir]` (default `tests/js/fixtures`).
 """
@@ -19,9 +19,70 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from kinetic_augment.lab.bundle import SCALE_I16, decode_pane, encode_pane, jsonable  # noqa: E402
-from kinetic_augment.lab.pane import PaneRequest  # noqa: E402
+from kinetic_augment.lab.pane import PaneRequest, schema_defaults  # noqa: E402
 
 T, V = 4, 5
+
+JC, FX = "body.joint_coupled_noise", "face.expression_jitter"
+SHARE_ENTRIES = [
+    {
+        "id": FX,
+        "knobs": [{"key": "brows.sigma", "default": 1.0}, {"key": "mouth.sigma", "default": 0.5}],
+    },
+    {
+        "id": JC,
+        "knobs": [
+            {"key": "sigma_deg", "default": 2.5},
+            {"key": "elbow_sigma_deg", "default": 4.75},
+        ],
+    },
+]
+# (PaneRequest fields, UI requests that must find it)
+SHARE_CASES = [
+    (
+        {"entry_id": FX, "values": {"brows.sigma": 1.0, "mouth.sigma": 0.8}},
+        [
+            {"entry_id": FX, "values": {"mouth.sigma": 0.8}},
+            {"entry_id": FX, "values": {"brows.sigma": 1, "mouth.sigma": 0.8}, "edge": "low"},
+        ],
+    ),
+    (
+        {"entry_id": JC, "values": {}, "reroll": 2},
+        [
+            {"entry_id": JC, "reroll": 2},
+            {"entry_id": JC, "reroll": 2, "values": {"sigma_deg": 2.5}, "edge": "low"},
+        ],
+    ),
+    (
+        {"entry_id": JC, "values": {"elbow_sigma_deg": 10.0}, "mode": "extreme", "edge": "low"},
+        [
+            {"entry_id": JC, "mode": "extreme", "edge": "low", "values": {"elbow_sigma_deg": 10}},
+            {
+                "entry_id": JC,
+                "mode": "extreme",
+                "edge": "low",
+                "values": {"elbow_sigma_deg": 10, "sigma_deg": 2.5},
+            },
+        ],
+    ),
+    (
+        {"entry_id": JC, "values": {}, "mode": "extreme", "edge": "high"},
+        [
+            {"entry_id": JC, "mode": "extreme"},
+            {"entry_id": JC, "mode": "extreme", "edge": "high", "values": {"sigma_deg": 2.5}},
+        ],
+    ),
+    (
+        {"entry_id": "combined.default", "reroll": 1},
+        [{"entry_id": "combined.default", "reroll": 1}],
+    ),
+]
+SHARE_MISSES = [
+    {"entry_id": JC, "mode": "extreme", "edge": "low"},
+    {"entry_id": JC, "values": {"sigma_deg": 3.1}},
+    {"entry_id": JC, "reroll": 1},
+    {"entry_id": FX, "values": {}},
+]
 
 
 def fixture_arrays():
@@ -81,16 +142,22 @@ def main(out_dir: Path) -> None:
     }
     (out_dir / "pane.expected.json").write_text(json.dumps(expected, indent=1) + "\n")
 
-    # A share manifest as Task 10 writes it: request key -> sha1 of the gzipped blob.
+    # A share manifest as Task 10 writes it: PaneRequest.share_key -> blob id. Each case also
+    # lists requests as the UI sends them (values at default or not, any edge in random mode)
+    # that the browser must resolve to that case; `misses` must resolve to nothing.
     sha1 = hashlib.sha1(blob).hexdigest()
-    requests = [
-        PaneRequest("fx", "face.expression_jitter", {"brows.sigma": 1.0, "mouth.sigma": 0.5}),
-        PaneRequest("fx", "body.joint_coupled_noise", {}, mode="extreme", edge="low"),
-        PaneRequest("fx", "combined.default", {}, reroll=2),
-    ]
+    schema = {"profile": "slr_week4_default", "seed": 7, "entries": SHARE_ENTRIES}
+    cases = []
+    for i, (fields, lookups) in enumerate(SHARE_CASES):
+        req = PaneRequest("fx", **fields)
+        key = req.share_key(schema_defaults(schema, req.entry_id))
+        cases.append({"id": sha1 if i == 0 else f"case{i}", "key": key, "lookups": lookups})
     share = {
-        "panes": {r.key(): sha1 for r in requests},
-        "keys": [r.key() for r in requests],
+        "schema": schema,
+        "panes": {c["key"]: c["id"] for c in cases},
+        "cases": cases,
+        "misses": SHARE_MISSES,
+        "keys": [PaneRequest("fx", **fields).key() for fields, _ in SHARE_CASES],
         "sha1": sha1,
         "stops": {"body.joint_coupled_noise": {"sigma_deg": [0.0, 1.25, 2.5, 4.0, 5.0, 7.5, 10.0]}},
         "rerolls": 3,

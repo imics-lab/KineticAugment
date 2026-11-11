@@ -1,4 +1,5 @@
-// Lab.ShareSource / Lab.requestKey against a share manifest keyed by PaneRequest.key() in Python.
+// Lab.ShareSource / Lab.requestKey against a share manifest keyed by PaneRequest.share_key() in
+// Python (tests/js/make_fixture.py): each case must be found from requests as the UI sends them.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -11,21 +12,13 @@ const DIR = process.env.LAB_FIXTURE_DIR || path.join(__dirname, 'fixtures');
 const blob = fs.readFileSync(path.join(DIR, 'pane.bin'));
 const share = JSON.parse(fs.readFileSync(path.join(DIR, 'share.json'), 'utf8'));
 
-const SCHEMA = {
-  profile: 'default',
-  seed: 7,
-  entries: [
-    { id: 'face.expression_jitter', knobs: [{ key: 'brows.sigma', default: 1.0 }, { key: 'mouth.sigma', default: 0.5 }] },
-    { id: 'body.joint_coupled_noise', knobs: [{ key: 'sigma_deg', default: 2.5 }] },
-  ],
-};
-
 function makeData() {
   Lab.blobs = {};
-  Lab.addBlob(share.sha1, zlib.gzipSync(blob).toString('base64'));
+  const gz = zlib.gzipSync(blob).toString('base64');
+  for (const c of share.cases) Lab.addBlob(c.id, gz);
   Lab.addBlob('base1', blob.toString('base64')); // stored without gzip: also accepted
   return {
-    schema: SCHEMA,
+    schema: share.schema,
     profileText: 'profile_name: default\n',
     clips: [{ id: 'fx', n: 4, fps: 29.97 }],
     base: { fx: 'base1' },
@@ -35,44 +28,41 @@ function makeData() {
   };
 }
 
+const ui = (lookup) => Object.assign({ clip_id: 'fx' }, lookup);
+
 test('requestKey matches PaneRequest.key() after a JSON round trip', () => {
-  const req = { clip_id: 'fx', entry_id: 'face.expression_jitter', values: { 'mouth.sigma': 0.5, 'brows.sigma': 1.0 } };
-  // Python writes 1.0 where JavaScript writes 1, so both sides are compared after a JSON round trip.
+  // Python writes 1.0 where JavaScript writes 1, so keys are compared after a JSON round trip.
+  const req = { clip_id: 'fx', entry_id: 'face.expression_jitter', values: { 'mouth.sigma': 0.8, 'brows.sigma': 1.0 } };
   assert.equal(Lab.requestKey(req), Lab.canonicalKey(share.keys[0]));
-  assert.equal(
-    Lab.requestKey({ clip_id: 'fx', entry_id: 'combined.default', reroll: 2 }),
-    Lab.canonicalKey(share.keys[2]),
-  );
+  assert.equal(Lab.requestKey({ clip_id: 'fx', entry_id: 'combined.default', reroll: 1 }), Lab.canonicalKey(share.keys[4]));
 });
 
-test('ShareSource.pane finds the blob by request key and decodes it', async () => {
+test('every share_key case is found from its UI requests, normalised or not', () => {
+  const src = new Lab.ShareSource(makeData());
+  assert.ok(share.cases.length >= 5);
+  for (const c of share.cases) {
+    for (const lookup of c.lookups) {
+      assert.equal(src.paneId(ui(lookup)), c.id, `${JSON.stringify(lookup)} -> ${c.key}`);
+    }
+    // the manifest key itself, read back as a request, finds it too
+    assert.equal(src.paneId(JSON.parse(c.key)), c.id);
+  }
+});
+
+test('requests that were not precomputed find nothing', async () => {
+  const src = new Lab.ShareSource(makeData());
+  for (const miss of share.misses) assert.equal(src.paneId(ui(miss)), null, JSON.stringify(miss));
+  await assert.rejects(() => src.pane(ui(share.misses[1])), /not in the shared version/);
+});
+
+test('ShareSource.pane decodes the blob it finds', async () => {
   const src = new Lab.ShareSource(makeData());
   assert.equal(src.isShare, true);
-  const pane = await src.pane({
-    clip_id: 'fx', entry_id: 'face.expression_jitter', values: { 'brows.sigma': 1, 'mouth.sigma': 0.5 },
-    mode: 'random', reroll: 0, edge: 'high', profile: 'default',
-  });
+  const pane = await src.pane(ui(share.cases[0].lookups[0]));
   assert.equal(pane.meta.clip, 'fx');
   assert.deepEqual(pane.arrays.mesh_verts.shape, [4, 5, 3]);
-  const extreme = await src.pane({ clip_id: 'fx', entry_id: 'body.joint_coupled_noise', mode: 'extreme', edge: 'low' });
+  const extreme = await src.pane(ui(share.cases[2].lookups[0]));
   assert.equal(extreme.meta.n, 4);
-});
-
-test('ShareSource.pane treats values at their default like no value', async () => {
-  const src = new Lab.ShareSource(makeData());
-  // the manifest key has brows.sigma 1.0 and mouth.sigma 0.5, both the schema defaults
-  const pane = await src.pane({ clip_id: 'fx', entry_id: 'face.expression_jitter', values: {} });
-  assert.equal(pane.meta.clip, 'fx');
-  // and random mode ignores the extreme edge
-  await src.pane({ clip_id: 'fx', entry_id: 'combined.default', reroll: 2, edge: 'low' });
-});
-
-test('ShareSource.pane rejects a setting that was not precomputed', async () => {
-  const src = new Lab.ShareSource(makeData());
-  await assert.rejects(
-    () => src.pane({ clip_id: 'fx', entry_id: 'body.joint_coupled_noise', values: { sigma_deg: 3.1 } }),
-    /not in the shared version/,
-  );
 });
 
 test('ShareSource.stops returns the manifest stops, null where there are none', () => {

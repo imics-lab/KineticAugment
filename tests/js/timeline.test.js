@@ -42,3 +42,12 @@ test('a pane not loaded yet is null', () => {
   assert.equal(f.A, null);
   assert.equal(Lab.clockLength('playback', { nBase: 6, A: null, B: null }), 6);
 });
+
+test('playback follows the wall clock, not the screen refresh rate', () => {
+  // 30 fps: after 1 s the clip is 30 frames on, however many animation frames ran
+  assert.equal(Lab.playFrame(0, 1.0, 30, 1, 100), 30);
+  assert.equal(Lab.playFrame(10, 0.5, 30, 0.5, 100), 17); // half speed: 7.5 frames -> 7
+  assert.equal(Lab.playFrame(90, 1.0, 30, 1, 100), 20, 'wraps at the clip end');
+  assert.equal(Lab.playFrame(5, 0.0, 30, 1, 100), 5);
+  assert.equal(Lab.playFrame(0, 0.1, 30, 1, 100), 3, 'no float drift below a whole frame');
+});

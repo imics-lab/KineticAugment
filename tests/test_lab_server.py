@@ -273,6 +273,33 @@ def test_cli_starts_uvicorn(tmp_path, lab_home, monkeypatch):
     assert calls["url"] == "http://127.0.0.1:8123/"
 
 
+@pytest.mark.parametrize("complete", [True, False])
+def test_cli_falls_back_to_repo_models_without_saving(tmp_path, lab_home, monkeypatch, complete):
+    import kinetic_augment.lab.cli as cli
+
+    repo_models = _model_dir(tmp_path, complete)
+    monkeypatch.setattr(cli, "repo_model_dir", lambda: repo_models)
+    config = cli.startup_config(None)
+    assert config.model_dir == (str(repo_models) if complete else None)
+    assert not LabConfig.path().exists()  # used for this run only
+
+
+def test_cli_saved_and_given_model_dir_win_over_repo_models(tmp_path, lab_home, monkeypatch):
+    import kinetic_augment.lab.cli as cli
+
+    monkeypatch.setattr(cli, "repo_model_dir", lambda: _model_dir(tmp_path, True))
+    LabConfig(model_dir="/saved/models").save()
+    assert cli.startup_config(None).model_dir == "/saved/models"
+    assert cli.startup_config("/given").model_dir == "/given"
+    assert LabConfig.load().model_dir == "/given"
+
+
+def test_repo_model_dir_is_the_repo_models_folder():
+    from kinetic_augment.lab.models import repo_model_dir
+
+    assert repo_model_dir() == REPO / "models"
+
+
 @pytest.mark.parametrize(
     "payload",
     [
