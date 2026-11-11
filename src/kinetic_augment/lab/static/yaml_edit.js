@@ -4,17 +4,16 @@
 //     left as the base has it); each edited range leaf gets the new value (ranges in flow style,
 //     `[0.9, 1.1]`), keeps its comment and adds `  # viewer: was <old>`; `profile_name` becomes
 //     `name`. Entry keys are YAML paths `region.key`; range keys are dotted for nested ones
-//     (`brows.sigma`, `mode_weights.segment`). An edit with no line in the base is an error.
-//   Lab.savedEdits(schema, perEntry) -> {edits, entries}: a pane's per-entry settings as edits.
-//     An entry counts as edited when it has values; its run's overrides (`mode_weights` of a
-//     time-warp or frame-drop variant, the demo-only `start_rate` / `p`) are written too, so the
-//     file runs what the pane ran (`run_profile` merges overrides into `ranges`). Two variants of
-//     one chain entry add up their mode weights.
+//     (`brows.sigma`). An edit with no line in the base is an error.
+//   Lab.savedEdits(schema, perEntry) -> {edits, entries, ids}: a pane's per-entry settings as
+//     edits: only the knob values the pane moved off their defaults (an entry with values counts
+//     as edited; `ids` are its lab entry ids). The run's demo overrides (mirror p = 1, hand
+//     dropout's start_rate, the variants' mode_weights) are never written (Ruling R18).
 //   Lab.parseYaml(text) -> object: the YAML subset profiles use (block maps, block and flow
 //     lists of scalars, plain and quoted scalars, comments).
-//   Lab.valuesFromProfile(schema, data) -> {entryId: values}: for every lab entry the profile
-//     enables (a variant only when its mode weight is on), the knob values that differ from the
-//     knob defaults.
+//   Lab.valuesFromProfile(schema, data) -> {entryId: values}: for every lab entry whose chain
+//     entry the profile enables, the file's values of that entry's active knobs that differ from
+//     the knob defaults.
 // Classic script: adds to window.Lab and module.exports.
 var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
 (typeof window !== 'undefined' ? window : globalThis).Lab = Lab;
@@ -144,15 +143,6 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   };
 
   // ---- writing --------------------------------------------------------------------------
-  function flatten(obj, prefix, out) {
-    Object.keys(obj || {}).forEach(function (k) {
-      var v = obj[k], key = prefix ? prefix + '.' + k : k;
-      if (v && typeof v === 'object' && !Array.isArray(v)) flatten(v, key, out);
-      else out[key] = v;
-    });
-    return out;
-  }
-
   Lab.buildSavedYaml = function buildSavedYaml(baseText, edits, entries, opts) {
     edits = edits || {};
     var name = opts && opts.name;
@@ -201,21 +191,20 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     return lines.join('\n');
   };
 
+  // Only the knob values the pane moved off their defaults (Ruling R18): the run's demo overrides
+  // (mirror p = 1, hand dropout's start_rate, the variants' mode_weights) are never written, since
+  // a saved profile goes into the training pipeline.
   Lab.savedEdits = function savedEdits(schema, perEntry) {
-    var edits = {}, entries = [];
+    var edits = {}, entries = [], ids = [];
     ((schema && schema.entries) || []).forEach(function (entry) {
       var s = perEntry && perEntry[entry.id];
       if (!s || !s.values || !Object.keys(s.values).length) return;
       var target = edits[entry.entry] = edits[entry.entry] || {};
       if (entries.indexOf(entry.entry) < 0) entries.push(entry.entry);
-      var over = flatten(entry.overrides || {}, '', {});
-      Object.keys(over).forEach(function (k) {
-        if (/^mode_weights\./.test(k) && typeof target[k] === 'number') target[k] += over[k];
-        else target[k] = over[k];
-      });
+      ids.push(entry.id);
       Object.keys(s.values).forEach(function (k) { target[k] = s.values[k]; });
     });
-    return { edits: edits, entries: entries };
+    return { edits: edits, entries: entries, ids: ids };
   };
 
   function dig(obj, dotted) {
@@ -232,14 +221,9 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       var body = (regions[entry.entry.slice(0, dot)] || {})[entry.entry.slice(dot + 1)];
       if (!body || body.enabled !== true) return;
       var ranges = body.ranges || {};
-      var weights = (entry.overrides || {}).mode_weights;
-      if (weights) {
-        var file = ranges.mode_weights || {};
-        var on = Object.keys(weights).filter(function (k) { return weights[k] > 0; });
-        if (!on.every(function (k) { return Number(file[k]) > 0; })) return;
-      }
       var values = {};
       entry.knobs.forEach(function (k) {
+        if (k.active === false) return; // a key this variant does not use
         var v = dig(ranges, k.key);
         if (v !== undefined && !same(v, k.default)) values[k.key] = v;
       });

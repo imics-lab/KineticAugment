@@ -19,6 +19,9 @@ test('explainHtml: does, changes, keeps, proven vs used, escaped; demo overrides
   assert.match(html, /Proven:<\/b> Half the clips flipped/);
   assert.match(html, /Used:<\/b> Half \(p = 0\.5\)/);
   assert.match(html, /panes start from p = 1 rather than the profile/);
+  assert.match(html, /Saved settings don&#39;t include this demo starting value\.<\/p>/);
+  assert.deepEqual(Lab.demoOverrides(ENTRY), ['p']);
+  assert.deepEqual(Lab.demoOverrides({ overrides: { mode_weights: { none: 1 } } }), [], 'variant weights are not demo values');
   const warp = Lab.explainHtml(Object.assign({}, ENTRY, { overrides: { mode_weights: { none: 1 } }, note: 'Opt-in.' }));
   assert.doesNotMatch(warp, /panes start from/);
   assert.match(warp, /<p class="ex-note">Opt-in\.<\/p>/);

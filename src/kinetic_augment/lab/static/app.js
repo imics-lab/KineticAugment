@@ -658,14 +658,16 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     var say = function (html, kind) { msg.innerHTML = html; msg.hidden = !html; msg.className = 'small sa-msg' + (kind ? ' ' + kind : ''); };
     var pane = function (form) { return form.querySelector('input[type=radio]:checked').value; };
     var describe = function () {
-      var got = Lab.savedEdits(app.schema, app.state.panes[pane(saveForm)].perEntry);
-      saveForm.querySelector('.sa-what').textContent = got.entries.length
-        ? 'Saves the base profile with pane ' + pane(saveForm) + '\'s changes, each turned on: ' +
-          entryTitles(Object.keys(app.state.panes[pane(saveForm)].perEntry).filter(function (id) {
-            var s = app.state.panes[pane(saveForm)].perEntry[id];
-            return s.values && Object.keys(s.values).length;
-          })) + '.'
-        : 'Pane ' + pane(saveForm) + ' has no changed knobs yet.';
+      var which = pane(saveForm);
+      var got = Lab.savedEdits(app.schema, app.state.panes[which].perEntry);
+      var text = got.ids.length
+        ? 'Saves the base profile with pane ' + which + '\'s changed knobs, each augmentation turned on: ' +
+          entryTitles(got.ids) + '.'
+        : 'Pane ' + which + ' has no changed knobs yet.';
+      if (got.ids.some(function (id) { return Lab.demoOverrides && Lab.demoOverrides(app.entry(id)).length; })) {
+        text += ' ' + Lab.DEMO_NOT_SAVED;
+      }
+      saveForm.querySelector('.sa-what').textContent = text;
     };
     Array.prototype.forEach.call(saveForm.querySelectorAll('input[type=radio]'), function (r) { r.onchange = describe; });
     box.querySelector('[data-sa=save]').onclick = function () {

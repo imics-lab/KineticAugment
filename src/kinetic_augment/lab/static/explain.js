@@ -3,6 +3,7 @@
 //     proven vs used range, note (a whole profile: what it runs, and that it is view only).
 //   Lab.readoutHtml(meta, which) -> the readout of one pane: its draws, the report.measure numbers
 //     in words with units, and any fallback.
+//   Lab.demoOverrides(entry) -> the run's demo starting values (not saved), Lab.DEMO_NOT_SAVED.
 //   Lab.unchangedReason(meta, baseN) -> a short sentence when a pane's draw changed nothing (no
 //     entry applied, or a frame drop that kept every frame), else ''.
 // Classic script: adds to window.Lab and module.exports.
@@ -35,6 +36,13 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       'literature has shown to be safe.',
   };
 
+  // The run's demo starting values (mirror p = 1, hand dropout's top start rate): override keys
+  // other than the variant's mode_weights. Save never writes them (Ruling R18).
+  Lab.demoOverrides = function demoOverrides(entry) {
+    return Object.keys((entry && entry.overrides) || {}).filter(function (k) { return k !== 'mode_weights'; });
+  };
+  Lab.DEMO_NOT_SAVED = 'Saved settings don\'t include this demo starting value.';
+
   Lab.explainHtml = function explainHtml(entry) {
     if (!entry) return '';
     if (entry.whole) {
@@ -55,13 +63,13 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       '<div><h3>Keeps</h3>' + list(entry.keeps) + '</div>' +
       '<div><h3>Proven vs used</h3><p><b class="ex-proven">Proven:</b> ' + esc(entry.proven) + '</p>' +
       '<p><b class="ex-used">Used:</b> ' + esc(entry.used) + '</p></div></div>';
-    var demo = Object.keys(entry.overrides || {}).filter(function (k) { return k !== 'mode_weights'; });
+    var demo = Lab.demoOverrides(entry);
     if (demo.length) {
       html += '<p class="ex-note">In this lab the panes start from ' + demo.map(function (k) {
         var v = entry.overrides[k];
         return esc(k) + ' = ' + esc(Array.isArray(v) ? '[' + v.join(', ') + ']' : v);
       }).join(', ') + ' rather than the profile\'s own value, so that the effect shows. The knob starts there; ' +
-        'drag it to change it.</p>';
+        'drag it to change it. ' + esc(Lab.DEMO_NOT_SAVED) + '</p>';
     }
     if (entry.note) html += '<p class="ex-note">' + esc(entry.note) + '</p>';
     return html;

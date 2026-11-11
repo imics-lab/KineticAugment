@@ -30,20 +30,28 @@ function moved(knob) {
   return r[0] < lo ? [lo, r[1]] : r;
 }
 
-const out = {};
-schema.entries.forEach((entry) => {
-  const values = {};
-  entry.knobs.forEach((k) => { values[k.key] = moved(k); });
+function build(entry, values, name) {
   const perEntry = {};
   perEntry[entry.id] = { values };
   const got = Lab.savedEdits(schema, perEntry);
-  const name = 'lab-test-' + entry.id.replace(/\./g, '-');
-  out[entry.id] = {
+  return {
     name,
     chain: entry.entry,
     values,
     edits: got.edits[entry.entry],
     text: Lab.buildSavedYaml(base, got.edits, got.entries, { name }),
   };
+}
+
+// Every knob moved, and (`single`) one knob moved that is not one of the run's demo overrides, so
+// Python can check the overrides stay as the base has them (Ruling R18).
+const out = {};
+schema.entries.forEach((entry) => {
+  const name = 'lab-test-' + entry.id.replace(/\./g, '-');
+  const values = {};
+  entry.knobs.forEach((k) => { values[k.key] = moved(k); });
+  out[entry.id] = build(entry, values, name);
+  const other = entry.knobs.find((k) => !(k.key in (entry.overrides || {})));
+  if (other) out[entry.id].single = build(entry, { [other.key]: moved(other) }, name + '-single');
 });
 fs.writeFileSync(outPath, JSON.stringify(out));

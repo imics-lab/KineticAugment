@@ -68,43 +68,49 @@ test('a value equal to the old one is left alone; an unknown key is an error', (
 const SCHEMA = {
   entries: [
     { id: 'temporal.time_warp.uniform', entry: 'temporal.time_warp', overrides: { mode_weights: { none: 1, varied: 0, segment: 0 } },
-      knobs: [{ key: 'duration', kind: 'range', default: [0.6, 1.65] }, { key: 'segment_factor', kind: 'range', default: [0.6, 1.65] }] },
+      knobs: [{ key: 'duration', kind: 'range', default: [0.6, 1.65], active: true },
+        { key: 'segment_factor', kind: 'range', default: [0.6, 1.65], active: false }] },
     { id: 'temporal.time_warp.segment', entry: 'temporal.time_warp', overrides: { mode_weights: { none: 0, varied: 0, segment: 1 } },
-      knobs: [{ key: 'duration', kind: 'range', default: [0.6, 1.65] }, { key: 'segment_factor', kind: 'range', default: [0.6, 1.65] }] },
+      knobs: [{ key: 'duration', kind: 'range', default: [0.6, 1.65], active: true },
+        { key: 'segment_factor', kind: 'range', default: [0.6, 1.65], active: true }] },
     { id: 'temporal.hand_dropout', entry: 'temporal.hand_dropout', overrides: { start_rate: [0.05, 0.05] },
-      knobs: [{ key: 'start_rate', kind: 'range', default: [0.05, 0.05] }, { key: 'max_run_frames', kind: 'scalar', default: 10 }] },
+      knobs: [{ key: 'start_rate', kind: 'range', default: [0.05, 0.05], active: true },
+        { key: 'max_run_frames', kind: 'scalar', default: 10, active: true }] },
+    { id: 'scene.mirror', entry: 'scene.mirror', overrides: { p: 1.0 },
+      knobs: [{ key: 'p', kind: 'scalar', default: 1.0, active: true }] },
     { id: 'body.joint_coupled_noise', entry: 'body.joint_coupled_noise', overrides: {},
-      knobs: [{ key: 'elbow_sigma_deg', kind: 'scalar', default: 4.75 }, { key: 'side_mode', kind: 'enum', default: 'mirror' }] },
+      knobs: [{ key: 'elbow_sigma_deg', kind: 'scalar', default: 4.75, active: true },
+        { key: 'side_mode', kind: 'enum', default: 'mirror', active: true }] },
     { id: 'face.expression_jitter', entry: 'face.expression_jitter', overrides: {},
-      knobs: [{ key: 'brows.sigma', kind: 'scalar', default: 0.0625 }, { key: 'mouth_jaw.enabled', kind: 'bool', default: false }] },
+      knobs: [{ key: 'brows.sigma', kind: 'scalar', default: 0.0625, active: true },
+        { key: 'mouth_jaw.enabled', kind: 'bool', default: false, active: true }] },
   ],
 };
 
-test('savedEdits: a pane\'s edited entries, with the run\'s overrides written as range keys', () => {
+test('savedEdits: only the knobs the pane moved; demo overrides are never written (R18)', () => {
   const got = Lab.savedEdits(SCHEMA, {
     'temporal.time_warp.segment': { values: { segment_factor: [0.5, 2.0] } },
     'temporal.hand_dropout': { values: { max_run_frames: 6 } },
     'body.joint_coupled_noise': { values: {} }, // visited, nothing moved: not saved
   });
   assert.deepEqual(got.entries.sort(), ['temporal.hand_dropout', 'temporal.time_warp']);
-  assert.deepEqual(got.edits['temporal.time_warp'], {
-    'mode_weights.none': 0, 'mode_weights.varied': 0, 'mode_weights.segment': 1, segment_factor: [0.5, 2.0],
-  });
-  assert.deepEqual(got.edits['temporal.hand_dropout'], { start_rate: [0.05, 0.05], max_run_frames: 6 });
+  assert.deepEqual(got.ids.sort(), ['temporal.hand_dropout', 'temporal.time_warp.segment']);
+  assert.deepEqual(got.edits['temporal.time_warp'], { segment_factor: [0.5, 2.0] }, 'no mode_weights');
+  assert.deepEqual(got.edits['temporal.hand_dropout'], { max_run_frames: 6 }, 'no start_rate');
   const out = Lab.buildSavedYaml(BASE, got.edits, got.entries, { name: 'warp' });
-  assert.match(out, /^ {10}segment: 1 {2}# setting: weight of the one-slowed-segment warp {2}# viewer: was 0$/m);
-  assert.match(out, /^ {10}none: 0 {2}# setting: .* {2}# viewer: was 1$/m);
+  assert.doesNotMatch(out, /^ {10}(none|varied|segment|rate|random): .*viewer: was/m, 'mode weights as the base has them');
+  assert.match(out, /^ {8}start_rate: \[0\.0, 0\.05\] {2}# proven: none/m, 'start_rate as the base has it');
+  assert.match(out, /^ {8}max_run_frames: 6 {2}# proven: .* {2}# viewer: was 10$/m);
 });
 
-test('savedEdits: two variants of one time warp add up their mode weights', () => {
-  const got = Lab.savedEdits(SCHEMA, {
-    'temporal.time_warp.uniform': { values: { duration: [0.7, 1.4] } },
-    'temporal.time_warp.segment': { values: { segment_factor: [0.5, 2.0] } },
-  });
-  const e = got.edits['temporal.time_warp'];
-  assert.equal(e['mode_weights.none'], 1);
-  assert.equal(e['mode_weights.segment'], 1);
-  assert.deepEqual(e.duration, [0.7, 1.4]);
+test('savedEdits: mirror is saved with the base p unless the user moved p', () => {
+  let got = Lab.savedEdits(SCHEMA, { 'scene.mirror': { values: {} }, 'body.joint_coupled_noise': { values: { elbow_sigma_deg: 10 } } });
+  assert.deepEqual(got.edits, { 'body.joint_coupled_noise': { elbow_sigma_deg: 10 } });
+  assert.equal(Object.keys(got.edits).some((e) => 'p' in got.edits[e] || 'start_rate' in got.edits[e]), false);
+  got = Lab.savedEdits(SCHEMA, { 'scene.mirror': { values: { p: 0.8 } } });
+  assert.deepEqual(got.edits, { 'scene.mirror': { p: 0.8 } });
+  const out = Lab.buildSavedYaml(BASE, got.edits, got.entries, { name: 'm' });
+  assert.match(out, /^ {8}p: 0\.8 {2}# proven: p=0\.5 .* {2}# viewer: was 0\.5$/m);
 });
 
 test('parseYaml reads the profile subset: nested maps, flow lists, scalars, comments', () => {
@@ -122,18 +128,23 @@ test('parseYaml reads the profile subset: nested maps, flow lists, scalars, comm
   assert.deepEqual(Lab.parseYaml('a:\n  - 1\n  - x\nb: "q # not a comment"\nc: ~\n'), { a: [1, 'x'], b: 'q # not a comment', c: null });
 });
 
-test('valuesFromProfile: a saved file sets the values of each entry it enables, by variant', () => {
+test('valuesFromProfile: an enabled entry loads into each variant that uses the key', () => {
   const edits = Lab.savedEdits(SCHEMA, {
     'temporal.time_warp.segment': { values: { segment_factor: [0.5, 2.0] } },
     'face.expression_jitter': { values: { 'brows.sigma': 0.1, 'mouth_jaw.enabled': true } },
     'body.joint_coupled_noise': { values: { elbow_sigma_deg: 10 } },
   });
   const text = Lab.buildSavedYaml(BASE, edits.edits, edits.entries, { name: 'back' });
-  const got = Lab.valuesFromProfile(SCHEMA, Lab.parseYaml(text));
+  let got = Lab.valuesFromProfile(SCHEMA, Lab.parseYaml(text));
   assert.deepEqual(got['temporal.time_warp.segment'], { segment_factor: [0.5, 2.0] });
-  assert.equal(got['temporal.time_warp.uniform'], undefined, 'the uniform weight is 0 in the file');
+  assert.deepEqual(got['temporal.time_warp.uniform'], {}, 'segment_factor is not a uniform knob');
   assert.deepEqual(got['face.expression_jitter'], { 'brows.sigma': 0.1, 'mouth_jaw.enabled': true });
   assert.deepEqual(got['body.joint_coupled_noise'], { elbow_sigma_deg: 10 }, 'defaults are not copied');
-  // hand dropout is off in the file: not touched
-  assert.equal(got['temporal.hand_dropout'], undefined);
+  assert.equal(got['temporal.hand_dropout'], undefined, 'hand dropout is off in the file: not touched');
+  assert.deepEqual(got['scene.mirror'], { p: 0.5 }, 'the file\'s p, not the demo p = 1');
+  // a uniform-only edit (duration) loads into uniform, and into segment, which also uses it
+  const warp = Lab.savedEdits(SCHEMA, { 'temporal.time_warp.uniform': { values: { duration: [0.7, 1.4] } } });
+  got = Lab.valuesFromProfile(SCHEMA, Lab.parseYaml(Lab.buildSavedYaml(BASE, warp.edits, warp.entries, { name: 'u' })));
+  assert.deepEqual(got['temporal.time_warp.uniform'], { duration: [0.7, 1.4] });
+  assert.deepEqual(got['temporal.time_warp.segment'], { duration: [0.7, 1.4] });
 });

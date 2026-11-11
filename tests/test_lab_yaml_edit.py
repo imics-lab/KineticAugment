@@ -73,6 +73,41 @@ def test_saved_yaml_validates_and_carries_the_edits(built):
         assert "# viewer: was" in case["text"], entry_id
 
 
+def _flat(tree, prefix=""):
+    out = {}
+    for key, value in tree.items():
+        path = f"{prefix}{key}"
+        if isinstance(value, dict):
+            out.update(_flat(value, path + "."))
+        else:
+            out[path] = value
+    return out
+
+
+def test_saved_yaml_writes_only_moved_knobs_never_demo_overrides(built):
+    """Ruling R18: mode_weights, mirror p and hand-dropout start_rate are written only if moved."""
+    base = load_profile(BASE)
+    schema = {e["id"]: e for e in build_schema(base)["entries"]}
+    singles = 0
+    for entry_id, case in built.items():
+        assert set(case["edits"]) == set(case["values"]), entry_id
+        assert not any(k.startswith("mode_weights") for k in case["edits"]), entry_id
+        single = case.get("single")
+        if single is None:
+            continue
+        singles += 1
+        assert set(single["edits"]) == set(single["values"]), entry_id
+        profile = validate_profile_text(single["text"])
+        ranges = resolved_ranges(profile, case["chain"])
+        base_ranges = resolved_ranges(base, case["chain"])
+        for key, value in single["values"].items():
+            assert _same(_dig(ranges, key), value), (entry_id, key)
+        for key in _flat(schema[entry_id]["overrides"]):
+            if key not in single["values"]:
+                assert _same(_dig(ranges, key), _dig(base_ranges, key)), (entry_id, key)
+    assert singles >= 16
+
+
 def test_saved_yaml_keeps_every_line_and_comment(built):
     base_lines = BASE.read_text().split("\n")
     for entry_id, case in built.items():
