@@ -240,3 +240,6 @@ models/vposer/*.pt
 # Round-trip viewer data (derived; source frames of signers)
 /demo/round_trip/clips/
 /demo/round_trip/clips.json
+
+# Brainstorm and plan-execution scratch
+.superpowers/
