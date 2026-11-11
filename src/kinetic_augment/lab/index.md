@@ -14,3 +14,4 @@
 - `saving.py` — `slugify`, `validate_profile_text`, `save_setting`: saved settings as YAML in `configs/viewer_saved/` with an index line each.
 - `schema.py` — `load_knobs` reads `knobs.yaml`; `build_schema(profile)` merges it with a profile's values (and each run's overrides) into the schema the browser UI renders.
 - `server.py` — `create_app`: the FastAPI routes (status, models, schema, clips, panes, uploads, jobs, saved settings) and static files; setup mode while models are missing.
+- `static/` — The Lab web page (HTML, CSS, classic scripts, vendored three.js), served by the server and copied into the share zip (see `static/index.md`).

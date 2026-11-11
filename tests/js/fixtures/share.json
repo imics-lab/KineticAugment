@@ -1,0 +1,27 @@
+{
+ "panes": {
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"face.expression_jitter\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"brows.sigma\":1.0,\"mouth.sigma\":0.5}}": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
+  "{\"clip_id\":\"fx\",\"edge\":\"low\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{}}": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"combined.default\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":2,\"values\":{}}": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3"
+ },
+ "keys": [
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"face.expression_jitter\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":0,\"values\":{\"brows.sigma\":1.0,\"mouth.sigma\":0.5}}",
+  "{\"clip_id\":\"fx\",\"edge\":\"low\",\"entry_id\":\"body.joint_coupled_noise\",\"mode\":\"extreme\",\"profile\":\"default\",\"reroll\":0,\"values\":{}}",
+  "{\"clip_id\":\"fx\",\"edge\":\"high\",\"entry_id\":\"combined.default\",\"mode\":\"random\",\"profile\":\"default\",\"reroll\":2,\"values\":{}}"
+ ],
+ "sha1": "d4fb33d45aee8c86c80d8e70052056d9edd1aea3",
+ "stops": {
+  "body.joint_coupled_noise": {
+   "sigma_deg": [
+    0.0,
+    1.25,
+    2.5,
+    4.0,
+    5.0,
+    7.5,
+    10.0
+   ]
+  }
+ },
+ "rerolls": 3
+}

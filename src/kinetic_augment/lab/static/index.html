@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Augmentation Lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <nav id="sidebar" class="sidebar" aria-label="clips and augmentations">
+      <header class="brand">
+        <h1>Augmentation Lab</h1>
+        <span id="mode-badge" class="badge-mode"></span>
+      </header>
+      <section>
+        <h2>Clips</h2>
+        <div id="clip-list" class="list"></div>
+        <!-- full mode only; the add-video flow (Task 9) unhides and wires this button -->
+        <button id="add-video" class="item add" type="button" hidden>＋ add video</button>
+        <div id="add-video-status" class="small"></div>
+      </section>
+      <section>
+        <h2>Augmentations</h2>
+        <div id="entry-list" class="list grouped"></div>
+      </section>
+      <section>
+        <h2>Whole profiles</h2>
+        <div id="profile-list" class="list"></div>
+      </section>
+      <section>
+        <h2>Saved settings</h2>
+        <div id="saved-list" class="list"></div>
+        <div id="saved-actions" class="saved-actions"></div>
+      </section>
+      <footer id="share-footer" class="share-footer" hidden>
+        <a href="setup.html">Want live knobs? Set up full mode</a>
+      </footer>
+    </nav>
+
+    <main id="middle" class="middle">
+      <div id="status" class="status" role="status" hidden></div>
+      <section id="explain" class="explain-box" aria-label="what this augmentation does"></section>
+      <div id="stage" class="stage">
+        <figure class="source-cell">
+          <figcaption><span>source video</span><span id="source-label" class="mono small"></span></figcaption>
+          <canvas id="source-frame" width="4" height="3"></canvas>
+        </figure>
+        <div id="panes" class="panes"></div>
+      </div>
+      <div id="timeline" class="timeline"></div>
+      <div id="toggles" class="toggles-row"></div>
+      <details class="readout" id="readout-box">
+        <summary>What each pane drew</summary>
+        <div id="readout-A" class="readout-pane"></div>
+        <div id="readout-B" class="readout-pane"></div>
+      </details>
+    </main>
+
+    <aside id="knobs" class="knob-panel" aria-label="knobs">
+      <p class="placeholder">The knobs for the selected augmentation appear here.</p>
+    </aside>
+  </div>
+
+  <script src="vendor/three.min.js"></script>
+  <script src="vendor/OrbitControls.js"></script>
+  <script src="bundle.js"></script>
+  <script src="sources.js"></script>
+  <!-- the share build overwrites data/load.js with the scripts that hold its clips and panes
+       (they call Lab.addBlob from sources.js, so it loads after sources.js) -->
+  <script src="data/load.js"></script>
+  <script src="timeline.js"></script>
+  <script src="panes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

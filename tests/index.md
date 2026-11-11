@@ -56,3 +56,5 @@
 - `test_lab_saving.py` — Tests `slugify`, profile validation and `save_setting` (file, index line, overwrite, nothing written when invalid).
 - `test_lab_server.py` — Tests the lab routes with a fake store and models (setup mode, panes, uploads, saved settings) and the `kinetic-lab` host check.
 - `test_lab_schema.py` — Tests the lab knob schema: every lab entry and range key has a knob, defaults sit within limits, plain text is present, the extreme flag matches, and each knob's limits are accepted by the augmentation.
+- `test_lab_js.py` — Runs the Lab page's Node tests (`tests/js/*.test.js`) on freshly written fixtures; skips without `node`.
+- `js/` — Node tests for the Lab page's scripts and their fixture writer (see `js/index.md`).
