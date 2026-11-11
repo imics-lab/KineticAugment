@@ -50,4 +50,5 @@
 - `test_week4_report.py` — Tests `report.measure`: identity gives zeros, a 1 cm wrist shift reads 10 mm, unaligned runs skip the frame-by-frame keys.
 - `index.md` — Index of automated test files.
 - `test_lab_extreme.py` — Tests extreme draws: every entry's edge rule (low/high signs, mirrored axes, frame-drop keep recomputed) and the pass-through hook.
+- `test_lab_pane.py` — Tests the lab pane runner (`pane_profile`, `PaneRequest.key`, `run_pane` vs the week-4 chain, extreme truncation, speed) and the `ClipStore`.
 - `test_lab_schema.py` — Tests the lab knob schema: every lab entry and range key has a knob, defaults sit within limits, plain text is present, the extreme flag matches, and each knob's limits are accepted by the augmentation.
