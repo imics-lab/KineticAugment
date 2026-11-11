@@ -51,4 +51,6 @@
 - `index.md` — Index of automated test files.
 - `test_lab_extreme.py` — Tests extreme draws: every entry's edge rule (low/high signs, mirrored axes, frame-drop keep recomputed) and the pass-through hook.
 - `test_lab_pane.py` — Tests the lab pane runner (`pane_profile`, `PaneRequest.key`, `run_pane` vs the week-4 chain, extreme truncation, speed) and the `ClipStore`.
+- `test_lab_models.py` — Tests `check_models`, `MODEL_LINKS` and the `LabConfig` round trip.
+- `test_lab_ingest.py` — Tests the `JobQueue` (one at a time, failures, unknown ids) and the missing-scripts error.
 - `test_lab_schema.py` — Tests the lab knob schema: every lab entry and range key has a knob, defaults sit within limits, plain text is present, the extreme flag matches, and each knob's limits are accepted by the augmentation.
