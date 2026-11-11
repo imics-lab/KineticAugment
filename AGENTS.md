@@ -27,6 +27,7 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`.github/index.md`](.github/index.md)
 - [`.github/ISSUE_TEMPLATE/index.md`](.github/ISSUE_TEMPLATE/index.md)
 - [`configs/index.md`](configs/index.md)
+- [`configs/viewer_saved/index.md`](configs/viewer_saved/index.md)
 - [`data/index.md`](data/index.md)
 - [`data/hand_variants/index.md`](data/hand_variants/index.md)
 - [`data/hand_variants/round_trip_eval/index.md`](data/hand_variants/round_trip_eval/index.md)

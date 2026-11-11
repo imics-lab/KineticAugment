@@ -271,3 +271,73 @@ def test_cli_starts_uvicorn(tmp_path, lab_home, monkeypatch):
     calls.clear()
     main(["--port", "8123"])
     assert calls["url"] == "http://127.0.0.1:8123/"
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"clip_id": "c1", "entry_id": "a", "reroll": "a"},
+        {"clip_id": "c1", "entry_id": "a", "reroll": -1},
+        {"clip_id": "c1", "entry_id": "a", "values": [1]},
+        {"clip_id": 5, "entry_id": "a"},
+        {"clip_id": "c1", "entry_id": "a", "mode": 3},
+        {"clip_id": "c1", "entry_id": "a", "surprise": 1},
+    ],
+)
+def test_pane_malformed_payload_is_422(tmp_path, lab_home, monkeypatch, payload):
+    monkeypatch.setattr(server_mod, "run_pane", _fake_run_pane([]))
+    client, _, _ = _app(tmp_path)
+    r = client.post("/api/pane", json=payload)
+    assert r.status_code == 422 and isinstance(r.json()["detail"], str) and r.json()["detail"]
+
+
+def test_pane_type_error_in_run_is_422(tmp_path, lab_home, monkeypatch):
+    def boom(prep, req, base, models):
+        raise TypeError("'<' not supported between 'str' and 'float'")
+
+    monkeypatch.setattr(server_mod, "run_pane", boom)
+    client, _, _ = _app(tmp_path)
+    r = client.post("/api/pane", json={"clip_id": "c1", "entry_id": "a", "values": {"k": "text"}})
+    assert r.status_code == 422 and "not supported" in r.json()["detail"]
+
+
+def test_upload_rejects_non_video(tmp_path, lab_home):
+    queue = FakeQueue()
+    client, store, _ = _app(tmp_path, queue=queue)
+    for name in ("notes.txt", "clip", "x.mp4.exe"):
+        r = client.post("/api/videos", files={"file": (name, b"v")})
+        assert r.status_code == 422, name
+    assert client.post("/api/videos", files={"file": ("A.MOV", b"v")}).status_code == 200
+    assert not queue.submitted[0][0].name.endswith((".txt", ".exe"))
+
+
+def test_upload_deleted_when_submit_fails(tmp_path, lab_home):
+    class Broken(FakeQueue):
+        def submit(self, video, clip_id):
+            raise RuntimeError("queue down")
+
+    client, store, _ = _app(tmp_path, queue=Broken())
+    with pytest.raises(RuntimeError):
+        client.post("/api/videos", files={"file": ("a.mp4", b"v")})
+    assert list((store.root / ".uploads").iterdir()) == []
+
+
+@pytest.mark.parametrize("fails", [False, True])
+def test_upload_deleted_when_job_ends(tmp_path, lab_home, monkeypatch, fails):
+    import time
+
+    def fake_ingest(video, clip_id, store, models, progress):
+        assert Path(video).exists()
+        if fails:
+            raise RuntimeError("no hands")
+        return clip_id
+
+    monkeypatch.setattr(server_mod, "ingest_video", fake_ingest)
+    client, store, _ = _app(tmp_path)  # default JobQueue with the real wrapper
+    job = client.post("/api/videos", files={"file": ("a.mp4", b"v")}).json()["job_id"]
+    for _ in range(100):
+        if client.get(f"/api/jobs/{job}").json()["state"] in ("done", "failed"):
+            break
+        time.sleep(0.05)
+    assert client.get(f"/api/jobs/{job}").json()["state"] == ("failed" if fails else "done")
+    assert list((store.root / ".uploads").iterdir()) == []

@@ -10,7 +10,10 @@ import yaml
 from kinetic_augment.augmentations.profile import Profile, profile_from_dict
 
 DEFAULT_FOLDER = Path("configs/viewer_saved")
-INDEX_HEADER = "# Saved lab settings index\n\n- `index.md` — Index of this folder.\n"
+INDEX_HEADER = (
+    "# Saved lab settings index\n\n- `index.md` — Index of this folder.\n\n"
+    "Saved Lab settings; each file is a full profile `load_profile` reads.\n\n"
+)
 
 
 def slugify(name: str) -> str:

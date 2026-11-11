@@ -9,13 +9,15 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from fastapi import Body, FastAPI, File, HTTPException, Query, UploadFile
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, StrictInt, StrictStr
 
 from kinetic_augment.augmentations.profile import Profile, load_profile
 from kinetic_augment.lab.bundle import encode_pane
 from kinetic_augment.lab.clipstore import ClipStore
-from kinetic_augment.lab.ingest import JobQueue
+from kinetic_augment.lab.ingest import JobQueue, ingest_video
 from kinetic_augment.lab.models import MODEL_LINKS, REQUIRED_MODELS, LabConfig, check_models
 from kinetic_augment.lab.pane import PaneRequest, run_pane
 from kinetic_augment.lab.saving import (
@@ -31,6 +33,22 @@ PROFILE_NAMES = ("default", "ambitious", "literature")
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 UPLOAD_DIR = ".uploads"
 OCTET = "application/octet-stream"
+VIDEO_SUFFIXES = (".mp4", ".mov", ".m4v", ".avi", ".webm")
+
+
+class PaneBody(BaseModel):
+    """The JSON a pane request carries; wrong types are a 422, never a crash."""
+
+    class Config:
+        extra = "forbid"
+
+    clip_id: StrictStr
+    entry_id: StrictStr
+    values: Dict[str, Any] = {}
+    mode: StrictStr = "random"
+    reroll: StrictInt = 0
+    edge: StrictStr = "high"
+    profile: StrictStr = "default"
 
 
 def _default_loader(model_dir):
@@ -58,10 +76,28 @@ def create_app(
     app starts in setup mode until `POST /api/models` supplies a complete folder.
     """
     app = FastAPI(title="KineticAugment Lab")
+
+    @app.exception_handler(RequestValidationError)
+    def bad_request(_request, exc: RequestValidationError):
+        parts = [
+            ".".join(str(x) for x in e.get("loc", ())[1:]) + ": " + str(e.get("msg", ""))
+            for e in exc.errors()
+        ]
+        return JSONResponse({"detail": "; ".join(parts) or "invalid request"}, status_code=422)
+
     store = store if store is not None else ClipStore()
     saved_dir = Path(saved_dir)
     state: Dict[str, Any] = {"models": None, "jobs": job_queue}
     lock = threading.Lock()
+
+    def ingest_then_delete(store_, models_):
+        def runner(video, clip_id, progress):
+            try:
+                return ingest_video(video, clip_id, store_, models_, progress)
+            finally:  # the upload is only a temporary copy
+                Path(video).unlink(missing_ok=True)
+
+        return runner
 
     def missing(folder: Optional[str]) -> List[str]:
         return check_models(Path(folder)) if folder else list(REQUIRED_MODELS)
@@ -78,7 +114,7 @@ def create_app(
             state["models"] = models
             store.models = models
             if state["jobs"] is None:
-                state["jobs"] = JobQueue(store, models)
+                state["jobs"] = JobQueue(store, models, runner=ingest_then_delete(store, models))
         return None
 
     def status(error: Optional[str] = None, folder: Optional[str] = None) -> Dict[str, Any]:
@@ -186,22 +222,18 @@ def create_app(
             raise HTTPException(404, "no such frame")
 
     @app.post("/api/pane")
-    def post_pane(body: Dict[str, Any] = Body(...)):
+    def post_pane(body: PaneBody):
         models = need_models()
-        fields = {"clip_id", "entry_id", "values", "mode", "reroll", "edge", "profile"}
-        extra = sorted(set(body) - fields)
-        if extra or "clip_id" not in body or "entry_id" not in body:
-            raise HTTPException(422, "a pane needs clip_id and entry_id (and only known fields)")
+        if body.reroll < 0:
+            raise HTTPException(422, "reroll must be 0 or more")
+        req = PaneRequest(**getattr(body, "model_dump", body.dict)())
         try:
-            req = PaneRequest(**body)
             prep = store.get(req.clip_id)
         except KeyError:
             raise HTTPException(404, "no such clip")
-        except TypeError as exc:
-            raise HTTPException(422, str(exc))
         try:
             meta, arrays = run_pane(prep, req, base_for(req), models)
-        except ValueError as exc:
+        except (ValueError, TypeError) as exc:
             return JSONResponse({"detail": str(exc)}, status_code=422)
         return Response(encode_pane(meta, arrays), media_type=OCTET)
 
@@ -209,29 +241,34 @@ def create_app(
     @app.post("/api/videos")
     def post_video(file: UploadFile = File(...)):
         need_models()
-        stem = Path(file.filename or "").stem
+        name = Path(file.filename or "")
+        if name.suffix.lower() not in VIDEO_SUFFIXES:
+            raise HTTPException(422, "upload a video file: " + ", ".join(VIDEO_SUFFIXES))
         try:
-            base_id = slugify(stem)
+            base_id = slugify(name.stem)
         except ValueError:
             raise HTTPException(422, "the file name has no letters or digits to name the clip")
         taken = {c["id"] for c in store.list()}
         updir = store.root / UPLOAD_DIR
         updir.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile(
-            dir=updir, suffix=Path(file.filename or "").suffix or ".mp4", delete=False
-        ) as tmp:
-            shutil.copyfileobj(file.file, tmp)
-        n = 1
-        while True:
-            clip_id = base_id if n == 1 else f"{base_id}-{n}"
-            n += 1
-            if clip_id in taken:
-                continue
-            try:
-                job_id = state["jobs"].submit(Path(tmp.name), clip_id)
-            except ValueError:  # that id is already in flight
-                continue
-            return {"job_id": job_id, "clip_id": clip_id}
+        with tempfile.NamedTemporaryFile(dir=updir, suffix=name.suffix.lower(), delete=False) as t:
+            shutil.copyfileobj(file.file, t)
+        tmp = Path(t.name)
+        try:
+            n = 1
+            while True:
+                clip_id = base_id if n == 1 else f"{base_id}-{n}"
+                n += 1
+                if clip_id in taken:
+                    continue
+                try:
+                    job_id = state["jobs"].submit(tmp, clip_id)
+                except ValueError:  # that id is already in flight
+                    continue
+                return {"job_id": job_id, "clip_id": clip_id}
+        except BaseException:
+            tmp.unlink(missing_ok=True)
+            raise
 
     @app.get("/api/jobs/{job_id}")
     def get_job(job_id: str):
