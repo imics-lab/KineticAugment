@@ -103,14 +103,30 @@ def load_profile(
     """
     Read a profile file, apply the `enable` / `disable` overrides and validate it.
 
+    Raises: see `profile_from_dict`, which does the validation.
+    """
+    with open(path, "r") as handle:
+        data = yaml.safe_load(handle) or {}
+    return profile_from_dict(data, source=str(path), enable=enable, disable=disable)
+
+
+def profile_from_dict(
+    data: Dict[str, Any],
+    source: str = "<dict>",
+    enable: Sequence[str] = (),
+    disable: Sequence[str] = (),
+) -> Profile:
+    """
+    Build a profile from the mapping a profile file holds, with `load_profile`'s validation.
+
+    `source` only names the profile when `profile_name` is missing (its file stem).
+
     Raises:
         ValueError: schema_version is not 1; `seed` missing; an unknown top-level key, region,
             entry key or range key; an override that names an entry the profile does not have;
             both arm-noise entries enabled; or a Tier 1 range with a distribution Tier 1 does
             not draw (see `tier1_ranges`).
     """
-    with open(path, "r") as handle:
-        data = yaml.safe_load(handle) or {}
     if not isinstance(data, dict):
         raise ValueError(f"A profile must be a mapping, got {type(data).__name__}")
     unknown = [k for k in data if k not in TOP_KEYS]
@@ -126,7 +142,7 @@ def load_profile(
     if "seed" not in data:
         raise ValueError("Missing required key 'seed'")
     profile = Profile(
-        name=str(data.get("profile_name", Path(path).stem)),
+        name=str(data.get("profile_name", Path(source).stem)),
         seed=int(data["seed"]),
         schema_version=SCHEMA_VERSION,
         entries=_parse_entries(data.get("regions")),

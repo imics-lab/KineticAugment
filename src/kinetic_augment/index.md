@@ -8,6 +8,7 @@
 - `canonicalization.py` — Moves landmark frames to and from a canonical body-centered coordinate frame.
 - `constraints/` — Joint, velocity, and self-collision constraint enforcement.
 - `evaluation/` — Metrics, datasets, recurrent classifiers, and benchmark tools.
+- `lab/` — Augmentation Lab: the `kinetic-lab` server, pane runner, share build, saved settings and the web page (see `lab/index.md`).
 - `pipeline/` — Configurable augmentation pipeline, chaining, presets, and datasets.
 - `pipeline_legacy.py` — Deprecated wrapper for the earlier augmentation pipeline API.
 - `utils/` — Landmark data-format conversion helpers and left/right index maps.

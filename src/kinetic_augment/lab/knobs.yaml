@@ -1,0 +1,1220 @@
+# The Augmentation Lab's plain-English knob text: one entry per lab augmentation, each with its
+# explanation (does/changes/keeps/proven/used/note, from the week-4 demo) and one knob per range key of
+# the augmentation. `plain` is read first by the UI; `technical` is the symbol and YAML key.
+# `proven` is the literature range (null = none); `limits` bound the slider; `active: false` marks a
+# knob the run's mode does not use; `share: true` knobs get stops in share mode.
+body.joint_coupled_noise:
+  title: Arm angle noise
+  does: 'Turns the shoulder, elbow and wrist of both arms by a small random amount, the same for the whole
+    clip. The amounts are linked: the shoulder and wrist share part of one random draw, and the two arms
+    change in step (mirrored), so the arms move together the way one signer''s would.'
+  changes:
+  - the arm posture, so each hand moves a few centimetres and turns with the wrist
+  keeps:
+  - the finger poses (handshape)
+  - the torso, head and face
+  - the bone lengths
+  - the timing
+  proven: Shoulder and wrist turned by at most ±4°, each joint changed with chance 0.3 (SPOTER [M1]);
+    elbow by at most ±7.5°, with no harm in pose-based translation [T]
+  used: 'Typical turn 2.5° for shoulder and wrist, never more than 5°; elbow typical 4.75°, at most 9.5°
+    (σ, the typical size of a change: σ 2.5°, ≤ 5°; elbow σ 4.75°, ≤ 9.5°)'
+  extreme: true
+  knobs:
+  - key: sigma_deg
+    kind: scalar
+    plain: How far the shoulders and wrists are turned, typically (the published ±4° limit is a cap, so
+      it sits on the maximum below).
+    technical: shoulder/wrist σ (sigma_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 10
+    step: 0.25
+    share: true
+    active: true
+  - key: truncate_deg
+    kind: scalar
+    plain: The most the shoulders and wrists can ever be turned (the published ±4° limit is this cap,
+      not a typical size).
+    technical: shoulder/wrist truncation (truncate_deg)
+    unit: °
+    proven:
+    - 0
+    - 4
+    limits:
+    - 0
+    - 10
+    step: 0.25
+    share: false
+    active: true
+  - key: elbow_sigma_deg
+    kind: scalar
+    plain: How far the elbows are bent or straightened, typically (the published ±7.5° limit is a cap,
+      so it sits on the maximum below).
+    technical: elbow σ (elbow_sigma_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 15
+    step: 0.25
+    share: true
+    active: true
+  - key: elbow_truncate_deg
+    kind: scalar
+    plain: The most an elbow can ever be bent or straightened (the published ±7.5° limit is this cap,
+      not a typical size).
+    technical: elbow truncation (elbow_truncate_deg)
+    unit: °
+    proven:
+    - 0
+    - 7.5
+    limits:
+    - 0
+    - 15
+    step: 0.25
+    share: false
+    active: true
+  - key: chain_coupling
+    kind: scalar
+    plain: How much the shoulder and wrist of one arm move together (0 = independently, 1 = identically).
+    technical: chain coupling (chain_coupling)
+    unit: 0–1
+    proven: null
+    limits:
+    - 0
+    - 1
+    step: 0.05
+    share: false
+    active: true
+  - key: side_coupling
+    kind: scalar
+    plain: How much the left and right arms change alike (0 = independently, 1 = identically).
+    technical: side coupling (side_coupling)
+    unit: 0–1
+    proven: null
+    limits:
+    - 0
+    - 1
+    step: 0.05
+    share: false
+    active: true
+  - key: side_mode
+    kind: enum
+    plain: 'How the two arms relate: mirrored, drawn separately, or moving the same way.'
+    technical: side mode (side_mode)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    options:
+    - mirror
+    - independent
+    - synchronous
+    multi: false
+    active: true
+  - key: drift_deg
+    kind: scalar
+    plain: A slow wander of the arm angles over the clip (0 = none).
+    technical: drift (drift_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 5
+    step: 0.25
+    share: false
+    active: true
+body.limb_length_scaling:
+  title: Arm bone lengths
+  does: Lengthens or shortens the upper arm and forearm, as for a signer with other proportions, then
+    re-bends each arm so the wrist stays where it was (two-bone IK).
+  changes:
+  - the arm bone lengths and where the elbows are
+  keeps:
+  - the handshapes and face
+  - the timing
+  proven: No published range; the spread between signers in this project's data is 5.7% (Grounding §6.1)
+  used: Each arm bone scaled to between 0.93 and 1.07 times its length (0.93–1.07)
+  note: 'An opt-in experiment arm: off in the default profile.'
+  extreme: true
+  knobs:
+  - key: factor
+    kind: range
+    plain: How much longer or shorter the arm bones are made, as a range of scale factors.
+    technical: length factor (factor)
+    unit: ×
+    proven: null
+    limits:
+    - 0.8
+    - 1.2
+    step: 0.01
+    share: true
+    active: true
+  - key: bones
+    kind: enum
+    plain: Which arm bones are resized.
+    technical: bones (bones)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    options:
+    - upper_arm
+    - forearm
+    - hand
+    multi: true
+    active: true
+  - key: retarget
+    kind: bool
+    plain: Re-bend the arm so each wrist stays exactly where it was.
+    technical: retarget (retarget)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    active: true
+body.movement_size:
+  title: Movement size
+  does: 'Makes every movement bigger or smaller: each wrist''s path is scaled about its own centre, and
+    the arm is re-bent to follow it so the hand stays on the scaled path (two-bone IK).'
+  changes:
+  - how far the hands travel
+  keeps:
+  - where the movement happens (its centre)
+  - the handshapes and face
+  - the timing
+  proven: No measured range; 0.85–1.15 times is the linguistic example in Grounding [L2.10, L2.11]
+  used: Between 0.8 and 1.2 times the size, with equal chance for each ratio (0.8–1.2, log-uniform)
+  extreme: true
+  knobs:
+  - key: factor
+    kind: range
+    plain: How much bigger or smaller every movement is made, as a range of scale factors.
+    technical: size factor (factor)
+    unit: ×
+    proven: null
+    limits:
+    - 0.6
+    - 1.4
+    step: 0.01
+    share: true
+    active: true
+body.location_jitter:
+  title: Signing-space shift
+  does: Moves where the signing happens by one random 3-D offset for the whole clip, measured relative
+    to the signer's body (the torso frame), and re-bends the arms so the hands follow.
+  changes:
+  - where the hands are relative to the body, by up to 25 mm
+  keeps:
+  - the shape and size of every movement
+  - the handshapes and face
+  - the timing
+  proven: Typical shift 10 mm, at most 20 mm, matching the spread seen in real production (σ = 10 mm,
+    ≤ 20 mm [T])
+  used: Typical shift 12.5 mm, at most 25 mm (σ = 12.5 mm, ≤ 25 mm)
+  extreme: true
+  knobs:
+  - key: sigma_mm
+    kind: scalar
+    plain: How far the signing space is moved, typically.
+    technical: offset σ (sigma_mm)
+    unit: mm
+    proven:
+    - 0
+    - 10
+    limits:
+    - 0
+    - 25
+    step: 0.5
+    share: true
+    active: true
+  - key: truncate_mm
+    kind: scalar
+    plain: The farthest the signing space can ever be moved.
+    technical: offset truncation (truncate_mm)
+    unit: mm
+    proven:
+    - 1
+    - 20
+    limits:
+    - 1
+    - 50
+    step: 0.5
+    share: false
+    active: true
+fingers.joint_coupled_noise:
+  title: Finger bend noise
+  does: Bends or straightens each finger a little, the same for the whole clip. The knuckle and middle
+    joint of each finger (MCP, PIP) get one random amount each, neighbouring fingers change alike, and
+    the end joint (DIP) follows the middle joint.
+  changes:
+  - the finger bends, by a few degrees
+  keeps:
+  - the arms, wrists and face
+  - the timing
+  proven: No published range
+  used: Typical change 3.75° per joint, at most 7.5° (σ 3.75°, ≤ 7.5°; an estimate of 3° and 6°, widened
+    by a quarter)
+  note: 'The change is a few degrees per joint: use the hand views to see it.'
+  extreme: true
+  knobs:
+  - key: sigma_deg
+    kind: scalar
+    plain: How much each finger joint is bent or straightened, typically.
+    technical: joint σ (sigma_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 8
+    step: 0.25
+    share: true
+    active: true
+  - key: truncate_deg
+    kind: scalar
+    plain: The most any finger joint can ever change.
+    technical: joint truncation (truncate_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 15
+    step: 0.25
+    share: false
+    active: true
+  - key: finger_coupling
+    kind: scalar
+    plain: How much neighbouring fingers bend alike (0 = independently, 1 = identically).
+    technical: finger coupling (finger_coupling)
+    unit: 0–1
+    proven: null
+    limits:
+    - 0
+    - 1
+    step: 0.05
+    share: false
+    active: true
+  - key: dip_ratio
+    kind: scalar
+    plain: How much the fingertip joint follows the middle joint's change.
+    technical: DIP-to-PIP ratio (dip_ratio)
+    unit: ''
+    proven: null
+    limits:
+    - 0
+    - 1
+    step: 0.01
+    share: false
+    active: true
+fingers.handshape_jitter:
+  title: Handshape-safe finger jitter
+  does: 'Jitters every finger joint while keeping the handshape: which fingers are selected, open or closed,
+    how far apart they are, and the thumb. If a random change would turn it into a different handshape,
+    a new change is drawn; after 5 tries the clip is left unchanged.'
+  changes:
+  - the joints of the fingers that do not define the handshape, and the thumb, most (typical change 7.5°);
+    the defining fingers less
+  keeps:
+  - the handshape class
+  - the arms, wrists and face
+  - the timing
+  proven: No published range; GISLR's “finger-tree rotate” gives no angle [T]
+  used: Typical change 7.5° for the non-defining fingers and thumb, 3.75° for the defining fingers and
+    2° for their bend, never more than twice the typical size (σ 7.5°, 3.75°, flexion σ 2°, all ≤ 2σ)
+  extreme: false
+  knobs:
+  - key: nonselected_sigma_deg
+    kind: scalar
+    plain: How much the fingers that do not define the handshape, and the thumb, are jittered.
+    technical: non-selected σ (nonselected_sigma_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 15
+    step: 0.25
+    share: true
+    active: true
+  - key: selected_sigma_deg
+    kind: scalar
+    plain: How much the fingers that define the handshape are jittered.
+    technical: selected σ (selected_sigma_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 8
+    step: 0.25
+    share: true
+    active: true
+  - key: selected_flexion_sigma_deg
+    kind: scalar
+    plain: How much the defining fingers' bend is jittered.
+    technical: selected flexion σ (selected_flexion_sigma_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 4
+    step: 0.25
+    share: false
+    active: true
+  - key: truncate_sigmas
+    kind: scalar
+    plain: How many typical sizes of change (σ) a joint may move away from where it was, at most.
+    technical: truncation (truncate_sigmas)
+    unit: σ
+    proven: null
+    limits:
+    - 0.5
+    - 4
+    step: 0.1
+    share: false
+    active: true
+  - key: max_redraws
+    kind: scalar
+    plain: How many times a draw that would change the handshape is retried before leaving the clip alone.
+    technical: max redraws (max_redraws)
+    unit: tries
+    proven: null
+    limits:
+    - 0
+    - 10
+    step: 1
+    share: false
+    integer: true
+    active: true
+  - key: feature_margin_deg
+    kind: scalar
+    plain: How far a finger must stay from the angle at which its handshape would count as a different
+      shape.
+    technical: feature margin (feature_margin_deg)
+    unit: °
+    proven: null
+    limits:
+    - 0
+    - 10
+    step: 0.5
+    share: false
+    active: true
+face.expression_jitter:
+  title: Facial expression jitter
+  does: 'Shifts the facial expression a little for the whole clip: the brow, eye and cheek/nose expression
+    scores (blendshapes) each get one random offset, and the face points move to match through a map from
+    scores to points fitted on the clip. Mouth and jaw stay as they are, since mouth patterns can change
+    the sign.'
+  changes:
+  - the brows, eyelids and cheeks, by a few millimetres
+  - the face expression scores (blendshapes)
+  keeps:
+  - the mouth and jaw
+  - the head's direction and the face points that do not move with expression
+  - the body, hands and timing
+  proven: No published range; mouth patterns excluded because they can carry meaning [L7.3, L1.5]
+  used: Typical change 0.0625 for brows and eyes, at most 0.125; 0.0375 for cheeks and nose, at most 0.075;
+    mouth and jaw off. Scores run from 0 (none) to 1 (full) (σ 0.0625, ≤ 0.125; cheeks/nose σ 0.0375,
+    ≤ 0.075)
+  note: 'The change is a few millimetres: use the face view to see it.'
+  extreme: true
+  knobs:
+  - key: brows.enabled
+    kind: bool
+    plain: Whether the brow expression is changed at all.
+    technical: brow switch (brows.enabled)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    active: true
+  - key: brows.sigma
+    kind: scalar
+    plain: How much the brow expression score is changed, typically (scores run from 0 = none to 1 = full).
+    technical: brow σ (brows.sigma)
+    unit: score
+    proven: null
+    limits:
+    - 0
+    - 0.125
+    step: 0.0025
+    share: true
+    active: true
+  - key: brows.truncate
+    kind: scalar
+    plain: The most the brow expression score can ever be changed (scores run from 0 = none to 1 = full).
+    technical: brow truncation (brows.truncate)
+    unit: score
+    proven: null
+    limits:
+    - 0.005
+    - 0.25
+    step: 0.0025
+    share: false
+    active: true
+  - key: eyes.enabled
+    kind: bool
+    plain: Whether the eye expression is changed at all.
+    technical: eye switch (eyes.enabled)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    active: true
+  - key: eyes.sigma
+    kind: scalar
+    plain: How much the eye expression score is changed, typically (scores run from 0 = none to 1 = full).
+    technical: eye σ (eyes.sigma)
+    unit: score
+    proven: null
+    limits:
+    - 0
+    - 0.125
+    step: 0.0025
+    share: true
+    active: true
+  - key: eyes.truncate
+    kind: scalar
+    plain: The most the eye expression score can ever be changed (scores run from 0 = none to 1 = full).
+    technical: eye truncation (eyes.truncate)
+    unit: score
+    proven: null
+    limits:
+    - 0.005
+    - 0.25
+    step: 0.0025
+    share: false
+    active: true
+  - key: cheeks_nose.enabled
+    kind: bool
+    plain: Whether the cheek and nose expression is changed at all.
+    technical: cheek and nose switch (cheeks_nose.enabled)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    active: true
+  - key: cheeks_nose.sigma
+    kind: scalar
+    plain: How much the cheek and nose expression score is changed, typically (scores run from 0 = none
+      to 1 = full).
+    technical: cheek and nose σ (cheeks_nose.sigma)
+    unit: score
+    proven: null
+    limits:
+    - 0
+    - 0.075
+    step: 0.0025
+    share: false
+    active: true
+  - key: cheeks_nose.truncate
+    kind: scalar
+    plain: The most the cheek and nose expression score can ever be changed (scores run from 0 = none
+      to 1 = full).
+    technical: cheek and nose truncation (cheeks_nose.truncate)
+    unit: score
+    proven: null
+    limits:
+    - 0.005
+    - 0.15
+    step: 0.0025
+    share: false
+    active: true
+  - key: mouth_jaw.enabled
+    kind: bool
+    plain: Whether the mouth and jaw expression is changed at all.
+    technical: mouth and jaw switch (mouth_jaw.enabled)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    active: true
+  - key: mouth_jaw.sigma
+    kind: scalar
+    plain: How much the mouth and jaw expression score is changed, typically (scores run from 0 = none
+      to 1 = full).
+    technical: mouth and jaw σ (mouth_jaw.sigma)
+    unit: score
+    proven: null
+    limits:
+    - 0
+    - 0.075
+    step: 0.0025
+    share: false
+    active: true
+  - key: mouth_jaw.truncate
+    kind: scalar
+    plain: The most the mouth and jaw expression score can ever be changed (scores run from 0 = none to
+      1 = full).
+    technical: mouth and jaw truncation (mouth_jaw.truncate)
+    unit: score
+    proven: null
+    limits:
+    - 0.005
+    - 0.15
+    step: 0.0025
+    share: false
+    active: true
+  - key: frame_noise
+    kind: scalar
+    plain: Extra frame-by-frame flicker added to the expression scores (0 = none).
+    technical: per-frame noise (frame_noise)
+    unit: score
+    proven: null
+    limits:
+    - 0
+    - 0.05
+    step: 0.0025
+    share: false
+    active: true
+  - key: min_face_frames
+    kind: scalar
+    plain: The fewest frames with a visible face a clip needs before its face is changed.
+    technical: min face frames (min_face_frames)
+    unit: frames
+    proven: null
+    limits:
+    - 1
+    - 120
+    step: 1
+    share: false
+    integer: true
+    active: true
+  - key: ridge_alpha
+    kind: scalar
+    plain: How cautious the fit that moves face points to match the expression is (higher = smaller, smoother
+      moves).
+    technical: ridge penalty (ridge_alpha)
+    unit: ''
+    proven: null
+    limits:
+    - 0.001
+    - 0.1
+    step: 0.001
+    share: false
+    active: true
+temporal.time_warp.uniform:
+  title: 'Speed: whole clip'
+  does: Plays the whole clip faster or slower by one factor, making the new frames by smooth blending
+    between neighbouring frames (slerp for joint rotations).
+  changes:
+  - the clip’s length and the speed of every movement, uniformly
+  keeps:
+  - every pose the clip passes through, in the same order
+  - 'the start and the end: nothing is cropped'
+  - the body, handshapes and face of each frame
+  proven: Between 0.67 and 1.5 times the speed; 0.5 times hurt once (0.67–1.5×; 0.5× hurt once [L6.2,
+    M6, M3, T])
+  used: Between 0.6 and 1.65 times the speed, with equal chance for each ratio (0.6–1.65×, log-uniform)
+  extreme: true
+  knobs:
+  - key: duration
+    kind: range
+    plain: How much faster or slower the whole clip is played, as a range of speed factors.
+    technical: duration factor (duration)
+    unit: ×
+    proven:
+    - 0.67
+    - 1.5
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: true
+    active: true
+  - key: num_knots
+    kind: scalar
+    plain: How many points along the clip the speed is allowed to change at.
+    technical: speed knots (num_knots)
+    unit: knots
+    proven: null
+    limits:
+    - 2
+    - 8
+    step: 1
+    share: false
+    integer: true
+    active: false
+  - key: knot_rate
+    kind: range
+    plain: How much faster or slower the clip can get at each of those points, as a range of speed factors.
+    technical: knot rate (knot_rate)
+    unit: ×
+    proven: null
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: false
+    active: false
+  - key: protect_end
+    kind: scalar
+    plain: The share of the clip's end that is left at the plain overall speed.
+    technical: protected end (protect_end)
+    unit: fraction
+    proven: null
+    limits:
+    - 0
+    - 0.5
+    step: 0.01
+    share: false
+    active: false
+  - key: segment_width
+    kind: range
+    plain: How much of the clip the slowed or sped-up window covers, as a range of shares.
+    technical: segment width (segment_width)
+    unit: fraction
+    proven: null
+    limits:
+    - 0.05
+    - 1.0
+    step: 0.01
+    share: false
+    active: false
+  - key: segment_factor
+    kind: range
+    plain: How much faster or slower that window plays, as a range of speed factors.
+    technical: segment factor (segment_factor)
+    unit: ×
+    proven: null
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: false
+    active: false
+temporal.time_warp.varied:
+  title: 'Speed: changing over the clip'
+  does: 'Changes the speed smoothly over the clip: four points along it each get their own speed of 0.7–1.43
+    times, on top of the whole-clip factor. The last 20% of the clip keeps the whole-clip speed.'
+  changes:
+  - the clip’s length, and which parts are fast or slow
+  keeps:
+  - every pose the clip passes through, in the same order
+  - 'the start and the end: nothing is cropped'
+  - the body, handshapes and face of each frame
+  proven: 'None: speeds that change within a clip are excluded in the literature [L6.3, L6.4]'
+  used: Speed at each point between 0.7 and 1.43 times, with equal chance for each ratio (knot rates 0.7–1.43×,
+    log-uniform)
+  note: 'An opt-in experiment arm: off in the default profile.'
+  extreme: false
+  knobs:
+  - key: duration
+    kind: range
+    plain: How much faster or slower the whole clip is played, as a range of speed factors.
+    technical: duration factor (duration)
+    unit: ×
+    proven:
+    - 0.67
+    - 1.5
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: false
+    active: true
+  - key: num_knots
+    kind: scalar
+    plain: How many points along the clip the speed is allowed to change at.
+    technical: speed knots (num_knots)
+    unit: knots
+    proven: null
+    limits:
+    - 2
+    - 8
+    step: 1
+    share: false
+    integer: true
+    active: true
+  - key: knot_rate
+    kind: range
+    plain: How much faster or slower the clip can get at each of those points, as a range of speed factors.
+    technical: knot rate (knot_rate)
+    unit: ×
+    proven: null
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: true
+    active: true
+  - key: protect_end
+    kind: scalar
+    plain: The share of the clip's end that is left at the plain overall speed.
+    technical: protected end (protect_end)
+    unit: fraction
+    proven: null
+    limits:
+    - 0
+    - 0.5
+    step: 0.01
+    share: false
+    active: true
+  - key: segment_width
+    kind: range
+    plain: How much of the clip the slowed or sped-up window covers, as a range of shares.
+    technical: segment width (segment_width)
+    unit: fraction
+    proven: null
+    limits:
+    - 0.05
+    - 1.0
+    step: 0.01
+    share: false
+    active: false
+  - key: segment_factor
+    kind: range
+    plain: How much faster or slower that window plays, as a range of speed factors.
+    technical: segment factor (segment_factor)
+    unit: ×
+    proven: null
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: false
+    active: false
+temporal.time_warp.segment:
+  title: 'Speed: one stretch of the clip'
+  does: Slows down or speeds up one stretch of the clip (20–60% of it) by one factor, on top of the whole-clip
+    factor.
+  changes:
+  - the clip’s length, and the speed inside the window
+  keeps:
+  - every pose the clip passes through, in the same order
+  - 'the start and the end: nothing is cropped'
+  - the body, handshapes and face of each frame
+  proven: 'None: speeds that change within a clip are excluded in the literature [L6.3, L6.4]'
+  used: A stretch covering 20–60% of the clip, played at 0.6–1.65 times the speed (window 20–60% of the
+    clip, factor 0.6–1.65×)
+  note: 'An opt-in experiment arm: off in the default profile.'
+  extreme: false
+  knobs:
+  - key: duration
+    kind: range
+    plain: How much faster or slower the whole clip is played, as a range of speed factors.
+    technical: duration factor (duration)
+    unit: ×
+    proven:
+    - 0.67
+    - 1.5
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: false
+    active: true
+  - key: num_knots
+    kind: scalar
+    plain: How many points along the clip the speed is allowed to change at.
+    technical: speed knots (num_knots)
+    unit: knots
+    proven: null
+    limits:
+    - 2
+    - 8
+    step: 1
+    share: false
+    integer: true
+    active: false
+  - key: knot_rate
+    kind: range
+    plain: How much faster or slower the clip can get at each of those points, as a range of speed factors.
+    technical: knot rate (knot_rate)
+    unit: ×
+    proven: null
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: false
+    active: false
+  - key: protect_end
+    kind: scalar
+    plain: The share of the clip's end that is left at the plain overall speed.
+    technical: protected end (protect_end)
+    unit: fraction
+    proven: null
+    limits:
+    - 0
+    - 0.5
+    step: 0.01
+    share: false
+    active: false
+  - key: segment_width
+    kind: range
+    plain: How much of the clip the slowed or sped-up window covers, as a range of shares.
+    technical: segment width (segment_width)
+    unit: fraction
+    proven: null
+    limits:
+    - 0.05
+    - 1.0
+    step: 0.01
+    share: false
+    active: true
+  - key: segment_factor
+    kind: range
+    plain: How much faster or slower that window plays, as a range of speed factors.
+    technical: segment factor (segment_factor)
+    unit: ×
+    proven: null
+    limits:
+    - 0.4
+    - 2.5
+    step: 0.01
+    share: true
+    active: true
+temporal.frame_drop.rate:
+  title: 'Dropped frames: lower frame rate'
+  does: 'Drops frames to reach a lower frame rate: keeps the frames nearest a grid of 12–25 frames per
+    second, never goes below 8, and never leaves a gap longer than 125 ms.'
+  changes:
+  - the number of frames and the gaps between them
+  keeps:
+  - every kept frame exactly as it was
+  - the first and last frames
+  proven: At least 10 frames per second, where people's understanding stops improving; hidden runs of
+    up to 8 frames (≥ 10 fps [T]; masked runs ≤ 8 frames [M4, M10])
+  used: Frame rate 12–25 per second, never below 8, no gap over 125 ms (12–25 fps, ≥ 8 fps, gaps ≤ 125
+    ms)
+  note: The kept frames keep their timestamps; played back to back at the clip’s frame rate, the clip
+    looks faster.
+  extreme: true
+  knobs:
+  # ≥ 10 fps is safe (no gain above it); 30 = the source clips' frame rate, which this knob can't exceed
+  - key: target_fps
+    kind: range
+    plain: The lower frame rate the clip is thinned down to, as a range of frames per second.
+    technical: target rate (target_fps)
+    unit: fps
+    proven:
+    - 10
+    - 30
+    limits:
+    - 8
+    - 50
+    step: 1
+    share: true
+    active: true
+  - key: min_fps
+    kind: scalar
+    plain: The lowest frame rate the clip may ever be thinned to.
+    technical: minimum rate (min_fps)
+    unit: fps
+    proven: null
+    limits:
+    - 1
+    - 12
+    step: 1
+    share: false
+    active: true
+  - key: p
+    kind: range
+    plain: The chance that each frame is dropped, as a range of probabilities.
+    technical: drop probability (p)
+    unit: 0–1
+    proven: null
+    limits:
+    - 0
+    - 0.5
+    step: 0.01
+    share: false
+    active: false
+  - key: max_gap_ms
+    kind: scalar
+    plain: The longest stretch with no frame at all that is allowed.
+    technical: max gap (max_gap_ms)
+    unit: ms
+    proven:
+    - 10
+    - 100
+    limits:
+    - 10
+    - 250
+    step: 5
+    share: false
+    active: true
+  - key: fill
+    kind: enum
+    plain: 'What stands in for dropped frames: nothing, a repeat of the last frame, or a blend.'
+    technical: fill (fill)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    options:
+    - none
+    - hold
+    - interpolate
+    multi: false
+    active: true
+temporal.frame_drop.random:
+  title: 'Dropped frames: at random'
+  does: Drops frames at random, each with a chance of 0–0.2, never leaving a gap longer than 125 ms.
+  changes:
+  - the number of frames and the gaps between them
+  keeps:
+  - every kept frame exactly as it was
+  - the first and last frames
+  proven: Hidden runs of up to 8 frames; no range for the drop chance (masked runs ≤ 8 frames [M4, M10])
+  used: Chance of 0–0.2 per frame, gaps no longer than 125 ms (p 0–0.2, gaps ≤ 125 ms)
+  note: The kept frames keep their timestamps; played back to back at the clip’s frame rate, the clip
+    looks faster.
+  extreme: true
+  knobs:
+  # ≥ 10 fps is safe (no gain above it); 30 = the source clips' frame rate, which this knob can't exceed
+  - key: target_fps
+    kind: range
+    plain: The lower frame rate the clip is thinned down to, as a range of frames per second.
+    technical: target rate (target_fps)
+    unit: fps
+    proven:
+    - 10
+    - 30
+    limits:
+    - 8
+    - 50
+    step: 1
+    share: false
+    active: false
+  - key: min_fps
+    kind: scalar
+    plain: The lowest frame rate the clip may ever be thinned to.
+    technical: minimum rate (min_fps)
+    unit: fps
+    proven: null
+    limits:
+    - 1
+    - 12
+    step: 1
+    share: false
+    active: false
+  - key: p
+    kind: range
+    plain: The chance that each frame is dropped, as a range of probabilities.
+    technical: drop probability (p)
+    unit: 0–1
+    proven: null
+    limits:
+    - 0
+    - 0.5
+    step: 0.01
+    share: true
+    active: true
+  - key: max_gap_ms
+    kind: scalar
+    plain: The longest stretch with no frame at all that is allowed.
+    technical: max gap (max_gap_ms)
+    unit: ms
+    proven:
+    - 10
+    - 100
+    limits:
+    - 10
+    - 250
+    step: 5
+    share: false
+    active: true
+  - key: fill
+    kind: enum
+    plain: 'What stands in for dropped frames: nothing, a repeat of the last frame, or a blend.'
+    technical: fill (fill)
+    unit: ''
+    proven: null
+    limits: null
+    step: null
+    share: false
+    options:
+    - none
+    - hold
+    - interpolate
+    multi: false
+    active: true
+temporal.hand_dropout:
+  title: Hand goes missing
+  does: Removes a hand for short runs of frames, as when the tracker (MediaPipe) loses it mid-sign. A
+    run starts with a set chance at each frame, lasts 1.9 frames on average and at most 10.
+  changes:
+  - 'the hand in the dropped frames: the tracker loses it (its values are missing and marked invalid)'
+  keeps:
+  - the body, face and the other hand
+  - every other frame
+  - the timing
+  proven: Runs of up to 8 frames; the start chance has no literature value, measured 0.039 here (runs
+    ≤ 8 frames [M4, M10])
+  used: Runs of 1–10 frames, starting with a chance of 0–0.05 per frame
+  extreme: false
+  knobs:
+  - key: start_rate
+    kind: range
+    plain: How likely a hand is to go missing at any frame, as a range of chances per frame.
+    technical: start rate (start_rate)
+    unit: per frame
+    proven: null
+    limits:
+    - 0
+    - 0.1
+    step: 0.005
+    share: true
+    active: true
+  - key: run_length_mean
+    kind: scalar
+    plain: How many frames a missing hand stays missing, on average.
+    technical: mean run length (run_length_mean)
+    unit: frames
+    proven: null
+    limits:
+    - 1
+    - 4
+    step: 0.1
+    share: false
+    active: true
+  - key: max_run_frames
+    kind: scalar
+    plain: The longest a hand can stay missing.
+    technical: max run (max_run_frames)
+    unit: frames
+    proven:
+    - 1
+    - 8
+    limits:
+    - 1
+    - 20
+    step: 1
+    share: false
+    integer: true
+    active: true
+scene.mirror:
+  title: Mirror left and right
+  does: 'Flips the body left to right about the vertical plane through the shoulders and swaps the sides:
+    hands, body points, face points and the Left/Right expression scores (blendshapes).'
+  changes:
+  - which hand does what
+  - each handshape and the face become their mirror images
+  keeps:
+  - the shape and size of every movement (mirrored)
+  - the timing
+  proven: Half the clips flipped; it cost 1.3 percentage points on WLASL once (p = 0.5 [M6, T])
+  used: Half the clips flipped (p = 0.5)
+  extreme: false
+  knobs:
+  - key: p
+    kind: scalar
+    plain: The chance that a clip is flipped left to right.
+    technical: mirror probability (p)
+    unit: 0–1
+    proven:
+    - 0
+    - 0.5
+    limits:
+    - 0
+    - 1
+    step: 0.05
+    share: true
+    active: true
+scene.view:
+  title: Camera angle
+  does: Turns the whole scene left or right about the vertical line through the shoulders (yaw) and tilts
+    it up or down (pitch), as if the camera stood elsewhere.
+  changes:
+  - the body’s orientation to the camera
+  keeps:
+  - 'the pose: every joint angle and bone length'
+  - the handshapes and face
+  - the timing
+  proven: Turn up to ±20°, tilt up to ±5° (yaw ±20° [M7]; pitch ±5° [T])
+  used: Turn up to ±25°, tilt up to ±6° (yaw ±25°, pitch ±6°)
+  extreme: true
+  knobs:
+  - key: yaw_deg
+    kind: scalar
+    plain: How far the camera view is turned left or right.
+    technical: yaw (yaw_deg)
+    unit: ± °
+    proven:
+    - 0
+    - 20
+    limits:
+    - 0
+    - 50
+    step: 0.5
+    share: true
+    active: true
+  - key: pitch_deg
+    kind: scalar
+    plain: How far the camera view is tilted up or down.
+    technical: pitch (pitch_deg)
+    unit: ± °
+    proven:
+    - 0
+    - 5
+    limits:
+    - 0
+    - 12
+    step: 0.5
+    share: true
+    active: true
+scene.scale:
+  title: Camera distance
+  does: Scales the whole scene about the shoulder centre, as if the camera were nearer or farther.
+  changes:
+  - the overall size
+  keeps:
+  - 'the proportions: every position relative to every other'
+  - the pose, handshapes and timing
+  proven: 0.8–1.2 times the size (GISLR [M10])
+  used: 0.75–1.25 times the size
+  extreme: true
+  knobs:
+  - key: factor
+    kind: range
+    plain: How much nearer or farther the camera seems, as a range of size factors.
+    technical: scale factor (factor)
+    unit: ×
+    proven:
+    - 0.8
+    - 1.2
+    limits:
+    - 0.5
+    - 1.5
+    step: 0.01
+    share: true
+    active: true
+scene.uncentre:
+  title: Off-centre signer
+  does: Moves the whole scene sideways and up or down, as if the signer stood elsewhere in the frame.
+    The shift is limited so no hand point inside the frame leaves it.
+  changes:
+  - where the signer is in the frame
+  keeps:
+  - the pose, size and handshapes
+  - every position relative to every other
+  - the timing
+  proven: Up to ±0.1 of the frame size (GISLR [M10])
+  used: Up to ±0.125 of the frame, hands kept in it
+  extreme: false
+  knobs:
+  - key: limit
+    kind: scalar
+    plain: How far the signer can be shifted away from the centre of the frame.
+    technical: shift limit (limit)
+    unit: ± frame
+    proven:
+    - 0
+    - 0.1
+    limits:
+    - 0
+    - 0.25
+    step: 0.005
+    share: true
+    active: true

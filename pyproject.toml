@@ -62,10 +62,19 @@ full = [
     "trimesh>=3.10.0",
     "pybullet>=3.2.0",
 ]
+# Augmentation Lab (local browser app)
+lab = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "python-multipart>=0.0.9",
+    "trimesh>=3.10.0",
+    "fast-simplification>=0.1.7",
+]
 # Development dependencies
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "httpx>=0.24",
     "black>=23.0.0",
     "flake8>=6.0.0",
     "mypy>=1.0.0",
@@ -82,12 +91,13 @@ Issues = "https://github.com/imics-lab/KineticAugment/issues"
 
 [project.scripts]
 kinetic-augment = "kinetic_augment.cli:main"
+kinetic-lab = "kinetic_augment.lab.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-kinetic_augment = ["py.typed"]
+kinetic_augment = ["py.typed", "lab/knobs.yaml", "lab/static/**/*"]
 
 [tool.black]
 line-length = 100

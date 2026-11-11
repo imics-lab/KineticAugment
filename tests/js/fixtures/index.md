@@ -1,0 +1,10 @@
+# JS test fixtures index
+
+Written by `tests/js/make_fixture.py`; regenerate rather than edit.
+
+- `pane.bin` — A small pane blob from `bundle.encode_pane` (NaN points, a wrapping int16 delta mesh, uint16 faces above 32767).
+- `pane.bin.gz` — The same blob gzipped (mtime 0).
+- `pane.expected.json` — `bundle.decode_pane` of the blob: meta and every array's dtype, shape and values (NaN as null).
+- `share.json` — A share manifest keyed by `PaneRequest.share_key()` with its schema, the UI requests each key must answer, requests that must miss, raw `key()`s, stops and rerolls.
+- `range_parity.json` — Every range knob of the default schema with its stops and `share.range_from_marker` at many markers (the Node parity test compares `rangeFromMarker` with it).
+- `index.md` — Index of this folder.

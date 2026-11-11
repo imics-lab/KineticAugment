@@ -21,6 +21,7 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - Add implementation code beneath `src/kinetic_augment` and tests beneath `tests`.
 - Keep YAML task profiles in `configs` and do not commit licensed model weights.
 - Update the nearest `index.md` whenever files or folders are added, removed, or renamed.
+- `kinetic-lab` starts the Augmentation Lab (local web page for comparing augmentations; needs `pip install -e '.[smplx,lab]'` and the model files). See `docs/augmentation-lab.md`.
 - Keep `CLAUDE.md` as a relative symlink to this file, and keep `agent.md` synchronized with significant changes here.
 
 ## Folder indexes
@@ -29,6 +30,7 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`.github/index.md`](.github/index.md)
 - [`.github/ISSUE_TEMPLATE/index.md`](.github/ISSUE_TEMPLATE/index.md)
 - [`configs/index.md`](configs/index.md)
+- [`configs/viewer_saved/index.md`](configs/viewer_saved/index.md)
 - [`data/index.md`](data/index.md)
 - [`data/hand_variants/index.md`](data/hand_variants/index.md)
 - [`data/hand_variants/round_trip_eval/index.md`](data/hand_variants/round_trip_eval/index.md)
@@ -64,6 +66,10 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`src/kinetic_augment/body_model/index.md`](src/kinetic_augment/body_model/index.md)
 - [`src/kinetic_augment/constraints/index.md`](src/kinetic_augment/constraints/index.md)
 - [`src/kinetic_augment/constraints/collision/index.md`](src/kinetic_augment/constraints/collision/index.md)
+- [`src/kinetic_augment/lab/index.md`](src/kinetic_augment/lab/index.md)
+- [`src/kinetic_augment/lab/static/index.md`](src/kinetic_augment/lab/static/index.md)
+- [`src/kinetic_augment/lab/static/data/index.md`](src/kinetic_augment/lab/static/data/index.md)
+- [`src/kinetic_augment/lab/static/vendor/index.md`](src/kinetic_augment/lab/static/vendor/index.md)
 - [`src/kinetic_augment/evaluation/index.md`](src/kinetic_augment/evaluation/index.md)
 - [`src/kinetic_augment/evaluation/benchmark/index.md`](src/kinetic_augment/evaluation/benchmark/index.md)
 - [`src/kinetic_augment/evaluation/datasets/index.md`](src/kinetic_augment/evaluation/datasets/index.md)
@@ -72,3 +78,5 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`src/kinetic_augment/pipeline/index.md`](src/kinetic_augment/pipeline/index.md)
 - [`src/kinetic_augment/utils/index.md`](src/kinetic_augment/utils/index.md)
 - [`tests/index.md`](tests/index.md)
+- [`tests/js/index.md`](tests/js/index.md)
+- [`tests/js/fixtures/index.md`](tests/js/fixtures/index.md)

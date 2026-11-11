@@ -46,5 +46,18 @@
 - `test_extract_face_landmarks.py` — Integration test: real FaceLandmarker on a pilot clip (face found, frames align with hands, head-matrix layout).
 - `test_face_metrics.py` — Tests the gate metrics: matrix rotation scale removal, head-pose agreement, correspondence floor.
 - `test_week4_profile.py` — Tests the week-4 profile loader, the proven-range comments in the shipped YAMLs, the chain's determinism, identity and stream independence.
+- `test_lab_chain_hook.py` — Tests the chain draw hook (none is unchanged, a hook replaces the draw before apply) and `profile_from_dict` against `load_profile`.
 - `test_week4_report.py` — Tests `report.measure`: identity gives zeros, a 1 cm wrist shift reads 10 mm, unaligned runs skip the frame-by-frame keys.
 - `index.md` — Index of automated test files.
+- `test_lab_extreme.py` — Tests extreme draws: every entry's edge rule (low/high signs, mirrored axes, frame-drop keep recomputed) and the pass-through hook.
+- `test_lab_pane.py` — Tests the lab pane runner (`pane_profile`, `PaneRequest.key`, `run_pane` vs the week-4 chain, extreme truncation, speed) and the `ClipStore`.
+- `test_lab_models.py` — Tests `check_models`, `MODEL_LINKS` and the `LabConfig` round trip.
+- `test_lab_ingest.py` — Tests the `JobQueue` (one at a time, failures, unknown ids) and the missing-scripts error.
+- `test_lab_saving.py` — Tests `slugify`, profile validation and `save_setting` (file, index line, overwrite, nothing written when invalid).
+- `test_lab_server.py` — Tests the lab routes with a fake store and models (setup mode, panes, uploads, saved settings) and the `kinetic-lab` host check.
+- `test_lab_schema.py` — Tests the lab knob schema: every lab entry and range key has a knob, defaults sit within limits, plain text is present, the extreme flag matches, and each knob's limits are accepted by the augmentation.
+- `test_lab_share.py` — Tests the share build: the pane grid (defaults, proven edges, extreme only where allowed), the size-budget choice, no modules or fetch in the page, mesh decimation and a small real zip.
+- `test_lab_js.py` — Runs the Lab page's Node tests (`tests/js/*.test.js`) on freshly written fixtures; skips without `node`.
+- `test_lab_docs.py` — Tests that every Lab file is in its folder index, AGENTS.md lists the indexes, the setup page is a plain classic page, and the Lab doc is linked.
+- `test_lab_yaml_edit.py` — Builds the Save button's YAML in Node for every lab entry (all knobs moved) and checks each loads with `validate_profile_text`, carries the edits, writes only moved knobs (no demo overrides or `mode_weights`, Ruling R18), keeps every line and comment; skips without `node`.
+- `js/` — Node tests for the Lab page's scripts and their fixture writer (see `js/index.md`).

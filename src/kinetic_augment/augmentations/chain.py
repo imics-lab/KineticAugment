@@ -12,6 +12,10 @@ the identity. `scene.uncentre` needs the clip's camera: without one it is skippe
 `fallbacks` as "no_camera". After the clip stages, `build_outputs` runs and the
 `stage == "outputs"` entries (hand dropout) edit those outputs.
 
+An optional `draw_hook(name, draw, aug) -> dict` runs on each entry that passes the gate, after
+`sample` and before `apply`; the dict it returns is applied and recorded (the Augmentation Lab
+uses it to pin or widen draws). Without a hook nothing changes.
+
 Every draw dict is recorded after `apply`, so it holds the diagnostics `apply` added. A
 `"fallback"` in it is also copied to `ChainResult.fallbacks`. Each clip-stage entry that keeps
 the frame count (every one but the temporal ones) also gets `"wrist_moved_mm_max"`: the largest
@@ -21,7 +25,7 @@ it (body frame, before the scene transform, so the scene entries record 0.0).
 
 import zlib
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -94,9 +98,15 @@ class AugmentationChain:
     and the image-space outputs are None.
     """
 
-    def __init__(self, profile: Profile, skeleton):
+    def __init__(
+        self,
+        profile: Profile,
+        skeleton,
+        draw_hook: Optional[Callable[[str, Dict[str, Any], Any], Dict[str, Any]]] = None,
+    ):
         self.profile = profile
         self.skeleton = skeleton
+        self.draw_hook = draw_hook
         self.augmentations = {
             e.name: AugmentationRegistry.get(e.name)(ranges=e.ranges, probability=e.probability)
             for e in profile.entries
@@ -146,6 +156,8 @@ class AugmentationChain:
                 draws[name] = {"gated": True}
                 return target
             draw = aug.sample(rng, target, ctx)
+            if self.draw_hook is not None:
+                draw = self.draw_hook(name, draw, aug)
             measure = aug.stage == "clip" and "temporal" not in aug.regions
             before = wrists_of(target) if measure else None
             out = aug.apply(target, draw, ctx)
