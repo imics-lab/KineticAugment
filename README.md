@@ -242,6 +242,13 @@ Then open <http://localhost:8765/#clip=20983> (round trip) or
 gives every step, the model files needed, how to check each step worked, and fixes for common
 problems.
 
+## Augmentation Lab
+
+The Lab is a web page for comparing augmentations side by side with live or precomputed knobs.
+Run it with `kinetic-lab` after `pip install -e '.[smplx,lab]'`, or send the shareable zip, which
+needs only a browser. [docs/augmentation-lab.md](docs/augmentation-lab.md) covers both modes,
+building the zip and using saved settings.
+
 ## Available Augmentations
 
 | Category | Augmentations |

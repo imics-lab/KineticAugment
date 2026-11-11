@@ -58,5 +58,6 @@
 - `test_lab_schema.py` — Tests the lab knob schema: every lab entry and range key has a knob, defaults sit within limits, plain text is present, the extreme flag matches, and each knob's limits are accepted by the augmentation.
 - `test_lab_share.py` — Tests the share build: the pane grid (defaults, proven edges, extreme only where allowed), the size-budget choice, no modules or fetch in the page, mesh decimation and a small real zip.
 - `test_lab_js.py` — Runs the Lab page's Node tests (`tests/js/*.test.js`) on freshly written fixtures; skips without `node`.
+- `test_lab_docs.py` — Tests that every Lab file is in its folder index, AGENTS.md lists the indexes, the setup page is a plain classic page, and the Lab doc is linked.
 - `test_lab_yaml_edit.py` — Builds the Save button's YAML in Node for every lab entry (all knobs moved) and checks each loads with `validate_profile_text`, carries the edits, writes only moved knobs (no demo overrides or `mode_weights`, Ruling R18), keeps every line and comment; skips without `node`.
 - `js/` — Node tests for the Lab page's scripts and their fixture writer (see `js/index.md`).

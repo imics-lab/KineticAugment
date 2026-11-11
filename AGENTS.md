@@ -19,6 +19,7 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - Add implementation code beneath `src/kinetic_augment` and tests beneath `tests`.
 - Keep YAML task profiles in `configs` and do not commit licensed model weights.
 - Update the nearest `index.md` whenever files or folders are added, removed, or renamed.
+- `kinetic-lab` starts the Augmentation Lab (local web page for comparing augmentations; needs `pip install -e '.[smplx,lab]'` and the model files). See `docs/augmentation-lab.md`.
 - Keep `CLAUDE.md` as a relative symlink to this file, and keep `agent.md` synchronized with significant changes here.
 
 ## Folder indexes

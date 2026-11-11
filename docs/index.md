@@ -33,6 +33,7 @@
 - `Week_2_Findings.md` — Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07).
 - `Hand_Pipeline_Variants.md` — The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29).
 - `Augmentation_Ranges.md` — Proven against used range for every week-4 augmentation, the 25% rule, and the three week-4 profiles.
+- `augmentation-lab.md` — The Augmentation Lab: share mode and full mode, building the zip, and using saved settings.
 - `media/` — Images and placeholder assets referenced by documentation.
 - `index.md` — Index of the documentation pages and media folder.
 - `research-guide/` — Source-grounded research onboarding, verification status, and practical learning roadmap.
