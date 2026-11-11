@@ -62,6 +62,7 @@ Run the test suite with `pytest`. The documented phase checks can also be run wi
 - [`src/kinetic_augment/body_model/index.md`](src/kinetic_augment/body_model/index.md)
 - [`src/kinetic_augment/constraints/index.md`](src/kinetic_augment/constraints/index.md)
 - [`src/kinetic_augment/constraints/collision/index.md`](src/kinetic_augment/constraints/collision/index.md)
+- [`src/kinetic_augment/lab/index.md`](src/kinetic_augment/lab/index.md)
 - [`src/kinetic_augment/evaluation/index.md`](src/kinetic_augment/evaluation/index.md)
 - [`src/kinetic_augment/evaluation/benchmark/index.md`](src/kinetic_augment/evaluation/benchmark/index.md)
 - [`src/kinetic_augment/evaluation/datasets/index.md`](src/kinetic_augment/evaluation/datasets/index.md)
