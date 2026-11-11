@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pickle
 import shutil
+import threading
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -26,6 +27,8 @@ class ClipStore:
         self.root = Path(root) if root is not None else DEFAULT_ROOT
         self.models = models
         self._cache: "OrderedDict[str, PreparedClip]" = OrderedDict()
+        self._lock = threading.Lock()  # guards the cache and the per-clip locks
+        self._clip_locks: Dict[str, threading.Lock] = {}
 
     def _dir(self, clip_id: str) -> Path:
         if not clip_id or "/" in clip_id or "\\" in clip_id or clip_id.startswith("."):
@@ -46,30 +49,45 @@ class ClipStore:
         return out
 
     def get(self, clip_id: str) -> PreparedClip:
-        """The prepared clip; raises KeyError when the clip is unknown."""
-        if clip_id in self._cache:
-            self._cache.move_to_end(clip_id)
-            return self._cache[clip_id]
+        """The prepared clip (thread-safe: concurrent calls for one clip fit it once)."""
+        with self._lock:
+            if clip_id in self._cache:
+                self._cache.move_to_end(clip_id)
+                return self._cache[clip_id]
+            clip_lock = self._clip_locks.setdefault(clip_id, threading.Lock())
+        with clip_lock:
+            with self._lock:
+                if clip_id in self._cache:
+                    self._cache.move_to_end(clip_id)
+                    return self._cache[clip_id]
+            result, hands, face = self._load(clip_id)
+            prep = prepare_clip(clip_id, result, hands, face, self.models)
+            with self._lock:
+                self._cache[clip_id] = prep
+                while len(self._cache) > LRU_SIZE:
+                    self._cache.popitem(last=False)
+            return prep
+
+    def _load(self, clip_id: str):
+        """`(result, hands, face)` from `fit.pkl`, else refit from the exported caches."""
         d = self._dir(clip_id)
         fit = d / "fit.pkl"
         if fit.exists():
             with open(fit, "rb") as handle:
-                result, hands, face = pickle.load(handle)
-        elif (d / "hands.npz").exists() and (d / "face.npz").exists():
-            from kinetic_augment.body_model.face_observations import load_face_clip
-            from kinetic_augment.body_model.face_pipeline import run_clip
-            from kinetic_augment.body_model.hand_observations import load_hand_clip
+                return pickle.load(handle)
+        if (d / "hands.npz").exists() and (d / "face.npz").exists():
+            return self._refit(d)
+        raise KeyError(clip_id)
 
-            hands, face = load_hand_clip(d / "hands.npz"), load_face_clip(d / "face.npz")
-            result = run_clip(hands, face, self.models)
-            self._write_fit(d, result, hands, face)
-        else:
-            raise KeyError(clip_id)
-        prep = prepare_clip(clip_id, result, hands, face, self.models)
-        self._cache[clip_id] = prep
-        while len(self._cache) > LRU_SIZE:
-            self._cache.popitem(last=False)
-        return prep
+    def _refit(self, d: Path):
+        from kinetic_augment.body_model.face_observations import load_face_clip
+        from kinetic_augment.body_model.face_pipeline import run_clip
+        from kinetic_augment.body_model.hand_observations import load_hand_clip
+
+        hands, face = load_hand_clip(d / "hands.npz"), load_face_clip(d / "face.npz")
+        result = run_clip(hands, face, self.models)
+        self._write_fit(d, result, hands, face)
+        return result, hands, face
 
     def frame_path(self, clip_id: str, i: int) -> Path:
         """Path of frame `i` (0-based); raises KeyError when it does not exist."""
@@ -94,4 +112,5 @@ class ClipStore:
         out.mkdir(parents=True, exist_ok=True)
         for jpg in sorted(Path(frames_dir).glob("*.jpg")):
             shutil.copy2(jpg, out / jpg.name)
-        self._cache.pop(clip_id, None)
+        with self._lock:
+            self._cache.pop(clip_id, None)

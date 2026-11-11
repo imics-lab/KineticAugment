@@ -23,6 +23,7 @@ import yaml
 
 from ..augmentations.base import AugmentationRegistry
 from ..augmentations.profile import Profile, resolved_ranges
+from .extreme import extreme_allowed
 from .runs import RUNS, merge
 
 PROFILES = ["default", "ambitious", "literature"]
@@ -72,7 +73,7 @@ def build_schema(profile: Profile) -> Dict[str, Any]:
             "proven": text["proven"],
             "used": text["used"],
             "note": text.get("note", ""),
-            "extreme": bool(text["extreme"]),
+            "extreme": extreme_allowed(lab_id),
             "overrides": copy.deepcopy(run.overrides),
             "knobs": [dict(k, default=_dig(ranges, k["key"])) for k in text["knobs"]],
         }

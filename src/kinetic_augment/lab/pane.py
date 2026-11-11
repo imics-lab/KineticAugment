@@ -16,7 +16,7 @@ from kinetic_augment.augmentations.profile import Profile, profile_from_dict, re
 from kinetic_augment.augmentations.report import measure
 from kinetic_augment.augmentations.scene import fit_clip_camera
 from kinetic_augment.lab.bundle import SCALE_I16, bundle_arrays, jsonable, source_frames
-from kinetic_augment.lab.extreme import EXTREME_ENTRIES, make_hook
+from kinetic_augment.lab.extreme import extreme_allowed, make_hook
 from kinetic_augment.lab.runs import RUNS, merge
 
 WHOLE_PREFIXES = ("combined.", "saved:")
@@ -142,7 +142,7 @@ def run_pane(
     Run `req` on `prep` and return `(meta, arrays)` for `bundle.encode_pane`.
 
     For `combined.*` / `saved:*` ids `base` is the whole profile to run (the caller resolves the
-    id to it). Extreme mode needs an entry in `EXTREME_ENTRIES`.
+    id to it). Extreme mode needs an entry with an extreme switch (`extreme_allowed`).
 
     Raises:
         ValueError: bad values, unknown entry, or extreme requested where there is no extreme.
@@ -150,7 +150,7 @@ def run_pane(
     if req.mode not in ("random", "extreme"):
         raise ValueError(f"mode must be 'random' or 'extreme', got {req.mode!r}")
     run = None if req.whole else RUNS.get(req.entry_id)
-    if req.mode == "extreme" and (req.whole or run is None or run.entry not in EXTREME_ENTRIES):
+    if req.mode == "extreme" and (req.whole or not extreme_allowed(req.entry_id)):
         raise ValueError("no extreme for this one")
     profile = pane_profile(base, req)
     skeleton = models.skeleton

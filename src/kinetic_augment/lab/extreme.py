@@ -28,6 +28,7 @@ from ..augmentations.profile import Profile, tier1_ranges
 from ..augmentations.ranges import parse_range
 from ..augmentations.tier1 import Tier1Ranges
 from ..augmentations.timing import FrameDrop
+from .runs import RUNS
 from ..evaluation.datasets.face_features import MEDIAPIPE_BLENDSHAPE_NAMES
 
 _DEFAULT_FPS = 30.0
@@ -173,6 +174,15 @@ _RULES: Dict[str, Callable[..., Dict[str, Any]]] = {
 }
 
 EXTREME_ENTRIES = frozenset(_RULES)
+
+# Extreme only pins the uniform duration of the time warp, so its other two modes have none.
+NOT_EXTREME = frozenset({"temporal.time_warp.varied", "temporal.time_warp.segment"})
+
+
+def extreme_allowed(entry_id: str) -> bool:
+    """Whether the lab entry `entry_id` has an extreme switch (Ruling R2); False if unknown."""
+    run = RUNS.get(entry_id)
+    return run is not None and run.entry in EXTREME_ENTRIES and entry_id not in NOT_EXTREME
 
 
 def extreme_draw(

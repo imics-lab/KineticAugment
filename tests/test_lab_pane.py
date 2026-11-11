@@ -1,6 +1,8 @@
 """The Lab pane runner and clip store."""
 
 import pickle
+import shutil
+import threading
 import time
 from pathlib import Path
 
@@ -75,6 +77,58 @@ def test_clipstore_lists_adds_and_serves_frames(tmp_path):
         store.frame_path("abc", 3)
     with pytest.raises(KeyError):
         store.get("missing")
+
+
+def test_run_pane_extreme_gated_by_lab_entry_flag():
+    """Time-warp varied/segment share a chain entry that has an extreme, but the lab entry not."""
+    base = load_profile(AMBITIOUS)
+    for entry in ("temporal.time_warp.varied", "temporal.time_warp.segment"):
+        with pytest.raises(ValueError, match="no extreme for this one"):
+            run_pane(None, _req(entry, mode="extreme"), base, None)
+
+
+def test_clipstore_concurrent_get_fits_once(tmp_path, monkeypatch):
+    import kinetic_augment.lab.clipstore as cs
+
+    (tmp_path / "c").mkdir()
+    for name in ("hands.npz", "face.npz"):
+        (tmp_path / "c" / name).write_bytes(b"x")
+    calls = []
+
+    def slow_refit(self, d):
+        calls.append(d)
+        time.sleep(0.3)
+        return ("r", "h", "f")
+
+    monkeypatch.setattr(cs.ClipStore, "_refit", slow_refit)
+    monkeypatch.setattr(cs, "prepare_clip", lambda *a: object())
+    store, got = ClipStore(tmp_path, None), []
+    threads = [threading.Thread(target=lambda: got.append(store.get("c"))) for _ in range(2)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert len(calls) == 1 and len(got) == 2 and got[0] is got[1]
+
+
+@requires_smplx
+def test_clipstore_refits_from_exported_caches_once(fitted, tmp_path, monkeypatch):
+    import kinetic_augment.body_model.face_pipeline as fp
+
+    models = fitted[0]
+    (tmp_path / "01991").mkdir()
+    shutil.copy(f"{REAL_CLIP}_hands.npz", tmp_path / "01991" / "hands.npz")
+    shutil.copy(f"{REAL_CLIP}_face.npz", tmp_path / "01991" / "face.npz")
+    first = ClipStore(tmp_path, models).get("01991")
+    assert (tmp_path / "01991" / "fit.pkl").exists()
+    assert first.clip.frames > 0
+
+    def no_refit(*args, **kwargs):
+        raise AssertionError("refit although fit.pkl exists")
+
+    monkeypatch.setattr(fp, "run_clip", no_refit)
+    second = ClipStore(tmp_path, models).get("01991")
+    assert second.clip.frames == first.clip.frames
 
 
 @pytest.fixture(scope="module")
