@@ -49,3 +49,4 @@
 - `test_lab_chain_hook.py` — Tests the chain draw hook (none is unchanged, a hook replaces the draw before apply) and `profile_from_dict` against `load_profile`.
 - `test_week4_report.py` — Tests `report.measure`: identity gives zeros, a 1 cm wrist shift reads 10 mm, unaligned runs skip the frame-by-frame keys.
 - `index.md` — Index of automated test files.
+- `test_lab_extreme.py` — Tests extreme draws: every entry's edge rule (low/high signs, mirrored axes, frame-drop keep recomputed) and the pass-through hook.
