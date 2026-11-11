@@ -4,9 +4,11 @@
   <img src="docs/media/banner.png" alt="KineticAugment Banner" width="70%">
 </p>
 
-**KineticAugment** is a framework for augmenting human motion data while preserving anatomical and semantic plausibility. It's designed for researchers and engineers working on Sign Language Recognition, Human Activity Recognition, and other motion analysis tasks who need to increase dataset size without introducing unrealistic or label-altering artifacts.
+**KineticAugment** is a general framework for augmenting human motion data while preserving anatomical and semantic plausibility. It is designed for researchers and engineers working on any task that learns from body, hand, or face motion (human activity and action recognition, gesture and sign language recognition, rehabilitation and sports analysis, human-robot interaction, motion generation) who need to increase dataset size without introducing unrealistic or label-altering artifacts.
 
 Traditional data augmentation techniques often fail on skeletal time-series data, creating impossible poses and unnatural movements. KineticAugment solves this by treating the human body as a structured kinematic system, governed by a set of core biomechanical and contextual principles.
+
+The framework is not tied to one application. Everything that depends on the task (which features carry meaning, how fast a hand may move, which augmentations are safe) lives in a [task profile](./docs/04_Task_Specific_Profiles.md), not in the core. Sign language recognition was the first case study, which is why the demo clips and several of the findings documents come from sign language data.
 
 ---
 
@@ -31,15 +33,11 @@ Traditional data augmentation techniques often fail on skeletal time-series data
   <em>Screen recording of the round-trip viewer (preview; <a href="docs/media/round_trip_demo.mp4">full 42 s recording</a>).</em>
 </p>
 
-This is how we check augmentations visually. Augmentations are not applied to the raw landmarks.
-Each frame's MediaPipe pose, hand and face landmarks are fitted to one SMPL-X body (MANO hands,
-head and jaw). The augmentation edits that body, and MediaPipe-format landmarks are read back off
-the mesh. If the round trip with no augmentation reproduces the original signing, then the
-differences seen after an augmentation come from the augmentation itself.
+This is how we check augmentations visually. Augmentations are not applied to the raw landmarks. Each frame's MediaPipe pose, hand and face landmarks are fitted to one SMPL-X body (MANO hands, head and jaw). The augmentation edits that body, and MediaPipe-format landmarks are read back off the mesh. If the round trip with no augmentation reproduces the original motion, then the differences seen after an augmentation come from the augmentation itself. The clips in this demo are sign language videos, the first case study; the same check applies to any recorded motion.
 
 The viewer shows, for one clip at a time:
 
-1. **Sign video**: the source clip.
+1. **Source video**: the clip being checked (the viewer labels this panel "Sign video").
 2. **MediaPipe extraction (2-D)**: pose, hand and face-mesh landmarks drawn on the frame.
 3. **Extraction vs round trip (3-D)**: the extracted landmarks against those read back off SMPL-X,
    coloured by error.
@@ -57,23 +55,33 @@ The complete documentation provides the theory, architecture, and practical guid
 *   **[01 - Core Principles](./docs/01_Core_Principles.md)**: A deep dive into the 6 pillars that govern the framework.
 *   **[04 - Task-Specific Profiles](./docs/04_Task_Specific_Profiles.md)**: How to tailor augmentations for your specific application (operation names there are conceptual; the registered names are in [Available Augmentations](#available-augmentations)).
 *   **[05 - The Validation Framework](./docs/05_Validation_Framework.md)**: Ensuring the quality and validity of generated data.
-*   **[Augmentation Grounding](./docs/Augmentation_Grounding.md)**: The evidence-based design of the Tier 1 augmentations (which are safe for every sign, and by how much).
+*   **[07 - Object-Aware Constraints](./docs/07_Object_Aware_Constraints.md)** (planned): Contact and penetration against object meshes, the floor, and the scene.
+*   **[08 - Differentiable Losses and the Violation Report](./docs/08_Differentiable_Losses_and_Violation_Report.md)** (planned): The constraints as losses and as a per-frame, per-joint report.
+*   **[09 - Plausibility Metrics and Validation](./docs/09_Plausibility_Metrics_and_Validation.md)** (planned): Floor and object metrics, and validation on recorded grasps.
 *   **[Glossary](./docs/GLOSSARY.md)**: Definitions of key terms.
 
-**Research logs** (the body-model work, in order):
+### Case study: sign language
 
-*   **[V1 Problem Scope](./docs/V1_Problem_Scope.md)**: Scope, defects found in the first converter, and the decisions behind the V1 body model.
-*   **[V1 Findings](./docs/V1_Findings.md)**: The body round trip (pose).
-*   **[V1.2 Findings](./docs/V1_2_Findings.md)**: The hands.
-*   **[V1.3 Face Design](./docs/V1_3_Face_Design.md)**, **[V1.3 Findings](./docs/V1_3_Findings.md)** and **[V1.3 Face Integration Results](./docs/V1_3_Face_Integration_Results.md)**
-*   **[Week 2 Findings](./docs/Week_2_Findings.md)**: The round trip on unseen footage, and what its error is made of.
+These documents record the first application of the framework. They are specific to sign language data; the methods they test (the round trip between landmarks and the body model, hand and face fitting, meaning-preserving augmentation) are not.
+
+*   **[V1 Problem Scope](./docs/V1_Problem_Scope.md)** and **[V1 Findings](./docs/V1_Findings.md)**: The MediaPipe to SMPL-X round trip.
+*   **[Week 2 Findings](./docs/Week_2_Findings.md)**: The round trip on unseen footage.
+*   **[V1.2 Findings](./docs/V1_2_Findings.md)**: Hands, from MediaPipe to MANO and back.
+*   **[V1.3 Face Design](./docs/V1_3_Face_Design.md)**, **[V1.3 Findings](./docs/V1_3_Findings.md)**, and **[V1.3 Face Integration Results](./docs/V1_3_Face_Integration_Results.md)**: Head pose, jaw, hand-to-face geometry, and the face stream.
+*   **[Augmentation Grounding](./docs/Augmentation_Grounding.md)**: Which augmentations preserve the meaning of a sign, and the evidence for each.
 *   Augmentation evidence: **[linguistics](./docs/augmentation-evidence/linguistics.md)** and **[sign-language augmentation literature](./docs/augmentation-evidence/slr_augmentation.md)**
 
-**Legacy** (kept for history, out of date; each file opens with a note on what replaces it):
+### Legacy
+
+Kept for history; each file opens with a note on what replaces it.
 
 *   **[02 - Framework Architecture](./docs/legacy/02_Framework_Architecture.md)**
 *   **[03 - The Augmentation Catalogue](./docs/legacy/03_Augmentation_Catalogue.md)**
-*   **[06 - Development Roadmap](./docs/legacy/06_Development_Roadmap.md)**
+*   **[06 - Development Roadmap](./docs/legacy/06_Development_Roadmap.md)**: The original plan, plus the planned Phases 6 to 9.
+
+## Roadmap: from the body alone to the body with objects
+
+The next phases extend the constraint system beyond the body itself: hands against object meshes, feet against the floor, and the same constraints offered as differentiable losses and as a dense violation report. This makes the framework usable for augmenting motion that involves objects and for checking and repairing motion produced by generative models. The companion project [KineticSynth](https://github.com/imics-lab/KineticSynth) builds on these extensions. See the [roadmap](./docs/legacy/06_Development_Roadmap.md#planned-phases-6-to-9) and documents 07 to 09.
 
 ## Installation
 

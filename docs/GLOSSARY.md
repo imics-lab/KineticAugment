@@ -25,12 +25,30 @@ This document provides definitions for key terms used throughout the KineticAugm
 **Chiral / Chirality**
 : A property of an object (or motion) that is not superimposable on its mirror image. For example, writing with one's right hand is a chiral action; a mirrored version would show a person writing with their left hand, which may not be semantically equivalent in all contexts.
 
+**Contact**
+: A body part is in contact with an object when its distance to the object's surface is below a threshold. Contact is derived by the constraint engine from geometry, not recorded.
+
+**Contact Target**
+: A statement that a given part of the body should touch a given object during given frames. The constraint system pulls the body toward its contact targets while keeping it out of the object.
+
+**Convex Decomposition**
+: Splitting a mesh into a small number of convex pieces, so that a physics engine can test it for collisions efficiently.
+
 ### D
+
+**Differentiable Loss**
+: A function of the body-model parameters that is zero when a constraint holds, grows with the violation, and has a gradient, so that an optimizer or a neural network can be pushed toward valid motion.
 
 **Dynamic Time Warping (DTW)**
 : An algorithm for measuring the similarity between two temporal sequences that may vary in speed. In KineticAugment, it is used in the *Validation Framework* to ensure that an augmented movement path has not deviated too much from the original's shape.
 
 ### F
+
+**Floating**
+: The body hovering above the floor when it should be supported by it.
+
+**Foot Skating**
+: A foot that is on the floor sliding along it, a common artifact of generated and of carelessly augmented motion.
 
 **Forward Kinematics**
 : A method for calculating the position of the end of a linked structure (like an arm) given the angles of all the joints. It is the primary mechanism for enforcing *Kinematic Chain Consistency* when a parent joint (e.g., the shoulder) is rotated.
@@ -60,6 +78,9 @@ This document provides definitions for key terms used throughout the KineticAugm
 
 ### P
 
+**Penetration Depth**
+: How far a point of the body is inside another surface: another body part, an object, or the floor.
+
 **Perlin / Simplex Noise**
 : A type of gradient noise function used to produce natural-looking, smooth, pseudo-random patterns. In KineticAugment, it is ideal for creating `Dynamic Trajectory Jittering` that mimics natural human tremor or path variation without being jerky.
 
@@ -71,12 +92,20 @@ This document provides definitions for key terms used throughout the KineticAugm
 ### S
 
 **Sign Space**
-: The three-dimensional area in front of a signer's body where most signs are produced. The location of a sign within this space is often a phonologically meaningful feature that must be preserved within a certain tolerance.
+: (Sign language.) The three-dimensional area in front of a signer's body where most signs are produced. The location of a sign within this space is often a phonologically meaningful feature that must be preserved within a certain tolerance.
+
+**Signed Distance Grid**
+: A regular grid that stores, for each cell, the distance to the nearest point of a surface, negative inside the object. Sampling it gives the distance and its gradient for any point at low cost.
 
 ### T
 
 **Task-Specific Profile**
 : A configuration file (e.g., `slr_profile.yaml`) that defines a complete augmentation strategy for a specific task. It specifies which augmentations to use, their parameters, and their probabilities, effectively implementing the *Augmentation Priority System*.
+
+### V
+
+**Violation Report**
+: For a whole sequence, per frame and per joint, how far the motion is from satisfying each constraint, in physical units. See [08 - Differentiable Losses and the Violation Report](./08_Differentiable_Losses_and_Violation_Report.md).
 
 ### Y
 
