@@ -1,6 +1,6 @@
 # 08: Differentiable Losses and the Violation Report
 
-**Status: planned (Phase 8 of the [roadmap](./legacy/06_Development_Roadmap.md)).** Nothing in this document is implemented yet.
+**Status: planned (Phase 8 of the [roadmap](./06_Roadmap.md)).** Nothing in this document is implemented yet.
 
 ## 1. Why
 

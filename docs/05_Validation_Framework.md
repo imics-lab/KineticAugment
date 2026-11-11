@@ -171,6 +171,6 @@ Metrics for the body's relation to the floor and to objects (ground penetration,
 
 ### Next Up: Roadmap and Glossary
 
-This concludes the documentation of the framework's philosophy and current structure. The [Development Roadmap](./legacy/06_Development_Roadmap.md) describes what is built and what is planned, documents 07 to 09 specify the planned extensions, and the final document provides definitions for key terms used throughout.
+This concludes the documentation of the framework's philosophy and current structure. The [Development Roadmap](./06_Roadmap.md) describes what is built and what is planned, documents 07 to 09 specify the planned extensions, and the final document provides definitions for key terms used throughout.
 
-**Next: [06 - Development Roadmap](./legacy/06_Development_Roadmap.md)** or **[Glossary](./GLOSSARY.md)**
+**Next: [06 - Roadmap](./06_Roadmap.md)** or **[Glossary](./GLOSSARY.md)**

@@ -6,6 +6,10 @@
 | `01_Core_Principles.md` | The six principles governing every augmentation |
 | `04_Task_Specific_Profiles.md` | How profiles tailor augmentations to a task (operation names are conceptual) |
 | `05_Validation_Framework.md` | Final validation of augmented samples (metrics) |
+| `06_Roadmap.md` | Current status (early stage) and the planned Phases 6 to 9 |
+| `07_Object_Aware_Constraints.md` | Planned (Phase 7): contact and penetration against objects, floor and scene |
+| `08_Differentiable_Losses_and_Violation_Report.md` | Planned (Phase 8): constraints as losses and as a per-frame, per-joint report |
+| `09_Plausibility_Metrics_and_Validation.md` | Planned (Phase 9): floor and object metrics, validation on recorded grasps |
 | `Augmentation_Grounding.md` | Evidence-based design of the Tier 1 augmentations (most current design doc) |
 | `GLOSSARY.md` | Definitions of key terms |
 | `V1_Problem_Scope.md` | V1 round-trip scope, defects found, decisions, assumptions ledger (long research log) |

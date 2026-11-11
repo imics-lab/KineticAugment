@@ -1,6 +1,6 @@
 # 09: Plausibility Metrics and Validation on Recorded Motion
 
-**Status: planned (Phase 9 of the [roadmap](./legacy/06_Development_Roadmap.md)).** Nothing in this document is implemented yet.
+**Status: planned (Phase 9 of the [roadmap](./06_Roadmap.md)).** Nothing in this document is implemented yet.
 
 ## 1. Why
 

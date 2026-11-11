@@ -6,6 +6,8 @@
 
 **KineticAugment** is a general framework for augmenting human motion data while preserving anatomical and semantic plausibility. It is designed for researchers and engineers working on any task that learns from body, hand, or face motion (human activity and action recognition, gesture and sign language recognition, rehabilitation and sports analysis, human-robot interaction, motion generation) who need to increase dataset size without introducing unrealistic or label-altering artifacts.
 
+> **Status:** KineticAugment is at an early stage of development. The API may change, and much of the validation so far comes from one application, sign language. See the [roadmap](./docs/06_Roadmap.md) for what exists and what is planned.
+
 Traditional data augmentation techniques often fail on skeletal time-series data, creating impossible poses and unnatural movements. KineticAugment solves this by treating the human body as a structured kinematic system, governed by a set of core biomechanical and contextual principles.
 
 The framework is not tied to one application. Everything that depends on the task (which features carry meaning, how fast a hand may move, which augmentations are safe) lives in a [task profile](./docs/04_Task_Specific_Profiles.md), not in the core. Sign language recognition was the first case study, which is why the demo clips and several of the findings documents come from sign language data.
@@ -55,6 +57,7 @@ The complete documentation provides the theory, architecture, and practical guid
 *   **[01 - Core Principles](./docs/01_Core_Principles.md)**: A deep dive into the 6 pillars that govern the framework.
 *   **[04 - Task-Specific Profiles](./docs/04_Task_Specific_Profiles.md)**: How to tailor augmentations for your specific application (operation names there are conceptual; the registered names are in [Available Augmentations](#available-augmentations)).
 *   **[05 - The Validation Framework](./docs/05_Validation_Framework.md)**: Ensuring the quality and validity of generated data.
+*   **[06 - Roadmap](./docs/06_Roadmap.md)**: Where the framework stands (early stage) and the planned Phases 6 to 9.
 *   **[07 - Object-Aware Constraints](./docs/07_Object_Aware_Constraints.md)** (planned): Contact and penetration against object meshes, the floor, and the scene.
 *   **[08 - Differentiable Losses and the Violation Report](./docs/08_Differentiable_Losses_and_Violation_Report.md)** (planned): The constraints as losses and as a per-frame, per-joint report.
 *   **[09 - Plausibility Metrics and Validation](./docs/09_Plausibility_Metrics_and_Validation.md)** (planned): Floor and object metrics, and validation on recorded grasps.
@@ -77,11 +80,11 @@ Kept for history; each file opens with a note on what replaces it.
 
 *   **[02 - Framework Architecture](./docs/legacy/02_Framework_Architecture.md)**
 *   **[03 - The Augmentation Catalogue](./docs/legacy/03_Augmentation_Catalogue.md)**
-*   **[06 - Development Roadmap](./docs/legacy/06_Development_Roadmap.md)**: The original plan, plus the planned Phases 6 to 9.
+*   **[06 - Development Roadmap](./docs/legacy/06_Development_Roadmap.md)**: The original plan, replaced by [06 - Roadmap](./docs/06_Roadmap.md).
 
 ## Roadmap: from the body alone to the body with objects
 
-The next phases extend the constraint system beyond the body itself: hands against object meshes, feet against the floor, and the same constraints offered as differentiable losses and as a dense violation report. This makes the framework usable for augmenting motion that involves objects and for checking and repairing motion produced by generative models. The companion project [KineticSynth](https://github.com/imics-lab/KineticSynth) builds on these extensions. See the [roadmap](./docs/legacy/06_Development_Roadmap.md#planned-phases-6-to-9) and documents 07 to 09.
+The next phases extend the constraint system beyond the body itself: hands against object meshes, feet against the floor, and the same constraints offered as differentiable losses and as a dense violation report. This makes the framework usable for augmenting motion that involves objects and for checking and repairing motion produced by generative models. The companion project [KineticSynth](https://github.com/imics-lab/KineticSynth) builds on these extensions. See the [roadmap](./docs/06_Roadmap.md) and documents 07 to 09.
 
 ## Installation
 
