@@ -8,7 +8,8 @@ the single folder `augmentation-lab/`:
 - `data/manifest.js`: `window.LAB_DATA = {schema, profileText, clips, base, panes, stops, rerolls}`
 - `data/<clip>/<sha1>.js`: `Lab.addBlob("<sha1>", "<base64 of the gzipped pane blob>")`
 - `data/<clip>/frames/NNNN.jpg`: the video frames
-- `data/load.js`: writes one `<script>` tag per data file, in order (replaces the placeholder)
+- `data/load.js`: writes the `<script>` tag of the manifest (replaces the placeholder); the page
+  loads each blob script by adding a tag when the blob is first needed (`Lab.loadScript`)
 
 `plan_grid` lists the panes; `build_share` runs them. Meshes are in every pane: decimated once per
 build (`decimate_mesh`) and quantised to a few mm, so the grid, not the meshes, is cut to fit the budget.
@@ -245,7 +246,8 @@ def decimate_mesh(
     """
     Quadric decimation of a rest mesh to about `target` vertices (twice that many faces).
 
-    Returns `(index, faces)`: `index` maps each kept vertex to its nearest original vertex, so a
+    Returns `(index, faces)`: `index` maps each kept vertex to its nearest original vertex (distinct,
+    no two kept vertices share one), so a
     frame's decimated mesh is `verts[index]` (or `verts[:, index]` for a clip), and `faces` index
     the kept vertices.
     """
@@ -255,7 +257,18 @@ def decimate_mesh(
     vertices = np.asarray(vertices, dtype=np.float64)
     mesh = trimesh.Trimesh(vertices, np.asarray(faces), process=False)
     small = mesh.simplify_quadric_decimation(face_count=2 * target)
-    index = cKDTree(vertices).query(np.asarray(small.vertices))[1].astype(np.int64)
+    tree = cKDTree(vertices)
+    kept = np.asarray(small.vertices)
+    _, near = tree.query(kept, k=min(16, len(vertices)))
+    index = np.empty(len(kept), dtype=np.int64)
+    used = set()
+    for i, candidates in enumerate(near):  # nearest original vertex not already taken
+        pick = next((int(c) for c in candidates if int(c) not in used), None)
+        if pick is None:  # all 16 nearest taken (never seen): widen the search
+            order = np.argsort(np.linalg.norm(vertices - kept[i], axis=1))
+            pick = next(int(c) for c in order if int(c) not in used)
+        used.add(pick)
+        index[i] = pick
     return index, np.asarray(small.faces, dtype=np.uint16)
 
 
@@ -345,7 +358,8 @@ def build_share(
         store.frame_path(c, i).stat().st_size for c in clip_ids for i in range(frames[c])
     )
     page_bytes = sum(p.stat().st_size for p in STATIC_DIR.rglob("*") if p.is_file())
-    fixed = frame_bytes + page_bytes + sum(len(_gzip(b)) for b in base_blobs.values())
+    base_gz = {cid: _gzip(blob) for cid, blob in base_blobs.items()}  # gzipped once
+    fixed = frame_bytes + page_bytes + sum(len(g) for g in base_gz.values())
 
     if grid is None:
         sizes = []
@@ -368,21 +382,21 @@ def build_share(
         panes: Dict[str, str] = {}
         failed: List[str] = []
         unique = set()
-        scripts: List[str] = []
         for cid, prep in preps.items():
             (data / cid / "frames").mkdir(parents=True)
             for i in range(frames[cid]):
                 shutil.copy2(store.frame_path(cid, i), data / cid / "frames" / f"{i:04d}.jpg")
 
-        def write_blob(cid: str, blob: bytes) -> str:
+        def write_blob(cid: str, blob: bytes, gz: Optional[bytes] = None) -> str:
+            """Write `data/<cid>/<sha1>.js` once per (clip, blob); `gz` is the blob if gzipped."""
             sha1 = hashlib.sha1(blob).hexdigest()
-            if sha1 not in unique:
-                unique.add(sha1)
-                (data / cid / f"{sha1}.js").write_text(_script(sha1, _gzip(blob)), encoding="ascii")
-                scripts.append(f"data/{cid}/{sha1}.js")
+            if (cid, sha1) not in unique:
+                unique.add((cid, sha1))
+                gz = _gzip(blob) if gz is None else gz
+                (data / cid / f"{sha1}.js").write_text(_script(sha1, gz), encoding="ascii")
             return sha1
 
-        base_ids = {cid: write_blob(cid, blob) for cid, blob in base_blobs.items()}
+        base_ids = {cid: write_blob(cid, blob, base_gz[cid]) for cid, blob in base_blobs.items()}
         for cid, prep in preps.items():
             for n, tmpl in enumerate(requests):
                 req = dataclasses.replace(tmpl, clip_id=cid)
@@ -412,11 +426,10 @@ def build_share(
             "window.LAB_DATA = " + json.dumps(jsonable(lab_data), separators=(",", ":")) + ";\n",
             encoding="utf-8",
         )
-        order = ["data/manifest.js"] + scripts
-        tags = "".join(f'<script src="{p}"><\\/script>' for p in order)
+        # Only the manifest loads at page open; the page adds each blob's script on first use.
         (data / "load.js").write_text(
-            "// Written by the share build: the data scripts, in order.\n"
-            f"document.write('{tags}');\n",
+            "// Written by the share build: the manifest. Blob scripts load when first needed.\n"
+            "document.write('<script src=\"data/manifest.js\"><\\/script>');\n",
             encoding="utf-8",
         )
         size = _write_zip(stage, out_zip)

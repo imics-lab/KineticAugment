@@ -11,5 +11,7 @@ Node tests (`node --test tests/js/*.test.js`) for the Lab page's classic scripts
 - `yaml_edit.test.js` — `Lab.buildSavedYaml` on `configs/slr_week4_default.yaml` (comments kept, `# viewer: was`, `enabled: true`, dotted face keys, flow ranges), `Lab.savedEdits`, `Lab.parseYaml`, `Lab.valuesFromProfile`.
 - `build_saved.js` — Helper for `tests/test_lab_yaml_edit.py` (not a test): writes the saved YAML of every lab entry.
 - `panes.test.js` — The panes' per-frame buffers with the vendored three.js (axis flip, missing points, no-body frames draw points but no mesh, mirrored winding, ghost vs solid meshes).
+- `knob_keys.test.js` — Range-knob parity with `share.range_from_marker`, marker arrow keys (`Lab.knobMath.markerKey`) and which keys the timeline leaves alone (`Lab.keyIsForControl`).
+- `share_lazy.test.js` — `ShareSource` loads blob scripts on first use (`Lab.loadScript`), once, frees them after decoding, rejects missing ones.
 - `fixtures/` — Generated fixtures, committed so `node --test` runs alone (see `fixtures/index.md`).
 - `index.md` — Index of this folder.

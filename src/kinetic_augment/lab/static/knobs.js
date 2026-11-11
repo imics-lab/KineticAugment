@@ -120,6 +120,24 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     return clamp((v - L0) / ((L1 - L0) || 1), 0, 1);
   }
 
+  // What an arrow key does to a focused marker holding `value`: the next value, null when it is
+  // already at the end, undefined for any other key. Share mode (`stops`) steps to the previous /
+  // next stop; live mode moves by the knob's step.
+  function markerKey(knob, key, value, stops) {
+    var dir = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[key];
+    if (!dir) return undefined;
+    var v = markerOf(knob, value);
+    if (stops && stops.length) {
+      var cands = stops.map(function (s) { return { m: markerOf(knob, s), s: s }; })
+        .filter(function (c) { return dir > 0 ? c.m > v + 1e-9 : c.m < v - 1e-9; })
+        .sort(function (a, b) { return dir > 0 ? a.m - b.m : b.m - a.m; });
+      if (!cands.length) return null;
+      var s = cands[0].s;
+      return typeof s === 'number' && knob.kind === 'range' ? rangeFromMarker(knob, s) : s;
+    }
+    return knob.kind === 'range' ? rangeFromMarker(knob, v + dir * knob.step) : valueAt(knob, frac(knob, v + dir * knob.step));
+  }
+
   // Live mode: every knob kept; a value equal to its default is dropped.
   function setValue(values, key, value, defaults) {
     var out = Object.assign({}, values);
@@ -157,7 +175,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
 
   Lab.knobMath = {
     roundTo: roundTo, clamp: clamp, same: same, bands: bands, snap: snap, rangeModel: rangeModel,
-    rangeFromMarker: rangeFromMarker, markerOf: markerOf, valueAt: valueAt, frac: frac,
+    rangeFromMarker: rangeFromMarker, markerKey: markerKey, markerOf: markerOf, valueAt: valueAt, frac: frac,
     setValue: setValue, shareSet: shareSet, scheduler: scheduler,
   };
 
@@ -273,6 +291,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
 
   KnobPanel.prototype.modesHtml = function () {
     var self = this, entry = this.entry;
+    var noDice = this.isShare && !(this.opts.rerolls > 0); // no precomputed draws: nothing to roll
     var rows = PANES.map(function (w) {
       var s = self.settings(w), lw = w.toLowerCase();
       var ext = s.mode === 'extreme';
@@ -291,12 +310,13 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
         '<span class="seg"' + (ext ? '' : ' hidden') + ' role="group" aria-label="which edge for pane ' + w + '">' +
         '<button type="button" data-act="edge" data-edge="low" data-pane="' + w + '" class="' + (s.edge === 'low' ? 'on' : '') + '">low</button>' +
         '<button type="button" data-act="edge" data-edge="high" data-pane="' + w + '" class="' + (s.edge === 'high' ? 'on' : '') + '">high</button></span>' +
-        '<button type="button" class="dice" data-act="dice" data-pane="' + w + '"' + (ext ? ' disabled' : '') +
-        ' title="a new random draw for pane ' + w + '">new draw</button>' + draw +
+        '<button type="button" class="dice" data-act="dice" data-pane="' + w + '"' + (ext || noDice ? ' disabled' : '') +
+        ' title="' + (noDice ? 'the shared version has no extra draws' : 'a new random draw for pane ' + w) + '">new draw</button>' + draw +
         '<span class="kp-pane-note small"' + (self.notes[w] ? '' : ' hidden') + '>' + esc(self.notes[w]) + '</span>' +
         '</div>';
     }).join('');
     var foot = '<div class="kp-modes-foot">' +
+      (noDice ? '<span class="small">no new draws in the shared version</span>' : '') +
       (entry.extreme ? '' : '<span class="small">no extreme for this one</span>') +
       '<button type="button" data-act="copy" title="give pane B the same settings and draw as pane A">copy A → B</button></div>';
     return '<div class="kp-modes">' + rows + foot + '</div>';
@@ -471,6 +491,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       self.message = '';
       move(ev);
       ev.preventDefault();
+      if (mk && mk.focus) mk.focus(); // preventDefault stopped the click focusing it: arrow keys need it
     });
     bar.addEventListener('pointermove', move);
     var end = function () {
@@ -485,21 +506,12 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     bar.addEventListener('lostpointercapture', end);
     Array.prototype.forEach.call(bar.querySelectorAll('.mk'), function (mk) {
       mk.addEventListener('keydown', function (ev) {
-        var dir = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[ev.key];
-        if (!dir) return;
+        var w = mk.dataset.pane;
+        var next = markerKey(knob, ev.key, self.value(w, knob), self.stops(knob));
+        if (next === undefined) return;
         ev.preventDefault();
-        var w = mk.dataset.pane, v = markerOf(knob, self.value(w, knob)), next;
-        var stops = self.stops(knob);
-        if (stops) {
-          var marks = stops.map(function (s) { return markerOf(knob, s); });
-          var cands = marks.map(function (m, i) { return { m: m, s: stops[i] }; })
-            .filter(function (c) { return dir > 0 ? c.m > v + 1e-9 : c.m < v - 1e-9; })
-            .sort(function (a, b) { return dir > 0 ? a.m - b.m : b.m - a.m; });
-          if (!cands.length) return;
-          next = typeof cands[0].s === 'number' && knob.kind === 'range' ? rangeFromMarker(knob, cands[0].s) : cands[0].s;
-        } else {
-          next = knob.kind === 'range' ? rangeFromMarker(knob, v + dir * knob.step) : valueAt(knob, frac(knob, v + dir * knob.step));
-        }
+        ev.stopPropagation(); // the timeline's arrow keys must not also act
+        if (next === null) return; // already at the last stop
         if (self.setKnob(w, knob, next)) self.sched.drag(w);
         self.updateBar(bar, knob);
       });

@@ -66,8 +66,8 @@
   <script src="vendor/OrbitControls.js"></script>
   <script src="bundle.js"></script>
   <script src="sources.js"></script>
-  <!-- the share build overwrites data/load.js with the scripts that hold its clips and panes
-       (they call Lab.addBlob from sources.js, so it loads after sources.js) -->
+  <!-- the share build overwrites data/load.js with the tag of its manifest (window.LAB_DATA); blob
+       scripts (Lab.addBlob, from sources.js) are added later, when a clip or pane is first used -->
   <script src="data/load.js"></script>
   <script src="timeline.js"></script>
   <script src="panes.js"></script>

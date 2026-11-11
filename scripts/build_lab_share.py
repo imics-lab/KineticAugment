@@ -8,8 +8,8 @@ Lab page and a precomputed grid of panes for each clip, sized to `--budget-mb`.
     python scripts/build_lab_share.py --clips 57949 01986 01988 --out dist/augmentation-lab.zip
 
 A clip that is not in the clip store yet is added from `--video-dir/<id>.mp4` (extraction and fit,
-about a minute). `--clips` defaults to 57949, 01986 and the first clip of
-`demo/round_trip/clips.json` `order` that has a video and is not one of those two.
+about a minute). `--clips` defaults to 57949, 01986 and a short third clip: the first clip of
+`demo/round_trip/clips.json` `order` with a video of at most 60 frames (else the first such video).
 """
 
 import argparse
@@ -28,6 +28,7 @@ from kinetic_augment.lab.share import MESH_MM, MESH_VERTICES, build_share  # noq
 
 FIXED = ["57949", "01986"]
 VIDEO_SUFFIXES = (".mp4", ".mov", ".m4v", ".webm", ".avi")
+MAX_THIRD_FRAMES = 60
 
 
 def find_video(video_dir: Path, clip_id: str):
@@ -38,11 +39,30 @@ def find_video(video_dir: Path, clip_id: str):
     return None
 
 
-def default_clips(video_dir: Path, order_file: Path):
-    """The two fixed clips and the first clip in `order` that has a video and is not one of them."""
+def video_frames(video: Path) -> int:
+    """Number of frames in `video` (OpenCV's count; 0 when it cannot be read)."""
+    import cv2
+
+    cap = cv2.VideoCapture(str(video))
+    try:
+        return int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    finally:
+        cap.release()
+
+
+def default_clips(video_dir: Path, order_file: Path, max_frames: int = MAX_THIRD_FRAMES):
+    """
+    The two fixed clips and a third: the first clip in `order` that has a video of at most
+    `max_frames` frames (short, so the zip has room for more stops and rerolls); when none does,
+    the first other video in `video_dir` that short.
+    """
     order = json.loads(order_file.read_text()).get("order", [])
-    third = next((c for c in order if c not in FIXED and find_video(video_dir, c)), None)
-    return FIXED + ([third] if third else [])
+    others = sorted(p.stem for p in video_dir.iterdir() if p.suffix in VIDEO_SUFFIXES)
+    for clip_id in [c for c in order if c not in FIXED] + [c for c in others if c not in order]:
+        video = find_video(video_dir, clip_id)
+        if clip_id not in FIXED and video and 0 < video_frames(video) <= max_frames:
+            return FIXED + [clip_id]
+    return FIXED
 
 
 def parse_args(argv=None):

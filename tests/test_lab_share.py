@@ -143,6 +143,7 @@ def test_decimate_mesh_target_and_valid_faces():
     assert 2400 <= len(index) <= 3600
     assert small.dtype == np.uint16 and small.max() < len(index)
     assert index.min() >= 0 and index.max() < len(verts)
+    assert len(np.unique(index)) == len(index)  # no two kept vertices map to one original
     assert (small[:, 0] != small[:, 1]).all() and (small[:, 1] != small[:, 2]).all()
     again_index, again_faces = decimate_mesh(verts, faces, target=3000)
     assert np.array_equal(index, again_index) and np.array_equal(small, again_faces)
@@ -168,6 +169,7 @@ def test_build_share_small(tmp_path):
         entries=["body.location_jitter", "combined.default"],
     )
     assert summary["panes"] >= 6 and summary["unique_blobs"] >= 2 and summary["size_bytes"] > 0
+    assert summary["unique_blobs"] == summary["panes"] + 1  # every pane and the base: one file each
     root = "augmentation-lab/"
     with zipfile.ZipFile(out) as zf:
         names = zf.namelist()
@@ -178,7 +180,8 @@ def test_build_share_small(tmp_path):
         manifest = zf.read(root + "data/manifest.js").decode()
         data = json.loads(manifest[len("window.LAB_DATA = ") : manifest.rindex(";")])
         load = zf.read(root + "data/load.js").decode()
-        assert load.index("data/manifest.js") < load.index("data/57949/")
+        assert "data/manifest.js" in load and "data/57949/" not in load  # blobs load lazily
+        assert load.count("<script") == 1
         sha = data["base"]["57949"]
         assert f"{root}data/57949/{sha}.js" in names
         assert any(n.startswith(root + "data/57949/frames/0000") for n in names)

@@ -117,6 +117,29 @@ if (!Lab.decodePane && typeof require !== 'undefined') require('./bundle.js');
   // Called by the share zip's data scripts: Lab.addBlob("<sha1>", "<base64 of the gzipped blob>").
   Lab.addBlob = function addBlob(sha1, base64) { Lab.blobs[sha1] = base64; };
 
+  // Loads one data script by adding a <script src> tag (works from file://, unlike fetch). A
+  // script that is already loading is shared. Resolves when it has run, rejects if it is missing.
+  var loading = {};
+  Lab.loadScript = function loadScript(src) {
+    if (loading[src]) return loading[src];
+    var p = new Promise(function (resolve, reject) {
+      if (typeof document === 'undefined') { reject(new Error('no page to load ' + src + ' into')); return; }
+      var tag = document.createElement('script');
+      var done = function (err) {
+        tag.onload = tag.onerror = null;
+        if (tag.parentNode) tag.parentNode.removeChild(tag);
+        delete loading[src];
+        if (err) reject(err); else resolve();
+      };
+      tag.onload = function () { done(null); };
+      tag.onerror = function () { done(new Error('missing data file ' + src)); };
+      tag.src = src;
+      document.head.appendChild(tag);
+    });
+    loading[src] = p;
+    return p;
+  };
+
   function fromBase64(text) {
     var bin = atob(text);
     var out = new Uint8Array(bin.length);
@@ -131,10 +154,14 @@ if (!Lab.decodePane && typeof require !== 'undefined') require('./bundle.js');
     this.isShare = true;
     this._cache = new Map(); // sha1 -> Promise<{meta, arrays}>, most recent last
     this._index = {};
+    this._clipOf = {}; // sha1 -> clip id, for the data script path (data/<clip>/<sha1>.js)
     var self = this;
+    var base = this.data.base || {};
+    Object.keys(base).forEach(function (clip) { self._clipOf[base[clip]] = clip; });
     var panes = this.data.panes || {};
     Object.keys(panes).forEach(function (key) {
       var req = JSON.parse(key);
+      self._clipOf[panes[key]] = req.clip_id;
       self._index[canonical(req)] = panes[key];
       var loose = self._looseKey(req);
       if (!(loose in self._index)) self._index[loose] = panes[key];
@@ -165,11 +192,20 @@ if (!Lab.decodePane && typeof require !== 'undefined') require('./bundle.js');
       cache.set(sha1, hit);
       return hit;
     }
-    var text = Lab.blobs[sha1];
-    if (text === undefined) return Promise.reject(new Error('missing data file for ' + sha1));
-    var bytes = fromBase64(text);
-    var gz = bytes[0] === 0x1f && bytes[1] === 0x8b;
-    var done = (gz ? Lab.gunzip(bytes) : Promise.resolve(bytes)).then(Lab.decodePane);
+    // A blob whose script is not loaded yet is loaded now (the zip loads them on first use).
+    var clip = this._clipOf[sha1];
+    var preloaded = Lab.blobs[sha1] !== undefined;
+    var ready = preloaded ? Promise.resolve() :
+      !clip ? Promise.reject(new Error('missing data file for ' + sha1)) :
+        Lab.loadScript('data/' + encodeURIComponent(clip) + '/' + sha1 + '.js');
+    var done = ready.then(function () {
+      var text = Lab.blobs[sha1];
+      if (text === undefined) throw new Error('missing data file for ' + sha1);
+      var bytes = fromBase64(text);
+      if (!preloaded) delete Lab.blobs[sha1]; // decoded below; the script loads again if evicted
+      var gz = bytes[0] === 0x1f && bytes[1] === 0x8b;
+      return gz ? Lab.gunzip(bytes) : Promise.resolve(bytes);
+    }).then(Lab.decodePane);
     done.catch(function () { cache.delete(sha1); });
     cache.set(sha1, done);
     while (cache.size > CACHE_SIZE) cache.delete(cache.keys().next().value);

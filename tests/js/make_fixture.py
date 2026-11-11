@@ -163,6 +163,35 @@ def main(out_dir: Path) -> None:
         "rerolls": 3,
     }
     (out_dir / "share.json").write_text(json.dumps(share, indent=1) + "\n")
+    write_range_parity(out_dir)
+
+
+def write_range_parity(out_dir: Path) -> None:
+    """Every range knob of the real schema, its stops, and `range_from_marker` at many markers."""
+    from kinetic_augment.augmentations.profile import load_profile
+    from kinetic_augment.lab.schema import build_schema
+    from kinetic_augment.lab.share import knob_stops, range_from_marker
+
+    schema = build_schema(load_profile(ROOT / "configs" / "slr_week4_default.yaml"))
+    knobs = []
+    for entry in schema["entries"]:
+        for knob in entry["knobs"]:
+            if knob["kind"] != "range":
+                continue
+            lo, hi = knob["limits"]
+            markers = [lo + (hi - lo) * i / 40 for i in range(41)] + [knob["default"][1]]
+            stops = knob_stops(knob, 7) + knob_stops(knob, 3)
+            markers += [s[1] for s in stops] + [s[0] for s in stops]
+            knobs.append(
+                {
+                    "id": entry["id"],
+                    "knob": knob,
+                    "stops": jsonable(stops),
+                    "markers": markers,
+                    "expected": [range_from_marker(knob, m) for m in markers],
+                }
+            )
+    (out_dir / "range_parity.json").write_text(json.dumps(jsonable(knobs)) + "\n")
 
 
 if __name__ == "__main__":

@@ -101,8 +101,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     speed.onchange = function () { self.speed = Number(speed.value); self._anchor(); };
     window.addEventListener('keydown', function (e) {
       var tag = e.target && e.target.tagName;
-      if (tag === 'SELECT' || tag === 'TEXTAREA' || (tag === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'range')) return;
-      if (e.target && e.target.isContentEditable) return;
+      if (Lab.keyIsForControl(e.target)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return; // leave browser shortcuts (Cmd+←) alone
       if (e.key === ' ' && tag !== 'BUTTON') { e.preventDefault(); self.toggle(); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); self.pause(); self.show(self.t - 1); }
@@ -189,6 +188,16 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   };
 
   Timeline.prototype.toggle = function () { if (this.playing) this.pause(); else this.play(); };
+
+  // Keys typed into a slider, text field, menu or editable text belong to that control.
+  Lab.keyIsForControl = function keyIsForControl(target) {
+    if (!target) return false;
+    var tag = target.tagName;
+    if (tag === 'SELECT' || tag === 'TEXTAREA' || tag === 'INPUT') return true;
+    if (target.isContentEditable) return true;
+    var role = typeof target.getAttribute === 'function' ? target.getAttribute('role') : target.role;
+    return role === 'slider';
+  };
 
   Lab.Timeline = Timeline;
 })();
