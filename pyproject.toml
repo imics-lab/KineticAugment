@@ -62,6 +62,12 @@ full = [
     "trimesh>=3.10.0",
     "pybullet>=3.2.0",
 ]
+# Augmentation Lab (local browser app)
+lab = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "python-multipart>=0.0.9",
+]
 # Development dependencies
 dev = [
     "pytest>=7.0.0",
@@ -82,6 +88,7 @@ Issues = "https://github.com/imics-lab/KineticAugment/issues"
 
 [project.scripts]
 kinetic-augment = "kinetic_augment.cli:main"
+kinetic-lab = "kinetic_augment.lab.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
