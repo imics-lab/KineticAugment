@@ -1,8 +1,10 @@
-# Evaluation models index
+# evaluation/models/
 
-- `__init__.py` — Exports classifier base classes, recurrent models, and trainer.
-- `base.py` — Defines the PyTorch SLR classifier base and dependency check.
-- `lstm_classifier.py` — Implements LSTM and GRU sequence classifiers for sign recognition.
-- `face_classifier.py` — Implements separate masked GRU encoders for aligned body and facial streams.
-- `trainer.py` — Trains and evaluates SLR classifiers on sequence datasets.
-- `index.md` — Index of evaluation model and training modules.
+| File | Description |
+|---|---|
+| `__init__.py` | Exports the model classes |
+| `base.py` | Abstract SLR classifier base |
+| `lstm_classifier.py` | Bidirectional LSTM/GRU classifier for ablations |
+| `face_classifier.py` | Masked temporal classifier for body + face feature streams |
+| `trainer.py` | Trainer with early stopping |
+| `index.md` | This index |

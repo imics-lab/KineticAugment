@@ -2,6 +2,11 @@
 Benchmark Runner for KineticAugment Evaluation.
 
 Runs augmentation experiments and collects metrics.
+
+Limitation: the quality metrics (smoothness, variance, ...) are computed on SYNTHETIC
+random-walk data (see `_generate_test_samples`), not on real clips, so they compare pipeline
+configurations on a fixed stand-in signal and do not measure quality on real sign data.
+Only the model-training stage uses the real dataset at `dataset_path`.
 """
 
 from __future__ import annotations
@@ -213,7 +218,13 @@ class BenchmarkRunner:
         num_samples: int = 20,
         num_frames: int = 30,
     ) -> List[np.ndarray]:
-        """Generate synthetic test samples for quality evaluation."""
+        """
+        Generate SYNTHETIC test samples for quality evaluation.
+
+        Each sample is a random offset plus a cumulative-sum random walk, shaped
+        (num_frames, 543, 3). It is not real motion data, so quality metrics computed on it
+        are only a relative comparison between pipeline configurations.
+        """
         rng = np.random.RandomState(seed)
 
         samples = []

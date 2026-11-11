@@ -5,7 +5,8 @@ The surface is every SMPL-X vertex in the FLAME vertex map, except the eyeball m
 triangle whose three vertices are kept. Regions follow ASL-LEX 2.0's head locations, plus Neck and Ear, with finer
 subregions underneath. They come from rules on the rest mesh -- the mapped MediaPipe landmarks,
 vertex normals and SMPL-X skinning weights -- so no further licensed asset is needed. Thresholds
-are provisional and are tuned by eye on `scripts/render_face_regions.py`'s image.
+are provisional and were tuned by eye on a render of the labelled head surface (that render script is not in the
+repository; `scripts/evaluate_face.py` exercises `build_head_surface`).
 
 Tuning record (first render, thresholds as first written all passed the anchor tests):
 - Neck was `dominant_joint == 12` only. The render showed the 117 lowest vertices, skinned mostly

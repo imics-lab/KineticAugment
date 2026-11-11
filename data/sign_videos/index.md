@@ -1,8 +1,12 @@
-# Sign video index
+# data/sign_videos/
 
-- `01986.mp4` — Source sign-language video clip 01986 for landmark extraction.
-- `01987.mp4` — Source sign-language video clip 01987 for landmark extraction.
-- `01988.mp4` — Source sign-language video clip 01988 for landmark extraction.
-- `01991.mp4` — Source sign-language video clip 01991 for landmark extraction.
-- `01992.mp4` — Source sign-language video clip 01992 for landmark extraction.
-- `index.md` — Index of the sample source videos in this folder.
+Sample WLASL sign-language clips (licence unclear) used by the extraction examples. Named by WLASL video id.
+
+| File | Description |
+|---|---|
+| `01986.mp4` | Sample sign clip (83 frames, 25 fps) |
+| `01987.mp4` | Sample sign clip |
+| `01988.mp4` | Sample sign clip |
+| `01991.mp4` | Sample sign clip (the week-4 pilot clip) |
+| `01992.mp4` | Sample sign clip |
+| `index.md` | This index |

@@ -1,4 +1,9 @@
-# `.github` index
+# .github/
 
-- `ISSUE_TEMPLATE/` — GitHub issue forms for bug reports and feature requests.
-- `index.md` — Index of the GitHub configuration entries in this folder.
+`ISSUE_TEMPLATE/` deliberately has no `index.md`: any `.md` there can become an issue template,
+so its files are listed here instead.
+
+| Item | Description |
+|---|---|
+| `ISSUE_TEMPLATE/` | GitHub issue templates: `bug_report.md` (reproducible defect) and `feature_request.md` (feature or improvement) |
+| `index.md` | This index |

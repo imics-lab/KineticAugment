@@ -1,6 +1,9 @@
+> **Legacy:** This is the original wish-list of augmentations. It is out of date: it lists operations that were never implemented (e.g. Limb Length Scaling) and contradicts the research.
+> The registered operations are listed in the [README](../../README.md#available-augmentations); the evidence-based design is in [Augmentation_Grounding](../Augmentation_Grounding.md).
+
 # 03: The Augmentation Catalogue
 
-This document serves as a comprehensive catalogue of the augmentation techniques available in the KineticAugment framework. These are the fundamental "verbs" that can be combined and constrained within a [Task-Specific Profile](./04_Task_Specific_Profiles.md) to create a full augmentation strategy.
+This document serves as a comprehensive catalogue of the augmentation techniques available in the KineticAugment framework. These are the fundamental "verbs" that can be combined and constrained within a [Task-Specific Profile](../04_Task_Specific_Profiles.md) to create a full augmentation strategy.
 
 The techniques are divided into three categories:
 *   **A. Extrinsic (Scene-Level) Augmentations:** Modifying the subject's relationship to the camera/environment without altering the pose itself.
@@ -53,4 +56,4 @@ These transformations manipulate the motion sequence along the time axis. They a
 
 This catalogue lists the available tools. The next section explains how to intelligently select, combine, and constrain these tools to build a robust augmentation strategy for your specific problem.
 
-➡️ **Next: [04 - Task-Specific Profiles](./04_Task_Specific_Profiles.md)**
+➡️ **Next: [04 - Task-Specific Profiles](../04_Task_Specific_Profiles.md)**

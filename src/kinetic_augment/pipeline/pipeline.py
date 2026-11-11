@@ -31,6 +31,10 @@ class Pipeline:
     - 'landmark': Direct landmark augmentation (fast)
     - 'smplx': SMPL-X parameter augmentation (accurate)
 
+    Limitation: constraint enforcement (joint / velocity / collision limits) only acts in
+    mode='smplx'. In mode='landmark' it is currently a no-op -- the data is returned unchanged
+    because landmark-space constraint enforcement (IK -> enforce -> FK) is not implemented.
+
     Example:
         >>> # From preset
         >>> pipeline = Pipeline.from_preset('moderate')
@@ -136,7 +140,9 @@ class Pipeline:
         """
         Enforce constraints on augmented data.
 
-        For landmark mode, converts to SMPL-X params if wrapper is available.
+        Only acts in mode='smplx'. In mode='landmark' this is a NO-OP and returns `data`
+        unchanged, whether or not a wrapper is available (landmark -> IK -> enforce -> FK is
+        not implemented; see the TODO below).
         """
         if self.mode == 'smplx':
             # SMPL-X mode: enforce directly on parameters

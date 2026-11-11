@@ -18,7 +18,7 @@ Example:
     >>> rebuilt = reconstruct_body(fit, skeleton)
 
 Also: joint_mapping correspondence tables, SMPLXWrapper, and the deprecated
-image-space MediaPipeToSMPLX / SMPLXToMediaPipe classes (via the lazy getters).
+image-space MediaPipeToSMPLX / SMPLXToMediaPipe classes (now in kinetic_augment.legacy; lazy getters kept).
 """
 
 
@@ -31,13 +31,13 @@ def get_smplx_wrapper():
 
 def get_mp_to_smplx():
     """Get MediaPipeToSMPLX class (lazy import)."""
-    from kinetic_augment.body_model.mp_to_smplx import MediaPipeToSMPLX
+    from kinetic_augment.legacy.mp_to_smplx import MediaPipeToSMPLX
     return MediaPipeToSMPLX
 
 
 def get_smplx_to_mp():
     """Get SMPLXToMediaPipe class (lazy import)."""
-    from kinetic_augment.body_model.smplx_to_mp import SMPLXToMediaPipe
+    from kinetic_augment.legacy.smplx_to_mp import SMPLXToMediaPipe
     return SMPLXToMediaPipe
 
 

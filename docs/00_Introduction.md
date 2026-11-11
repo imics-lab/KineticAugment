@@ -38,6 +38,9 @@ This framework is designed to be a valuable tool for any domain involving the an
 *   **Physical Rehabilitation & Sports Biomechanics**
 *   **Ergonomics and Posture Analysis**
 *   **Human-Robot Interaction & Animation**
+*   **Validation and Repair of Generated Motion:** the same constraints that keep an augmentation valid can check, and correct, motion produced by a generative model (see [07 - Object-Aware Constraints](./07_Object_Aware_Constraints.md) and [08 - Differentiable Losses and the Violation Report](./08_Differentiable_Losses_and_Violation_Report.md))
+
+None of these is privileged in the core of the framework. What differs from one application to the next is captured in a [task profile](./04_Task_Specific_Profiles.md). Sign language recognition was the first application to be studied in depth, so many examples in this documentation come from it.
 
 ---
 

@@ -17,7 +17,7 @@ For landmark coordinates `X` and label `y`, augmentation creates `X' = A(X)`. Th
 | Sign Language Recognition (**SLR**) | A signing clip mapped to a sign class. | Generalization across signers, viewpoints, and timing. | Hand configurations, locations, motion, and relevant facial information may matter; invariance depends on the sign and dataset. |
 | Human Activity Recognition (**HAR**) | A motion clip mapped to an activity such as running. | Generalization across subjects and motion styles. | Task-defining patterns and environmental contacts may matter; speed can itself define a class boundary. |
 
-These intentions appear in [the SLR profile](../../configs/slr_profile.yaml) and [the running profile](../../configs/har_running_profile.yaml). Their priority comments are design proposals, not measurements of linguistic or activity invariance. A transformation appropriate for running should not automatically be applied to a sign. Even within SLR, a class-specific judgment may be necessary.
+These intentions appear in [the SLR profile](../../configs/slr_profile.yaml) and [the running profile](../../configs/legacy/har_running_profile.yaml). Their priority comments are design proposals, not measurements of linguistic or activity invariance. A transformation appropriate for running should not automatically be applied to a sign. Even within SLR, a class-specific judgment may be necessary.
 
 ## Why arbitrary coordinate noise is risky
 
@@ -55,7 +55,7 @@ flowchart LR
 
 Text fallback: video → estimator → coordinates → training augmentation → recognizer → class. Data and augmentation also need inspection. Evaluation clips should ordinarily bypass random training augmentation; chapter 4 explains the dataset implementation.
 
-**Code present:** `MediaPipeExtractor` in [render_landmarks.py](../../scripts/render_landmarks.py), lines 35–68, calls MediaPipe Holistic on video frames. `Pipeline.process` in [pipeline.py](../../src/kinetic_augment/pipeline/pipeline.py), lines 98–129, calls an augmentation chain. `LSTMClassifier` and `GRUClassifier` in [lstm_classifier.py](../../src/kinetic_augment/evaluation/models/lstm_classifier.py) are downstream recognizers, not SMPL-X estimators.
+**Code present:** `MediaPipeExtractor` in [render_landmarks.py](../../scripts/legacy/render_landmarks.py), lines 35–68, calls MediaPipe Holistic on video frames. `Pipeline.process` in [pipeline.py](../../src/kinetic_augment/pipeline/pipeline.py), lines 98–129, calls an augmentation chain. `LSTMClassifier` and `GRUClassifier` in [lstm_classifier.py](../../src/kinetic_augment/evaluation/models/lstm_classifier.py) are downstream recognizers, not SMPL-X estimators.
 
 MediaPipe's legacy Holistic combines body, face, and hand estimators into 543 landmarks. It is the relevant external background for this checkout's format; newer APIs should not silently replace its coordinate convention. [Official legacy Holistic documentation](https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/holistic.md).
 
@@ -71,7 +71,7 @@ An **axis-angle rotation vector** points along the rotation axis; its length giv
 
 ### The consequential representation warning
 
-**Code present:** [`MediaPipeToSMPLX.fit`](../../src/kinetic_augment/body_model/mp_to_smplx.py), lines 92–143, stores bone vectors inside arrays named `body_pose` and hand pose. Its module explicitly says this is **not standard SMPL-X axis-angle** (lines 22–25). [`SMPLXToMediaPipe.project`](../../src/kinetic_augment/body_model/smplx_to_mp.py), lines 70–173, reconstructs selected positions by vector addition along chains; it accepts a wrapper but never calls it.
+**Code present:** [`MediaPipeToSMPLX.fit`](../../src/kinetic_augment/legacy/mp_to_smplx.py), lines 92–143, stores bone vectors inside arrays named `body_pose` and hand pose. Its module explicitly says this is **not standard SMPL-X axis-angle** (lines 22–25). [`SMPLXToMediaPipe.project`](../../src/kinetic_augment/legacy/smplx_to_mp.py), lines 70–173, reconstructs selected positions by vector addition along chains; it accepts a wrapper but never calls it.
 
 In contrast, [`SMPLXWrapper.forward`](../../src/kinetic_augment/body_model/smplx_wrapper.py), lines 143–221, calls the actual SMPL-X model with rotation parameters. Intrinsic classes and angle constraints are written around rotation-style slots. **Inference:** passing the encoder's bone vectors through rotation operations or into the true model mixes meanings even if shapes pass validation. A reconstruction image from the bespoke vector path cannot establish accurate SMPL-X fitting. Consult [project status](05-project-status.md) for verification scope and compatibility; the encoder's name is not evidence of an inverse-kinematics solver.
 

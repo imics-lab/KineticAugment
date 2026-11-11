@@ -1,4 +1,3 @@
-# --- START OF FILE src/kinetic_augment/utils/data_formats.py ---
 
 import json
 import numpy as np

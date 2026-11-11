@@ -1,4 +1,6 @@
-# Demo index
+# demo/
 
-- `round_trip/` — Interactive web viewer for the per-clip MediaPipe → SMPL-X → MediaPipe round trip (pose, hands, face mesh).
-- `index.md` — Index of the local web demos.
+| Item | Description |
+|---|---|
+| `round_trip/` | Web viewer for the per-clip MediaPipe -> SMPL-X -> MediaPipe round trip (pose, hands, face mesh) and the Tier 1 and week-4 augmentations |
+| `index.md` | This index |

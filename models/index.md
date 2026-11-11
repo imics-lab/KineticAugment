@@ -1,10 +1,14 @@
-# Models index
+# models/
 
-- `.gitignore` — Excludes downloaded model-weight formats from version control.
-- `README.md` — Lists required SMPL-X and VPoser assets and their expected locations.
-- `flame/` — FLAME triangle list and the MediaPipe → FLAME landmark embedding (licensed, local only).
-- `mano/` — SMPL-X vertex IDs mapped to FLAME mesh vertices.
-- `mediapipe/` — MediaPipe face-landmarker model and canonical face mesh (downloaded).
-- `smplx/` — SMPL-X version marker and location for locally supplied model files.
-- `vposer/` — VPoser version/configuration metadata and model helper implementation.
-- `index.md` — Index of model setup files and asset directories.
+Licensed model weights are not in git (`models/.gitignore` ignores `*.npz`, `*.pkl`, `*.pt`, `*.pth`, `*.onnx`, `*.h5`, `*.task`, `*.obj`). See `README.md` for setup.
+
+| Item | Description |
+|---|---|
+| `README.md` | Expected layout, what needs what, setup and verification |
+| `.gitignore` | Keeps weight files out of git |
+| `smplx/` | SMPL-X body model |
+| `mano/` | MANO hand models and the SMPL-X/FLAME vertex map |
+| `vposer/` | Vendored VPoser code/config (unused, proprietary licence) |
+| `flame/` | Only its `index.md` is in git: FLAME head (`generic_model.pkl`, `mediapipe_landmark_embedding.npz`), licensed, local only; face pipeline only |
+| `mediapipe/` | Only its `index.md` is in git: `face_landmarker.task`, `canonical_face_model.obj` (from `scripts/download_models.py --face`) |
+| `index.md` | This index |

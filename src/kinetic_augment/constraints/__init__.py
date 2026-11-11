@@ -18,7 +18,7 @@ Example:
 
 Collision Detection Example:
     >>> from kinetic_augment.constraints import ConstraintEngine
-    >>> from kinetic_augment.body_model import SMPLXWrapper
+    >>> from kinetic_augment.body_model.smplx_wrapper import SMPLXWrapper
     >>> wrapper = SMPLXWrapper(model_path='models')
     >>> engine = ConstraintEngine(collision_detection=True, smplx_wrapper=wrapper)
     >>> valid_params = engine.enforce(augmented_params)

@@ -3,9 +3,11 @@
 The true power of the KineticAugment framework lies in its ability to be tailored to specific tasks. A one-size-fits-all augmentation strategy is suboptimal because the features that are critical to one task may be noise in another. For example, the precise shape of the hand is paramount in Sign Language Recognition but less important for recognizing a "running" action.
 
 This is where **Task-Specific Profiles** come in. A profile is a configuration file (e.g., a `.yaml` file) that defines a complete augmentation plan by specifying:
-*   **Which** augmentations from the [catalogue](./03_Augmentation_Catalogue.md) to apply.
+*   **Which** augmentations from the [catalogue](./legacy/03_Augmentation_Catalogue.md) to apply.
 *   The **probability** and **intensity** of each augmentation.
 *   The **constraints** needed to preserve the meaning of the motion for that task.
+
+> **Note:** The profiles and operation names below are **conceptual**: they illustrate the priority system and are not loadable configs. The operations that `Pipeline.from_yaml` accepts are the registered names listed in the README's [Available Augmentations](../README.md#available-augmentations) table. A working config is `configs/slr_profile.yaml`. The earlier format is kept in `configs/legacy/`.
 
 The key concept that enables this is the **Augmentation Priority System**.
 
@@ -44,7 +46,7 @@ To preserve **Semantic Integrity**, we must first identify which features of a m
 
 #### Example `slr_profile.yaml`:
 ```yaml
-# configs/slr_profile.yaml
+# (conceptual) slr_profile.yaml
 # Augmentation profile for Sign Language Recognition
 
 # --- Global Settings ---
@@ -106,7 +108,7 @@ plan:
 
 #### Example `har_running_profile.yaml`:
 ```yaml
-# configs/har_running_profile.yaml
+# (conceptual) har_running_profile.yaml
 # Augmentation profile for HAR of "Running"
 
 # --- Global Settings ---

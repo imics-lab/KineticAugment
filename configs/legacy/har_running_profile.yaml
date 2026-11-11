@@ -22,8 +22,8 @@ profile_name: "HAR_Running_Default"
 kinematic_chains:
   - ["left_shoulder", "left_elbow", "left_wrist"]
   - ["right_shoulder", "right_elbow", "right_wrist"]
-  - ["pelvis", "left_hip", "left_knee", "left_anle"]
-  - ["pelvis", "right_hip", "right_knee", "right_anle"]
+  - ["pelvis", "left_hip", "left_knee", "left_ankle"]
+  - ["pelvis", "right_hip", "right_knee", "right_ankle"]
 
 # Defines anatomical joint angle limits (in radians).
 joint_limits:

@@ -1,9 +1,11 @@
-# Evaluation index
+# evaluation/
 
-- `__init__.py` — Re-exports evaluation metrics, datasets, models, and benchmark APIs.
-- `base.py` — Defines metric results, metric interfaces, aggregation, and comparison.
-- `benchmark/` — Experiment definitions, benchmark execution, and report generation.
-- `datasets/` — Base evaluation dataset interface and WLASL loader.
-- `metrics/` — Motion quality, temporal coherence, diversity, and constraint metrics.
-- `models/` — SLR classifier interfaces, LSTM/GRU and masked face-stream models, and trainer.
-- `index.md` — Index of evaluation APIs and subpackages.
+| Item | Description |
+|---|---|
+| `__init__.py` | Exports metrics, datasets, models and benchmark classes |
+| `base.py` | Metric base classes, `MetricResult`, `MetricAggregator` |
+| `benchmark/` | Experiment presets, runner, report generation |
+| `datasets/` | Dataset base class, synthetic data, WLASL loaders |
+| `metrics/` | Quality, temporal, diversity and constraint metrics |
+| `models/` | LSTM/GRU and face-stream classifiers, trainer |
+| `index.md` | This index |

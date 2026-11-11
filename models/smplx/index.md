@@ -1,5 +1,8 @@
-# SMPL-X model index
+# models/smplx/
 
-- `SMPLX_NEUTRAL.npz`, `SMPLX_MALE.npz`, `SMPLX_FEMALE.npz` — SMPL-X v1.1 body models (licensed, git-ignored).
-- `version.txt` — Text marker identifying the expected SMPL-X asset release.
-- `index.md` — Index of SMPL-X metadata and local asset location.
+| File | Description |
+|---|---|
+| `version.txt` | In git: SMPL-X version note (keeps the folder in git) |
+| `SMPLX_NEUTRAL.npz` | Not in git: required SMPL-X v1.1 neutral model (licensed) |
+| `SMPLX_MALE.npz`, `SMPLX_FEMALE.npz` | Not in git: SMPL-X v1.1 gendered models, checked by `scripts/download_models.py --check` |
+| `index.md` | This index |

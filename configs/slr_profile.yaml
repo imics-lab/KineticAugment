@@ -1,91 +1,45 @@
-# ==========================================================
-# KineticAugment Task-Specific Profile
-# Application: Sign Language Recognition (SLR)
-# ==========================================================
-#
-# Goal: Simulate natural variations between signers without
-# altering the linguistic meaning of the sign.
-#
-# Philosophy:
-# - HIGH Priority: Handshapes, grammatical facial expressions.
-# - MEDIUM Priority: Movement path, sign space location.
-# - LOW Priority: Overall body posture, incidental movements.
-#
-# ==========================================================
-
-# --- Global Settings ---
-# These settings define the "world" and "body" constraints.
-
-# A unique name for the profile.
-profile_name: "SignLanguageRecognition_Default"
-
-# Defines the skeleton's structure for Kinematic Chain Consistency.
-kinematic_chains:
-  - ["left_shoulder", "left_elbow", "left_wrist"]
-  - ["right_shoulder", "right_elbow", "right_wrist"]
-  - ["pelvis", "left_hip", "left_knee", "left_anle"]
-  - ["pelvis", "right_hip", "right_knee", "right_anle"]
-
-# Defines anatomical joint angle limits (in radians) for Anatomical Plausibility.
-joint_limits:
-  elbow: { min: 0.0, max: 2.6 }  # ~0 to 150 degrees
-  shoulder_pitch: { min: -1.57, max: 3.14 } # -90 to 180 degrees
-  shoulder_roll: { min: -1.57, max: 1.57 } # -90 to 90 degrees
-  knee: { min: 0.0, max: 2.4 }
-
-# --- Augmentation Plan ---
-# A sequence of augmentation operations to be applied.
-# Each operation has a probability of being applied.
-
+# KineticAugment pipeline config for Sign Language Recognition (SLR).
+# Format: kinetic_augment.Pipeline.from_yaml(). Generated from the 'moderate' preset.
+# PoseFlipping is deliberately absent: mirroring swaps the signing hand and can change
+# sign meaning. (The legacy-format profile lives in configs/legacy/slr_profile.yaml.)
+profile_name: slr_default
+mode: landmark
 plan:
-  # --- 1. Extrinsic (Scene-Level) Augmentations ---
-  - operation: "GlobalRotation"
-    probability: 0.0
-    params:
-      pivot_point: "pelvis"
-      max_angle_deg: { x: 0, y: 5, z: 2 } # Yaw up to 5deg, Roll up to 2deg
-
-  - operation: "GlobalScaling"
-    probability: 0.0
-    params:
-      scale_range: [0.95, 1.05] # Simulate moving 5% closer/further
-
-  # --- 2. Intrinsic (Anatomy-Level) Augmentations ---
-  - operation: "JointAnglePerturbation"
-    probability: 0.0
-    params:
-      # Apply moderate noise to MEDIUM priority arm joints
-      joint_group: "arms"
-      noise_stddev_rad: 0.05
-
-  - operation: "JointCoupledNoise"
-    probability: 0.0
-    params:
-      # Apply VERY LOW noise to HIGH priority finger joints
-      joint_group: "fingers"
-      noise_stddev: 0.005
-      # Enforces anatomical coupling to preserve handshape structure
-      correlation_source: "anatomical_hand_dependencies"
-      # Special flag for the pipeline to check semantic integrity
-      semantic_check: "preserve_handshape_class"
-
-  - operation: "PoseFlipping"
-    probability: 0.0
-    # Flips pose and swaps left/right landmark labels.
-    # Powerful for balancing datasets with dominant-hand bias.
-    # No extra parameters needed.
-
-  # --- 3. Temporal Augmentations ---
-  - operation: "TimeWarping"
-    probability: 0.0
-    params:
-      # Moderate time warping to simulate variations in signing speed
-      max_warp_factor: 0.15
-
-  - operation: "DynamicTrajectoryJittering"
-    probability: 0.0
-    params:
-      # Add subtle, smooth noise to hand trajectories
-      joint_group: "hands"
-      amplitude: 0.01 # Max deviation in meters
-      frequency: 0.1 # Low frequency for smooth noise
+- operation: GlobalRotation
+  probability: 0.6
+  params:
+    max_angle_deg:
+      x: 10
+      y: 15
+      z: 5
+- operation: GlobalScaling
+  probability: 0.4
+  params:
+    scale_range:
+    - 0.9
+    - 1.1
+- operation: TrajectoryJittering
+  probability: 0.3
+  params:
+    amplitude: 0.01
+    frequency: 0.3
+- operation: TimeWarping
+  probability: 0.4
+  params:
+    max_warp_factor: 0.15
+- operation: GaussianNoise
+  probability: 0.5
+  params:
+    stddev: 0.005
+    landmark_groups:
+    - pose
+    - left_hand
+    - right_hand
+constraints:
+  joint_limits: true
+  velocity_limits: true
+  collision_detection: false
+  strict_mode: false
+  use_sign_language_limits: true
+frame_rate: 30.0
+description: 'Sign Language Recognition: moderate augmentation, no left/right flipping'

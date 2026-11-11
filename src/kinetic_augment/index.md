@@ -1,15 +1,15 @@
-# Package index
+# src/kinetic_augment/
 
-- `.gitkeep` — Empty placeholder retained in the package directory.
-- `__init__.py` — Defines package exports and optional evaluation access.
-- `augmentations.py` — Legacy functional implementations of landmark and temporal augmentations.
-- `augmentations/` — Class-based extrinsic, intrinsic, and temporal augmentation modules.
-- `body_model/` — SMPL-X wrapper, joint mappings, and MediaPipe conversion code.
-- `canonicalization.py` — Moves landmark frames to and from a canonical body-centered coordinate frame.
-- `constraints/` — Joint, velocity, and self-collision constraint enforcement.
-- `evaluation/` — Metrics, datasets, recurrent classifiers, and benchmark tools.
-- `lab/` — Augmentation Lab: the `kinetic-lab` server, pane runner, share build, saved settings and the web page (see `lab/index.md`).
-- `pipeline/` — Configurable augmentation pipeline, chaining, presets, and datasets.
-- `pipeline_legacy.py` — Deprecated wrapper for the earlier augmentation pipeline API.
-- `utils/` — Landmark data-format conversion helpers and left/right index maps.
-- `index.md` — Index of the KineticAugment package modules and subpackages.
+| Item | Description |
+|---|---|
+| `__init__.py` | Public API re-exports (`Pipeline`, datasets, deprecated `AugmentationPipeline`); `__version__` |
+| `.gitkeep` | Placeholder file |
+| `augmentations/` | Registered extrinsic/intrinsic/temporal transforms, the Tier 1 augmentations, and the week-4 chain, profiles and outputs |
+| `body_model/` | MediaPipe <-> SMPL-X conversion for body, hands and face; SMPL-X wrapper |
+| `constraints/` | Constraint engine: joint limits, velocity limits, collision |
+| `evaluation/` | Metrics, datasets, classifiers and benchmark runner |
+| `lab/` | Augmentation Lab: the `kinetic-lab` server, pane runner, share build, saved settings and the web page (see `lab/index.md`) |
+| `pipeline/` | Registry-based `Pipeline`, config, presets, chains, PyTorch datasets |
+| `utils/` | 543-landmark layout, left/right maps, smoothing |
+| `legacy/` | **Legacy.** Deprecated pipeline, function-style augmentations, canonicalization, old converters |
+| `index.md` | This index |

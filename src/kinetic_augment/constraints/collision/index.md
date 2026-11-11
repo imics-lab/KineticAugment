@@ -1,8 +1,10 @@
-# Collision index
+# constraints/collision/
 
-- `__init__.py` — Exports collision checking, body-part geometry, and resolution interfaces.
-- `body_parts.py` — Defines collision body parts, geometry parameters, and adjacency rules.
-- `collision_checker.py` — Detects contacts and self-collisions between modeled body parts.
-- `collision_constraint.py` — Adapts collision checks into the constraint engine interface.
-- `resolution.py` — Implements gradient, rejection, and interpolation collision resolvers.
-- `index.md` — Index of self-collision detection and resolution modules.
+| File | Description |
+|---|---|
+| `__init__.py` | Exports the collision classes |
+| `body_parts.py` | Body part segmentation into capsule/sphere primitives |
+| `collision_checker.py` | PyBullet-based collision detection |
+| `collision_constraint.py` | Collision constraint integrating with `ConstraintEngine` |
+| `resolution.py` | Strategies resolving collisions by adjusting SMPL-X pose |
+| `index.md` | This index |

@@ -1,8 +1,12 @@
-# Constraints index
+# constraints/
 
-- `__init__.py` — Exports constraint engine, joint/velocity limits, and collision interfaces.
-- `collision/` — Body-part geometry, self-collision checks, and collision resolvers.
-- `engine.py` — Collects constraint violations and orchestrates constraint application.
-- `joint_limits.py` — Defines anatomical joint ranges and joint-limit enforcement.
-- `velocity_limits.py` — Defines motion-speed limits and sequence velocity checks.
-- `index.md` — Index of constraint enforcement modules.
+Used by `Pipeline`; only acts in `mode='smplx'` (no-op in landmark mode).
+
+| Item | Description |
+|---|---|
+| `__init__.py` | Exports the constraint classes |
+| `engine.py` | `ConstraintEngine`: validate and enforce all constraint types |
+| `joint_limits.py` | Anatomical range-of-motion limits |
+| `velocity_limits.py` | Maximum angular velocity limits |
+| `collision/` | PyBullet self-collision detection and resolution (experimental, off in all presets) |
+| `index.md` | This index |

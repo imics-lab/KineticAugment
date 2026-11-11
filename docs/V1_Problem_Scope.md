@@ -92,14 +92,14 @@ error this study exists to quantify. It is retained as a documented fallback (Se
 `3.7e-09` ([05-project-status.md:17](research-guide/05-project-status.md:17)). That number is real
 and reproducible. It also does not mean what it appears to mean.
 
-[`mp_to_smplx.py:1-30`](../src/kinetic_augment/body_model/mp_to_smplx.py:1) states in its own module
+[`mp_to_smplx.py:1-30`](../src/kinetic_augment/legacy/mp_to_smplx.py) states in its own module
 docstring that it stores the raw bone displacement `child − parent` directly into the axis-angle
 slots of `body_pose`, and that the result is **"NOT standard SMPL-X axis-angle, so you cannot
 feed these params directly into an SMPL-X model and expect meaningful output."**
 
-[`smplx_to_mp.py`](../src/kinetic_augment/body_model/smplx_to_mp.py) then reconstructs by adding
+[`smplx_to_mp.py`](../src/kinetic_augment/legacy/smplx_to_mp.py) then reconstructs by adding
 that displacement back onto the parent position. It accepts an `smplx_wrapper` argument and
-**never calls it** ([smplx_to_mp.py:14](../src/kinetic_augment/body_model/smplx_to_mp.py:14)).
+**never calls it** ([smplx_to_mp.py:14](../src/kinetic_augment/legacy/smplx_to_mp.py)).
 
 So the round-trip is exact because it is a subtraction followed by an addition. The SMPL-X model
 is never evaluated, no rotation is ever computed, and `betas` and `global_orient` have no effect
@@ -276,11 +276,11 @@ They are licensed assets requiring registration at `smpl-x.is.tue.mpg.de`.
 `AssertionError: Path models/smplx/smplx does not exist!`
 
 The docstrings in
-[smplx_wrapper.py:19](../src/kinetic_augment/body_model/smplx_wrapper.py:19) and
-[body_model/\_\_init\_\_.py:15](../src/kinetic_augment/body_model/__init__.py:15) are **wrong**;
-the runnable scripts ([test_phase1.py:324](../scripts/test_phase1.py:324),
-[test_phase3.py:473](../scripts/test_phase3.py:473),
-[render_landmarks.py:170](../scripts/render_landmarks.py:170)) are right.
+[smplx_wrapper.py:19](../src/kinetic_augment/body_model/smplx_wrapper.py) and
+[body_model/\_\_init\_\_.py:15](../src/kinetic_augment/body_model/__init__.py) are **wrong**;
+the runnable scripts ([phase1_smoke.py:324](../scripts/legacy/phase1_smoke.py),
+[phase3_smoke.py:473](../scripts/legacy/phase3_smoke.py),
+[render_landmarks.py:170](../scripts/legacy/render_landmarks.py)) are right.
 
 #### Finding 2 — the forward pass returns **127** joints, not 55
 
@@ -402,7 +402,7 @@ by extrapolating past the image boundary, so they are model prior, not observati
    any round-trip error reported for them would be meaningless.
 2. **`global_orient` cannot use the shoulder–hip frame** as Section 4 assumed — hips are observed
    in only 32% of frames. Derive the torso frame from **shoulders and nose** instead, as
-   [`canonicalization.py:35-50`](../src/kinetic_augment/canonicalization.py:35) already does.
+   [`canonicalization.py:35-50`](../src/kinetic_augment/legacy/canonicalization.py) already does.
 
 Legs remain in the method's scope; they are simply unverifiable until a full-body clip exists.
 Record that as a limitation rather than quietly fitting them.
@@ -746,7 +746,7 @@ video is anisotropically stretched — and the five clips have **three different
 (320×240 and 640×480 at 1.333, 1280×720 at 1.778, 288×192 at 1.500). There is no single
 correction, because the distortion differs per clip.
 
-**Root cause.** [`test_phase1.py:146-147`](../scripts/test_phase1.py:146) captures
+**Root cause.** [`phase1_smoke.py:146-147`](../scripts/legacy/phase1_smoke.py) captures
 `results.pose_landmarks` — image-normalised coordinates with a predicted pseudo-depth.
 MediaPipe also exposes `results.pose_world_landmarks`: metric, hip-centred, in real units.
 That is the correct input for fitting a metric body model.
@@ -894,8 +894,8 @@ and will fail the suite *loudly* the moment Step 8 makes it pass, forcing the ma
 The review is right that the verified maths is not yet reachable through `MediaPipeToSMPLX` and
 `SMPLXToMediaPipe`. But this is not a drop-in swap, for three reasons:
 
-1. **Every existing caller passes image-space data.** `scripts/render_landmarks.py` and
-   `scripts/test_phase2.py` call `fit(frame)` on 543-landmark image-space frames — exactly what
+1. **Every existing caller passes image-space data.** `scripts/legacy/render_landmarks.py` and
+   `scripts/legacy/phase2_smoke.py` call `fit(frame)` on 543-landmark image-space frames — exactly what
    Finding 9 shows cannot support a metric fit. Rewiring would make them silently wrong.
 2. **The framework's interchange format is image space.** Augmented landmarks feed a classifier
    as `(T, 543, 3)` image-space arrays. Fitting in world space produces world-space output, and
@@ -927,7 +927,7 @@ current headline is an aligned residual whose transform the converter does not r
   (diagnostic) side by side, per joint, with median, p95 and observation coverage.
 - **Wire the verified maths into the public classes.** `MediaPipeToSMPLX` and `SMPLXToMediaPipe`
   still use the displacement encoding of Section 3; the new modules are parallel to them, not
-  connected. The six `xfail` tests in `tests/test_body_model.py` flip when this lands and are the
+  connected. The six `xfail` tests in `tests/test_body_model.py` (since retired) were to flip when this landed and are the
   completion signal.
 
 ### Step 8 — ✅ **COMPLETE (2026-10-05)**
@@ -1516,7 +1516,7 @@ for b in range(batch_size):
     body_pose[b, pose_idx:pose_idx + 3] += noise
 ```
 
-and [`mp_to_smplx.py:96`](../src/kinetic_augment/body_model/mp_to_smplx.py:96) sets
+and [`mp_to_smplx.py:96`](../src/kinetic_augment/legacy/mp_to_smplx.py) sets
 `B = landmarks.shape[0]`, turning a clip's `T` frames into `B` independent batch rows. Every
 frame therefore receives an unrelated perturbation.
 

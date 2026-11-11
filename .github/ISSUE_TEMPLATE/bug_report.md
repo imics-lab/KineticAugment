@@ -47,7 +47,7 @@ If applicable, add the full traceback or any error messages you received. Please
 **5. Your Environment (please complete the following information):**
  - **OS:** [e.g., Ubuntu 22.04, macOS Sonoma, Windows 11]
  - **Python Version:** [e.g., 3.10.4]
- - **KineticAugment Version:** [e.g., 0.1.0 or main branch]
+ - **KineticAugment Version:** [e.g., 0.4.0 or main branch]
  - **Other relevant library versions:** [e.g., numpy 1.23.5, torch 2.0.1]
 
 **6. Additional Context**

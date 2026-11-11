@@ -1,7 +1,9 @@
-# Utilities index
+# utils/
 
-- `__init__.py` — Re-exports landmark format constants and mirror maps.
-- `data_formats.py` — Defines landmark block indices and JSON sequence load/save helpers.
-- `smoothing.py` — Gap-aware temporal smoothing of landmark tracks (Gaussian, One Euro) and the named `SMOOTHING` settings the round-trip demo exports.
-- `landmark_maps.py` — Defines left/right correspondence maps for pose and face landmarks.
-- `index.md` — Index of shared landmark and data-format utilities.
+| File | Description |
+|---|---|
+| `__init__.py` | Re-exports constants and helpers |
+| `data_formats.py` | 543-landmark layout constants and JSON load/save helpers |
+| `landmark_maps.py` | Left/right landmark swap maps for mirroring |
+| `smoothing.py` | Temporal smoothing filters for landmark tracks (Gaussian, One Euro), gap-aware, and the named `SMOOTHING` settings the round-trip demo exports |
+| `index.md` | This index |

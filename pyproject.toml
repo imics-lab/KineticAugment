@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kinetic-augment"
-version = "0.2.0"
+version = "0.4.0"
 description = "A geometry-aware data augmentation framework for human skeletal motion data"
 readme = "README.md"
 license = {text = "MIT"}
@@ -90,7 +90,6 @@ Repository = "https://github.com/imics-lab/KineticAugment"
 Issues = "https://github.com/imics-lab/KineticAugment/issues"
 
 [project.scripts]
-kinetic-augment = "kinetic_augment.cli:main"
 kinetic-lab = "kinetic_augment.lab.cli:main"
 
 [tool.setuptools.packages.find]

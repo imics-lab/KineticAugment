@@ -171,8 +171,12 @@ for name, result in results.items():
 
 ---
 
-### Next Up: Glossary
+### Planned Additions
 
-This concludes the main documentation of the framework's philosophy and structure. The final document provides definitions for key terms used throughout.
+Metrics for the body's relation to the floor and to objects (ground penetration, floating, foot skating, object penetration, contact precision and recall), and a validation of the constraint engine against recorded grasps, are specified in [09 - Plausibility Metrics and Validation](./09_Plausibility_Metrics_and_Validation.md).
 
-**Next: [Glossary](./GLOSSARY.md)**
+### Next Up: Roadmap and Glossary
+
+This concludes the documentation of the framework's philosophy and current structure. The [Development Roadmap](./06_Roadmap.md) describes what is built and what is planned, documents 07 to 09 specify the planned extensions, and the final document provides definitions for key terms used throughout.
+
+**Next: [06 - Roadmap](./06_Roadmap.md)** or **[Glossary](./GLOSSARY.md)**

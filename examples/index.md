@@ -1,6 +1,8 @@
-# Examples index
+# examples/
 
-- `.gitkeep` — Empty Git tracking placeholder for the examples folder.
-- `run_augmentation.py` — Loads landmark JSON, applies an augmentation pipeline, and saves the result.
-- `train_face_streams.py` — Trains the masked temporal classifier on official WLASL train and validation splits.
-- `index.md` — Index of runnable examples in this folder.
+| File | Description |
+|---|---|
+| `run_augmentation.py` | Apply presets and `configs/slr_profile.yaml` to one landmark clip with `Pipeline` (real clip, else synthetic) |
+| `train_face_streams.py` | Train the masked temporal face-stream classifier on WLASL splits (V1.3) |
+| `.gitkeep` | Placeholder file |
+| `index.md` | This index |

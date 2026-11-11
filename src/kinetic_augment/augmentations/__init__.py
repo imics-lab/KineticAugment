@@ -8,7 +8,7 @@ This package provides augmentation classes organized by type:
 
 - **Intrinsic** (body-level): SMPL-X based augmentations that respect
   kinematic chains and anatomical limits (joint angle perturbation,
-  limb length scaling)
+  hand pose perturbation, global orientation perturbation)
 
 - **Temporal** (time-level): Modifications to the time axis
   (time warping, speed variation)
@@ -40,6 +40,7 @@ try:
         GlobalScaling,
         PoseFlipping,
         TrajectoryJittering,
+        GaussianNoise,
     )
 except ImportError:
     pass
@@ -49,6 +50,7 @@ try:
         JointAnglePerturbation,
         HandPosePerturbation,
         JointCoupledNoise,
+        GlobalOrientPerturbation,
     )
 except ImportError:
     pass
@@ -57,6 +59,7 @@ try:
     from kinetic_augment.augmentations.temporal import (
         TimeWarping,
         SpeedVariation,
+        FrameDropping,
     )
 except ImportError:
     pass
@@ -82,13 +85,16 @@ __all__ = [
     "GlobalScaling",
     "PoseFlipping",
     "TrajectoryJittering",
+    "GaussianNoise",
     # Intrinsic
     "JointAnglePerturbation",
     "HandPosePerturbation",
     "JointCoupledNoise",
+    "GlobalOrientPerturbation",
     # Temporal
     "TimeWarping",
     "SpeedVariation",
+    "FrameDropping",
     # Week 4
     "AugmentationChain",
     "load_profile",

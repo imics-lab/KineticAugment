@@ -1,9 +1,11 @@
-# Pipeline index
+# pipeline/
 
-- `__init__.py` — Exports pipeline configuration, chains, presets, and optional datasets.
-- `chain.py` — Composes ordered augmentation steps and builds chains from presets.
-- `config.py` — Defines pipeline and constraint configuration objects and YAML loading.
-- `dataset.py` — Provides PyTorch datasets and loaders for augmented landmark sequences.
-- `pipeline.py` — Applies configured augmentation chains and constraints to motion data.
-- `presets.py` — Defines named none, conservative, moderate, and aggressive profiles.
-- `index.md` — Index of pipeline configuration, execution, and dataset modules.
+| File | Description |
+|---|---|
+| `__init__.py` | Exports `Pipeline`, `AugmentationChain`, config, presets, datasets |
+| `pipeline.py` | `Pipeline` (`from_preset`, `from_yaml`, `from_dict`, `process`), landmark and SMPL-X modes |
+| `chain.py` | `AugmentationChain`: probability-based composable execution |
+| `config.py` | `PipelineConfig` / `ConstraintConfig` dataclasses with YAML serialization |
+| `presets.py` | Built-in presets (none, conservative, moderate, aggressive) |
+| `dataset.py` | PyTorch Dataset wrappers with on-the-fly augmentation |
+| `index.md` | This index |

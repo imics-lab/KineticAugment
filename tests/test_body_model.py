@@ -4,8 +4,7 @@ Unit tests for the body_model module.
 Tests cover:
 - Joint mapping between SMPL-X and MediaPipe
 - SMPL-X wrapper functionality (requires models)
-- MediaPipe to SMPL-X fitting (requires models)
-- SMPL-X to MediaPipe projection (requires models)
+- SMPLXParamsContainer (no models required)
 """
 
 import numpy as np
@@ -260,29 +259,6 @@ class TestSMPLXWrapper:
             output['model_joints'],
             output['joints'][:, :smplx_wrapper.num_model_joints],
         )
-
-class TestLegacyConverters:
-    """
-    MediaPipeToSMPLX and SMPLXToMediaPipe are the bone-displacement encoding: they
-    store child-minus-parent vectors in SMPL-X-shaped slots and are not valid SMPL-X
-    parameters. They remain because image-space callers depend on them, but must
-    announce themselves so nobody mistakes them for real body-model fitting.
-
-    The correct contract -- world landmarks to genuine SMPL-X parameters and back,
-    reconstructing from parameters alone -- is tested in tests/test_converter.py.
-    That suite replaces six tests formerly here, which described an
-    optimisation-based fitter removed in f9c6d7b and deliberately not rebuilt.
-    """
-
-    def test_legacy_fitter_warns_and_points_to_the_converter(self):
-        from kinetic_augment.body_model.mp_to_smplx import MediaPipeToSMPLX
-        with pytest.warns(DeprecationWarning, match="converter"):
-            MediaPipeToSMPLX()
-
-    def test_legacy_projector_warns_and_points_to_the_converter(self):
-        from kinetic_augment.body_model.smplx_to_mp import SMPLXToMediaPipe
-        with pytest.warns(DeprecationWarning, match="converter"):
-            SMPLXToMediaPipe()
 
 
 class TestSMPLXParamsContainer:

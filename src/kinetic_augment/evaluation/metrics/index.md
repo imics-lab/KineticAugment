@@ -1,8 +1,10 @@
-# Evaluation metrics index
+# evaluation/metrics/
 
-- `__init__.py` — Exports constraint, diversity, quality, and temporal metric classes.
-- `constraint.py` — Measures constraint satisfaction, violation severity, and joint-limit compliance.
-- `diversity.py` — Measures variance, distribution shift, diversity, and coverage.
-- `quality.py` — Measures limb consistency, pose validity, detection rate, and plausibility.
-- `temporal.py` — Measures velocity, smoothness, temporal coherence, and spectral smoothness.
-- `index.md` — Index of motion evaluation metric implementations.
+| File | Description |
+|---|---|
+| `__init__.py` | Exports the metric classes |
+| `quality.py` | Pose quality and anatomical plausibility metrics |
+| `temporal.py` | Smoothness and temporal coherence metrics |
+| `diversity.py` | Augmentation diversity and distribution metrics |
+| `constraint.py` | Constraint satisfaction and violation metrics |
+| `index.md` | This index |

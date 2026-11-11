@@ -22,6 +22,8 @@ Example:
     >>> chain = output['model_joints']     # (1, 55, 3) kinematic chain only
 """
 
+from __future__ import annotations
+
 import os
 import warnings
 from pathlib import Path

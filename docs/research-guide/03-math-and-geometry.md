@@ -25,7 +25,7 @@ A useful distinction is **representation validity** versus **anatomical validity
 
 ### Walkthrough A: the active encoder stores displacement
 
-**Verbatim excerpt:** [`MediaPipeToSMPLX._encode_body`](../../src/kinetic_augment/body_model/mp_to_smplx.py), lines 121–131.
+**Verbatim excerpt:** [`MediaPipeToSMPLX._encode_body`](../../src/kinetic_augment/legacy/mp_to_smplx.py), lines 121–131.
 
 ```python
 def _encode_body(self, L: np.ndarray) -> np.ndarray:
@@ -54,7 +54,7 @@ The module explicitly describes this as bespoke encoding (lines 22–25). Its ph
 
 ### Walkthrough B: reconstruction adds the stored vector
 
-**Verbatim excerpt:** [`SMPLXToMediaPipe._reconstruct_body`](../../src/kinetic_augment/body_model/smplx_to_mp.py), lines 138–155.
+**Verbatim excerpt:** [`SMPLXToMediaPipe._reconstruct_body`](../../src/kinetic_augment/legacy/smplx_to_mp.py), lines 138–155.
 
 ```python
 out = original_pose.copy()
@@ -86,7 +86,7 @@ If the first upper-arm vector becomes `[0,0.3,0]`, the elbow moves to `[1,2.3,0]
 
 `project` requires `target_mp: (B,543,3)` as the anchor/template. It copies face landmarks and reconstructs the hand blocks from their own original hand anchors (lines 94–123). It never calls the wrapper supplied to its constructor (lines 67–68). Changes to `betas` or `global_orient` have no effect through this projector. Moving the body's pose wrist also does not automatically translate the separate 21-point hand block to that wrist. These are **source-supported limitations**, not observations from a licensed model run.
 
-A further contract mismatch: the encoder's hand slots follow thumb, index, middle, ring, pinky ([mp_to_smplx.py](../../src/kinetic_augment/body_model/mp_to_smplx.py), lines 63–69), whereas `HandPosePerturbation.FINGER_JOINT_INDICES` follows index, middle, pinky, ring, thumb ([intrinsic.py](../../src/kinetic_augment/augmentations/intrinsic.py), lines 187–193). Thus the intrinsic operation's “thumb” weights do not address the encoder's thumb slots. Treat those names as standard-model conventions, not a compatible handshape-preservation guarantee for the bespoke route.
+A further contract mismatch: the encoder's hand slots follow thumb, index, middle, ring, pinky ([mp_to_smplx.py](../../src/kinetic_augment/legacy/mp_to_smplx.py), lines 63–69), whereas `HandPosePerturbation.FINGER_JOINT_INDICES` follows index, middle, pinky, ring, thumb ([intrinsic.py](../../src/kinetic_augment/augmentations/intrinsic.py), lines 187–193). Thus the intrinsic operation's “thumb” weights do not address the encoder's thumb slots. Treat those names as standard-model conventions, not a compatible handshape-preservation guarantee for the bespoke route.
 
 ```mermaid
 flowchart LR
@@ -110,7 +110,7 @@ Write the transformed point as `q = s R.T (p − t)`: subtract shoulder midpoint
 
 ### Walkthrough C: build orthogonal body axes
 
-**Verbatim excerpt:** [`to_canonical_space_frame`](../../src/kinetic_augment/canonicalization.py), lines 35–50.
+**Verbatim excerpt:** [`to_canonical_space_frame`](../../src/kinetic_augment/legacy/canonicalization.py), lines 35–50.
 
 ```python
 centered_pose = centered_landmarks[POSE_START:POSE_END]

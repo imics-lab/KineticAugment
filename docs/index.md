@@ -1,43 +1,47 @@
-# Documentation index
+# docs/
 
-- `00_Introduction.md` — Introduces skeletal-motion augmentation and the framework’s motivation.
-- `01_Core_Principles.md` — Explains physical plausibility and task-level semantic constraints.
-- `02_Framework_Architecture.md` — Describes the augmentation, constraint, profile, and evaluation layers.
-- `03_Augmentation_Catalogue.md` — Catalogues extrinsic, intrinsic, and temporal transformations.
-- `04_Task_Specific_Profiles.md` — Explains how YAML profiles select and configure augmentations.
-- `05_Validation_Framework.md` — Describes checks for physical validity and task-level quality.
-- `Augmentation_Validation_Proposal.md` — Claude-reviewed design for raw MediaPipe validation: missingness, per-part coverage, mathematical tests, compatibility inventory, and implementation gates.
-- `06_Development_Roadmap.md` — Records implementation phases, status, and development plans.
-- `Augmentation_Grounding.md` — Research-grounded catalogue of meaning-preserving augmentations (tiers, invariant checks, ASL-LEX gating), the augmentation trials (2026-10-11, Tier 1 rework 2026-10-29), and recommended ranges from the 2026-11-02 tolerance report.
-- `augmentation-evidence/` — Source-level evidence notes behind `Augmentation_Grounding.md` (sign linguistics, SLR augmentation literature) and the tolerance report with its notes, each claim with URL and verification label.
-- `GLOSSARY.md` — Defines terminology used throughout the framework documentation.
-- `Mirror_Unsafe_Signs.md` — Which signs cannot be mirrored (absolute-direction glosses, HEART by caution), the blacklist, and a check of our 334 clips (all 39 glosses safe).
-- `Week4_Decisions_and_Questions.md` — Brief week-4 decisions and open questions for the advisor (2026-11-11).
-- `V1_Findings.md` — Presentation-ready summary of what V1 established: the result, findings, decisions, and open questions.
-- `V1_Problem_Scope.md` — Scopes the MediaPipe ↔ SMPL-X round-trip conversion task and its success criteria.
-- `V1_Review_Assessment.md` — Empirical test of the external V1 approach review: claim verdicts, missed errors, and recommended next steps (2026-10-05).
-- `V1_2_Hand_Roundtrip_Plan.md` — Proposed V1.2 MediaPipe ↔ MANO/SMPL-X hand conversion plan, mapping, metrics, and implementation gates.
-- `V1_2_Assumptions.md` — V1.2 assumption ledger, dependency map, verification order, and failure traces.
-- `V1_2_Feasibility_Probes.md` — Measurements of the hand model assets and MediaPipe hand data taken before V1.2 implementation.
-- `V1_2_Implementation_Plan.md` — Task-by-task implementation plan for the V1.2 hand round-trip feasibility slice (P0–P3).
-- `V1_2_Findings.md` — Measured V1.2 hand round-trip results, assumption status and next steps.
-- `V1_2_Implementation_Evidence.md` — Measurements taken while implementing V1.2 (synthetic gates, batch coupling, extraction determinism), kept with their provenance.
-- `V1_3_Face_Design.md` — Approved V1.3 design: SMPL-X neck, head and jaw from FaceLandmarker, signed hand-to-face distances with ASL-LEX regions, and the face stream.
-- `V1_3_Implementation_Plan.md` — Task-by-task plan for V1.3: face correspondence, head/neck/jaw fit, hand-to-face geometry, gate, face stream.
-- `V1_3_Findings.md` — Phase-A gate results for the V1.3 face fit: head pose, jaw, ear placement, hand-to-head distances, the depth-gap diagnostic, and the F1–F6 verdicts (2026-10-07).
-- `V1_3_Training_Data_Audit.md` — Independent audit of face features for landmark-based recognition, including tests, geometry risks, research comparisons and proposed training gates (2026-10-11).
-- `V1_3_Audit_Evidence.json` — Cache fingerprints, synthetic counterexamples and fresh fitting measurements supporting the training-data audit.
-- `V1_3_Face_Integration_Plan.md` — Implementation contract for reversible face attachment, quality masks, synchronized training samples and a masked facial classifier.
-- `V1_3_Face_Integration_Results.md` — Real-cache coverage, geometric and masking regressions, reproduction commands, and recognition-data limitations for the V1.3 integration.
-- `V1_3_Face_Integration_Evidence.json` — Compact machine-readable aggregate and per-clip evidence from the real-cache validation.
-- `V1_3_Head_Placement_Spike_08925.md` — One-clip spike: pose-only proximity, 11-point pose-face head placement, depth correction, and a roll traced to pose-world face points (2026-10-18).
-- `O11_Frame_Alignment.md` — Cross-clip test of O11 (2026-10-18): pose-world vs image roll is ~1-2°, so no roll correction is needed; the pose-face Kabsch vs R_head gap comes from pose-world face distortion; pitch/yaw still open.
-- `Resume_Handoff.md` — Résumé-writing brief with Bemnet’s contributions, measured results, and source links.
-- `Week_2_Findings.md` — Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07).
-- `Hand_Pipeline_Variants.md` — The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29).
-- `Augmentation_Ranges.md` — Proven against used range for every week-4 augmentation, the 25% rule, and the three week-4 profiles.
-- `augmentation-lab.md` — The Augmentation Lab: share mode and full mode, building the zip, and using saved settings.
-- `media/` — Images and placeholder assets referenced by documentation.
-- `index.md` — Index of the documentation pages and media folder.
-- `research-guide/` — Source-grounded research onboarding, verification status, and practical learning roadmap.
-- `superpowers/` — Design specs and implementation plans (`specs/`, `plans/`).
+| Item | Description |
+|---|---|
+| `00_Introduction.md` | Introduces skeletal-motion augmentation and the framework’s motivation |
+| `01_Core_Principles.md` | Explains physical plausibility and task-level semantic constraints |
+| `04_Task_Specific_Profiles.md` | Explains how YAML profiles select and configure augmentations |
+| `05_Validation_Framework.md` | Describes checks for physical validity and task-level quality |
+| `06_Roadmap.md` | Current status (early stage) and the planned Phases 6 to 9 |
+| `07_Object_Aware_Constraints.md` | Planned (Phase 7): contact and penetration against objects, floor and scene |
+| `08_Differentiable_Losses_and_Violation_Report.md` | Planned (Phase 8): constraints as losses and as a per-frame, per-joint report |
+| `09_Plausibility_Metrics_and_Validation.md` | Planned (Phase 9): floor and object metrics, validation on recorded grasps |
+| `Augmentation_Validation_Proposal.md` | Claude-reviewed design for raw MediaPipe validation: missingness, per-part coverage, mathematical tests, compatibility inventory, and implementation gates |
+| `Augmentation_Grounding.md` | Research-grounded catalogue of meaning-preserving augmentations (tiers, invariant checks, ASL-LEX gating), the augmentation trials (2026-10-11, Tier 1 rework 2026-10-29), and recommended ranges from the 2026-11-02 tolerance report |
+| `augmentation-evidence/` | Source-level evidence notes behind `Augmentation_Grounding.md` (sign linguistics, SLR augmentation literature) and the tolerance report with its notes, each claim with URL and verification label |
+| `GLOSSARY.md` | Defines terminology used throughout the framework documentation |
+| `Mirror_Unsafe_Signs.md` | Which signs cannot be mirrored (absolute-direction glosses, HEART by caution), the blacklist, and a check of our 334 clips (all 39 glosses safe) |
+| `Week4_Decisions_and_Questions.md` | Brief week-4 decisions and open questions for the advisor (2026-11-11) |
+| `V1_Findings.md` | Presentation-ready summary of what V1 established: the result, findings, decisions, and open questions |
+| `V1_Problem_Scope.md` | Scopes the MediaPipe ↔ SMPL-X round-trip conversion task and its success criteria |
+| `V1_Review_Assessment.md` | Empirical test of the external V1 approach review: claim verdicts, missed errors, and recommended next steps (2026-10-05) |
+| `V1_2_Hand_Roundtrip_Plan.md` | Proposed V1.2 MediaPipe ↔ MANO/SMPL-X hand conversion plan, mapping, metrics, and implementation gates |
+| `V1_2_Assumptions.md` | V1.2 assumption ledger, dependency map, verification order, and failure traces |
+| `V1_2_Feasibility_Probes.md` | Measurements of the hand model assets and MediaPipe hand data taken before V1.2 implementation |
+| `V1_2_Implementation_Plan.md` | Task-by-task implementation plan for the V1.2 hand round-trip feasibility slice (P0–P3) |
+| `V1_2_Findings.md` | Measured V1.2 hand round-trip results, assumption status and next steps |
+| `V1_2_Implementation_Evidence.md` | Measurements taken while implementing V1.2 (synthetic gates, batch coupling, extraction determinism), kept with their provenance |
+| `V1_3_Face_Design.md` | Approved V1.3 design: SMPL-X neck, head and jaw from FaceLandmarker, signed hand-to-face distances with ASL-LEX regions, and the face stream |
+| `V1_3_Implementation_Plan.md` | Task-by-task plan for V1.3: face correspondence, head/neck/jaw fit, hand-to-face geometry, gate, face stream |
+| `V1_3_Findings.md` | Phase-A gate results for the V1.3 face fit: head pose, jaw, ear placement, hand-to-head distances, the depth-gap diagnostic, and the F1–F6 verdicts (2026-10-07) |
+| `V1_3_Training_Data_Audit.md` | Independent audit of face features for landmark-based recognition, including tests, geometry risks, research comparisons and proposed training gates (2026-10-11) |
+| `V1_3_Audit_Evidence.json` | Cache fingerprints, synthetic counterexamples and fresh fitting measurements supporting the training-data audit |
+| `V1_3_Face_Integration_Plan.md` | Implementation contract for reversible face attachment, quality masks, synchronized training samples and a masked facial classifier |
+| `V1_3_Face_Integration_Results.md` | Real-cache coverage, geometric and masking regressions, reproduction commands, and recognition-data limitations for the V1.3 integration |
+| `V1_3_Face_Integration_Evidence.json` | Compact machine-readable aggregate and per-clip evidence from the real-cache validation |
+| `V1_3_Head_Placement_Spike_08925.md` | One-clip spike: pose-only proximity, 11-point pose-face head placement, depth correction, and a roll traced to pose-world face points (2026-10-18) |
+| `O11_Frame_Alignment.md` | Cross-clip test of O11 (2026-10-18): pose-world vs image roll is ~1-2°, so no roll correction is needed; the pose-face Kabsch vs R_head gap comes from pose-world face distortion; pitch/yaw still open |
+| `Resume_Handoff.md` | Résumé-writing brief with Bemnet’s contributions, measured results, and source links |
+| `Week_2_Findings.md` | Round trip on 20 unseen clips, what its error is made of (systematic vs varying), and the agreed plan for metrics and smoothing (2026-10-07) |
+| `Hand_Pipeline_Variants.md` | The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29) |
+| `Augmentation_Ranges.md` | Proven against used range for every week-4 augmentation, the 25% rule, and the three week-4 profiles |
+| `augmentation-lab.md` | The Augmentation Lab: share mode and full mode, building the zip, and using saved settings |
+| `media/` | Images and placeholder assets referenced by documentation |
+| `research-guide/` | Source-grounded research onboarding, verification status, and practical learning roadmap |
+| `superpowers/` | Design specs and implementation plans (`specs/`, `plans/`) |
+| `legacy/` | **Legacy.** Outdated original architecture, catalogue and roadmap docs |
+| `index.md` | This index |

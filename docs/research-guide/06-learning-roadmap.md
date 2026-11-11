@@ -16,7 +16,7 @@ You already know the core ML loop: examples enter a model, a loss drives weight 
 | Data to model | Read [chapter 4](04-data-training-evaluation.md), especially virtual versions, padding, valid lengths and training/evaluation mode. | Draw a batch with two unequal clip lengths; identify when augmentation runs and which frames the model should use. |
 | Evidence and research scope | Read [chapter 5](05-project-status.md), then agree on a question with the mentor. | Write a one-page experiment specification: question, data/splits, baseline, transformation contract, metric, compute budget and success criterion. |
 
-The older [architecture](../02_Framework_Architecture.md), [augmentation catalogue](../03_Augmentation_Catalogue.md), [profiles](../04_Task_Specific_Profiles.md), [validation framework](../05_Validation_Framework.md) and [roadmap](../06_Development_Roadmap.md) explain design goals and historical vocabulary. Compare their claims with live source and chapter 5; they are not an alternative executable specification. The [original glossary](../GLOSSARY.md) is a useful broader reference.
+The older [architecture](../legacy/02_Framework_Architecture.md), [augmentation catalogue](../legacy/03_Augmentation_Catalogue.md), [profiles](../04_Task_Specific_Profiles.md), [validation framework](../05_Validation_Framework.md) and [roadmap](../legacy/06_Development_Roadmap.md) explain design goals and historical vocabulary. Compare their claims with live source and chapter 5; they are not an alternative executable specification. The [original glossary](../GLOSSARY.md) is a useful broader reference.
 
 ## Safe setup options
 
