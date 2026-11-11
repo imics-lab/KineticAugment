@@ -119,3 +119,26 @@ test('LiveSource.pane posts the request and decodes the blob; a 422 carries its 
     globalThis.fetch = saved;
   }
 });
+
+test('watchJob polls every interval until done or failed, reporting each status', async () => {
+  const states = [
+    { state: 'waiting', step: '', progress: 0, error: null },
+    { state: 'running', step: 'extracting landmarks', progress: 0.1, error: null },
+    { state: 'running', step: 'fitting', progress: 0.4, error: null },
+    { state: 'done', step: 'done', progress: 1, error: null },
+  ];
+  const waits = [];
+  const seen = [];
+  const src = { job: async (id) => { assert.equal(id, 'j1'); return states.shift(); } };
+  const done = await Lab.watchJob(src, 'j1', {
+    interval: 2000, onUpdate: (s) => seen.push(s.step || s.state), wait: async (ms) => { waits.push(ms); },
+  });
+  assert.equal(done.state, 'done');
+  assert.deepEqual(seen, ['waiting', 'extracting landmarks', 'fitting', 'done']);
+  assert.deepEqual(waits, [2000, 2000, 2000]);
+
+  const failing = { job: async () => ({ state: 'failed', step: 'fitting', progress: 0.4, error: 'no hands found' }) };
+  await assert.rejects(() => Lab.watchJob(failing, 'j2', { wait: async () => {} }), /no hands found/);
+  const gone = { job: async () => { const e = new Error('no such job'); e.status = 404; throw e; } };
+  await assert.rejects(() => Lab.watchJob(gone, 'j3', { wait: async () => {} }), /no such job/);
+});

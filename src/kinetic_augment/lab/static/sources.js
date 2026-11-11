@@ -2,6 +2,7 @@
 //   status(), schema(profile), profileText(profile), clips(), base(clipId), pane(request),
 //   frameUrl(clipId, i), saved(), savedText(name), save(name, text, overwrite),
 //   stops(entryId, knobKey) -> number[] | null, addVideo(file), job(jobId), isShare.
+// Lab.watchJob(source, jobId, {onUpdate, interval}) polls an add-video job until it ends.
 // LiveSource talks to the local server (kinetic-lab); ShareSource reads window.LAB_DATA and the
 // blobs that the share zip's data scripts add with Lab.addBlob(sha1, base64).
 // Classic script (no modules: they fail from file://); adds to window.Lab and module.exports.
@@ -217,6 +218,23 @@ if (!Lab.decodePane && typeof require !== 'undefined') require('./bundle.js');
 
   Lab.LiveSource = LiveSource;
   Lab.ShareSource = ShareSource;
+
+  // Polls source.job(jobId) every `interval` ms (2 s) until the job is done (resolves with its
+  // status) or failed (rejects with its error); onUpdate sees every status.
+  Lab.watchJob = function watchJob(source, jobId, opts) {
+    opts = opts || {};
+    var interval = opts.interval || 2000;
+    var wait = opts.wait || function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+    function poll() {
+      return source.job(jobId).then(function (s) {
+        if (opts.onUpdate) opts.onUpdate(s);
+        if (s.state === 'done') return s;
+        if (s.state === 'failed') throw new Error(s.error || 'the video could not be processed');
+        return wait(interval).then(poll);
+      });
+    }
+    return poll();
+  };
 
   // The source for this page: the server when the page came over http and /api/status answers,
   // else the shared data. Resolves to {source, status}.

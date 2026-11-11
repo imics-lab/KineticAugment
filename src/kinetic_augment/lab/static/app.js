@@ -15,6 +15,9 @@
 //   Lab.app.refreshPane(which) / refreshPanes(): newest request wins; an error keeps the last frames
 //   Lab.app.selectClip(id) / selectEntry(id) / reloadClips(selectId?) / reloadSaved()
 //   Lab.app.setStatus(text, kind) and Lab.app.mounts (the containers in index.html)
+//   Lab.app.knobPanel (the Lab.KnobPanel of the selected entry), buildSaved(name, which) ->
+//     Promise<{name, text, entries}>, loadSettings(text, which, label) -> message; the Save / Load
+//     forms under the saved list and the full-mode "＋ add video" flow are wired on 'ready'.
 // Settings live per pane and per entry, so switching clips or entries keeps them (spec §5.4, §9).
 // Classic script: adds Lab.app to window.Lab; it boots on DOMContentLoaded, so scripts loaded after
 // it can still subscribe first.
@@ -527,6 +530,253 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       app.setStatus('could not start the Lab: ' + (err && err.message ? err.message : err), 'error');
     });
   };
+
+  // ---- knob panel (knobs.js) --------------------------------------------------------------
+  function mountKnobs() {
+    var entry = app.entry();
+    if (app.knobPanel) { app.knobPanel.destroy(); app.knobPanel = null; }
+    if (!entry || !Lab.KnobPanel || !app.mounts.knobs) return;
+    app.knobPanel = new Lab.KnobPanel(app.mounts.knobs, entry, app.state, {
+      isShare: app.source.isShare,
+      stops: function (entryId, key) { return app.source.stops(entryId, key); },
+      rerolls: app.source.isShare ? ((app.source.data || {}).rerolls || 0) : 0,
+      onChange: function (which) { app.refreshPane(which); },
+    });
+  }
+  app.on('entry', function () { if (app.source) mountKnobs(); });
+  app.on('pane', function (e) {
+    if (app.knobPanel) app.knobPanel.paneResult(e.which, e.pane.meta, app.base ? app.base.meta.n : null);
+  });
+
+  // ---- save and load settings (yaml_edit.js; spec §5.7) -----------------------------------
+  // Python's saving.slugify: lowercase [a-z0-9_], other runs one '-', at most 60 characters.
+  function slugify(name) {
+    return String(name).toLowerCase().replace(/[^a-z0-9_]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '');
+  }
+  app.slugify = slugify;
+
+  function profileText() {
+    if (!app._profileText) {
+      app._profileText = app.source.profileText(app.state.profile).catch(function (err) {
+        app._profileText = null;
+        throw err;
+      });
+    }
+    return app._profileText;
+  }
+
+  function entryTitles(ids) {
+    return ids.map(function (id) { var e = app.entry(id); return e ? e.title : id; }).join(', ');
+  }
+
+  // The saved YAML for one pane: {name, text, entries} (throws when nothing was changed).
+  app.buildSaved = function (name, which) {
+    var slug = slugify(name);
+    if (!slug) return Promise.reject(new Error('the name needs at least one letter or digit'));
+    var got = Lab.savedEdits(app.schema, app.state.panes[which].perEntry);
+    if (!got.entries.length) {
+      return Promise.reject(new Error('pane ' + which + ' has no changed knobs yet: move a knob first'));
+    }
+    return profileText().then(function (base) {
+      return { name: slug, text: Lab.buildSavedYaml(base, got.edits, got.entries, { name: slug }), entries: got.entries };
+    });
+  };
+
+  function download(name, text) {
+    var url = URL.createObjectURL(new Blob([text], { type: 'application/x-yaml' }));
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  // Sets one pane's values from a profile's text: every lab entry the file turns on. The shared
+  // version snaps each value to its stops and keeps one knob off default per entry.
+  app.loadSettings = function (text, which, label) {
+    var data = Lab.parseYaml(text);
+    var got = Lab.valuesFromProfile(app.schema, data);
+    var ids = Object.keys(got);
+    var dropped = [];
+    ids.forEach(function (id) {
+      var values = got[id];
+      if (app.source.isShare) {
+        var entry = app.entry(id), K = Lab.knobMath, defaults = {}, kept = {};
+        entry.knobs.forEach(function (k) { defaults[k.key] = k.default; });
+        entry.knobs.forEach(function (k) {
+          if (!(k.key in values)) return;
+          var stops = k.share ? app.source.stops(id, k.key) : null;
+          if (!stops || Object.keys(kept).length) { dropped.push(k.technical); return; }
+          var v = K.snap(values[k.key], stops);
+          if (k.kind === 'range' && typeof v === 'number') v = K.rangeFromMarker(k, v);
+          kept = K.shareSet(kept, k.key, v, defaults).values;
+        });
+        values = kept;
+      }
+      var s = app.paneSettings(which, id);
+      s.values = values;
+      if (app.source.isShare) s.reroll = 0;
+    });
+    mountKnobs();
+    app.refreshPane(which);
+    var msg = ids.length
+      ? 'Loaded ' + label + ' into pane ' + which + ': ' + entryTitles(ids) + '.'
+      : label + ' turns on none of the Lab\'s augmentations; nothing changed.';
+    if (dropped.length) msg += ' Not in the shared version (live only, or one knob at a time): ' + dropped.join(', ') + '.';
+    return msg;
+  };
+
+  function paneRadios(name) {
+    return '<span class="pane-pick" role="radiogroup" aria-label="which pane">pane ' +
+      '<label class="tag-a"><input type="radio" name="' + name + '" value="A" checked> A</label> ' +
+      '<label class="tag-b"><input type="radio" name="' + name + '" value="B"> B</label></span>';
+  }
+
+  function buildSavedActions() {
+    var box = app.mounts.savedActions;
+    if (!box || !Lab.buildSavedYaml) return;
+    var share = app.source.isShare;
+    box.innerHTML =
+      '<div class="sa-buttons"><button type="button" data-sa="save">Save setting…</button>' +
+      '<button type="button" data-sa="load">Load setting…</button></div>' +
+      '<form class="sa-form" data-form="save" hidden>' +
+      '<label>Name <input name="name" required maxlength="60" placeholder="elbow-test" autocomplete="off"></label>' +
+      paneRadios('save-pane') +
+      '<p class="small sa-what"></p>' +
+      '<div class="sa-row"><button type="submit">' + (share ? 'Download .yaml' : 'Save') + '</button>' +
+      '<button type="button" data-sa="cancel">Cancel</button></div></form>' +
+      '<form class="sa-form" data-form="load" hidden>' +
+      (share ? '<label>File <input type="file" name="file" accept=".yaml,.yml,text/yaml"></label>'
+        : '<label>Setting <select name="name"></select></label>') +
+      paneRadios('load-pane') +
+      '<div class="sa-row"><button type="submit">Load</button><button type="button" data-sa="cancel">Cancel</button></div></form>' +
+      '<p class="small sa-msg" role="status" hidden></p>';
+    var saveForm = box.querySelector('[data-form=save]'), loadForm = box.querySelector('[data-form=load]');
+    var msg = box.querySelector('.sa-msg');
+    var say = function (html, kind) { msg.innerHTML = html; msg.hidden = !html; msg.className = 'small sa-msg' + (kind ? ' ' + kind : ''); };
+    var pane = function (form) { return form.querySelector('input[type=radio]:checked').value; };
+    var describe = function () {
+      var got = Lab.savedEdits(app.schema, app.state.panes[pane(saveForm)].perEntry);
+      saveForm.querySelector('.sa-what').textContent = got.entries.length
+        ? 'Saves the base profile with pane ' + pane(saveForm) + '\'s changes, each turned on: ' +
+          entryTitles(Object.keys(app.state.panes[pane(saveForm)].perEntry).filter(function (id) {
+            var s = app.state.panes[pane(saveForm)].perEntry[id];
+            return s.values && Object.keys(s.values).length;
+          })) + '.'
+        : 'Pane ' + pane(saveForm) + ' has no changed knobs yet.';
+    };
+    Array.prototype.forEach.call(saveForm.querySelectorAll('input[type=radio]'), function (r) { r.onchange = describe; });
+    box.querySelector('[data-sa=save]').onclick = function () {
+      loadForm.hidden = true;
+      saveForm.hidden = !saveForm.hidden;
+      say('');
+      if (!saveForm.hidden) { describe(); saveForm.querySelector('input[name=name]').focus(); }
+    };
+    box.querySelector('[data-sa=load]').onclick = function () {
+      saveForm.hidden = true;
+      say('');
+      if (!share) {
+        var sel = loadForm.querySelector('select');
+        sel.innerHTML = app.saved.map(function (s) { return '<option>' + esc(s.name) + '</option>'; }).join('');
+        if (!app.saved.length) { say('No saved settings yet.'); loadForm.hidden = true; return; }
+      }
+      loadForm.hidden = !loadForm.hidden;
+    };
+    Array.prototype.forEach.call(box.querySelectorAll('[data-sa=cancel]'), function (b) {
+      b.onclick = function () { saveForm.hidden = true; loadForm.hidden = true; say(''); };
+    });
+
+    var doSave = function (name, which, overwrite) {
+      return app.buildSaved(name, which).then(function (out) {
+        if (share) {
+          download(out.name + '.yaml', out.text);
+          say('Downloaded <code>' + esc(out.name) + '.yaml</code> (pane ' + which + ').');
+          saveForm.hidden = true;
+          return null;
+        }
+        return app.source.save(out.name, out.text, overwrite).then(function (res) {
+          saveForm.hidden = true;
+          say('Saved pane ' + which + ' to <code>configs/viewer_saved/' + esc(res.name) + '.yaml</code>.');
+          return app.reloadSaved();
+        }, function (err) {
+          if (err.status !== 409) throw err;
+          say('A saved setting called "' + esc(out.name) + '" already exists. Replace it? ' +
+            '<button type="button" data-sa="replace">Replace</button> <button type="button" data-sa="keep">Keep it</button>', 'warn');
+          msg.querySelector('[data-sa=replace]').onclick = function () { doSave(name, which, true); };
+          msg.querySelector('[data-sa=keep]').onclick = function () { say(''); };
+          return null;
+        });
+      }).catch(function (err) { say('Could not save: ' + esc(err.detail || err.message), 'error'); });
+    };
+    saveForm.onsubmit = function (ev) {
+      ev.preventDefault();
+      doSave(saveForm.querySelector('input[name=name]').value, pane(saveForm), false);
+    };
+    loadForm.onsubmit = function (ev) {
+      ev.preventDefault();
+      var which = pane(loadForm);
+      var read;
+      if (share) {
+        var file = loadForm.querySelector('input[type=file]').files[0];
+        if (!file) { say('Pick a .yaml file first.', 'error'); return; }
+        read = file.text().then(function (t) { return { text: t, label: file.name }; });
+      } else {
+        var name = loadForm.querySelector('select').value;
+        read = app.source.savedText(name).then(function (t) { return { text: t, label: '"' + name + '"' }; });
+      }
+      read.then(function (got) {
+        say(esc(app.loadSettings(got.text, which, got.label)));
+        loadForm.hidden = true;
+      }).catch(function (err) { say('Could not load: ' + esc(err.detail || err.message), 'error'); });
+    };
+  }
+
+  // ---- add a video (full mode only) -------------------------------------------------------
+  var STEP_WORDS = { '': 'starting', 'extracting landmarks': 'extracting landmarks', fitting: 'fitting the body',
+    'saving frames': 'saving frames', done: 'done' };
+
+  function buildAddVideo() {
+    var btn = app.mounts.addVideo, status = document.getElementById('add-video-status');
+    if (!btn || app.source.isShare || !app.source.addVideo) return;
+    btn.hidden = false;
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.mp4,.mov,.m4v,.avi,.webm'; // the server's VIDEO_SUFFIXES
+    input.hidden = true;
+    btn.parentNode.insertBefore(input, btn.nextSibling);
+    var show = function (text, kind) {
+      if (!status) return;
+      status.textContent = text;
+      status.className = 'small' + (kind ? ' ' + kind : '');
+    };
+    btn.onclick = function () { input.value = ''; input.click(); };
+    input.onchange = function () {
+      var file = input.files[0];
+      if (!file) return;
+      btn.disabled = true;
+      show('uploading ' + file.name + '…');
+      app.source.addVideo(file).then(function (job) {
+        return Lab.watchJob(app.source, job.job_id, {
+          onUpdate: function (s) {
+            var step = s.state === 'waiting' ? 'waiting' : STEP_WORDS[s.step] || s.step || s.state;
+            show(job.clip_id + ': ' + step + (s.state === 'running' ? ' (' + Math.round(100 * (s.progress || 0)) + '%)' : ''));
+          },
+        }).then(function () {
+          show(job.clip_id + ': done');
+          return app.reloadClips(job.clip_id);
+        });
+      }).catch(function (err) {
+        show('could not add the video: ' + (err.detail || err.message), 'error');
+      }).then(function () { btn.disabled = false; });
+    };
+  }
+
+  app.on('ready', function () {
+    buildSavedActions();
+    buildAddVideo();
+  });
 
   Lab.app = app;
   if (typeof document !== 'undefined') {

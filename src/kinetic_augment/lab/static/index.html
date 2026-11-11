@@ -16,7 +16,7 @@
       <section>
         <h2>Clips</h2>
         <div id="clip-list" class="list"></div>
-        <!-- full mode only; the add-video flow (Task 9) unhides and wires this button -->
+        <!-- full mode only: app.js unhides and wires this button -->
         <button id="add-video" class="item add" type="button" hidden>＋ add video</button>
         <div id="add-video-status" class="small"></div>
       </section>
@@ -72,5 +72,9 @@
   <script src="timeline.js"></script>
   <script src="panes.js"></script>
   <script src="app.js"></script>
+  <!-- app.js starts on DOMContentLoaded, so these still plug in before it is ready -->
+  <script src="yaml_edit.js"></script>
+  <script src="explain.js"></script>
+  <script src="knobs.js"></script>
 </body>
 </html>
