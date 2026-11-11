@@ -4,8 +4,7 @@ Unit tests for the body_model module.
 Tests cover:
 - Joint mapping between SMPL-X and MediaPipe
 - SMPL-X wrapper functionality (requires models)
-- MediaPipe to SMPL-X fitting (requires models)
-- SMPL-X to MediaPipe projection (requires models)
+- SMPLXParamsContainer (no models required)
 """
 
 import numpy as np
@@ -234,107 +233,6 @@ class TestSMPLXWrapper:
         # In rest pose, joints should be centered around origin
         center = joints.mean(axis=1)
         assert np.abs(center).max() < 1.0  # Should be near origin
-
-
-@pytest.mark.skipif(not SMPLX_AVAILABLE, reason="PyTorch/SMPL-X not installed")
-@pytest.mark.skipif(not MODELS_DOWNLOADED, reason="SMPL-X models not downloaded")
-class TestMediaPipeToSMPLX:
-    """Tests for mp_to_smplx.py - requires SMPL-X models."""
-
-    @pytest.fixture
-    def fitter(self):
-        """Create fitter for testing."""
-        from kinetic_augment.body_model.smplx_wrapper import SMPLXWrapper
-        from kinetic_augment.body_model.mp_to_smplx import MediaPipeToSMPLX
-
-        wrapper = SMPLXWrapper(model_path=MODEL_PATH, gender='neutral')
-        return MediaPipeToSMPLX(wrapper, num_iterations=10, verbose=False)
-
-    def test_fitter_initialization(self, fitter):
-        """Test fitter initializes correctly."""
-        assert fitter.smplx is not None
-        assert len(fitter.smplx_joint_indices) > 0
-
-    def test_fit_random_landmarks(self, fitter):
-        """Test fitting with random landmarks."""
-        # Generate random landmarks (543 landmarks, 3D)
-        landmarks = np.random.randn(543, 3).astype(np.float32) * 0.1
-
-        # Add some structure (put hips and shoulders in reasonable positions)
-        landmarks[11] = [0.0, 0.5, 0.0]   # left shoulder
-        landmarks[12] = [0.0, 0.5, 0.3]   # right shoulder
-        landmarks[23] = [0.0, 0.0, 0.0]   # left hip
-        landmarks[24] = [0.0, 0.0, 0.3]   # right hip
-
-        params = fitter.fit(landmarks)
-
-        assert 'body_pose' in params
-        assert 'global_orient' in params
-        assert params['body_pose'].shape == (63,)
-
-
-@pytest.mark.skipif(not SMPLX_AVAILABLE, reason="PyTorch/SMPL-X not installed")
-@pytest.mark.skipif(not MODELS_DOWNLOADED, reason="SMPL-X models not downloaded")
-class TestSMPLXToMediaPipe:
-    """Tests for smplx_to_mp.py - requires SMPL-X models."""
-
-    @pytest.fixture
-    def projector(self):
-        """Create projector for testing."""
-        from kinetic_augment.body_model.smplx_wrapper import SMPLXWrapper
-        from kinetic_augment.body_model.smplx_to_mp import SMPLXToMediaPipe
-
-        wrapper = SMPLXWrapper(model_path=MODEL_PATH, gender='neutral')
-        return SMPLXToMediaPipe(wrapper)
-
-    def test_projector_initialization(self, projector):
-        """Test projector initializes correctly."""
-        assert projector.smplx is not None
-
-    def test_project_default_pose(self, projector):
-        """Test projecting default SMPL-X pose."""
-        params = projector.smplx.get_default_params(batch_size=1)
-        landmarks = projector.project(params)
-
-        assert landmarks.shape == (1, 543, 3)
-
-    def test_project_pose_only(self, projector):
-        """Test projecting pose landmarks only."""
-        params = projector.smplx.get_default_params(batch_size=1)
-        landmarks = projector.project(params, return_full_frame=False)
-
-        assert landmarks.shape == (1, 33, 3)
-
-
-class TestSimpleFitter:
-    """Tests for SimpleFitter - no SMPL-X required."""
-
-    def test_simple_fitter_initialization(self):
-        """Test SimpleFitter can be created without SMPL-X."""
-        from kinetic_augment.body_model.mp_to_smplx import SimpleFitter
-        fitter = SimpleFitter()
-        assert fitter.mp_to_smplx is not None
-
-    def test_simple_fitter_fit(self):
-        """Test SimpleFitter produces valid output structure."""
-        from kinetic_augment.body_model.mp_to_smplx import SimpleFitter
-
-        fitter = SimpleFitter()
-
-        # Create mock landmarks
-        landmarks = np.random.randn(543, 3).astype(np.float32)
-        # Set reasonable positions for key landmarks
-        landmarks[11] = [0.0, 0.5, 0.0]   # left shoulder
-        landmarks[12] = [0.3, 0.5, 0.0]   # right shoulder
-        landmarks[23] = [0.0, 0.0, 0.0]   # left hip
-        landmarks[24] = [0.3, 0.0, 0.0]   # right hip
-
-        params = fitter.fit(landmarks)
-
-        assert 'body_pose' in params
-        assert 'global_orient' in params
-        assert 'betas' in params
-        assert params['body_pose'].shape == (1, 63)
 
 
 class TestSMPLXParamsContainer:

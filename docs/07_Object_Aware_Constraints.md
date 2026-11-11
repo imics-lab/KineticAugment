@@ -1,6 +1,6 @@
 # 07: Object-Aware Constraints
 
-**Status: planned (Phase 7 of the [roadmap](./06_Development_Roadmap.md)).** Nothing in this document is implemented yet.
+**Status: planned (Phase 7 of the [roadmap](./06_Roadmap.md)).** Nothing in this document is implemented yet.
 
 ## 1. Why
 

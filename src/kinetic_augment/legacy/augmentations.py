@@ -1,12 +1,11 @@
-# --- START OF FILE src/kinetic_augment/augmentations.py ---
 
 import numpy as np
 from scipy.spatial.transform import Rotation
 from scipy.interpolate import CubicSpline
 
 # Import project-specific utilities and mappings
-from .utils.data_formats import POSE_START, POSE_END, FACE_START, FACE_END, LH_START, LH_END, RH_START, RH_END
-from .utils.landmark_maps import POSE_FULL_MAP, FACE_FULL_MAP
+from ..utils.data_formats import POSE_START, POSE_END, FACE_START, FACE_END, LH_START, LH_END, RH_START, RH_END
+from ..utils.landmark_maps import POSE_FULL_MAP, FACE_FULL_MAP
 
 # --- Implemented Augmentations ---
 

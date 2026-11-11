@@ -10,7 +10,7 @@ This script tests the body model module by:
 5. Generating visualization and statistics
 
 Usage:
-    python scripts/test_phase1.py --video-dir data/sign_videos --output-dir data/test_output
+    python scripts/legacy/phase1_smoke.py --video-dir data/sign_videos --output-dir data/test_output
 """
 
 import argparse
@@ -31,7 +31,7 @@ import cv2
 import numpy as np
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
 
 # MediaPipe imports
 try:
@@ -297,7 +297,7 @@ def test_body_model_conversion(landmarks: np.ndarray) -> dict:
     print("=" * 60)
 
     results = {
-        'simple_fitter': None,
+        'fitter': None,
         'smplx_available': False,
         'round_trip_error': None,
     }
@@ -305,7 +305,7 @@ def test_body_model_conversion(landmarks: np.ndarray) -> dict:
     # Test SMPLXWrapper (requires models)
     print("\n2. Testing SMPL-X integration...")
     # Note: smplx.create() expects the parent directory containing 'smplx/' folder
-    model_path = Path(__file__).parent.parent / 'models'
+    model_path = Path(__file__).resolve().parents[2] / 'models'
     smplx_model_dir = model_path / 'smplx'
 
 
@@ -316,12 +316,12 @@ def test_body_model_conversion(landmarks: np.ndarray) -> dict:
 
     try:
         from kinetic_augment.body_model.smplx_wrapper import SMPLXWrapper
-        from kinetic_augment.body_model.mp_to_smplx import MediaPipeToSMPLX
-        from kinetic_augment.body_model.smplx_to_mp import SMPLXToMediaPipe
+        from kinetic_augment.legacy.mp_to_smplx import MediaPipeToSMPLX
+        from kinetic_augment.legacy.smplx_to_mp import SMPLXToMediaPipe
 
         print("   Loading SMPL-X model...")
         wrapper = SMPLXWrapper(
-            model_path=Path(__file__).parent.parent / "models",
+            model_path=Path(__file__).resolve().parents[2] / "models",
             gender="neutral",
             use_pca=False,
         )
@@ -346,7 +346,7 @@ def test_body_model_conversion(landmarks: np.ndarray) -> dict:
         batch_params = {k: v[np.newaxis, ...] if v.ndim == 1 else v
                        for k, v in smplx_params.items() if not k.startswith('_')}
 
-        reconstructed = projector.project(batch_params, return_full_frame=False)
+        reconstructed = projector.project(batch_params, target_mp=test_frame[np.newaxis], return_full_frame=False)
         print(f"   ✓ Projection completed")
         print(f"     - Output shape: {reconstructed.shape}")
 
@@ -621,7 +621,7 @@ def main():
         print(f"   - {stats['video']}: {stats['frames']} frames, {det_rate:.1f}% detection")
 
     print("\n3. Body Model Conversion:")
-    print(f"   - SimpleFitter: {conversion_results['simple_fitter']}")
+    print(f"   - MediaPipeToSMPLX fitter: {conversion_results['fitter']}")
     print(f"   - SMPL-X available: {conversion_results['smplx_available']}")
     if conversion_results['round_trip_error'] is not None:
         print(f"   - Round-trip error: {conversion_results['round_trip_error']:.4f}")

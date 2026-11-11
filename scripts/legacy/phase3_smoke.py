@@ -11,7 +11,7 @@ Tests the PyBullet collision detection system:
 6. End-to-end test with SMPL-X
 
 Usage:
-    CUDA_VISIBLE_DEVICES="" python scripts/test_phase3.py
+    CUDA_VISIBLE_DEVICES="" python scripts/legacy/phase3_smoke.py
 """
 
 import os
@@ -24,7 +24,7 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 import numpy as np
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
 
 
 def test_body_parts():
@@ -465,7 +465,7 @@ def test_end_to_end_smplx():
         from kinetic_augment.constraints import ConstraintEngine
         from kinetic_augment.constraints.collision import CollisionConstraint
 
-        model_path = Path(__file__).parent.parent / 'models'
+        model_path = Path(__file__).resolve().parents[2] / 'models'
         if not (model_path / 'smplx').exists():
             print("  SMPL-X models not found, skipping end-to-end test")
             return True

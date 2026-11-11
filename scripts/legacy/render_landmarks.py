@@ -17,7 +17,8 @@ os.environ["QT_QPA_PLATFORM"] = "offscreen"
 import cv2
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "src"))
 
 import mediapipe as mp
 from mediapipe.framework.formats import landmark_pb2
@@ -121,8 +122,8 @@ def render_overlay(original, roundtrip, out_path, fps):
 
 
 def reconstruct_sequence(landmarks, wrapper):
-    from kinetic_augment.body_model.mp_to_smplx import MediaPipeToSMPLX
-    from kinetic_augment.body_model.smplx_to_mp import SMPLXToMediaPipe
+    from kinetic_augment.legacy.mp_to_smplx import MediaPipeToSMPLX
+    from kinetic_augment.legacy.smplx_to_mp import SMPLXToMediaPipe
 
     fitter    = MediaPipeToSMPLX()
     projector = SMPLXToMediaPipe(wrapper)
@@ -167,7 +168,7 @@ def process_video(path, out_dir):
 
     from kinetic_augment.body_model.smplx_wrapper import SMPLXWrapper
     wrapper = SMPLXWrapper(
-        model_path=Path(__file__).parent.parent / "models",
+        model_path=REPO_ROOT / "models",
         gender="neutral",
         use_pca=False,
     )
@@ -179,8 +180,8 @@ def process_video(path, out_dir):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--video-dir",  type=Path, default="../data/sign_videos")
-    parser.add_argument("--output-dir", type=Path, default="../data/test_output/videos")
+    parser.add_argument("--video-dir",  type=Path, default=REPO_ROOT / "data" / "sign_videos")
+    parser.add_argument("--output-dir", type=Path, default=REPO_ROOT / "data" / "test_output" / "videos")
     args = parser.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
 

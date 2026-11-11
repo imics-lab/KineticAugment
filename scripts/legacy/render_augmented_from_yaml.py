@@ -14,7 +14,7 @@ Each output video overlays:
 
 This file is intentionally self-contained for YAML loading and
 augmentation/render orchestration, so it does not depend on
-kinetic_augment.augmentations.py.
+kinetic_augment.legacy.augmentations.
 """
 
 import argparse
@@ -35,8 +35,8 @@ from scipy.interpolate import CubicSpline
 from scipy.spatial.transform import Rotation
 
 # Make project src importable.
-THIS_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(THIS_DIR.parent / "src"))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from kinetic_augment.utils.data_formats import (  # noqa: E402
     FACE_START,
@@ -388,9 +388,9 @@ def process_video(path: Path, out_dir: Path, config_path: Path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--video-dir", type=Path, default="../data/sign_videos")
-    parser.add_argument("--output-dir", type=Path, default="../data/test_output/videos")
-    parser.add_argument("--aug-config", type=Path, default="../data/augments.yaml", help="Path to YAML config.")
+    parser.add_argument("--video-dir", type=Path, default=REPO_ROOT / "data" / "sign_videos")
+    parser.add_argument("--output-dir", type=Path, default=REPO_ROOT / "data" / "test_output" / "videos")
+    parser.add_argument("--aug-config", type=Path, default=REPO_ROOT / "configs" / "legacy" / "augments.yaml", help="Path to YAML config.")
     parser.add_argument("--num_videos", type=int, default=1, help="Number of videos to process")
     args = parser.parse_args()
 

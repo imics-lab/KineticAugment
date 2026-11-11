@@ -26,10 +26,10 @@ Please provide a code snippet showing how you imagine this new feature would be 
 ```python
 # A conceptual code example of how the new feature might work.
 # For example:
-# from kinetic_augment import ...
+# from kinetic_augment import Pipeline
 #
 # # Show how the new augmentation or configuration would be called
-# pipeline = AugmentationPipeline(new_feature_parameter=True)
+# pipeline = Pipeline.from_preset("moderate")  # or Pipeline.from_yaml(...)
 # augmented_motion = pipeline.apply_new_augmentation(motion_data, strength=0.5)
 ```
 

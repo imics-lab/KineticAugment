@@ -1,4 +1,3 @@
-# --- START OF FILE src/kinetic_augment/utils/landmark_maps.py ---
 
 import numpy as np
 from .data_formats import POSE_START, POSE_END, FACE_START, FACE_END, LH_START, LH_END, RH_START, RH_END

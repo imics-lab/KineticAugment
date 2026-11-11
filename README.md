@@ -4,7 +4,9 @@
   <img src="docs/media/banner.png" alt="KineticAugment Banner" width="70%">
 </p>
 
-**KineticAugment** is a production-ready, general framework for augmenting human motion data while preserving anatomical and semantic plausibility. It is designed for researchers and engineers working on any task that learns from body, hand, or face motion (human activity and action recognition, gesture and sign language recognition, rehabilitation and sports analysis, human-robot interaction, motion generation) who need to increase dataset size without introducing unrealistic or label-altering artifacts.
+**KineticAugment** is a general framework for augmenting human motion data while preserving anatomical and semantic plausibility. It is designed for researchers and engineers working on any task that learns from body, hand, or face motion (human activity and action recognition, gesture and sign language recognition, rehabilitation and sports analysis, human-robot interaction, motion generation) who need to increase dataset size without introducing unrealistic or label-altering artifacts.
+
+> **Status:** KineticAugment is at an early stage of development. The API may change, and much of the validation so far comes from one application, sign language. See the [roadmap](./docs/06_Roadmap.md) for what exists and what is planned.
 
 Traditional data augmentation techniques often fail on skeletal time-series data, creating impossible poses and unnatural movements. KineticAugment solves this by treating the human body as a structured kinematic system, governed by a set of core biomechanical and contextual principles.
 
@@ -53,11 +55,9 @@ The complete documentation provides the theory, architecture, and practical guid
 
 *   **[00 - Introduction](./docs/00_Introduction.md)**: Why KineticAugment? The problem with naive augmentation.
 *   **[01 - Core Principles](./docs/01_Core_Principles.md)**: A deep dive into the 6 pillars that govern the framework.
-*   **[02 - Framework Architecture](./docs/02_Framework_Architecture.md)**: The layered model: Core Engine, Constraint System, and Task Profiles.
-*   **[03 - The Augmentation Catalogue](./docs/03_Augmentation_Catalogue.md)**: A comprehensive list of available augmentation techniques.
-*   **[04 - Task-Specific Profiles](./docs/04_Task_Specific_Profiles.md)**: How to tailor augmentations for your specific application.
+*   **[04 - Task-Specific Profiles](./docs/04_Task_Specific_Profiles.md)**: How to tailor augmentations for your specific application (operation names there are conceptual; the registered names are in [Available Augmentations](#available-augmentations)).
 *   **[05 - The Validation Framework](./docs/05_Validation_Framework.md)**: Ensuring the quality and validity of generated data.
-*   **[06 - Development Roadmap](./docs/06_Development_Roadmap.md)**: What is built and what is planned.
+*   **[06 - Roadmap](./docs/06_Roadmap.md)**: Where the framework stands (early stage) and the planned Phases 6 to 9.
 *   **[07 - Object-Aware Constraints](./docs/07_Object_Aware_Constraints.md)** (planned): Contact and penetration against object meshes, the floor, and the scene.
 *   **[08 - Differentiable Losses and the Violation Report](./docs/08_Differentiable_Losses_and_Violation_Report.md)** (planned): The constraints as losses and as a per-frame, per-joint report.
 *   **[09 - Plausibility Metrics and Validation](./docs/09_Plausibility_Metrics_and_Validation.md)** (planned): Floor and object metrics, and validation on recorded grasps.
@@ -72,16 +72,25 @@ These documents record the first application of the framework. They are specific
 *   **[V1.2 Findings](./docs/V1_2_Findings.md)**: Hands, from MediaPipe to MANO and back.
 *   **[V1.3 Face Design](./docs/V1_3_Face_Design.md)**, **[V1.3 Findings](./docs/V1_3_Findings.md)**, and **[V1.3 Face Integration Results](./docs/V1_3_Face_Integration_Results.md)**: Head pose, jaw, hand-to-face geometry, and the face stream.
 *   **[Augmentation Grounding](./docs/Augmentation_Grounding.md)**: Which augmentations preserve the meaning of a sign, and the evidence for each.
+*   Augmentation evidence: **[linguistics](./docs/augmentation-evidence/linguistics.md)** and **[sign-language augmentation literature](./docs/augmentation-evidence/slr_augmentation.md)**
+
+### Legacy
+
+Kept for history; each file opens with a note on what replaces it.
+
+*   **[02 - Framework Architecture](./docs/legacy/02_Framework_Architecture.md)**
+*   **[03 - The Augmentation Catalogue](./docs/legacy/03_Augmentation_Catalogue.md)**
+*   **[06 - Development Roadmap](./docs/legacy/06_Development_Roadmap.md)**: The original plan, replaced by [06 - Roadmap](./docs/06_Roadmap.md).
 
 ## Roadmap: from the body alone to the body with objects
 
-The next phases extend the constraint system beyond the body itself: hands against object meshes, feet against the floor, and the same constraints offered as differentiable losses and as a dense violation report. This makes the framework usable for augmenting motion that involves objects and for checking and repairing motion produced by generative models. The companion project [KineticSynth](https://github.com/imics-lab/KineticSynth) builds on these extensions. See the [roadmap](./docs/06_Development_Roadmap.md) and documents 07 to 09.
+The next phases extend the constraint system beyond the body itself: hands against object meshes, feet against the floor, and the same constraints offered as differentiable losses and as a dense violation report. This makes the framework usable for augmenting motion that involves objects and for checking and repairing motion produced by generative models. The companion project [KineticSynth](https://github.com/imics-lab/KineticSynth) builds on these extensions. See the [roadmap](./docs/06_Roadmap.md) and documents 07 to 09.
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/KineticAugment.git
+git clone https://github.com/imics-lab/KineticAugment.git
 cd KineticAugment
 
 # Create conda environment
@@ -114,12 +123,14 @@ augmented_motion = pipeline.process(landmarks)
 ```python
 from kinetic_augment import Pipeline
 
-# Load from YAML config file
+# Load from YAML config file (operation names must be registered ones, see "Available Augmentations")
 pipeline = Pipeline.from_yaml('configs/slr_profile.yaml')
 
 # Process with constraint enforcement
 augmented = pipeline.process(landmarks, enforce_constraints=True)
 ```
+
+`configs/legacy/` holds configs for the deprecated `AugmentationPipeline` (in `src/kinetic_augment/legacy/`). They use a different format and do not load with `Pipeline.from_yaml`.
 
 ### PyTorch Dataset Integration
 
@@ -190,14 +201,18 @@ report.save('results/', formats=['txt', 'csv', 'md'])
 ```
 KineticAugment/
 ├── src/kinetic_augment/
-│   ├── body_model/          # SMPL-X integration & joint mapping
-│   ├── augmentations/       # Extrinsic, intrinsic, temporal transforms
+│   ├── body_model/          # MediaPipe <-> SMPL-X conversion: body, hands, face; SMPL-X wrapper
+│   ├── augmentations/       # Registered extrinsic, intrinsic, temporal transforms; tier1.py (Tier 1, not registered)
 │   ├── constraints/         # Joint limits, velocity, collision detection
 │   ├── pipeline/            # Unified pipeline & PyTorch datasets
-│   └── evaluation/          # Metrics, datasets, models, benchmarks
-├── configs/                 # YAML configuration files
-├── scripts/                 # Test and utility scripts
-├── docs/                    # Documentation
+│   ├── evaluation/          # Metrics, datasets, models, benchmarks
+│   └── legacy/              # Deprecated: AugmentationPipeline, old converters, canonicalization
+├── configs/                 # YAML configs for Pipeline.from_yaml
+│   └── legacy/              # Configs for the deprecated AugmentationPipeline
+├── scripts/                 # Extraction, fitting, evaluation and demo scripts
+│   └── legacy/              # Print-based phase smoke scripts and old renderers
+├── tests/                   # pytest suite
+├── docs/                    # Documentation (docs/legacy/: out-of-date design docs)
 ├── demo/round_trip/         # Round-trip web viewer (exported data not in git)
 └── models/                  # SMPL-X models (not in git)
 ```
@@ -231,11 +246,17 @@ problems.
 
 ## Available Augmentations
 
+These are the operations registered in `AugmentationRegistry`, usable from `Pipeline`, presets and YAML configs:
+
 | Category | Augmentations |
 |----------|---------------|
-| **Extrinsic** | GlobalRotation, GlobalScaling, GlobalTranslation, PoseFlipping, GaussianNoise, JointDropout |
-| **Intrinsic** | JointAnglePerturbation, HandPosePerturbation, BodyShapeVariation |
-| **Temporal** | TimeWarping, TemporalCrop, SpeedPerturbation, FrameDropout, TrajectoryJittering, MotionSmoothing |
+| **Extrinsic** (landmark mode) | GlobalRotation, GlobalScaling, PoseFlipping, TrajectoryJittering, GaussianNoise |
+| **Intrinsic** (SMPL-X mode) | JointAnglePerturbation, HandPosePerturbation, JointCoupledNoise, GlobalOrientPerturbation |
+| **Temporal** | TimeWarping, SpeedVariation, FrameDropping |
+
+### Tier 1 augmentations
+
+`src/kinetic_augment/augmentations/tier1.py` holds a separate, evidence-based set that is safe for every sign: mirror, view change (yaw and pitch), duration scaling, small arm-joint perturbations, scene scaling, and un-centring. Each parameter is drawn once per clip. They act on the fitted SMPL-X body and on MediaPipe-format landmarks. They are used by `scripts/augment_trials.py` and the [round-trip viewer](#round-trip-viewer), and the design and ranges are in [Augmentation Grounding](./docs/Augmentation_Grounding.md). **Tier 1 is not part of the registry or `Pipeline`**: you cannot name it in a preset or YAML config.
 
 ## Evaluation Metrics
 
@@ -249,13 +270,16 @@ problems.
 ## Testing
 
 ```bash
-# Run all phase tests
-CUDA_VISIBLE_DEVICES="" python scripts/test_phase1.py  # SMPL-X integration
-CUDA_VISIBLE_DEVICES="" python scripts/test_phase2.py  # Augmentations
-CUDA_VISIBLE_DEVICES="" python scripts/test_phase3.py  # Collision detection
-CUDA_VISIBLE_DEVICES="" python scripts/test_phase4.py  # Pipeline
-CUDA_VISIBLE_DEVICES="" python scripts/test_phase5.py  # Evaluation
+pip install -e '.[dev]'
+pytest tests/
 ```
+
+The older print-based smoke scripts for the first library phases live in `scripts/legacy/phaseN_smoke.py` (N = 1 to 5: SMPL-X integration, augmentations, collision detection, pipeline, evaluation). They are not collected by pytest. Run one with, for example, `CUDA_VISIBLE_DEVICES="" python scripts/legacy/phase4_smoke.py`.
+
+## Known Limitations
+
+- **Constraint enforcement only acts in `mode='smplx'`.** In `mode='landmark'`, `process(..., enforce_constraints=True)` is a no-op (a TODO in `pipeline/pipeline.py`).
+- **`BenchmarkRunner` quality metrics use synthetic random-walk data**, not real clips. Treat its numbers as a smoke test of the metric code, not as evidence about your dataset.
 
 ## Contributing
 

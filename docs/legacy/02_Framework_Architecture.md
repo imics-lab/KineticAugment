@@ -1,6 +1,9 @@
+> **Legacy:** This describes the original four-layer design (Core Engine, Constraint System, Task Profiles) as first planned. It is out of date: the API it sketches (e.g. a `rotate_joint()`-style interface) was never built.
+> For the current API see the [README](../../README.md); for the body model see [V1_Problem_Scope](../V1_Problem_Scope.md) and the `V1_*_Findings` logs.
+
 # 02: Framework Architecture
 
-To effectively implement the [Core Principles](./01_Core_Principles.md), KineticAugment is designed with a modular, layered architecture. This design separates the fundamental transformation operations from the rules that govern them, making the framework flexible, extensible, and easy to configure.
+To effectively implement the [Core Principles](../01_Core_Principles.md), KineticAugment is designed with a modular, layered architecture. This design separates the fundamental transformation operations from the rules that govern them, making the framework flexible, extensible, and easy to configure.
 
 The architecture consists of four main layers:
 1.  **The Core Augmentation Engine** (The "Muscle")
@@ -63,7 +66,7 @@ This layer provides the "verbs" of our augmentation language (e.g., "rotate", "s
 
 ### Layer 2: The Constraint System
 
-The **Constraint System** is the intelligent layer that enforces the [Core Principles](./01_Core_Principles.md). It acts as a smart wrapper or gatekeeper around the Core Engine.
+The **Constraint System** is the intelligent layer that enforces the [Core Principles](../01_Core_Principles.md). It acts as a smart wrapper or gatekeeper around the Core Engine.
 
 *   **Role:** To ensure every transformation is physically, kinematically, and temporally valid.
 *   **Characteristics:**
@@ -77,8 +80,8 @@ The **Constraint System** is the intelligent layer that enforces the [Core Princ
 This layer provides the "rules" of our augmentation language, turning a potentially chaotic process into a controlled one.
 
 *   **Planned extensions:**
-    *   **Objects, floor, and scene:** penetration and contact against object meshes ([07 - Object-Aware Constraints](./07_Object_Aware_Constraints.md)).
-    *   **Losses and a dense report:** every constraint also offered as a differentiable loss and as a per-frame, per-joint violation report, so that the rules can be used outside the augmentation pipeline, for example to train or to check a generative model ([08 - Differentiable Losses and the Violation Report](./08_Differentiable_Losses_and_Violation_Report.md)).
+    *   **Objects, floor, and scene:** penetration and contact against object meshes ([07 - Object-Aware Constraints](../07_Object_Aware_Constraints.md)).
+    *   **Losses and a dense report:** every constraint also offered as a differentiable loss and as a per-frame, per-joint violation report, so that the rules can be used outside the augmentation pipeline, for example to train or to check a generative model ([08 - Differentiable Losses and the Violation Report](../08_Differentiable_Losses_and_Violation_Report.md)).
 
 ### Layer 3: Task-Specific Profiles
 
