@@ -67,6 +67,8 @@ lab = [
     "fastapi>=0.110",
     "uvicorn>=0.27",
     "python-multipart>=0.0.9",
+    "trimesh>=3.10.0",
+    "fast-simplification>=0.1.7",
 ]
 # Development dependencies
 dev = [
