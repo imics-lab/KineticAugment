@@ -38,7 +38,8 @@ def ingest_video(video: Path, clip_id: str, store, models, progress: Progress) -
     with tempfile.TemporaryDirectory(prefix="kinetic_lab_") as tmp:
         work = Path(tmp)
         progress("extracting landmarks", 0.0)
-        hands, face = demo.extract(video, work, True)
+        face_model = Path(models.model_dir) / "mediapipe" / "face_landmarker.task"
+        hands, face = demo.extract(video, work, True, face_model=face_model)
         progress("fitting", 0.4)
         result, _recon = demo.run_with_mano(hands, face, models)
         progress("saving frames", 0.8)
@@ -72,6 +73,9 @@ class JobQueue:
     def submit(self, video: Path, clip_id: str) -> str:
         job_id = uuid.uuid4().hex
         with self._lock:
+            for other in self._jobs.values():
+                if other["clip_id"] == clip_id and other["state"] in ("waiting", "running"):
+                    raise ValueError(f"clip {clip_id!r} is already being ingested")
             self._jobs[job_id] = {
                 "video": Path(video),
                 "clip_id": clip_id,

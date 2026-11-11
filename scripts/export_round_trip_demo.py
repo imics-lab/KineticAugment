@@ -211,7 +211,7 @@ def face_residuals_mm(blue, green, corr, weights, hidden):
     return rms(used), rms(other)
 
 
-def extract(video: Path, cache: Path, reextract: bool):
+def extract(video: Path, cache: Path, reextract: bool, face_model: Path = None):
     """MediaPipe hands + pose and face mesh for one clip, cached in `cache`."""
     from extract_face_landmarks import extract_face
     from extract_hand_landmarks import HANDS_SETTINGS, HOLISTIC_SETTINGS, extract_hands
@@ -227,7 +227,7 @@ def extract(video: Path, cache: Path, reextract: bool):
         clip.meta = {"source": video.name, "mediapipe": mp.__version__}
         save_hand_clip(hands_path, clip)
     if reextract or not face_path.exists():
-        clip = extract_face(video)
+        clip = extract_face(video) if face_model is None else extract_face(video, face_model)
         clip.meta = {"source": video.name, "mediapipe": mp.__version__}
         save_face_clip(face_path, clip)
     return load_hand_clip(hands_path), load_face_clip(face_path)
