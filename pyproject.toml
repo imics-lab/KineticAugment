@@ -87,7 +87,7 @@ kinetic-augment = "kinetic_augment.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-kinetic_augment = ["py.typed"]
+kinetic_augment = ["py.typed", "lab/knobs.yaml", "lab/static/**/*"]
 
 [tool.black]
 line-length = 100
