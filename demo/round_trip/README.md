@@ -54,6 +54,39 @@ source frame is beside it. A duration change re-times the clip, so the transport
 the augmented frames and each shows the source frame it comes from. The URL keeps the clip,
 augmentation and frame (`augment.html#clip=20983&a=combined&f=45`). The same keys play and step.
 
+The same menu lists the week-4 augmentations ([Augmentation_Ranges.md](../../docs/Augmentation_Ranges.md)),
+grouped by region: body (arm joint noise, limb length, movement size, location jitter), fingers
+(finger joint noise, handshape jitter), face (expression jitter), temporal (time warp uniform,
+varied and segment; frame drop rate and random; hand dropout), scene (the week-4 mirror, view,
+scale and uncentre), and the default, ambitious and literature profiles whole. Each entry runs
+alone from `configs/slr_week4_ambitious.yaml` at that profile's ranges. Two runs force a draw that
+shows, and the page says so: the mirror always mirrors, and hand dropout uses the top of its
+start-rate range. The box at the top gives the proven range from the literature beside the range
+used, and the readout lists the draws, the measures of `kinetic_augment.augmentations.report` and
+any fallback. Week-4 runs are compared with the week-4 original (`w4.base`): the same round trip
+with the observed face carried on the head, where the Tier 1 original has the face read back off
+the mesh. The **hands** and **face** buttons move the shared camera close, for the finger and
+expression changes, which are a few degrees or millimetres.
+
+### All-augmentations page
+
+`all.html` (the **all augmentations** link) shows every exported augmentation of the clip at once,
+one panel each, beside the source frame and the original. Each panel draws the original in blue
+and the augmentation in orange, and all panels share one camera: drag any of them to orbit, use
+the **front**, **side**, **hands** and **face** buttons and ＋/－ to zoom. The checkboxes hide groups
+of panels (Tier 1, each week-4 region, the whole profiles) and the original, meshes or points. A
+panel's title opens it on the augmentations page.
+
+The **clock** setting picks how the panels line up in time:
+
+- **playback** (default): every panel plays its own frames at the clip's frame rate, so a time
+  warp runs ahead of or behind the original, and frame dropping makes the clip shorter and faster.
+  A shorter clip holds its last frame, marked "ended".
+- **source time**: every panel shows its frame nearest the current source frame, so the poses line
+  up and only the non-temporal changes show.
+
+The URL keeps the clip, clock and frame (`all.html#clip=57949&clock=play&f=20`).
+
 The page is plain HTML and JavaScript with no build step. It loads three.js from the jsDelivr CDN,
 so the viewing device needs an internet connection.
 
@@ -99,24 +132,25 @@ python scripts/export_round_trip_demo.py --clips 20983 --video-dir path/to/video
 ```
 
 This runs MediaPipe on the video, fits SMPL-X to every frame, exports the four smoothing settings
-and then the seven Tier 1 augmentations. It takes about one to two minutes on a laptop CPU (68 s for
+then the seven Tier 1 augmentations and the 20 week-4 runs. It takes about one to two minutes on a laptop CPU (68 s for
 a 41-frame clip), most of it the four SMPL-X fits; adding `--smoothing off` exports only the
 unsmoothed setting, in about a quarter of the time. It prints one line per smoothing setting (`off`,
 `gauss1`, `gauss2`, `oneeuro`), one line per augmentation (`aug view`, …, `aug combined`), then
-`augmentations done`. It writes `demo/round_trip/clips/20983/` and updates
+`augmentations done`, then one line per week-4 run (`w4 w4.base`, `w4 body.joint_coupled_noise`,
+…, `w4 combined.literature`) and `week-4 augmentations done`, about 10 s in all. It writes `demo/round_trip/clips/20983/` and updates
 `demo/round_trip/clips.json`; re-running it overwrites that clip.
 
 Check what was exported:
 
 ```bash
-python -c "import json; c = json.load(open('demo/round_trip/clips.json'))['clips']['20983']; print('smoothing:', sorted(c['variants'])); print('augmentations:', sorted(c.get('augmentations', {})))"
+python -c "import json; c = json.load(open('demo/round_trip/clips.json'))['clips']['20983']; print('smoothing:', sorted(c['variants'])); print('augmentations:', len(c.get('augmentations', {})))"
 ```
 
 Expected output:
 
 ```text
 smoothing: ['gauss1', 'gauss2', 'off', 'oneeuro']
-augmentations: ['arm_joints', 'combined', 'duration', 'mirror', 'scale', 'uncentre', 'view']
+augmentations: 28
 ```
 
 ### 3. Serve the pages
@@ -141,10 +175,12 @@ such as 8777, in both commands and in the addresses below.
 | --- | --- | --- |
 | Round trip | <http://localhost:8765/#clip=20983> | the source video, MediaPipe's extraction, extraction vs round trip, the fitted SMPL-X body, error strips |
 | Augmentations | <http://localhost:8765/augment.html#clip=20983&a=combined> | what the augmentation changes, then the original, both one over the other, and the augmented body |
+| All augmentations | <http://localhost:8765/all.html#clip=20983> | every augmentation at once, one panel each, playing together |
 
-On the augmentations page, the **augmentation** menu picks one of the seven (`a=` in the address:
-`view`, `mirror`, `duration`, `arm_joints`, `scale`, `uncentre`, `combined`). The links at the top
-of each page switch between the two. Space plays and pauses; ← and → step one frame.
+On the augmentations page, the **augmentation** menu picks one of the seven Tier 1 augmentations
+(`a=` in the address: `view`, `mirror`, `duration`, `arm_joints`, `scale`, `uncentre`, `combined`)
+or one of the week-4 runs (`a=body.limb_length_scaling`, `a=temporal.time_warp.varied`,
+`a=combined.ambitious`, …). The links at the top of each page switch between the three. Space plays and pauses; ← and → step one frame.
 
 ### If something goes wrong
 
@@ -230,6 +266,8 @@ This route runs the full pipeline, so it needs the project installed and the lic
 
    # only some augmentations, or none; another of the clip's draws (0 is its own)
    python scripts/export_round_trip_demo.py --clips 20983 --augment view mirror --video-dir path/to/videos
+   python scripts/export_round_trip_demo.py --clips 20983 --week4 body.movement_size combined.default --video-dir path/to/videos
+   python scripts/export_round_trip_demo.py --clips 20983 --week4 --video-dir path/to/videos  # no week-4 runs
    python scripts/export_round_trip_demo.py --clips 20983 --augment --video-dir path/to/videos
    python scripts/export_round_trip_demo.py --clips 20983 --aug-draw 3 --video-dir path/to/videos
    ```
@@ -264,7 +302,8 @@ tar -czf round_trip_demo.tar.gz -C demo round_trip
 ```
 
 Expect about 30 MB per clip with all four smoothing settings, plus about 40 MB for the seven
-augmentations, so the 50-clip review set is about 3.5 GB. Exporting fewer settings (`--smoothing off gauss1`) makes the bundle proportionally
+Tier 1 augmentations and about 100 MB for the week-4 runs, so the 50-clip review set is about
+8.5 GB. Exporting fewer settings (`--smoothing off gauss1`) makes the bundle proportionally
 smaller.
 
 ## What gets exported
@@ -281,6 +320,10 @@ For each clip, `clips/<clip>/` holds:
   camera fit and measurements, and an index of its `data.bin`.
 - `aug/<augmentation>/data.bin`: the source time of each augmented frame, the augmented mesh
   (int16, 0.1 mm), the augmented read-back points in 3-D and projected into the frame.
+- `aug/<week-4 run>/` (written by `scripts/demo_week4.py`): the same two files. Its `clip.json`
+  has `kind: "week4"`, the run's draws, the entries applied, fallbacks, the ranges used, the
+  `report.measure` values and the identity check; `times` is replayed from the time-warp and
+  frame-drop draws. `aug/w4.base/` is the unaugmented week-4 original they are compared with.
 
 ### How the numbers are measured
 

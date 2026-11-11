@@ -15,10 +15,10 @@
 <body>
 <header>
   <div class="title">
-    <h1>Tier 1 augmentations</h1>
-    <span class="sub">the SMPL-X round trip, augmented: drawn once per clip, applied to every frame</span>
+    <h1>Augmentations</h1>
+    <span class="sub">the SMPL-X round trip, augmented: Tier 1 and week 4, each drawn once per clip</span>
   </div>
-  <nav class="pages"><a href="index.html">round trip</a><a class="on" href="augment.html">augmentations</a></nav>
+  <nav class="pages"><a href="index.html">round trip</a><a class="on" href="augment.html">augmentations</a><a href="all.html">all augmentations</a></nav>
   <label class="clip-pick">clip <select id="clip"></select></label>
   <label class="clip-pick">augmentation <select id="aug"></select></label>
   <div id="summary" class="chips"></div>
@@ -28,7 +28,7 @@
   <section id="explain" class="explain"></section>
   <section class="panels three-up">
     <figure class="panel">
-      <figcaption>1 · Original (round trip, no augmentation)
+      <figcaption><span id="orig-title">1 · Original (round trip, no augmentation)</span>
         <span class="toggles">
           <label><input type="checkbox" id="t-mesh1" checked> mesh</label>
           <label><input type="checkbox" id="t-pts1" checked> points</label>
@@ -57,7 +57,7 @@
       <div id="view-aug" class="three"></div>
       <div class="legend"><i style="--c:var(--aug)"></i>read back off the augmented SMPL-X
         · drag to orbit · scroll to zoom · the three views share one camera
-        <button id="reset-cam">front view</button><button id="side-cam">side view</button></div>
+        <button id="reset-cam">front view</button><button id="side-cam">side view</button><button id="hands-cam">hands</button><button id="face-cam">face</button></div>
     </figure>
   </section>
 

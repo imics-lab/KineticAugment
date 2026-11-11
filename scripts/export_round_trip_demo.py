@@ -23,6 +23,10 @@ Per clip it:
      and all of them combined. Arm joints edit the SMPL-X rotations and re-pose the mesh; the
      others act on the mesh and the read-back points. A weak-perspective camera fitted to the
      clip projects the augmented points back into the image.
+  6. Runs the week-4 augmentation chain (`scripts/demo_week4.py`) on the same round trip: every
+     entry of the ambitious profile alone (time warp and frame drop once per mode) and the
+     default, ambitious and literature profiles whole, plus the unaugmented `w4.base` they are
+     compared with. Written in the same aug/<name>/ format.
 
 Writes <out>/clips/<clip>/{v/<smoothing>/, aug/<augmentation>/}{clip.json, data.bin} and
 <out>/clips/<clip>/frames/NNNN.jpg, and updates <out>/clips.json. data.bin holds the arrays listed
@@ -31,6 +35,7 @@ in clip.json["arrays"] (little-endian, C order).
 Usage (from the repo root; see demo/round_trip/README.md):
     python scripts/export_round_trip_demo.py --clips 20983 --video-dir path/to/videos
     python scripts/export_round_trip_demo.py --sample 50 --video-dir path/to/videos
+    python scripts/export_round_trip_demo.py --clips 20983 --week4 --augment  # no augmentations
     python scripts/export_round_trip_demo.py --reindex
 """
 
@@ -47,6 +52,8 @@ from pathlib import Path
 import numpy as np
 
 import cv2  # noqa: E402
+
+from demo_week4 import RUNS as WEEK4, export_week4  # noqa: E402
 
 from kinetic_augment.augmentations.tier1 import (  # noqa: E402
     ARM_JOINTS,
@@ -370,7 +377,7 @@ def jitter_mm(points):
 
 
 def export_clip(clip_id, video_dir: Path, out_root: Path, models, variants, reextract=False,
-                augmentations=(), seed=SEED, sample=0):
+                augmentations=(), seed=SEED, sample=0, week4=()):
     started = time.time()
     video = video_dir / f"{clip_id}.mp4"
     out = out_root / "clips" / clip_id
@@ -392,6 +399,11 @@ def export_clip(clip_id, video_dir: Path, out_root: Path, models, variants, reex
         source = "off" if "off" in trips else variants[0]
         export_augmentations(clip_id, trips[source], source, out / "aug", models, augmentations,
                              seed, sample)
+    if week4:
+        source = "off" if "off" in trips else variants[0]
+        trip = trips[source]
+        export_week4(clip_id, trip.result, trip.hands, trip.face, out / "aug", models, week4,
+                     source)
 
 
 def write_data(path: Path, arrays):
@@ -889,9 +901,13 @@ def update_index(out_root: Path, order):
         name: {"label": s.label, "description": s.description} for name, s in SMOOTHING.items()
     }
     index["augmentation"] = {
-        name: {"label": label, "description": description}
+        name: {"label": label, "description": description, "group": "tier1"}
         for name, (label, description) in AUGMENTATIONS.items()
     }
+    index["augmentation"].update({
+        name: {"label": run.label, "description": run.description, "group": run.group}
+        for name, run in WEEK4.items()
+    })
     clips = index["clips"] = {}
     for clip_dir in sorted((out_root / "clips").iterdir()):
         variants = {}
@@ -903,7 +919,8 @@ def update_index(out_root: Path, order):
             augs = {}
             for meta_path in sorted(clip_dir.glob("aug/*/clip.json")):
                 aug = json.loads(meta_path.read_text())
-                augs[aug["augmentation"]] = {"n": aug["n"], "title": aug["title"]}
+                augs[aug["augmentation"]] = {"n": aug["n"], "title": aug["title"],
+                                             "kind": aug.get("kind", "tier1")}
             if augs:
                 clips[clip_dir.name]["augmentations"] = augs
     index_path.write_text(json.dumps(index, indent=1, allow_nan=False))
@@ -941,6 +958,13 @@ def main():
         help="Tier 1 augmentations to export, from the unsmoothed round trip (default: all)",
     )
     parser.add_argument(
+        "--week4",
+        nargs="*",
+        choices=list(WEEK4),
+        default=list(WEEK4),
+        help="week-4 runs to export, from the unsmoothed round trip (default: all; none if empty)",
+    )
+    parser.add_argument(
         "--aug-draw",
         type=int,
         default=0,
@@ -958,7 +982,7 @@ def main():
     models = load_face_models()
     for clip_id in clips:
         export_clip(clip_id, video_dir, args.output_dir, models, args.smoothing, args.reextract,
-                    args.augment, args.seed, args.aug_draw)
+                    args.augment, args.seed, args.aug_draw, args.week4)
     update_index(args.output_dir, order)
 
 
