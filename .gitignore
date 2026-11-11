@@ -242,3 +242,6 @@ models/vposer/*.pt
 
 # Brainstorm and plan-execution scratch
 .superpowers/
+
+# Personal notes kept out of the shared repo
+docs/Resume_Handoff.md
