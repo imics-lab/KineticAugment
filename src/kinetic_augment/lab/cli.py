@@ -47,7 +47,7 @@ def startup_config(model_dir: Optional[str] = None) -> LabConfig:
 
 
 def build_app(args: argparse.Namespace):
-    return create_app(ClipStore(args.clips_dir), startup_config(args.model_dir))
+    return create_app(ClipStore(args.clips_dir), startup_config(args.model_dir), port=args.port)
 
 
 def _open_browser(url: str) -> None:

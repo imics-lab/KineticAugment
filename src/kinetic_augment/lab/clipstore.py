@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from kinetic_augment.lab.pane import PreparedClip, prepare_clip
 
-DEFAULT_ROOT = Path("demo/round_trip/clips")
+DEFAULT_ROOT = Path(__file__).resolve().parents[3] / "demo" / "round_trip" / "clips"
 LRU_SIZE = 4
 
 
@@ -42,7 +42,7 @@ class ClipStore:
             return out
         for d in sorted(p for p in self.root.iterdir() if p.is_dir()):
             fit = (d / "fit.pkl").exists()
-            if not (fit or (d / "hands.npz").exists()):
+            if not (fit or ((d / "hands.npz").exists() and (d / "face.npz").exists())):
                 continue
             frames = len(list((d / "frames").glob("*.jpg"))) if (d / "frames").is_dir() else 0
             out.append({"id": d.name, "frames": frames, "source": "fit" if fit else "exported"})

@@ -15,8 +15,8 @@ body.joint_coupled_noise:
   - the torso, head and face
   - the bone lengths
   - the timing
-  proven: Shoulder and wrist turned by at most ±4°, each joint changed with chance 0.3; elbow by at most
-    ±7.5°, with no harm to sign translation (±4° at p = 0.3, SPOTER [M1]; ±7.5° elbow [T])
+  proven: Shoulder and wrist turned by at most ±4°, each joint changed with chance 0.3 (SPOTER [M1]);
+    elbow by at most ±7.5°, with no harm in pose-based translation [T]
   used: 'Typical turn 2.5° for shoulder and wrist, never more than 5°; elbow typical 4.75°, at most 9.5°
     (σ, the typical size of a change: σ 2.5°, ≤ 5°; elbow σ 4.75°, ≤ 9.5°)'
   extreme: true

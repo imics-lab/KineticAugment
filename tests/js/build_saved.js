@@ -33,13 +33,14 @@ function moved(knob) {
 function build(entry, values, name) {
   const perEntry = {};
   perEntry[entry.id] = { values };
-  const got = Lab.savedEdits(schema, perEntry);
+  const got = Lab.savedEdits(schema, perEntry, Lab.parseYaml(base));
   return {
+    weights: got.weights,
     name,
     chain: entry.entry,
     values,
     edits: got.edits[entry.entry],
-    text: Lab.buildSavedYaml(base, got.edits, got.entries, { name }),
+    text: Lab.buildSavedYaml(base, got.edits, got.entries, { name, weights: got.weights }),
   };
 }
 

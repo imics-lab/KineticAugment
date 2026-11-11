@@ -71,7 +71,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   // gunzip(bytes) -> Promise<Uint8Array>, through the browser's DecompressionStream.
   Lab.gunzip = function gunzip(bytes) {
     var DS = typeof DecompressionStream !== 'undefined' ? DecompressionStream : undefined;
-    if (!DS) return Promise.reject(new Error('browser too old'));
+    if (!DS) return Promise.reject(new Error('This page needs Safari 16.4 or newer, or a recent Chrome.'));
     return Promise.resolve().then(function () {
       var stream = new Blob([bytes]).stream().pipeThrough(new DS('gzip'));
       return new Response(stream).arrayBuffer();

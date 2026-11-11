@@ -85,13 +85,15 @@ def _flat(tree, prefix=""):
 
 
 def test_saved_yaml_writes_only_moved_knobs_never_demo_overrides(built):
-    """Ruling R18: mode_weights, mirror p and hand-dropout start_rate are written only if moved."""
+    """Rulings R18/R20: mirror p and hand-dropout start_rate are written only if moved; a mode
+    weight only when it turns an edited variant on."""
     base = load_profile(BASE)
     schema = {e["id"]: e for e in build_schema(base)["entries"]}
     singles = 0
     for entry_id, case in built.items():
         assert set(case["edits"]) == set(case["values"]), entry_id
         assert not any(k.startswith("mode_weights") for k in case["edits"]), entry_id
+        assert not any(k.startswith("mode_weights") for k in case["values"]), entry_id
         single = case.get("single")
         if single is None:
             continue
@@ -103,9 +105,41 @@ def test_saved_yaml_writes_only_moved_knobs_never_demo_overrides(built):
         for key, value in single["values"].items():
             assert _same(_dig(ranges, key), value), (entry_id, key)
         for key in _flat(schema[entry_id]["overrides"]):
+            if key.startswith("mode_weights.") and single["weights"]:
+                continue  # checked in test_saved_yaml_turns_on_an_edited_variants_weight
             if key not in single["values"]:
                 assert _same(_dig(ranges, key), _dig(base_ranges, key)), (entry_id, key)
     assert singles >= 16
+
+
+def test_saved_yaml_turns_on_an_edited_variants_weight(built):
+    """Ruling R20: an edited variant whose mode weight is 0 in the base is saved with it at 1."""
+    base = load_profile(BASE)
+    schema = {e["id"]: e for e in build_schema(base)["entries"]}
+    turned = 0
+    for entry_id, case in built.items():
+        weights = (schema[entry_id]["overrides"] or {}).get("mode_weights")
+        if not weights:
+            continue
+        mode = next(m for m, w in weights.items() if w == 1)
+        base_weights = resolved_ranges(base, case["chain"])["mode_weights"]
+        for label in ("single", None):
+            sub = case.get(label) if label else case
+            if sub is None:
+                continue
+            profile = validate_profile_text(sub["text"])  # still a valid profile
+            saved = resolved_ranges(profile, case["chain"])["mode_weights"]
+            if base_weights[mode] == 0:
+                turned += 1
+                assert sub["weights"] == {case["chain"]: [mode]}, entry_id
+                assert saved[mode] == 1, entry_id
+                assert f"{mode}: 1" in sub["text"] and "# viewer: was 0" in sub["text"]
+            else:
+                assert sub["weights"] == {}, entry_id
+            for other in base_weights:
+                if other != mode:
+                    assert saved[other] == base_weights[other], (entry_id, other)
+    assert turned >= 6  # varied, segment, rate (whole and single each)
 
 
 def test_saved_yaml_keeps_every_line_and_comment(built):

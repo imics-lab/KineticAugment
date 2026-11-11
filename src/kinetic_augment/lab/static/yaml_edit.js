@@ -4,11 +4,16 @@
 //     left as the base has it); each edited range leaf gets the new value (ranges in flow style,
 //     `[0.9, 1.1]`), keeps its comment and adds `  # viewer: was <old>`; `profile_name` becomes
 //     `name`. Entry keys are YAML paths `region.key`; range keys are dotted for nested ones
-//     (`brows.sigma`). An edit with no line in the base is an error.
-//   Lab.savedEdits(schema, perEntry) -> {edits, entries, ids}: a pane's per-entry settings as
-//     edits: only the knob values the pane moved off their defaults (an entry with values counts
-//     as edited; `ids` are its lab entry ids). The run's demo overrides (mirror p = 1, hand
-//     dropout's start_rate, the variants' mode_weights) are never written (Ruling R18).
+//     (`brows.sigma`). An edit with no line in the base is an error. `opts.weights`
+//     (`{"region.key": [mode, ...]}`) writes those `mode_weights` leaves as 1 with
+//     `# viewer: was 0` (Ruling R20).
+//   Lab.savedEdits(schema, perEntry, baseData?) -> {edits, entries, ids, weights, turnedOn}: a
+//     pane's per-entry settings as edits: only the knob values the pane moved off their defaults
+//     (an entry with values counts as edited; `ids` are its lab entry ids). The run's demo
+//     overrides (mirror p = 1, hand dropout's start_rate) are never written (Ruling R18). Given
+//     the parsed base profile, an edited time-warp / frame-drop variant whose mode weight is 0
+//     there also gets `weights`: that one weight turned on, the others as the base has them
+//     (Ruling R20); `turnedOn` lists those variants' lab entry ids.
 //   Lab.parseYaml(text) -> object: the YAML subset profiles use (block maps, block and flow
 //     lists of scalars, plain and quoted scalars, comments).
 //   Lab.valuesFromProfile(schema, data) -> {entryId: values}: for every lab entry whose chain
@@ -146,11 +151,15 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   Lab.buildSavedYaml = function buildSavedYaml(baseText, edits, entries, opts) {
     edits = edits || {};
     var name = opts && opts.name;
+    var weights = (opts && opts.weights) || {}; // "region.key" -> [mode names to turn on] (R20)
     var enable = {};
     (entries || []).concat(Object.keys(edits)).forEach(function (e) { enable[e] = false; });
     var pending = {}; // "region.key|range.key" -> true until written
     Object.keys(edits).forEach(function (e) {
       Object.keys(edits[e]).forEach(function (k) { pending[e + '|' + k] = true; });
+    });
+    Object.keys(weights).forEach(function (e) {
+      weights[e].forEach(function (mode) { pending[e + '|mode_weights.' + mode] = true; });
     });
     var nameDone = !name;
     var stack = [];
@@ -174,8 +183,17 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
         if (parseScalar(value) === true) return raw;
         return m[1] + 'enabled: true' + (parts.comment ? '  ' + parts.comment : '');
       }
-      if (path[3] !== 'ranges' || path.length < 5 || !edits[entryKey]) return raw;
+      if (path[3] !== 'ranges' || path.length < 5) return raw;
       var rangeKey = path.slice(4).join('.');
+      if (weights[entryKey] && path.length === 6 && path[4] === 'mode_weights' &&
+          weights[entryKey].indexOf(path[5]) >= 0) {
+        // R20: the edited variant's mode must run in training, so its weight 0 becomes 1
+        delete pending[entryKey + '|' + rangeKey];
+        if (parseScalar(value) === 1) return raw;
+        var wc = parts.comment ? '  ' + parts.comment.replace(/\s+$/, '') : '';
+        return m[1] + m[2] + ': 1' + wc + '  # viewer: was ' + value;
+      }
+      if (!edits[entryKey]) return raw;
       if (!(rangeKey in edits[entryKey])) return raw;
       delete pending[entryKey + '|' + rangeKey];
       var next = edits[entryKey][rangeKey], old = parseScalar(value);
@@ -191,11 +209,14 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     return lines.join('\n');
   };
 
-  // Only the knob values the pane moved off their defaults (Ruling R18): the run's demo overrides
-  // (mirror p = 1, hand dropout's start_rate, the variants' mode_weights) are never written, since
-  // a saved profile goes into the training pipeline.
-  Lab.savedEdits = function savedEdits(schema, perEntry) {
-    var edits = {}, entries = [], ids = [];
+  // Only the knob values the pane moved off their defaults (Rulings R18, R20): the run's demo
+  // overrides (mirror p = 1, hand dropout's start_rate) are never written, since a saved profile
+  // goes into the training pipeline. The one exception is a time-warp / frame-drop variant whose
+  // mode weight is 0 in the base profile (`baseData`, the parsed base text): that one weight is
+  // written as 1 so the tuned variant runs in training. `weights` maps "region.key" -> modes;
+  // `turnedOn` lists the lab entry ids concerned.
+  Lab.savedEdits = function savedEdits(schema, perEntry, baseData) {
+    var edits = {}, entries = [], ids = [], weights = {}, turnedOn = [];
     ((schema && schema.entries) || []).forEach(function (entry) {
       var s = perEntry && perEntry[entry.id];
       if (!s || !s.values || !Object.keys(s.values).length) return;
@@ -203,8 +224,19 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       if (entries.indexOf(entry.entry) < 0) entries.push(entry.entry);
       ids.push(entry.id);
       Object.keys(s.values).forEach(function (k) { target[k] = s.values[k]; });
+      var mw = (entry.overrides || {}).mode_weights;
+      if (!mw || !baseData) return;
+      var dot = entry.entry.indexOf('.');
+      var body = ((baseData.regions || {})[entry.entry.slice(0, dot)] || {})[entry.entry.slice(dot + 1)];
+      var baseWeights = ((body && body.ranges) || {}).mode_weights || {};
+      Object.keys(mw).forEach(function (mode) {
+        if (mw[mode] !== 1 || baseWeights[mode] !== 0) return;
+        var list = weights[entry.entry] = weights[entry.entry] || [];
+        if (list.indexOf(mode) < 0) list.push(mode);
+        if (turnedOn.indexOf(entry.id) < 0) turnedOn.push(entry.id);
+      });
     });
-    return { edits: edits, entries: entries, ids: ids };
+    return { edits: edits, entries: entries, ids: ids, weights: weights, turnedOn: turnedOn };
   };
 
   function dig(obj, dotted) {

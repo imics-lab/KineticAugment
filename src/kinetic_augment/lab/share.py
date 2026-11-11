@@ -5,7 +5,7 @@ The zip holds the Lab page (`static/`, classic scripts only) and its data as `<s
 it opens by double-clicking `index.html` (no server, no models, no network). Data layout, under
 the single folder `augmentation-lab/`:
 
-- `data/manifest.js`: `window.LAB_DATA = {schema, profileText, clips, base, panes, stops, rerolls}`
+- `data/manifest.js`: `window.LAB_DATA = {profile, schema, profileText, clips, base, panes, stops, rerolls}`
 - `data/<clip>/<sha1>.js`: `Lab.addBlob("<sha1>", "<base64 of the gzipped pane blob>")`
 - `data/<clip>/frames/NNNN.jpg`: the video frames
 - `data/load.js`: writes the `<script>` tag of the manifest (replaces the placeholder); the page
@@ -412,6 +412,7 @@ def build_share(
                     progress(f"clip {cid}: pane {n + 1}/{len(requests)}")
 
         lab_data = {
+            "profile": profile,
             "schema": jsonable(schema),
             "profileText": _profile_path(profile).read_text(),
             "clips": [

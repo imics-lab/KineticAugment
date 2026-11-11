@@ -51,6 +51,11 @@ shows the setup page, where you enter the model folder once (remembered in
 `~/.kinetic_lab/config.json`). The model files and where to get them are on that page
 (`src/kinetic_augment/lab/static/setup.html`, also reachable at `/setup.html`).
 
+MANO note: put `MANO_LEFT.pkl` and `MANO_RIGHT.pkl` in `<repo>/models/mano` and run
+`python scripts/convert_mano.py` from the repository root (it always reads `models/mano`). If you
+keep your models in another folder, convert inside the repo first, then copy the two `.npz` files
+over.
+
 "＋ add video" takes an `.mp4`, runs extraction and the SMPL-X fit once (one to two minutes on a
 laptop CPU) and caches it, so reopening the clip is instant.
 
@@ -77,8 +82,12 @@ shows something visible the first time you open it, and they are never written o
 - hand dropout starts at its top rate;
 - time warp and frame drop start with a mode weight on, so there is something to see.
 
-So if you tweak one time-warp or frame-drop variant, the saved file records that variant's knob but
-not its weight. The tweak only takes effect once you turn that variant's weight on in the profile.
+The one exception is a time-warp or frame-drop variant you changed whose mode weight is 0 in the
+base profile (for example the varied or segment time warp, or the rate frame drop). Without its
+weight the variant would never run in training, so Save also writes that one weight as 1, with
+`# viewer: was 0`, and leaves the other weights as the base has them. The Save dialog says so
+("Turned on ... in the saved profile so your change is used in training."). Mirror's `p` and hand
+dropout's start rate are still never written unless you moved them.
 
 ## Where things live
 

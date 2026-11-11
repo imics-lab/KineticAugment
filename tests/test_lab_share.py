@@ -61,6 +61,14 @@ def test_plan_grid_includes_defaults_and_proven_edges(schema):
     assert len(more) > len(reqs)
 
 
+def test_plan_grid_keys_carry_the_build_profile(schema):
+    # The manifest's `profile` is the profile its keys carry; the app asks with that name.
+    for profile in ("default", "ambitious", "literature"):
+        reqs = plan_grid(schema, 3, 0, profile)
+        keys = [r.share_key(schema_defaults(schema, r.entry_id)) for r in reqs]
+        assert {json.loads(k)["profile"] for k in keys} == {profile}
+
+
 def test_plan_grid_is_unique_by_share_key(schema):
     reqs = plan_grid(schema, 5, 3)
     keys = [r.share_key(schema_defaults(schema, r.entry_id)) for r in reqs]
@@ -186,6 +194,8 @@ def test_build_share_small(tmp_path):
         assert f"{root}data/57949/{sha}.js" in names
         assert any(n.startswith(root + "data/57949/frames/0000") for n in names)
         assert data["clips"][0]["id"] == "57949" and data["rerolls"] == 0
+        assert data["profile"] == "default"
+        assert {json.loads(k)["profile"] for k in data["panes"]} == {data["profile"]}
         assert "body.location_jitter" in data["stops"]
         for key, blob_id in data["panes"].items():
             assert json.loads(key)["clip_id"] == "57949"

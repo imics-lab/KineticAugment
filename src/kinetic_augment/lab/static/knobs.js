@@ -237,6 +237,10 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   // Why a knob can't be moved here, or null.
   KnobPanel.prototype.lockReason = function (knob) {
     if (knob.active === false) return 'not used by this variant';
+    if (this.isShare && knob.kind === 'enum') {
+      // every single choice was worked out ahead at the defaults; combinations were not
+      return knob.multi ? 'only one choice at a time was worked out ahead \u2014 use full mode for combinations' : null;
+    }
     if (this.isShare && (!knob.share || !this.stops(knob))) return 'live only';
     return null;
   };
@@ -244,7 +248,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   KnobPanel.prototype.setKnob = function (which, knob, value) {
     var s = this.settings(which);
     if (this.isShare) {
-      var stop = snap(value, this.stops(knob));
+      var stop = knob.kind === 'enum' ? value : snap(value, this.stops(knob));
       if (knob.kind === 'range' && typeof stop === 'number') stop = rangeFromMarker(knob, stop);
       value = stop;
       var r = shareSet(s.values, knob.key, value, this.defaults);

@@ -223,6 +223,8 @@ if (!Lab.decodePane && typeof require !== 'undefined') require('./bundle.js');
     if (!s) return Promise.reject(new Error('no schema in the shared data'));
     return Promise.resolve(s);
   };
+  // The profile this shared version was built for (its pane keys carry the name).
+  ShareSource.prototype.profile = function () { return this.data.profile || 'default'; };
   ShareSource.prototype.profileText = function () { return Promise.resolve(this.data.profileText || ''); };
   ShareSource.prototype.clips = function () { return Promise.resolve((this.data.clips || []).slice()); };
   ShareSource.prototype.base = function (clipId) {

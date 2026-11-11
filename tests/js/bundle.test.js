@@ -77,11 +77,11 @@ test('gunzip inflates a gzipped blob', async () => {
   assert.deepEqual(Buffer.from(raw), Buffer.from(bytes('pane.bin')));
 });
 
-test('gunzip says the browser is too old without DecompressionStream', async () => {
+test('gunzip says which browsers work without DecompressionStream', async () => {
   const saved = globalThis.DecompressionStream;
   try {
     globalThis.DecompressionStream = undefined;
-    await assert.rejects(() => Lab.gunzip(bytes('pane.bin.gz')), /browser too old/);
+    await assert.rejects(() => Lab.gunzip(bytes('pane.bin.gz')), /needs Safari 16\.4 or newer, or a recent Chrome/);
   } finally {
     globalThis.DecompressionStream = saved;
   }

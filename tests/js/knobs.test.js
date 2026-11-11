@@ -171,6 +171,28 @@ test('panel, live: two markers set two panes; dice and copy A → B ask for that
   assert.deepEqual(asked, ['A', 'A', 'B', 'B', 'B']);
 });
 
+test('panel, share: single-choice enums are live, one knob at a time; multi-choice stays locked', () => {
+  const state = newState();
+  const side = ENTRY.knobs[3], bones = ENTRY.knobs[4];
+  const el = stubEl();
+  const p = new Lab.KnobPanel(el, ENTRY, state, { isShare: true, rerolls: 2, stops: () => null });
+  assert.equal(p.lockReason(side), null);
+  assert.match(p.lockReason(bones), /only one choice at a time was worked out ahead/);
+  assert.match(el.innerHTML, /bones \(bones\)<\/span> <span class="knob-lock">only one choice/);
+  assert.doesNotMatch(el.innerHTML, /side mode \(side_mode\)<\/span> <span class="knob-lock">/);
+  const s = state.panes.A.perEntry[ENTRY.id];
+  // the requested key is the manifest key: the option string under the knob's own key
+  assert.equal(p.setKnob('A', side, 'independent'), true);
+  assert.deepEqual(s.values, { side_mode: 'independent' });
+  p.opts.stops = (id, k) => (k === 'elbow_sigma_deg' ? [0, 4.75, 7.5] : null);
+  p.setKnob('A', ENTRY.knobs[1], 7.5);
+  assert.deepEqual(s.values, { elbow_sigma_deg: 7.5 }, 'the enum went back to its default');
+  p.setKnob('A', side, 'synchronous');
+  assert.deepEqual(s.values, { side_mode: 'synchronous' }, 'and the enum replaces the scalar');
+  p.setKnob('A', side, 'mirror');
+  assert.deepEqual(s.values, {}, 'the default again is the profile pane');
+});
+
 test('panel, share: snaps to stops, one knob at a time, dice cycles the precomputed draws', () => {
   const state = newState();
   const stops = { sigma_deg: [0, 2.5, 4, 6], elbow_sigma_deg: [0, 4.75, 7.5, 10, 15] };

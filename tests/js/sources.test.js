@@ -142,3 +142,16 @@ test('watchJob polls every interval until done or failed, reporting each status'
   const gone = { job: async () => { const e = new Error('no such job'); e.status = 404; throw e; } };
   await assert.rejects(() => Lab.watchJob(gone, 'j3', { wait: async () => {} }), /no such job/);
 });
+
+test('a share built for another profile is found under that profile', async () => {
+  // Python writes `"profile":"ambitious"` into the pane keys; the app asks with the build's profile.
+  const req = { clip_id: 'fx', entry_id: 'body.location_jitter', values: {}, mode: 'random', reroll: 0, edge: 'high', profile: 'ambitious' };
+  const data = makeData();
+  data.profile = 'ambitious';
+  data.panes = { [Lab.requestKey(req)]: share.cases[0].id };
+  const src = new Lab.ShareSource(data);
+  assert.equal(src.profile(), 'ambitious');
+  assert.equal(src.paneId(Object.assign({}, req, { profile: src.profile() })), share.cases[0].id);
+  assert.equal(src.paneId(Object.assign({}, req, { profile: 'default' })), null);
+  assert.equal(new Lab.ShareSource(makeData()).profile(), 'default');
+});

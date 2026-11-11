@@ -6,10 +6,12 @@ import shutil
 import tempfile
 import threading
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Sequence
+from urllib.parse import urlsplit
 
 from fastapi import Body, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, StrictInt, StrictStr
@@ -34,6 +36,8 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 UPLOAD_DIR = ".uploads"
 OCTET = "application/octet-stream"
 VIDEO_SUFFIXES = (".mp4", ".mov", ".m4v", ".avi", ".webm")
+LOCAL_NAMES = ("127.0.0.1", "localhost")
+MAX_UPLOAD_BYTES = 500 * 1024 * 1024
 
 
 class PaneBody(BaseModel):
@@ -70,12 +74,43 @@ def create_app(
     saved_dir: Path = DEFAULT_FOLDER,
     static_dir: Path = STATIC_DIR,
     job_queue: Optional[Any] = None,
+    port: Optional[int] = None,
+    extra_hosts: Sequence[str] = (),
+    max_upload_bytes: int = MAX_UPLOAD_BYTES,
 ) -> FastAPI:
     """
     Build the app. Models load now when `config.model_dir` holds every required file, else the
     app starts in setup mode until `POST /api/models` supplies a complete folder.
     """
     app = FastAPI(title="KineticAugment Lab")
+
+    def host_ok(netloc: str) -> bool:
+        """`127.0.0.1` or `localhost` (on `port` when given); `extra_hosts` is for tests."""
+        if netloc in extra_hosts:
+            return True
+        parts = urlsplit("//" + netloc)
+        try:
+            their_port = parts.port
+        except ValueError:
+            return False
+        return parts.hostname in LOCAL_NAMES and (port is None or their_port == port)
+
+    @app.middleware("http")
+    async def local_only(request, call_next):
+        """Refuse foreign Host headers (DNS rebinding), cross-origin POSTs and huge uploads."""
+        host = request.headers.get("host", "")
+        if not host_ok(host):
+            return PlainTextResponse("this server answers on 127.0.0.1 only", status_code=400)
+        if request.method == "POST":
+            origin = request.headers.get("origin")
+            if origin is not None and urlsplit(origin).netloc != host:
+                return PlainTextResponse("cross-origin request refused", status_code=403)
+            length = request.headers.get("content-length", "")
+            if length.isdigit() and int(length) > max_upload_bytes:
+                return PlainTextResponse("that upload is too large", status_code=413)
+        return await call_next(request)
+
+    app.add_middleware(GZipMiddleware, minimum_size=1024)
 
     @app.exception_handler(RequestValidationError)
     def bad_request(_request, exc: RequestValidationError):
@@ -233,7 +268,7 @@ def create_app(
             raise HTTPException(404, "no such clip")
         try:
             meta, arrays = run_pane(prep, req, base_for(req), models)
-        except (ValueError, TypeError) as exc:
+        except (ValueError, TypeError, KeyError, IndexError) as exc:
             return JSONResponse({"detail": str(exc)}, status_code=422)
         return Response(encode_pane(meta, arrays), media_type=OCTET)
 
@@ -254,6 +289,9 @@ def create_app(
         with tempfile.NamedTemporaryFile(dir=updir, suffix=name.suffix.lower(), delete=False) as t:
             shutil.copyfileobj(file.file, t)
         tmp = Path(t.name)
+        if tmp.stat().st_size > max_upload_bytes:
+            tmp.unlink(missing_ok=True)
+            raise HTTPException(413, "that upload is too large")
         try:
             n = 1
             while True:

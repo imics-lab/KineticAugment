@@ -62,7 +62,7 @@ pip install -e '.[smplx,lab]'</pre>
         <tr><td><code>smplx/SMPLX_NEUTRAL.npz</code></td><td>the body</td>
             <td><a href="https://smpl-x.is.tue.mpg.de/" target="_blank" rel="noopener">https://smpl-x.is.tue.mpg.de/</a></td></tr>
         <tr><td><code>mano/MANO_LEFT.npz</code>, <code>mano/MANO_RIGHT.npz</code></td><td>the hands</td>
-            <td>MANO comes with the SMPL-X download. Then run <code>python scripts/convert_mano.py</code> to make these two files.</td></tr>
+            <td>MANO comes with the SMPL-X download. Put <code>MANO_LEFT.pkl</code> and <code>MANO_RIGHT.pkl</code> in <code>&lt;repo&gt;/models/mano</code>, then run <code>python scripts/convert_mano.py</code> from the repository root (it always reads <code>models/mano</code>) to make these two files. If you keep your models somewhere else, convert in the repo first, then copy the two <code>.npz</code> files there.</td></tr>
         <tr><td><code>mano/SMPL-X__FLAME_vertex_ids.npy</code></td><td>links the head to the face model</td>
             <td>already in the repository</td></tr>
         <tr><td><code>flame/generic_model.pkl</code></td><td>the face shape</td>

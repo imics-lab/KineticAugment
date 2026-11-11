@@ -73,7 +73,7 @@ def lab_home(tmp_path, monkeypatch):
     monkeypatch.setenv("KINETIC_LAB_HOME", str(tmp_path / "home"))
 
 
-def _app(tmp_path, complete=True, queue=None):
+def _app(tmp_path, complete=True, queue=None, **kw):
     static = tmp_path / "static"
     static.mkdir(exist_ok=True)
     (static / "index.html").write_text("<p>lab</p>")
@@ -86,6 +86,7 @@ def _app(tmp_path, complete=True, queue=None):
         saved_dir=tmp_path / "saved",
         static_dir=static,
         job_queue=queue,
+        **{"extra_hosts": ("testserver",), **kw},
     )
     return TestClient(app), store, models
 
@@ -368,3 +369,52 @@ def test_upload_deleted_when_job_ends(tmp_path, lab_home, monkeypatch, fails):
         time.sleep(0.05)
     assert client.get(f"/api/jobs/{job}").json()["state"] == ("failed" if fails else "done")
     assert list((store.root / ".uploads").iterdir()) == []
+
+
+def test_foreign_host_is_refused(tmp_path, lab_home):
+    client, _, _ = _app(tmp_path, extra_hosts=(), port=8770)
+    assert client.get("/api/status", headers={"host": "evil.example:8770"}).status_code == 400
+    assert client.get("/api/status", headers={"host": "127.0.0.1:9999"}).status_code == 400
+    assert client.get("/api/status", headers={"host": "127.0.0.1:8770"}).status_code == 200
+    assert client.get("/api/status", headers={"host": "localhost:8770"}).status_code == 200
+
+
+def test_cross_origin_post_is_refused(tmp_path, lab_home):
+    client, _, _ = _app(tmp_path)
+    body = {"name": "x", "text": GOOD}
+    r = client.post("/api/saved", json=body, headers={"origin": "http://evil.example"})
+    assert r.status_code == 403
+    r = client.post("/api/saved", json=body, headers={"origin": "http://testserver"})
+    assert r.status_code == 200
+
+
+def test_upload_cap_is_413(tmp_path, lab_home):
+    client, _, _ = _app(tmp_path, queue=FakeQueue(), max_upload_bytes=10)
+    r = client.post("/api/videos", files={"file": ("a.mp4", b"x" * 100)})
+    assert r.status_code == 413
+
+
+def test_pane_key_and_index_errors_are_422(tmp_path, lab_home, monkeypatch):
+    client, _, _ = _app(tmp_path)
+    for exc in (KeyError("k"), IndexError("i")):
+
+        def boom(*_a, _e=exc, **_k):
+            raise _e
+
+        monkeypatch.setattr(server_mod, "run_pane", boom)
+        r = client.post("/api/pane", json={"clip_id": "c1", "entry_id": "a"})
+        assert r.status_code == 422
+
+
+def test_live_responses_are_gzipped(tmp_path, lab_home):
+    client, _, _ = _app(tmp_path)
+    r = client.get("/api/schema", headers={"accept-encoding": "gzip"})
+    assert r.headers.get("content-encoding") == "gzip"
+
+
+def test_default_folders_are_repo_relative():
+    from kinetic_augment.lab.clipstore import DEFAULT_ROOT
+    from kinetic_augment.lab.saving import DEFAULT_FOLDER
+
+    assert DEFAULT_ROOT.is_absolute() and DEFAULT_ROOT == REPO / "demo" / "round_trip" / "clips"
+    assert DEFAULT_FOLDER.is_absolute() and DEFAULT_FOLDER == REPO / "configs" / "viewer_saved"

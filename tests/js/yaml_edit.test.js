@@ -73,6 +73,8 @@ const SCHEMA = {
     { id: 'temporal.time_warp.segment', entry: 'temporal.time_warp', overrides: { mode_weights: { none: 0, varied: 0, segment: 1 } },
       knobs: [{ key: 'duration', kind: 'range', default: [0.6, 1.65], active: true },
         { key: 'segment_factor', kind: 'range', default: [0.6, 1.65], active: true }] },
+    { id: 'temporal.frame_drop.rate', entry: 'temporal.frame_drop', overrides: { mode_weights: { rate: 1, random: 0 } },
+      knobs: [{ key: 'target_fps', kind: 'range', default: [12, 25], active: true }] },
     { id: 'temporal.hand_dropout', entry: 'temporal.hand_dropout', overrides: { start_rate: [0.05, 0.05] },
       knobs: [{ key: 'start_rate', kind: 'range', default: [0.05, 0.05], active: true },
         { key: 'max_run_frames', kind: 'scalar', default: 10, active: true }] },
@@ -88,19 +90,43 @@ const SCHEMA = {
 };
 
 test('savedEdits: only the knobs the pane moved; demo overrides are never written (R18)', () => {
-  const got = Lab.savedEdits(SCHEMA, {
-    'temporal.time_warp.segment': { values: { segment_factor: [0.5, 2.0] } },
+  const perEntry = {
+    'temporal.time_warp.uniform': { values: { duration: [0.7, 1.4] } }, // weight already 1: left alone
     'temporal.hand_dropout': { values: { max_run_frames: 6 } },
     'body.joint_coupled_noise': { values: {} }, // visited, nothing moved: not saved
-  });
+  };
+  const got = Lab.savedEdits(SCHEMA, perEntry, Lab.parseYaml(BASE));
   assert.deepEqual(got.entries.sort(), ['temporal.hand_dropout', 'temporal.time_warp']);
-  assert.deepEqual(got.ids.sort(), ['temporal.hand_dropout', 'temporal.time_warp.segment']);
-  assert.deepEqual(got.edits['temporal.time_warp'], { segment_factor: [0.5, 2.0] }, 'no mode_weights');
+  assert.deepEqual(got.ids.sort(), ['temporal.hand_dropout', 'temporal.time_warp.uniform']);
+  assert.deepEqual(got.edits['temporal.time_warp'], { duration: [0.7, 1.4] }, 'no mode_weights');
   assert.deepEqual(got.edits['temporal.hand_dropout'], { max_run_frames: 6 }, 'no start_rate');
-  const out = Lab.buildSavedYaml(BASE, got.edits, got.entries, { name: 'warp' });
+  assert.deepEqual(got.weights, {});
+  assert.deepEqual(got.turnedOn, []);
+  const out = Lab.buildSavedYaml(BASE, got.edits, got.entries, { name: 'warp', weights: got.weights });
   assert.doesNotMatch(out, /^ {10}(none|varied|segment|rate|random): .*viewer: was/m, 'mode weights as the base has them');
   assert.match(out, /^ {8}start_rate: \[0\.0, 0\.05\] {2}# proven: none/m, 'start_rate as the base has it');
   assert.match(out, /^ {8}max_run_frames: 6 {2}# proven: .* {2}# viewer: was 10$/m);
+});
+
+test('savedEdits (R20): an edited variant whose mode weight is 0 gets that one weight turned on', () => {
+  const got = Lab.savedEdits(SCHEMA, {
+    'temporal.time_warp.segment': { values: { segment_factor: [0.5, 2.0] } },
+    'temporal.frame_drop.rate': { values: { target_fps: [10, 20] } },
+  }, Lab.parseYaml(BASE));
+  assert.deepEqual(got.weights, { 'temporal.time_warp': ['segment'], 'temporal.frame_drop': ['rate'] });
+  assert.deepEqual(got.turnedOn.sort(), ['temporal.frame_drop.rate', 'temporal.time_warp.segment']);
+  assert.deepEqual(got.edits['temporal.time_warp'], { segment_factor: [0.5, 2.0] }, 'knobs only in edits');
+  const out = Lab.buildSavedYaml(BASE, got.edits, got.entries, { name: 'warp', weights: got.weights });
+  const warp = block(out, 'temporal', 'time_warp');
+  assert.match(warp, /^ {10}segment: 1 {2}# setting: weight of the one-slowed-segment warp {2}# viewer: was 0$/m);
+  assert.match(warp, /^ {10}none: 1 {2}# setting: weight of uniform duration only$/m, 'none as the base has it');
+  assert.match(warp, /^ {10}varied: 0 {2}# setting: weight of the varying-speed warp$/m, 'varied as the base has it');
+  const drop = block(out, 'temporal', 'frame_drop');
+  assert.match(drop, /^ {10}rate: 1 {2}# setting: weight of the lower frame-rate grid {2}# viewer: was 0$/m);
+  assert.match(drop, /^ {10}random: 1 {2}# setting: weight of random drops under the gap limit$/m);
+  assert.equal(out.split('\n').length, BASE.split('\n').length, 'no line added or removed');
+  assert.throws(() => Lab.buildSavedYaml(BASE, got.edits, got.entries, { name: 'x', weights: { 'temporal.time_warp': ['nope'] } }),
+    /mode_weights\.nope/);
 });
 
 test('savedEdits: mirror is saved with the base p unless the user moved p', () => {

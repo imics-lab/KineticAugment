@@ -172,7 +172,11 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     }, function (err) {
       if (seq !== app._seq[which]) return null;
       var msg = err && err.message ? err.message : String(err);
-      app.panes.setNote(which, (app.last[which] ? 'kept the last frames: ' : '') + msg);
+      if (err && err.status === 422) {  // the server refused the value itself
+        app.panes.setNote(which, 'This value isn\'t allowed: ' + (err.detail || msg) + (app.last[which] ? ' (kept the last frames)' : ''));
+      } else {
+        app.panes.setNote(which, (app.last[which] ? 'kept the last frames: ' : '') + msg);
+      }
       app.emit('pane-error', { which: which, error: err, request: req });
       return null;
     }).then(function (out) {
@@ -502,7 +506,11 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       app.status = chosen.status;
       document.body.classList.toggle('share', app.source.isShare);
       document.body.classList.toggle('live', !app.source.isShare);
-      app.mounts.modeBadge.textContent = app.source.isShare ? 'shared version' : 'full mode';
+      // A shared version is built for one profile; its pane keys carry that profile's name.
+      var sharedProfile = app.source.isShare && app.source.profile();
+      if (sharedProfile) app.state.profile = sharedProfile;
+      app.mounts.modeBadge.textContent = app.source.isShare
+        ? 'shared version' + (sharedProfile ? ' \u00b7 ' + sharedProfile + ' profile' : '') : 'full mode';
       app.mounts.shareFooter.hidden = !app.source.isShare;
       if (!app.source.isShare && chosen.status.mode === 'setup') { setupMode(chosen.status); return null; }
       return Promise.all([app.source.schema(app.state.profile), app.source.clips()]).then(function (got) {
@@ -573,12 +581,17 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
   app.buildSaved = function (name, which) {
     var slug = slugify(name);
     if (!slug) return Promise.reject(new Error('the name needs at least one letter or digit'));
-    var got = Lab.savedEdits(app.schema, app.state.panes[which].perEntry);
-    if (!got.entries.length) {
+    var perEntry = app.state.panes[which].perEntry;
+    if (!Lab.savedEdits(app.schema, perEntry).entries.length) {
       return Promise.reject(new Error('pane ' + which + ' has no changed knobs yet: move a knob first'));
     }
     return profileText().then(function (base) {
-      return { name: slug, text: Lab.buildSavedYaml(base, got.edits, got.entries, { name: slug }), entries: got.entries };
+      var got = Lab.savedEdits(app.schema, perEntry, Lab.parseYaml(base));
+      return {
+        name: slug,
+        text: Lab.buildSavedYaml(base, got.edits, got.entries, { name: slug, weights: got.weights }),
+        entries: got.entries,
+      };
     });
   };
 
@@ -607,9 +620,11 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
         entry.knobs.forEach(function (k) { defaults[k.key] = k.default; });
         entry.knobs.forEach(function (k) {
           if (!(k.key in values)) return;
-          var stops = k.share ? app.source.stops(id, k.key) : null;
+          // a single-choice enum has every option worked out ahead; a scalar needs stops
+          var choice = k.kind === 'enum' && !k.multi && k.options.indexOf(values[k.key]) >= 0;
+          var stops = choice ? [] : (k.share && k.kind !== 'enum' ? app.source.stops(id, k.key) : null);
           if (!stops || Object.keys(kept).length) { dropped.push(k.technical); return; }
-          var v = K.snap(values[k.key], stops);
+          var v = choice ? values[k.key] : K.snap(values[k.key], stops);
           if (k.kind === 'range' && typeof v === 'number') v = K.rangeFromMarker(k, v);
           kept = K.shareSet(kept, k.key, v, defaults).values;
         });
@@ -660,6 +675,10 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
     var describe = function () {
       var which = pane(saveForm);
       var got = Lab.savedEdits(app.schema, app.state.panes[which].perEntry);
+      var render = function (turned) {
+        var note = turned.length ? ' Turned on ' + entryTitles(turned) + ' in the saved profile so your change is used in training.' : '';
+        saveForm.querySelector('.sa-what').textContent = describe.text + note;
+      };
       var text = got.ids.length
         ? 'Saves the base profile with pane ' + which + '\'s changed knobs, each augmentation turned on: ' +
           entryTitles(got.ids) + '.'
@@ -667,7 +686,13 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
       if (got.ids.some(function (id) { return Lab.demoOverrides && Lab.demoOverrides(app.entry(id)).length; })) {
         text += ' ' + Lab.DEMO_NOT_SAVED;
       }
-      saveForm.querySelector('.sa-what').textContent = text;
+      describe.text = text;
+      render([]);
+      if (got.ids.length) {
+        profileText().then(function (base) {
+          if (pane(saveForm) === which) render(Lab.savedEdits(app.schema, app.state.panes[which].perEntry, Lab.parseYaml(base)).turnedOn);
+        }).catch(function () { /* the base text is read again when saving */ });
+      }
     };
     Array.prototype.forEach.call(saveForm.querySelectorAll('input[type=radio]'), function (r) { r.onchange = describe; });
     box.querySelector('[data-sa=save]').onclick = function () {
@@ -700,7 +725,7 @@ var Lab = (typeof window !== 'undefined' ? window : globalThis).Lab || {};
         }
         return app.source.save(out.name, out.text, overwrite).then(function (res) {
           saveForm.hidden = true;
-          say('Saved pane ' + which + ' to <code>configs/viewer_saved/' + esc(res.name) + '.yaml</code>.');
+          say('Saved pane ' + which + ' to <code>' + esc(res.path || 'configs/viewer_saved/' + res.name + '.yaml') + '</code>.');
           return app.reloadSaved();
         }, function (err) {
           if (err.status !== 409) throw err;
