@@ -1,0 +1,11 @@
+xy 01986 left: mean ratio 0.542 median ratio 0.455 med/med 0.465 mean/mean 0.530
+xy L pooled med/med 0.625 mean/mean 0.622 mean ratio 0.624 median ratio 0.614
+xy R pooled med/med 0.733 mean/mean 0.701 mean ratio 0.704 median ratio 0.737
+xy mean of clip med/med 0.615 median of clip 0.550
+xy (fL+fR)/(uL+uR) of pooled medians 0.673
+xyz 01986 left: mean ratio 1.395 median ratio 1.567 med/med 1.582 mean/mean 1.423
+xyz L pooled med/med 1.441 mean/mean 1.265 mean ratio 1.244 median ratio 1.228
+xyz R pooled med/med 1.502 mean/mean 1.375 mean ratio 1.376 median ratio 1.323
+xyz mean of clip med/med 1.289 median of clip 1.202
+xyz (fL+fR)/(uL+uR) of pooled medians 1.471
+image-bounds coverage: {15: 67.0, 16: 78.5, 23: 25.7, 24: 26.2} of 409

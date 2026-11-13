@@ -1,0 +1,46 @@
+== A. d(shoulder position)/d(rotation of joint j), finite difference, max over 3 axes (m/rad) ==
+  rest pose: joints that move a shoulder -> {0: 0.4367, 3: 0.3268, 6: 0.1949, 9: 0.1656, 13: 0.1192, 14: 0.1026}
+  random pose: joints that move a shoulder -> {0: 0.4891, 3: 0.3799, 6: 0.252, 9: 0.2023, 13: 0.1143, 14: 0.1069}
+  ancestor chain of L shoulder (16): [16, 13, 9, 6, 3, 0];  arm-IK driven joints: [16, 18, 17, 19]
+
+== B. Counterexample: the one segment the review's direction check omits ==
+  shoulder-line (L-R) direction error: 40.105 deg  (root angle 40.107 deg)
+  shoulder width fitted 0.315931 vs truth 0.315931 m
+  upper arm/forearm lengths equal: True
+  rest L/R shoulders at z-rest: arm span in T-pose (wrist-to-wrist) 1.342 m -> rotation lever is maximal in T-pose
+
+== C. Real clips: observed shoulder line vs zero-root rest shoulder line ==
+  rest shoulder line yaw/roll in MP axes after Rx(180) gauge: (0.6143357368655401, 0.8721551909496131)  (identity: (-0.6143357368655401, -0.8721551909496131))
+    clip    n angle med    p95    max |yaw| med    p95 |roll| med    p95
+   01986   83      7.44   8.88   9.55      7.56   9.13       2.05   3.50
+   01987   75      4.59   7.41  10.80      1.78   4.95       3.32   6.39
+   01988  143      3.31   6.45   8.28      3.15   6.72       1.96   4.29
+   01991   49      4.72  19.68  20.05      5.28  20.29       1.05   2.01
+   01992   59      6.52   7.15   7.69      3.50   6.58       4.24   5.30
+  pooled: angle median 4.79 p95 10.29 max 20.05 deg; |yaw| median 3.71 p95 9.87; |roll| median 2.10 p95 5.22
+  frames with shoulder-line angle >= 40.1 deg (the counterexample): 0.00%;  >= 30 deg: 0.00%;  >= 20 deg: 0.24%
+
+== D. Is the MediaPipe hip centre available when hips are 'not visible'? ==
+  frames with both hips vis>=0.5: 42.3%;  |hip midpoint| (should be ~0 by MP world convention): median 3.82 mm, max 11.46 mm, n=409
+
+== F. Nose position relative to shoulders, in a shoulder + hip-centre torso frame (mm) ==
+  axes: x = along shoulder line, up = toward shoulders from hips (orthogonalised), fwd = x cross up
+    clip    n  x mean  x std up mean up std fwd mean fwd std pitch std pitch rng
+   01986   83     2.9   12.2   205.8   14.6    151.5    13.1      4.19     14.36
+   01987   75     8.0   12.2   148.2   24.8    172.4     7.2      4.91     17.24
+   01988  143     0.2   17.6   176.4   22.8    162.2    18.3      6.28     25.97
+   01991   49   -34.2   21.2   176.9    5.0    151.8    20.6      3.25     11.79
+   01992   59    12.1    2.9   175.3    7.8    159.1    12.0      3.17     15.97
+  SMPL-X rest, hip proxy pelvis(0): nose (x, up, fwd) = [ -1.8052 183.8005 143.2424] mm, pitch 37.93 deg
+  SMPL-X rest, hip proxy hip-joint midpoint (1,2): nose (x, up, fwd) = [ -1.8052 191.6311 132.5839] mm, pitch 34.68 deg
+  observed pooled pitch (nose forward of torso axis): median 43.29 deg
+  NOTE sign of fwd: x cross up. In SMPL-X rest (x=left, up=+y) fwd=+z = facing direction.
+        In MP world (x=left, up=-y) fwd = x cross (-y) = -z = toward camera = facing direction. Same meaning.
+
+== E. Head motion leaks into a shoulders+nose root (real SMPL-X mesh nose, joints[55]) ==
+  nod down 15 (neck 7.5 + head 7.5, about x)  : spurious torso root   9.18 deg, axis [0.9998 0.0152 0.0107]; arm landmarks change? shoulders moved 0.00e+00 mm
+  nod down 30 (neck 15 + head 15)             : spurious torso root  18.26 deg, axis [0.9998 0.0152 0.0107]; arm landmarks change? shoulders moved 0.00e+00 mm
+  nod up 20 (neck -10 + head -10)             : spurious torso root  12.38 deg, axis [-0.9998 -0.0152 -0.0107]; arm landmarks change? shoulders moved 0.00e+00 mm
+  head turn 40 (head yaw, about y)            : spurious torso root   4.35 deg, axis [-0.9998 -0.0152 -0.0107]; arm landmarks change? shoulders moved 0.00e+00 mm
+  head tilt 20 (head roll, about z)           : spurious torso root   0.62 deg, axis [0.9998 0.0152 0.0107]; arm landmarks change? shoulders moved 0.00e+00 mm
+  neck forward 20 only (about x)              : spurious torso root  18.77 deg, axis [0.9998 0.0152 0.0107]; arm landmarks change? shoulders moved 0.00e+00 mm

@@ -1,0 +1,32 @@
+== S7-forward: SMPL-X(returned params) vs reconstruct_body ==
+  betas=0    |b|=0.00: fit.betas returned all-zero=True; max err with returned betas 0.0002022 mm
+  |b|~2      |b|=2.23: fit.betas returned all-zero=True; max err with returned betas 41.31 mm; with skeleton's betas passed by hand 2.50e-07 m
+  test betas |b|=2.06: fit.betas returned all-zero=True; max err with returned betas 61.69 mm; with skeleton's betas passed by hand 1.91e-07 m
+  |b|~6      |b|=5.99: fit.betas returned all-zero=True; max err with returned betas 111.8 mm; with skeleton's betas passed by hand 2.48e-07 m
+  real frames (neutral): n=409 max=1.70e-07 m
+== S7-fold: reconstruct_body(fit) vs R@FK(ik)+t with my own Kabsch ==
+  fold max err 6.04e-15 m over 100; no-pivot control median 84 mm, |root rest|=352 mm
+== whole-body rotation: error vs truth (root rotation estimate, Step 8 territory) ==
+    0 deg: worst-joint median 0.0 mm, max 0.0 mm
+   10 deg: worst-joint median 17.2 mm, max 24.4 mm
+   30 deg: worst-joint median 52.6 mm, max 79.7 mm
+   90 deg: worst-joint median 149.5 mm, max 244.7 mm
+  180 deg: worst-joint median 259.5 mm, max 475.5 mm
+== S7-only-params ==
+  random fit.betas changes reconstruct_body by 0.0
+  same fit, shaped vs neutral skeleton: max diff 53.0 mm
+== S7-nan ==
+  invalid [15]: NaN rows=27, invalid rows NaN? [False], err at invalid rows mm=[145.1]
+  invalid [13, 15]: NaN rows=27, invalid rows NaN? [False, False], err at invalid rows mm=[244.2, 310.1]
+  invalid [13]: NaN rows=27, invalid rows NaN? [False], err at invalid rows mm=[126.0]
+  junk in invalid rows: 0 bitwise differences in 820 comparisons
+== S7-min3 / degeneracy / orphans ==
+  0 valid -> ValueError;  1 valid -> ValueError;  2 valid -> ValueError;  3 valid -> fit;  4 valid -> fit;  5 valid -> fit;  6 valid -> fit;
+  collinear L-arm only, truth rotated 0.5 rad about arm: fit OK, R shoulder err 33 mm, L wrist err 1.6e-13 mm
+  collinear L-arm only, truth rotated 1.0 rad about arm: fit OK, R shoulder err 64 mm, L wrist err 2.4e-13 mm
+  collinear L-arm only, truth rotated 2.0 rad about arm: fit OK, R shoulder err 112 mm, L wrist err 1.2e-13 mm
+  L elbow invalid (L wrist valid -> orphan): worst observed joint median 82.4 / max 277.7 mm
+  L shoulder invalid: median 31.3 / max 119.5 mm
+  L wrist invalid (no orphan): median 2.3e-13 / max 4.5e-12 mm
+  only L sh, R sh, L wrist valid: median 47.4 / max 192.7 mm
+  real data: {'elbow_inv_wrist_ok': 0, 'shoulder_inv_elbow_ok': 0, 'total': 410}

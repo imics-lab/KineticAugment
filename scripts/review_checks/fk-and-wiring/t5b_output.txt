@@ -1,0 +1,1 @@
+float64: FK with scipy rotations max 1.13e-08 m; FK with smplx.lbs.batch_rodrigues matrices max 0.00e+00 m

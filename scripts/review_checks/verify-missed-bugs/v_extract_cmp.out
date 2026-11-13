@@ -1,0 +1,6 @@
+01986: T=83 shared-vs-stored max 0.0000 mm | fresh-vs-stored: frame0 max 0.00 mm, median per-frame max 0.00 mm, median all 0.00 mm, last10 median per-frame max 0.00 mm, overall max 0.00
+01987: T=75 shared-vs-stored max 0.0000 mm | fresh-vs-stored: frame0 max 113.95 mm, median per-frame max 49.27 mm, median all 32.81 mm, last10 median per-frame max 15.35 mm, overall max 113.95
+01988: T=144 shared-vs-stored max 0.0000 mm | fresh-vs-stored: frame0 max 78.53 mm, median per-frame max 6.75 mm, median all 3.55 mm, last10 median per-frame max 3.86 mm, overall max 78.53
+01991: T=49 shared-vs-stored max 0.0000 mm | fresh-vs-stored: frame0 max 23.64 mm, median per-frame max 2.04 mm, median all 0.68 mm, last10 median per-frame max 0.28 mm, overall max 23.64
+01992: T=59 shared-vs-stored max 0.0000 mm | fresh-vs-stored: frame0 max 102.56 mm, median per-frame max 33.68 mm, median all 22.44 mm, last10 median per-frame max 22.35 mm, overall max 102.56
+determinism control fresh vs fresh2 01987 max diff mm: 0.0

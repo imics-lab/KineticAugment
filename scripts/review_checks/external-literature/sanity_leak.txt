@@ -1,0 +1,8 @@
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+shared 01986 vs stored max|d| m: 0.0
+shared 01987 (after 01986) vs stored max|d| m: 0.0
+presence field set on any world landmark: False
+fresh 01987 vs stored, per-frame max arm dev mm: frame0 113.9, median 49.3, max 113.9
+01987 median bone lengths stored (LU,LF,RU,RF): [0.2406, 0.1951, 0.2506, 0.2206]
+01987 median bone lengths fresh  (LU,LF,RU,RF): [0.2524, 0.1993, 0.2609, 0.2285]
+01987 visibility L/R wrist mean stored vs fresh: [0.8679999709129333, 0.8899999856948853, 0.949999988079071, 0.9480000138282776]

@@ -1,0 +1,30 @@
+(a) SMPL-X left elbow local axes (rest T-pose, palms down; body forward = +z, up = +y)
+  rotvec x +90: wrist moves   33.0 mm, direction [ 0.   -0.63  0.78]
+  rotvec y -90: wrist moves  356.4 mm, direction [-0.7   0.    0.71]
+  rotvec z +90: wrist moves  357.9 mm, direction [-0.77  0.64  0.  ]
+  -> local x ~ forearm axis (twist), local -y swings forearm forward (+z) = flexion, local z swings it up/down = varus/valgus. SMPLify's angle prior uses the same convention (penalises +y on left elbow).
+  repo table left_elbow: {'x': (0, 2.62), 'y': (-0.17, 0.17), 'z': (-1.57, 1.57)}  (labels x 'flexion only', y 'very limited')
+  anatomical 90 deg left-elbow flexion [ 0.    -1.571  0.   ] -> clamped [ 0.   -0.17  0.  ]; wrist moved 325 mm by a ZERO-noise clamp
+
+(b) zero-noise joint-limit clamp (repo table) on real-data parameters, max wrist displacement
+  TORSO  n=366: median 289 mm, p95 349 mm, frac > 50 mm 1.00
+  HINGE  n=366: median 302 mm, p95 358 mm, frac > 50 mm 1.00
+
+(c) same rotvec noise (sd 0.1 rad) applied to two parameterisations with identical joints
+  n=2148: wrist disagreement between the two augmented results: median 4.5 mm, p95 32.8 mm; for scale, the augmentation's own wrist displacement median 54.6 mm; ratio median 0.09
+
+(d) palm-plane roll about the forearm (MediaPipe pose 15/17/19, 16/18/20), per clip
+  L 01986: n= 53 roll std  11.4 deg, range   43.5 deg
+  L 01987: n= 68 roll std  22.6 deg, range   81.0 deg
+  L 01988: n=122 roll std  19.2 deg, range   80.2 deg
+  L 01991: n= 49 roll std   8.9 deg, range   37.7 deg
+  L 01992: n= 59 roll std   2.6 deg, range   11.7 deg
+  R 01986: n= 57 roll std  12.4 deg, range   55.6 deg
+  R 01987: n= 70 roll std  17.3 deg, range   61.0 deg
+  R 01988: n=118 roll std  23.6 deg, range   91.5 deg
+  R 01991: n= 48 roll std   4.7 deg, range   18.2 deg
+  R 01992: n= 59 roll std   5.7 deg, range   25.6 deg
+  visibility of pose landmarks 17-20 (pinky/index): median 0.94, frac >= 0.5 0.87
+
+(e) DELIVERED mesh in the landmark frame (MediaPipe world: y down, -z toward camera)
+  nose vertex minus shoulder midpoint: y median +0.193 m (negative = above), z median +0.129 m (negative = toward camera); frac nose BELOW shoulders 1.00, frac nose facing AWAY from camera 1.00

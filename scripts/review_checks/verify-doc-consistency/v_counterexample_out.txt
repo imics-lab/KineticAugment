@@ -1,0 +1,17 @@
+review case 0.7 rad about z, rest arms: raw max 319.15 mean 316.89; sim max 79.18 mean 44.70 mm
+-- rest arms, random axis
+  10 deg: raw mean  63.06 max   81.3 | sim mean   8.54 max   19.7 | rigid mean   8.63 max   19.8 mm
+  20 deg: raw mean 125.64 max  161.9 | sim mean  17.14 max   39.6 | rigid mean  17.69 max   40.0 mm
+  45 deg: raw mean 276.88 max  356.8 | sim mean  39.26 max   92.1 | rigid mean  44.06 max   91.7 mm
+-- random arms N(0,0.4), random axis
+  10 deg: raw mean  63.22 max   81.3 | sim mean   8.11 max   24.4 | rigid mean   8.87 max   27.3 mm
+  20 deg: raw mean 125.96 max  161.9 | sim mean  16.25 max   50.4 | rigid mean  17.84 max   55.3 mm
+  45 deg: raw mean 277.59 max  356.8 | sim mean  37.20 max  122.7 | rigid mean  41.86 max  130.0 mm
+-- random arms N(0,0.3), y axis
+  10 deg: raw mean  28.01 max   28.5 | sim mean  10.48 max   22.6 | rigid mean  11.23 max   23.3 mm
+  20 deg: raw mean  55.80 max   56.7 | sim mean  21.13 max   45.9 | rigid mean  23.15 max   47.7 mm
+  45 deg: raw mean 122.98 max  125.0 | sim mean  49.44 max  107.0 | rigid mean  58.41 max  111.5 mm
+-- rest arms, x/y/z axes
+  10 deg: raw mean  61.47 max   81.1 | sim mean   7.31 max   19.6 | rigid mean   7.38 max   19.4 mm
+  20 deg: raw mean 122.48 max  161.6 | sim mean  14.70 max   39.3 | rigid mean  15.23 max   38.8 mm
+  45 deg: raw mean 269.92 max  356.2 | sim mean  34.04 max   90.6 | rigid mean  39.02 max   88.6 mm

@@ -1,0 +1,34 @@
+=== E1: invalid landmark VALUES never influence the fit (bitwise) ===
+  masks with >=3 valid: 42; comparisons: 840; fits that differed bitwise: 0
+
+=== E2: orphan correspondences (valid landmark whose bone is unsolved) ===
+  L sh, R sh, L wrist only (no bone solvable)     : max error over the VALID landmarks: median   54.8 mm, max  206.9 mm (raises: no)
+  all but L elbow (L wrist orphaned)              : max error over the VALID landmarks: median   76.5 mm, max  331.8 mm (raises: no)
+  all but L shoulder (L elbow, L wrist orphaned)  : max error over the VALID landmarks: median   32.4 mm, max  152.0 mm (raises: no)
+  all but R shoulder                              : max error over the VALID landmarks: median   30.8 mm, max  137.1 mm (raises: no)
+  real clips: 0 of 409 fittable frames contain an orphaned correspondence
+
+=== E3: doc Step 7 synthetic table, recomputed with the harness's own function ===
+  root unrotated (200 trials): worst 5.32e-15 m   (doc: 5.3e-15 m)
+  root rotated 30 deg (200 trials): worst 70.0 mm   (doc: 70 mm worst)
+
+=== E4: hidden assumption -- expression = 0 ===
+  random expression (sigma 2) moves SMPL-X joints: body 0..21 max 0.412 mm; jaw/eyes 22..24 max 0.524 mm; hands max 0.000 mm
+
+=== E5: SMPLXSkeleton gender / betas handling ===
+  model files present: ['SMPLX_NEUTRAL.npz', 'index.md', 'version.txt']
+  gender=male: AssertionError: Path models/smplx/SMPLX_MALE.npz does not exist!
+  gender=female: AssertionError: Path models/smplx/SMPLX_FEMALE.npz does not exist!
+  betas of length 5: constructed (rest joints shape (55, 3))
+  betas of length 16: RuntimeError: einsum(): subscript l has size 10 for operand 1 which does not broadcast with previously seen size 1
+
+=== E6: rotated landmark frame -- fold is exact, frame ESTIMATE vs truth ===
+  whole landmark set rigidly rotated   0 deg: worst-joint error median    0.0 mm, max    0.0 mm
+  whole landmark set rigidly rotated  10 deg: worst-joint error median   17.7 mm, max   22.8 mm
+  whole landmark set rigidly rotated  30 deg: worst-joint error median   50.9 mm, max   73.3 mm
+  whole landmark set rigidly rotated  90 deg: worst-joint error median  153.4 mm, max  228.4 mm
+  whole landmark set rigidly rotated 180 deg: worst-joint error median  256.0 mm, max  359.6 mm
+
+=== E7: DeprecationWarning visibility (default warning filters) ===
+  called from __main__                    : warning printed = True
+  called from an imported library module  : warning printed = False

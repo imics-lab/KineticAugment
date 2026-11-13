@@ -1,0 +1,4 @@
+SMPLXSkeleton stores betas attribute: False
+fit.betas returned: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+reconstruct_body vs real SMPL-X forward(using fit.betas):   max 54.85 mm
+reconstruct_body vs real SMPL-X forward(using skeleton's betas): max 0.0001 mm

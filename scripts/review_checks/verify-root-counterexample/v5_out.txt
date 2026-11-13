@@ -1,0 +1,6 @@
+10 deg seed42 | converter mean   8.93 max   22.5 mean-of-trial-max  15.47 | raw mean  63.66 max   81.3 mean-of-trial-max  70.95 | sim mean   8.22 max   22.6 mean-of-trial-max  15.37
+20 deg seed42 | converter mean  18.12 max   45.9 mean-of-trial-max  30.95 | raw mean 126.84 max  161.9 mean-of-trial-max 141.36 | sim mean  16.51 max   45.4 mean-of-trial-max  30.84
+30 deg seed42 | converter mean  27.78 max   70.0 mean-of-trial-max  46.51 | raw mean 189.05 max  241.3 mean-of-trial-max 210.70 | sim mean  24.93 max   68.6 mean-of-trial-max  46.46
+45 deg seed42 | converter mean  43.49 max  109.7 mean-of-trial-max  70.04 | raw mean 279.52 max  356.8 mean-of-trial-max 311.54 | sim mean  37.97 max  104.5 mean-of-trial-max  70.39
+doc table: 10 -> 9.87/81 ; 20 -> 16.55/119 ; 45 -> 47.04/307 (mean/max mm)
+old strict-xfail case (seed 4, y 30): converter max 62.20 mean 32.84 mm

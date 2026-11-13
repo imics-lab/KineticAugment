@@ -1,0 +1,4 @@
+OneEuro(0.1, 40.0, 1.0): |refiltered(nosmooth) - default|  max=1.24e-07 m  median=3.73e-09 m   frame0 raw==smoothed max diff=0.0e+00
+OneEuro(0.05, 80.0, 1.0): |refiltered(nosmooth) - default|  max=2.06e-02 m  median=1.39e-03 m   frame0 raw==smoothed max diff=0.0e+00
+OneEuro(0.1, 10.0, 1.0): |refiltered(nosmooth) - default|  max=6.16e-02 m  median=4.94e-03 m   frame0 raw==smoothed max diff=0.0e+00
+OneEuro(0.01, 40.0, 1.0): |refiltered(nosmooth) - default|  max=3.21e-03 m  median=1.18e-04 m   frame0 raw==smoothed max diff=0.0e+00

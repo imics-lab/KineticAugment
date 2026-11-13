@@ -1,0 +1,37 @@
+=== C1: SMPL-X forward(fit params) vs reconstruct_body(fit, skeleton) ===
+  PASS  1.631e-07 m   betas=0, root 0, translated (test regime)
+  PASS  2.412e-07 m   betas=0, landmark frame randomly rotated (global_orient up to 56 deg)
+  PASS  1.065e-07 m   betas=0, synthetic root rotated 0.7 rad
+  PASS  1.700e-07 m   betas=0, REAL clips (409 frames; |global_orient| median 4 deg)
+  FAIL  1.955e-02 m   SHAPED skeleton (|betas|=4.3), BodyFit used as returned
+  PASS  1.775e-07 m   SHAPED skeleton, betas passed to SMPL-X MANUALLY, rotated frame
+  BodyFit.betas from shaped skeleton = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  (skeleton betas norm 4.28)
+
+=== C2: rigid transform folds exactly into global_orient/transl ===
+  reconstruct_body vs independently computed R*FK+t (arm joints): max 7.109e-16 m
+  FK(global_orient, body_pose)+transl vs R*FK+t over body joints 0..21: max 8.882e-16 m
+  control: same fold WITHOUT root-pivot compensation: max 3.411e-01 m  (|J0| = 0.352 m)
+
+=== C3: does reconstruction depend only on the parameters? ===
+  signature: ['fit', 'skeleton']
+  changing fit.betas (random, sigma 3) changes reconstruct_body output by: 0.000e+00 m  -> betas field is IGNORED by reconstruct_body
+  same fit, shaped vs default skeleton: outputs differ by up to 16.6 mm -> shape lives in the skeleton argument, not in the params
+  BodyFit fields: ['body_pose', 'global_orient', 'transl', 'betas'] (no gender / model id / flat_hand_mean)
+
+=== C4: NaN where not modelled ===
+  NaN rows: 27 of 33; non-NaN rows: [11, 12, 13, 14, 15, 16]
+  left wrist INVALID in input -> reconstructed L wrist = [0.693, 0.023, 0.193] (not NaN; true was [0.671, 0.036, 0.334], error 143 mm)
+  left elbow+wrist INVALID -> reconstructed L elbow/wrist present: True; BodyFit records which landmarks were observed: False
+
+=== C5: <3 valid correspondences raises ===
+  0 valid correspondences: raises ValueError
+  1 valid correspondences: raises ValueError
+  2 valid correspondences: raises ValueError
+  3 valid correspondences: ok
+  4 valid correspondences: ok
+  5 valid correspondences: ok
+  6 valid correspondences: ok
+  validity=True but 3 NaN landmarks: ok
+  3 valid but COLLINEAR (straight left arm only): does NOT raise; observed error max 2.58e-16 m; R shoulder (unobserved) placed 0 mm from truth
+  straight-arm truth rotated about the arm axis -> R shoulder error (mm): [(0.0, 0.0), (0.5, 140.3), (1.0, 272.0), (2.0, 477.3)] (frame undetermined by collinear points)
+  L elbow invalid but L wrist valid: error on the FULLY observed joints (shoulders, R arm): median 75.9 mm, max 157.4 mm (exact when all valid)

@@ -1,0 +1,81 @@
+==============================================================================
+1. Script estimators by variant, landmark set, and per-axis (pooled medians, % sw)
+==============================================================================
+repo     script set (arms+hips)  x: A=0.022 B=0.043  y: A=0.016 B=0.033  z: A=0.062 B=0.074  xy: A=0.066 B=0.060  xyz: A=0.175 B=0.098  (n=32)
+                                 script's 'z is Nx noisier' = B_z/B_xy = 1.23; per-axis B_z/mean(B_x,B_y) = 1.94
+repo     arms only (scored set)  x: A=0.025 B=0.046  y: A=0.019 B=0.039  z: A=0.076 B=0.089  xy: A=0.074 B=0.066  xyz: A=0.222 B=0.111  (n=28)
+nosmooth script set (arms+hips)  x: A=0.125 B=0.255  y: A=0.122 B=0.214  z: A=0.227 B=0.316  xy: A=0.366 B=0.357  xyz: A=0.743 B=0.472  (n=32)
+nosmooth arms only (scored set)  x: A=0.140 B=0.275  y: A=0.134 B=0.238  z: A=0.251 B=0.376  xy: A=0.415 B=0.370  xyz: A=0.835 B=0.509  (n=28)
+static   script set (arms+hips)  x: A=0.154 B=0.368  y: A=0.250 B=0.447  z: A=0.366 B=0.512  xy: A=0.656 B=0.579  xyz: A=1.363 B=0.791  (n=27)
+static   arms only (scored set)  x: A=0.187 B=0.391  y: A=0.268 B=0.483  z: A=0.425 B=0.535  xy: A=0.683 B=0.674  xyz: A=1.555 B=0.845  (n=24)
+repo hips alone (hip-centred origin!): B_xyz=0.013%  (n=4)
+
+==============================================================================
+2. Autocorrelation of high-pass components (6 arm landmarks x 3 axes, pooled)
+==============================================================================
+component                   variant         lag1    lag2    lag3
+1st difference              iid theory    -0.500   0.000   0.000
+                            repo           0.527   0.275   0.148
+                            default        0.591   0.334   0.164
+                            nosmooth       0.252   0.136   0.097
+                            static        -0.001   0.074   0.026
+2nd difference (Method B's D)iid theory    -0.667   0.167   0.000
+                            repo          -0.184  -0.135  -0.039
+                            default       -0.172  -0.107  -0.076
+                            nosmooth      -0.400  -0.059   0.051
+                            static        -0.537   0.064   0.010
+residual from SG(7,2) fit   iid theory    -0.490  -0.245   0.313
+                            repo          -0.207  -0.488   0.140
+                            default       -0.198  -0.502   0.113
+                            nosmooth      -0.328  -0.409   0.259
+                            static        -0.413  -0.314   0.291
+
+Smoothing displacement (default - nosmooth, same raw predictions):
+  acf lag1..3 = 0.621 0.344 0.161
+
+==============================================================================
+3. Simulation: iid noise -> Method A/B, with and without the identified One Euro filter
+==============================================================================
+sigma/axis=0.5mm stationary   B/true: unfiltered=0.381 filtered=0.009 | A/true: unfiltered=0.626 filtered=0.016
+sigma/axis=0.5mm real-motion  B/true: unfiltered=0.850 filtered=0.172 | A/true: unfiltered=1.421 filtered=0.545
+sigma/axis=0.9mm stationary   B/true: unfiltered=0.383 filtered=0.012 | A/true: unfiltered=0.663 filtered=0.020
+sigma/axis=0.9mm real-motion  B/true: unfiltered=0.700 filtered=0.120 | A/true: unfiltered=1.077 filtered=0.319
+sigma/axis=2.0mm stationary   B/true: unfiltered=0.398 filtered=0.021 | A/true: unfiltered=0.662 filtered=0.032
+sigma/axis=2.0mm real-motion  B/true: unfiltered=0.558 filtered=0.089 | A/true: unfiltered=0.888 filtered=0.168
+
+iid theory (stationary, per-axis sigma s): A = sqrt2*s*chi_d.ppf(0.10);  B = sqrt(d)*s
+  z    A=0.178s  B=1.000s  A/B=0.178
+  xy   A=0.649s  B=1.414s  A/B=0.459
+  xyz  A=1.081s  B=1.732s  A/B=0.624
+  median 3-D Euclidean error of iid noise = 1.538s = 0.888 x B_xyz
+
+==============================================================================
+4. Same statistic as the round-trip score: median per-landmark 3-D Euclidean distance
+   / shoulder width over the 6 arm landmarks, between two detections of the SAME frames
+==============================================================================
+pair                                                 direct med     p95  aligned med     p95
+determinism (same settings, rerun)                       0.000%   0.00%       0.000%   0.00%   n=2343
+fresh graph vs repo's shared graph (= repo npz)          1.264%  18.16%       0.615%   6.14%   n=2334
+raw vs smoothed (filter displacement)                    2.404%   5.66%       1.101%   3.04%   n=2297
+raw vs raw, input downscaled to 75%                      2.272%   6.39%       0.959%   2.63%   n=2303
+smoothed, input downscaled to 75%                        1.940%   5.44%       0.891%   2.43%   n=2342
+smoothed, image padded/person shifted                    3.595%   8.98%       1.650%   3.97%   n=2343
+smoothed, brightness +25                                 2.828%   7.43%       1.212%   3.14%   n=2342
+tracking vs static_image_mode                            9.217%  20.06%       3.418%   9.64%   n=2275
+model_complexity 1 vs 2 (full vs heavy)                 25.672%  89.06%      15.408%  45.16%   n=1803
+
+Temporal self-residual in the same statistic (median ||p_t - SG(7,2) fit_t|| / sw):
+  repo      0.508%
+  default   0.414%
+  nosmooth  1.261%
+  static    2.117%
+
+==============================================================================
+5. Repo extraction reuses one Holistic graph across clips: per-clip effect
+   (repo npz vs fresh-graph re-extraction, 6 arm landmarks, % sw)
+==============================================================================
+  01986: median=0.000%  max=0.00%  first5 med=0.000%  rest med=0.000%  bitwise-equal=True
+  01987: median=9.518%  max=33.05%  first5 med=17.780%  rest med=9.029%  bitwise-equal=False
+  01988: median=1.088%  max=24.03%  first5 med=8.624%  rest med=1.051%  bitwise-equal=False
+  01991: median=0.197%  max=6.82%  first5 med=2.049%  rest med=0.136%  bitwise-equal=False
+  01992: median=6.825%  max=31.19%  first5 med=21.644%  rest med=6.458%  bitwise-equal=False

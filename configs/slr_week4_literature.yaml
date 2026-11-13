@@ -1,0 +1,146 @@
+# Week-4 literature profile: the default profile's augmentations at the proven ranges.
+# Conservative baseline for the ablation. Augmentations with no proven range are off.
+# Each range leaf carries "# proven: <range> (<source>)" or "# proven: none — <reason>"; each
+# setting leaf carries "# setting: <what it is>". Proven vs used ranges: docs/Augmentation_Ranges.md.
+profile_name: slr_week4_literature
+seed: 20261107
+schema_version: 1
+
+regions:
+  body:
+    joint_coupled_noise:
+      enabled: true  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        sigma_deg: 2.0  # proven: ±4° shoulder/wrist at p=0.3 (SPOTER [M1], [T]); default/ambitious use 2.5
+        truncate_deg: 4.0  # proven: ±4° shoulder/wrist (SPOTER [M1]); default/ambitious use 5.0
+        elbow_sigma_deg: 3.75  # proven: ±7.5° elbow, no harm in pose-based translation [T]; default/ambitious use 4.75
+        elbow_truncate_deg: 7.5  # proven: ±7.5° elbow [T]; default/ambitious use 9.5
+        chain_coupling: 0.5  # proven: none — shoulder/wrist share a common draw; designer's choice
+        side_coupling: 0.7  # proven: none — left/right correlation; designer's choice
+        side_mode: mirror  # setting: how the two sides relate (mirror, independent or synchronous)
+        drift_deg: 0.0  # proven: none — slow drift over the clip is off
+    tier1_arm_joints:
+      enabled: false  # setting: off in every week-4 profile; replaces joint_coupled_noise if turned on
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        p: 0.3  # proven: p=0.3 per joint (SPOTER [M1]); a probability, not widened
+        shoulder_wrist_deg: 4.0  # proven: ±4° (SPOTER [M1]); default/ambitious use 5.0
+        elbow_deg: 7.5  # proven: ±7.5° [T]; default/ambitious use 9.5 (the Tier 1 draw ignores it, shoulder_wrist_deg is used)
+    limb_length_scaling:
+      enabled: false  # setting: opt-in experiment arm
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        factor: [0.93, 1.07]  # proven: none — no literature; between-signer spread 5.7% (Grounding §6.1); default/ambitious use ±7%
+        bones: [upper_arm, forearm]  # setting: which bones are scaled
+        retarget: true  # setting: re-solve the arm so each wrist keeps its world position
+    movement_size:
+      enabled: false  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        factor: [0.8, 1.2]  # proven: none — no measured range; 0.85-1.15 is Grounding's example [L2.10, L2.11]; default/ambitious use 0.8-1.2, log-uniform
+    location_jitter:
+      enabled: false  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        sigma_mm: 10.0  # proven: 10 mm (production spread [T]); default/ambitious use 12.5
+        truncate_mm: 20.0  # proven: 20 mm (production spread [T]); default/ambitious use 25
+  fingers:
+    joint_coupled_noise:
+      enabled: false  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        sigma_deg: 3.75  # proven: none — no published range; estimate 3° widened 25%
+        truncate_deg: 7.5  # proven: none — no published range; estimate 6° widened 25%
+        finger_coupling: 0.5  # proven: none — correlation between neighbouring fingers; designer's choice
+        dip_ratio: 0.667  # setting: DIP flexion follows the PIP by this ratio
+    handshape_jitter:
+      enabled: false  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        nonselected_sigma_deg: 7.5  # proven: none — no published range ("finger-tree rotate" gives no angle [T])
+        selected_sigma_deg: 3.75  # proven: none — no published range [T]
+        selected_flexion_sigma_deg: 2.0  # proven: none — no published range [T]
+        truncate_sigmas: 2.0  # setting: truncation in standard deviations
+        max_redraws: 5  # setting: redraws allowed before falling back to no change
+        feature_margin_deg: 5.0  # setting: margin kept from the handshape class thresholds
+  face:
+    expression_jitter:
+      enabled: false  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        brows:
+          enabled: true  # setting: blendshape group on
+          sigma: 0.0625  # proven: none — no published range; lexical mouth patterns excluded [L7.3, L1.5]
+          truncate: 0.125  # proven: none — no published range [L7.3, L1.5]
+        eyes:
+          enabled: true  # setting: blendshape group on
+          sigma: 0.0625  # proven: none — no published range [L7.3, L1.5]
+          truncate: 0.125  # proven: none — no published range [L7.3, L1.5]
+        cheeks_nose:
+          enabled: true  # setting: blendshape group on
+          sigma: 0.0375  # proven: none — no published range [L7.3, L1.5]
+          truncate: 0.075  # proven: none — no published range [L7.3, L1.5]
+        mouth_jaw:
+          enabled: false  # setting: off, lexical mouth patterns can change the sign [L7.3, L1.5]
+          sigma: 0.0375  # proven: none — no published range; only used if switched on for an experiment
+          truncate: 0.075  # proven: none — no published range; only used if switched on for an experiment
+        frame_noise: 0.0  # proven: none — per-frame noise is off
+        min_face_frames: 30  # setting: fewest face frames a clip needs for the jitter
+        ridge_alpha: 0.01  # setting: ridge penalty of the blendshape-to-points fit
+  temporal:
+    time_warp:
+      enabled: true  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        duration: [0.67, 1.5]  # proven: 0.67-1.5× (0.5× hurt once) [L6.2, M6, M3, T]; default/ambitious use 0.6-1.65×, log-uniform
+        mode_weights:
+          none: 1  # setting: weight of uniform duration only
+          varied: 0  # setting: weight of the varying-speed warp
+          segment: 0  # setting: weight of the one-slowed-segment warp
+        num_knots: 4  # setting: speed knots of the varied warp
+        knot_rate: [0.7, 1.43]  # proven: none — non-uniform warps are excluded [L6.3, L6.4]; default/ambitious use 0.7-1.43×, log-uniform
+        protect_end: 0.2  # setting: share of the clip end left unwarped
+        segment_width: [0.2, 0.6]  # proven: none — non-uniform warps are excluded [L6.3, L6.4]; default/ambitious use 20-60% of the clip
+        segment_factor: [0.6, 1.65]  # proven: none — non-uniform warps are excluded [L6.3, L6.4]; default/ambitious use 0.6-1.65×
+    frame_drop:
+      enabled: true  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        mode_weights:
+          rate: 0  # setting: weight of the lower frame-rate grid
+          random: 1  # setting: weight of random drops under the gap limit
+        target_fps: [10, 25]  # proven: ≥10 fps, where human intelligibility stops improving [T]; default/ambitious use 12-25
+        min_fps: 10  # proven: ≥10 fps [T]; default/ambitious use 8
+        p: [0.0, 0.2]  # proven: none — drop probability per frame; the gap limit bounds the damage
+        max_gap_ms: 100  # proven: masked runs ≤8 frames (≈100 ms at 30 fps) [M4, M10]; default/ambitious use 125 ms
+        fill: none  # setting: what replaces dropped frames (none, hold or interpolate)
+    hand_dropout:
+      enabled: false  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        start_rate: [0.0, 0.05]  # proven: none — measured 0.039 run starts per detected interior hand-frame (scripts/measure_hand_dropout.py)
+        run_length_mean: 1.9  # proven: none — measured mean interior run length (scripts/measure_hand_dropout.py)
+        max_run_frames: 8  # proven: runs ≤8 frames [M4, M10]; default/ambitious use 10
+  scene:
+    mirror:
+      enabled: true  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        p: 0.5  # proven: p=0.5 (cost 1.3 pp on WLASL once) [M6, T]; a probability, not widened
+    view:
+      enabled: true  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        yaw_deg: 20.0  # proven: ±20° (Spoken2Sign [M7]); default/ambitious use ±25
+        pitch_deg: 5.0  # proven: ±5° ("a few degrees" [T]); default/ambitious use ±6
+    scale:
+      enabled: true  # setting: on/off switch for this augmentation
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        factor: [0.8, 1.2]  # proven: 0.8-1.2 (GISLR [M10]); default/ambitious use 0.75-1.25
+    uncentre:
+      enabled: true  # setting: on/off switch for this augmentation (skipped without a camera)
+      probability: 1.0  # setting: chance the augmentation runs on a clip
+      ranges:
+        limit: 0.1  # proven: ±0.1 of the frame (GISLR [M10]); default/ambitious use ±0.125, hands kept in frame

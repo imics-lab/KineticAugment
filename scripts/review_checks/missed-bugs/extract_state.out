@@ -1,0 +1,19 @@
+  01986: fps 25.00, frames 83
+  01987: fps 29.97, frames 75
+  01988: fps 30.00, frames 144
+  01991: fps 29.97, frames 50
+  01992: fps 29.97, frames 60
+
+  shared-instance re-run vs stored npz (max |diff| over arm landmarks 11-16):
+    01986: 0.000 mm
+    01987: 0.000 mm
+    01988: 0.000 mm
+    01991: 0.000 mm
+    01992: 0.000 mm
+
+  fresh instance per clip vs shared instance (as the script runs), arm landmarks 11-16:
+    01986: first 5 frames max diff [0. 0. 0. 0. 0.] mm; frames with diff > 1 mm: 0/83; overall max 0.00 mm (0.00% of ~0.33 m shoulder width)
+    01987: first 5 frames max diff [113.95  89.83  75.42  70.03  70.39] mm; frames with diff > 1 mm: 75/75; overall max 113.95 mm (34.53% of ~0.33 m shoulder width)
+    01988: first 5 frames max diff [78.53 46.29 34.89 33.17 30.78] mm; frames with diff > 1 mm: 143/144; overall max 78.53 mm (23.80% of ~0.33 m shoulder width)
+    01991: first 5 frames max diff [23.64 13.98  7.49  9.4  13.62] mm; frames with diff > 1 mm: 27/49; overall max 23.64 mm (7.16% of ~0.33 m shoulder width)
+    01992: first 5 frames max diff [102.56  91.59  87.42  84.38  71.  ] mm; frames with diff > 1 mm: 59/59; overall max 102.56 mm (31.08% of ~0.33 m shoulder width)

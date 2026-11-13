@@ -1,0 +1,33 @@
+Prior sd of unobserved quantities under beta~N(0,I) (linearised):
+   height_m             9.96 cm
+   L_leg_m              5.35 cm
+   hip_width_m          1.14 cm
+   pelvis_to_neck_m     3.18 cm
+   volume_L            17.58 L
+   chest_depth_m        4.02 cm
+
+=== Betas only (scale fixed = 1, as converter.py does) ===
+ sigma_L= 1 mm: eff.dof=3.07  dims with var halved=3  post/prior var eig=[0.001 0.003 0.108 0.817 0.998]
+     prior->posterior sd: height:10.0->3.4  L:5.3->1.5  hip:1.1->0.8  pelvis:3.2->1.6  volume:17.6->8.2  chest:4.0->2.4
+ sigma_L= 3 mm: eff.dof=2.47  dims with var halved=2  post/prior var eig=[0.005 0.028 0.523 0.976 1.   ]
+     prior->posterior sd: height:10.0->3.5  L:5.3->1.6  hip:1.1->0.9  pelvis:3.2->1.6  volume:17.6->9.3  chest:4.0->2.7
+ sigma_L= 5 mm: eff.dof=2.17  dims with var halved=2  post/prior var eig=[0.014 0.075 0.753 0.991 1.   ]
+     prior->posterior sd: height:10.0->3.7  L:5.3->1.8  hip:1.1->1.0  pelvis:3.2->1.7  volume:17.6->9.8  chest:4.0->2.8
+ sigma_L=10 mm: eff.dof=1.78  dims with var halved=2  post/prior var eig=[0.055 0.245 0.924 0.998 1.   ]
+     prior->posterior sd: height:10.0->4.3  L:5.3->2.3  hip:1.1->1.0  pelvis:3.2->1.8  volume:17.6->10.8  chest:4.0->3.1
+ sigma_L=20 mm: eff.dof=1.27  dims with var halved=1  post/prior var eig=[0.188 0.565 0.98  0.999 1.   ]
+     prior->posterior sd: height:10.0->5.7  L:5.3->3.2  hip:1.1->1.1  pelvis:3.2->2.0  volume:17.6->12.5  chest:4.0->3.4
+
+=== Betas + free scale with prior sd s_sd (both metric => scale should be 1) ===
+ scale prior sd= 1.0%  sigma_L= 3mm: scale posterior sd= 0.98% (shrink 0.98x prior), beta0 post sd=0.28, corr(beta0,scale)=-0.521
+ scale prior sd= 1.0%  sigma_L=10mm: scale posterior sd= 0.99% (shrink 0.99x prior), beta0 post sd=0.36, corr(beta0,scale)=-0.384
+ scale prior sd= 3.0%  sigma_L= 3mm: scale posterior sd= 2.48% (shrink 0.83x prior), beta0 post sd=0.44, corr(beta0,scale)=-0.841
+ scale prior sd= 3.0%  sigma_L=10mm: scale posterior sd= 2.68% (shrink 0.89x prior), beta0 post sd=0.50, corr(beta0,scale)=-0.749
+ scale prior sd= 5.0%  sigma_L= 3mm: scale posterior sd= 3.32% (shrink 0.66x prior), beta0 post sd=0.55, corr(beta0,scale)=-0.901
+ scale prior sd= 5.0%  sigma_L=10mm: scale posterior sd= 3.83% (shrink 0.77x prior), beta0 post sd=0.63, corr(beta0,scale)=-0.851
+ scale prior sd=10.0%  sigma_L= 3mm: scale posterior sd= 4.05% (shrink 0.41x prior), beta0 post sd=0.65, corr(beta0,scale)=-0.930
+ scale prior sd=10.0%  sigma_L=10mm: scale posterior sd= 5.13% (shrink 0.51x prior), beta0 post sd=0.79, corr(beta0,scale)=-0.908
+
+min-norm beta reproducing +1% scale on all 5 lengths exactly: |beta|=0.903, beta=[ 0.019  0.316 -0.427  0.04   0.327  0.329  0.187 -0.495  0.096 -0.167]
+  residual 7.07e-15 mm; its side effect on height -0.41 cm (pure 1% scale would be 1.72 cm)
+  beta0 alone: 0.151 sigma reproduces 1% scale with relative residual 18.5% on the 5 lengths

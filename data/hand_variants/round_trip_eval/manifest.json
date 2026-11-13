@@ -1,0 +1,140 @@
+{
+  "data_dir": "data/round_trip_eval",
+  "backends": [
+    "mano"
+  ],
+  "outputs": [
+    "track_shape",
+    "track_shape_scale",
+    "track_shape_scale_clean"
+  ],
+  "inputs": {
+    "data/round_trip_eval/05631_hands.npz": "72bfe09f958dd59284c4cb8ac6bdd2843e1c83c7fbd3e6d9329620039325c956",
+    "data/round_trip_eval/07389_hands.npz": "2c924db95d6850335552772d81e48182384823af68c904464a71999f6671445b",
+    "data/round_trip_eval/08917_hands.npz": "797bb8e257854b4f1116e4fe77885c478574fe2231ad708fcde69d2ca77ed860",
+    "data/round_trip_eval/08918_hands.npz": "b1d5926d5896128729095d0f88c91dcf78d22bc6ccfedb11cf7647c3fda34040",
+    "data/round_trip_eval/08938_hands.npz": "6275fd5f070f45d87d1262d9e41381376d21481e4015de645ea29b3c09cb97d4",
+    "data/round_trip_eval/09849_hands.npz": "3aeeeaad397b5076db69317f311cb620d94a1542619e019b1dabd108e0e7ba35",
+    "data/round_trip_eval/12328_hands.npz": "f129b6f4ecebc831b7b3910817acd063d9fb80a83cf0c22adfa7d370a1872c7a",
+    "data/round_trip_eval/13630_hands.npz": "10e3f0a3615a40dcc06ef9099762b9835c902794b038afd14978e44d389e0690",
+    "data/round_trip_eval/17083_hands.npz": "a07378be699e444389e41cabd3d32779d985f2f9a13cbd646223ddf58d8db4bc",
+    "data/round_trip_eval/21871_hands.npz": "7b9d6711083958c3590a61ea688d3ba0f6431341710e49fb990caf37ff0f65df",
+    "data/round_trip_eval/21942_hands.npz": "7861510ab04e9402e9e515827f428be5e085051bcadf61807902e47ab88a510d",
+    "data/round_trip_eval/28111_hands.npz": "fbd917403e0b9334a1d5b908dc5aa21a50dbcef901b0620cb2ed038abfc91fb6",
+    "data/round_trip_eval/57641_hands.npz": "a5e7d624e63fbe124451a52ae3fb69d86013d7b60249fc5a3316d775277de5d7",
+    "data/round_trip_eval/57949_hands.npz": "36548f8518bd4e123e8a8c2b06116e24579fabee125688d5882e99f5dc4f6e10",
+    "data/round_trip_eval/63229_hands.npz": "0e6f8f75700feb30632cd519f6162b187f64cd7109c12a7b47be9f34712c8a29",
+    "data/round_trip_eval/63665_hands.npz": "d64dab27d452f4ab8d7d2a469ae94912ce9b679d544dc6a294a6e7692a81d9b7",
+    "data/round_trip_eval/63669_hands.npz": "106995ca7aef62d4bd20d006b77d844656b55be4c1432cfab8d6bf54f037a909",
+    "data/round_trip_eval/69257_hands.npz": "e3ba8ad4179938df7711e8ee73de6378dadd6ee4c1dfcf8e58393167c595e293",
+    "data/round_trip_eval/69364_hands.npz": "98447363a1ef98b9bafecb2bdad14d53cffd1b64becb6a15d46e26f1e0e60c2f",
+    "data/round_trip_eval/69411_hands.npz": "8093dd4897c7566d8faa894b5b88e82a2113b5487d2c9e2d15732dcd25542a3b"
+  },
+  "clips": {
+    "05631": {
+      "mano: track_shape": 5.198905815260633,
+      "mano: track_shape_scale": 2.8388508796300513,
+      "mano: track_shape_scale_clean": 10.07151760146664
+    },
+    "07389": {
+      "mano: track_shape": 7.796916588663451,
+      "mano: track_shape_scale": 5.26307842142844,
+      "mano: track_shape_scale_clean": 13.137093974157386
+    },
+    "08917": {
+      "mano: track_shape": 4.2472164410766995,
+      "mano: track_shape_scale": 3.6928969996261216,
+      "mano: track_shape_scale_clean": 5.549275633713488
+    },
+    "08918": {
+      "mano: track_shape": 5.814590819401668,
+      "mano: track_shape_scale": 4.000025567830064,
+      "mano: track_shape_scale_clean": 10.752220925966174
+    },
+    "08938": {
+      "mano: track_shape": 4.626924702709059,
+      "mano: track_shape_scale": 3.9466407913072774,
+      "mano: track_shape_scale_clean": 6.248288223254938
+    },
+    "09849": {
+      "mano: track_shape": 6.526776487970599,
+      "mano: track_shape_scale": 4.514361687685502,
+      "mano: track_shape_scale_clean": 11.425247364913488
+    },
+    "12328": {
+      "mano: track_shape": 2.9218096748195417,
+      "mano: track_shape_scale": 2.654516988366056,
+      "mano: track_shape_scale_clean": 3.332551300744308
+    },
+    "13630": {
+      "mano: track_shape": 4.177617965196477,
+      "mano: track_shape_scale": 3.206767097751253,
+      "mano: track_shape_scale_clean": 7.132993464262073
+    },
+    "17083": {
+      "mano: track_shape": 5.024010321268618,
+      "mano: track_shape_scale": 4.799712290935638,
+      "mano: track_shape_scale_clean": 5.7024106025566645
+    },
+    "21871": {
+      "mano: track_shape": 4.93740318437252,
+      "mano: track_shape_scale": 3.3859353281669544,
+      "mano: track_shape_scale_clean": 8.791913091271388
+    },
+    "21942": {
+      "mano: track_shape": 6.128508279702253,
+      "mano: track_shape_scale": 3.9998848004523437,
+      "mano: track_shape_scale_clean": 11.683319132533589
+    },
+    "28111": {
+      "mano: track_shape": 7.235317330202744,
+      "mano: track_shape_scale": 4.210467362800207,
+      "mano: track_shape_scale_clean": 11.827256959089407
+    },
+    "57641": {
+      "mano: track_shape": 3.4608437698315844,
+      "mano: track_shape_scale": 3.3821492379387634,
+      "mano: track_shape_scale_clean": 3.780379742877832
+    },
+    "57949": {
+      "mano: track_shape": 3.826953682716977,
+      "mano: track_shape_scale": 3.4696312465779258,
+      "mano: track_shape_scale_clean": 5.0034473529563925
+    },
+    "63229": {
+      "mano: track_shape": 7.150759039256076,
+      "mano: track_shape_scale": 5.2960649486403515,
+      "mano: track_shape_scale_clean": 11.6515212513046
+    },
+    "63665": {
+      "mano: track_shape": 5.868043653354151,
+      "mano: track_shape_scale": 4.21673005236084,
+      "mano: track_shape_scale_clean": 10.544993781759674
+    },
+    "63669": {
+      "mano: track_shape": 4.967524187029931,
+      "mano: track_shape_scale": 3.720704852984453,
+      "mano: track_shape_scale_clean": 6.954952950185811
+    },
+    "69257": {
+      "mano: track_shape": 8.210536340935306,
+      "mano: track_shape_scale": 5.056904645633868,
+      "mano: track_shape_scale_clean": 12.77930794919126
+    },
+    "69364": {
+      "mano: track_shape": 4.550769201064383,
+      "mano: track_shape_scale": 3.990731355723677,
+      "mano: track_shape_scale_clean": 5.959513371708406
+    },
+    "69411": {
+      "mano: track_shape": 3.582893833471442,
+      "mano: track_shape_scale": 3.055658137169039,
+      "mano: track_shape_scale_clean": 5.43449085494637
+    }
+  },
+  "pooled_mean_mm": {
+    "mano: track_shape": 5.099105787992128,
+    "mano: track_shape_scale": 3.83632532697571,
+    "mano: track_shape_scale_clean": 7.8881193789046735
+  }
+}

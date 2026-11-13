@@ -1,0 +1,6 @@
+segments with world in-plane fraction >0.5: n=1327; in-plane fraction median 0.84
+|2-D angle(image) - 2-D angle(world xy)|: median 7.5 deg, p95 16.8 deg
+3-frame change in 2-D angle, frames where image angle changes >5 deg: n=202
+   corr(image change, world change) = 0.972
+   |world change - image change| / |image change|: median 0.29, p95 0.76
+   sign agreement: 99.0%

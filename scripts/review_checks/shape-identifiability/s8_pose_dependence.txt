@@ -1,0 +1,36 @@
+clip  segment       n  sd mm  r(len, |dir_z|)  r(len, elbow ang)  R2 pose->len
+01986 L upper      54   13.5             0.98               0.54          0.98
+01986 L fore       54   24.1             0.71               0.73          0.93
+01986 R upper      62   17.7             0.93               0.28          0.98
+01986 R fore       62   30.4             0.79               0.43          0.93
+01986 shoulder W   83    4.5            -0.37                nan          0.29
+01987 L upper      69    8.1            -0.11              -0.36          0.41
+01987 L fore       69   22.5            -0.68              -0.65          0.64
+01987 R upper      73   14.0            -0.76              -0.51          0.69
+01987 R fore       73   13.9            -0.06              -0.36          0.58
+01987 shoulder W   75   15.3            -0.48                nan          0.57
+01988 L upper     124   15.0             0.86               0.57          0.90
+01988 L fore      124   23.1             0.88               0.83          0.84
+01988 R upper     121   15.1            -0.31               0.15          0.53
+01988 R fore      121   24.5             0.61               0.75          0.73
+01988 shoulder W  143    5.5             0.27                nan          0.33
+01991 L upper      49    6.8             0.95               0.81          0.92
+01991 L fore       49   15.3            -0.75              -0.91          0.84
+01991 R upper      48   12.9            -0.69               0.16          0.95
+01991 R fore       48   13.6             0.70              -0.17          0.77
+01991 shoulder W   49    9.0             0.91                nan          0.87
+01992 L upper      59   10.0             0.45              -0.04          0.71
+01992 L fore       59    9.3            -0.69              -0.56          0.55
+01992 R upper      59    7.8             0.44              -0.44          0.85
+01992 R fore       59   21.5             0.26              -0.28          0.94
+01992 shoulder W   59    2.0             0.07                nan          0.09
+
+median R^2 of length explained by its own bone direction (+elbow angle): 0.77 (range 0.09-0.98); iid noise would give ~0.08 by chance at n~60, 5 regressors
+
+SMPL-X (10 betas) max |d(L-R)| per unit-norm beta: upper 1.39 mm, fore 0.80 mm; template L-R: upper -7.3, fore +3.3 mm
+clip   obs upper L-R  obs fore L-R  |beta| needed (upper)  (fore)
+01986           -5.5          27.8                    1.3    30.7
+01987          -10.0         -29.8                    2.0    41.4
+01988           20.7          14.6                   20.1    14.2
+01991          -31.3         -33.0                   17.2    45.4
+01992           -4.8          39.5                    1.8    45.3

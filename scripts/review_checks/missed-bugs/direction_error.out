@@ -1,0 +1,5 @@
+  L upper  direct direction error: median 2.57 deg, p95 4.55, max 5.88
+  L fore   direct direction error: median 2.65 deg, p95 4.73, max 6.37
+  R upper  direct direction error: median 2.81 deg, p95 5.41, max 7.02
+  R fore   direct direction error: median 2.13 deg, p95 5.35, max 7.57
+  |global_orient| (= Kabsch rotation applied on top of the IK): median 3.57 deg, max 8.63

@@ -1,0 +1,4 @@
+elbow frame pairs: 808; wrist observed in both frames: 706, wrist validity toggles: 13
+  |d rotvec| when wrist observed in both: p99 0.38 max 0.67 rad
+  |d rotvec| on validity toggles        : median 0.94 max 1.59 rad
+  jumps > 1.0 rad: 5 total, of which on toggles: 5

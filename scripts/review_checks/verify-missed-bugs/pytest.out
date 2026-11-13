@@ -1,0 +1,3 @@
+FAILED tests/test_converter.py::TestValidity::test_rotated_root_with_a_missing_wrist_reconstructs_the_rest
+FAILED tests/test_converter.py::TestValidity::test_refuses_to_fit_without_both_shoulders
+=================== 13 failed, 66 passed, 2 xfailed in 3.77s ===================

@@ -1,0 +1,5 @@
+01986: sw c1=0.333 c2=0.320  Lupperarm c1=0.243 c2=0.218  per-landmark median diff % sw: 16.9 35.0 41.2 44.8 116.8 69.4  vis med c1=0.96 c2=0.63
+01987: sw c1=0.345 c2=0.285  Lupperarm c1=0.252 c2=0.204  per-landmark median diff % sw: 15.0 19.6 15.0 20.9 49.7 21.4  vis med c1=1.00 c2=0.84
+01988: sw c1=0.327 c2=0.300  Lupperarm c1=0.257 c2=0.217  per-landmark median diff % sw: 14.5 22.8 24.4 18.4 75.3 23.1  vis med c1=0.99 c2=0.81
+01991: sw c1=0.347 c2=0.332  Lupperarm c1=0.229 c2=0.235  per-landmark median diff % sw: 12.3 24.6 17.2 19.7 54.4 20.3  vis med c1=1.00 c2=0.91
+01992: sw c1=0.329 c2=0.326  Lupperarm c1=0.230 c2=0.229  per-landmark median diff % sw: 27.7 48.8 42.5 34.0 78.0 27.5  vis med c1=1.00 c2=0.94

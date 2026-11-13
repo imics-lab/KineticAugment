@@ -1,0 +1,19 @@
+A001: FK(shaped skeleton) vs SMPL-X forward, 20 random full-body poses w/ root+transl+betas: max |diff| 2.92e-07 m
+A001: reconstruct_body vs SMPL-X forward on fit params, 60 real frames: max |diff| 1.22e-07 m
+N5: fit.betas returned = [0. 0. 0.]...; SMPL-X(returned params) vs reconstruct_body: max 68.60 mm; with true betas: 0.0000 mm
+N5: changing fit.betas changes reconstruct_body by 0.0e+00 m
+N6: left shoulder at offset 0.0: per-landmark error mm [72.39 34.59 86.25 21.63 36.19 23.33]
+N6: left shoulder at offset 1e-09: per-landmark error mm [0. 0. 0. 0. 0. 0.]
+N8 dir [ 0.31 -0.93  0.21] noise 0: |go| 81.4 deg, err 1.84 mm | noise 1e-06: |go| 0.0 deg, err 1.84 mm | noise 0.0001: |go| 0.0 deg, err 1.80 mm
+N8 dir [1. 0. 0.] noise 0: |go| 36.6 deg, err 1.84 mm | noise 1e-06: |go| 0.0 deg, err 1.84 mm | noise 0.0001: |go| 0.0 deg, err 1.76 mm
+N8 dir [ 0. -1.  0.] noise 0: |go| 0.0 deg, err 1.84 mm | noise 1e-06: |go| 0.0 deg, err 1.84 mm | noise 0.0001: |go| 0.0 deg, err 1.82 mm
+Traceback (most recent call last):
+  File "scripts/review_checks/verify-missed-bugs/v_misc.py", line 68, in <module>
+    fits = [fit_body(fr, ok, sk) for fr, ok in zip(P, OK)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "scripts/review_checks/verify-missed-bugs/v_misc.py", line 68, in <listcomp>
+    fits = [fit_body(fr, ok, sk) for fr, ok in zip(P, OK)]
+            ^^^^^^^^^^^^^^^^^^^^
+  File "src/kinetic_augment/body_model/converter.py", line 74, in fit_body
+    raise ValueError(
+ValueError: need 3 valid correspondences to fix the coordinate frame, got 0

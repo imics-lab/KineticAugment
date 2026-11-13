@@ -1,0 +1,5 @@
+C2 fit_body(shaped skeleton) returned betas: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+C2 SMPL-X forward on returned params vs reconstruct_body(fit, shaped): max gap 54.0 mm
+C2 ... if BodyFit had carried the true betas: max gap 0.0001 mm
+C1 reconstruct_body with betas changed to random: max output change 0.000e+00 m (SMPL-X forward would move joints by 181.0 mm)
+C3 real clips (409 frames): SMPL-X forward vs reconstruct_body worst gap 1.70e-07 m (doc: within 1e-5 m)

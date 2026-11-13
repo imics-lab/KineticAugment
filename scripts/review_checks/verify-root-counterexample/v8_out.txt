@@ -1,0 +1,2 @@
+as shipped   xyz pooled median A 0.175%  B 0.098%  (n=36)
+without hips xyz pooled median A 0.222%  B 0.111%  (n=30)

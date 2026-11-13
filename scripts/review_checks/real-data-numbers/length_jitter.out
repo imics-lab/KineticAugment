@@ -1,0 +1,7 @@
+per-clip |frame length - clip median| (median over frames, % of clip shoulder width) and robust CV (MAD*1.4826/median)
+  01986: L upper:  3.83% (CV  7.8%, range 0.219-0.277) | L fore:  2.18% (CV  3.9%, range 0.198-0.307) | R upper:  3.08% (CV  6.1%, range 0.227-0.297) | R fore:  7.10% (CV 14.1%, range 0.177-0.303) | shoulder W:  0.89% (CV  1.3%, range 0.321-0.342)
+  01987: L upper:  1.16% (CV  2.4%, range 0.206-0.262) | L fore:  5.84% (CV 15.1%, range 0.146-0.240) | R upper:  2.33% (CV  4.6%, range 0.216-0.273) | R fore:  2.65% (CV  5.9%, range 0.199-0.249) | shoulder W:  2.12% (CV  3.1%, range 0.298-0.342)
+  01988: L upper:  4.13% (CV  7.8%, range 0.222-0.276) | L fore:  1.93% (CV  3.4%, range 0.200-0.305) | R upper:  2.97% (CV  6.1%, range 0.218-0.276) | R fore:  2.30% (CV  4.3%, range 0.169-0.285) | shoulder W:  1.35% (CV  2.0%, range 0.317-0.342)
+  01991: L upper:  2.11% (CV  4.7%, range 0.220-0.238) | L fore:  4.14% (CV  8.9%, range 0.213-0.256) | R upper:  1.84% (CV  3.6%, range 0.231-0.284) | R fore:  3.28% (CV  6.2%, range 0.246-0.294) | shoulder W:  1.72% (CV  2.5%, range 0.340-0.367)
+  01992: L upper:  1.21% (CV  2.6%, range 0.209-0.248) | L fore:  1.78% (CV  3.2%, range 0.252-0.299) | R upper:  1.29% (CV  2.7%, range 0.215-0.243) | R fore:  1.26% (CV  2.6%, range 0.154-0.251) | shoulder W:  0.11% (CV  0.2%, range 0.327-0.341)
+pooled median |dev| % width: {'L upper': 2.54, 'L fore': 2.49, 'R upper': 2.4, 'R fore': 2.44, 'shoulder W': 1.01}

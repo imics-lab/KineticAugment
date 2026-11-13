@@ -1,0 +1,12 @@
+1. Left/right: SMPL-X rest x of joints 16 (L shoulder) 0.164, 17 (R shoulder) -0.152, 20 (L wrist) 0.670, 21 (R wrist) -0.672
+   MP world: x(left_shoulder 11) - x(right_shoulder 12) > 0 in 100.0% of frames (median +0.328 m)
+
+2. Umeyama / Kabsch edge cases
+   2000 random cases: max |scale err| 1.6e-15, planar rigid residual 2.7e-15, |det-1| on mirrored target 2.6e-15
+   mirrored target: Umeyama SSE 2.6537 vs best of 20000 random proper rotations 2.7600 (Umeyama must be <=)
+
+3. Converter output vs REAL SMPL-X forward on real frames (suite currently cannot check this: fixture error)
+   60 frames: max |reconstruct_body - SMPL-X forward| = 1.23e-07 m
+
+4. 'free scale hides 0.61 pts': is the direct output already the rigid optimum?
+   max |SSE(rigid re-aligned) - SSE(direct)| = 7.46e-17 m^2  -> the whole direct/aligned gap is the free scale

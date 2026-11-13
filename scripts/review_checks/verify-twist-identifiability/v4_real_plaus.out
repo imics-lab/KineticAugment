@@ -1,0 +1,14 @@
+AS DELIVERED (fit_body on raw MP world landmarks)
+  frames fitted 409; global_orient angle median 3.6 deg
+  SMPL-X head joint below shoulders (MP frame): 100.0%
+  body forward points away from camera: 100.0%
+  head joint to MP nose distance median 0.380 m
+  L arm n=355: upper-arm elevation from straight-down med 152 deg, above horizontal 100%, behind body 81%, forearm bends to humerus-frame -z (hyperext., z<-0.05) 100%, median z -0.87
+  R arm n=363: upper-arm elevation from straight-down med 143 deg, above horizontal 100%, behind body 85%, forearm bends to humerus-frame -z (hyperext., z<-0.05) 100%, median z -0.97
+WITH FIXED MP->SMPL-X AXIS FLIP (180 deg about x) applied before fit_body
+  frames fitted 409; global_orient angle median 3.8 deg
+  SMPL-X head joint below shoulders (MP frame): 0.0%
+  body forward points away from camera: 0.0%
+  head joint to MP nose distance median 0.192 m
+  L arm n=355: upper-arm elevation from straight-down med 28 deg, above horizontal 0%, behind body 19%, forearm bends to humerus-frame -z (hyperext., z<-0.05) 0%, median z +0.90
+  R arm n=363: upper-arm elevation from straight-down med 37 deg, above horizontal 0%, behind body 15%, forearm bends to humerus-frame -z (hyperext., z<-0.05) 0%, median z +0.94

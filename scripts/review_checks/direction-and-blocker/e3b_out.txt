@@ -1,0 +1,10 @@
+(1) per-frame camera fit, residual on upper-body landmarks, xy, % image shoulder width; frames=409
+    3D similarity (Umeyama on X,Y,Z), xy residual: median 27.97  p95 38.99
+    weak-perspective (s,R,t; 6 dof+scale), xy residual: median 23.99  p95 33.61
+    general 2x3 affine (8 dof), xy residual: median 5.91  p95 9.58
+
+(2) delta transfer of world displacement to image (natural motion t -> t+k), errors % image SW
+  k= 1: n= 433  true image displacement median   4.1%SW | transfer error median  3.0%SW p95   9.5 | relative error median 0.68 p95 1.51
+  k= 3: n= 772  true image displacement median   6.2%SW | transfer error median  4.8%SW p95  20.0 | relative error median 0.71 p95 1.97
+  k= 5: n= 945  true image displacement median   7.3%SW | transfer error median  5.9%SW p95  26.9 | relative error median 0.72 p95 2.10
+  k=10: n=1090  true image displacement median  10.3%SW | transfer error median  8.6%SW p95  44.6 | relative error median 0.74 p95 2.58

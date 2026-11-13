@@ -1,0 +1,5 @@
+01986_world.npz frames 83 finite-frames 83 nose vis min/median 0.9995 0.9999 hips both>=0.5 0.0 %
+01987_world.npz frames 75 finite-frames 75 nose vis min/median 0.9995 0.9998 hips both>=0.5 90.7 %
+01988_world.npz frames 144 finite-frames 143 nose vis min/median 0.9997 0.9999 hips both>=0.5 4.2 %
+01991_world.npz frames 49 finite-frames 49 nose vis min/median 0.9993 0.9997 hips both>=0.5 81.6 %
+01992_world.npz frames 59 finite-frames 59 nose vis min/median 0.9999 1.0 hips both>=0.5 100.0 %

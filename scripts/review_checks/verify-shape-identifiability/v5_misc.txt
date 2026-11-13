@@ -1,0 +1,27 @@
+=== (a) BodyFit.betas contract with a shaped skeleton ===
+ betas=[-2.   1.   0.   0.5]..: fit.betas nonzero? False; rec vs input 0.0000 mm; rec vs smplx(fit.betas) 79.98 mm; rec vs smplx(true betas) 0.0001 mm
+ betas=[1. 0. 0. 0.]..: fit.betas nonzero? False; rec vs input 0.0000 mm; rec vs smplx(fit.betas) 41.98 mm; rec vs smplx(true betas) 0.0000 mm
+
+=== (b) SMPLXSkeleton with 16 betas ===
+ raised RuntimeError einsum(): subscript l has size 10 for operand 1 which does not broadcast with previously seen size 1
+
+=== (c) fore/upper ratio reach within prior radius (real smplx, float64) ===
+ chi2(10) 95% radius 4.279
+ nb=10 |b|<=4.28: L 0.844-1.019  R 0.834-0.963  pooled 0.840-0.990
+ nb=10 |b|<=6.00: L 0.790-1.044  R 0.794-0.981  pooled 0.792-1.012
+ nb=10 |b|<=10.00: L 0.606-1.096  R 0.653-1.020  pooled 0.630-1.057
+ template: L 0.946 R 0.909 pooled 0.927
+
+=== (d) scale vs betas, posterior with real-smplx Jacobian ===
+ scale prior sd 1% sigma_L  3mm: post/prior sd 0.98, corr(b0,scale) -0.52
+ scale prior sd 1% sigma_L 10mm: post/prior sd 0.99, corr(b0,scale) -0.38
+ scale prior sd 3% sigma_L  3mm: post/prior sd 0.83, corr(b0,scale) -0.84
+ scale prior sd 3% sigma_L 10mm: post/prior sd 0.89, corr(b0,scale) -0.75
+ scale prior sd 5% sigma_L  3mm: post/prior sd 0.66, corr(b0,scale) -0.90
+ scale prior sd 5% sigma_L 10mm: post/prior sd 0.77, corr(b0,scale) -0.85
+
+=== (e) two bodies, same 5 lengths, through the converter (pairs from v2, real smplx) ===
+ heights 178.10236234613566 165.82526933483405   max |dL| mm 1.504352198367087e-11
+  truth=A, fit skeleton A          : median 0.000 mm  max 0.000 mm
+  truth=A, fit skeleton B          : median 0.248 mm  max 0.567 mm
+  truth=A, fit skeleton D(+1sd b0) : median 24.622 mm  max 41.661 mm

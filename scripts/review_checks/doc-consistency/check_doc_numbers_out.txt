@@ -1,0 +1,103 @@
+
+========================================================================
+1. Rest skeleton lengths (doc lines 283-289, 604-609)
+========================================================================
+L upper arm (16->18) 0.2676   R upper arm (17->19) 0.2749
+L forearm  (18->20) 0.2531   R forearm  (19->21) 0.2498
+L thigh (1->4) 0.3828  L shin (4->7) 0.4066  shoulder width (16-17) 0.3159
+fore/upper L 0.946  R 0.909
+
+========================================================================
+2. Visibility / coverage (Finding 5 table, line 333-337, Step 8 nose claim)
+========================================================================
+lm      pooled cov clip-avg cov  mean vis median vis  per-clip median vis
+nose         99.8%        99.9%     0.997      1.000  1.00 1.00 1.00 1.00 1.00
+L sho        99.8%        99.9%     0.996      1.000  1.00 1.00 1.00 1.00 1.00
+R sho        99.8%        99.9%     0.997      1.000  1.00 1.00 1.00 1.00 1.00
+L elb        99.8%        99.9%     0.912      0.959  0.88 0.98 0.98 0.92 1.00
+R elb        99.8%        99.9%     0.939      0.982  0.94 0.99 0.99 0.98 1.00
+L wri        86.6%        88.6%     0.816      0.937  0.77 0.96 0.98 0.76 0.99
+R wri        88.5%        90.8%     0.846      0.968  0.81 0.96 0.97 0.95 0.99
+L hip        42.2%        55.3%     0.402      0.193  0.11 0.95 0.14 0.63 0.67
+R hip        42.2%        55.3%     0.410      0.206  0.11 0.95 0.16 0.65 0.67
+L knee        0.0%         0.0%     0.044      0.027  0.00 0.06 0.00 0.08 0.03
+R knee        0.0%         0.0%     0.034      0.019  0.00 0.07 0.00 0.08 0.02
+L ank         0.0%         0.0%     0.006      0.002  0.00 0.00 0.00 0.02 0.00
+R ank         0.0%         0.0%     0.006      0.002  0.00 0.00 0.00 0.03 0.00
+
+========================================================================
+3. Pooled / per-clip observed bone lengths (lines 604-609, Finding 10)
+========================================================================
+01986_world 0.3327 0.2433 0.2765 0.2487 0.2487 fore/upper(L) 1.137
+01987_world 0.3337 0.2406 0.1909 0.2506 0.2207 fore/upper(L) 0.794
+01988_world 0.3253 0.2569 0.2715 0.2362 0.2569 fore/upper(L) 1.057
+01991_world 0.3467 0.2285 0.2388 0.2598 0.2718 fore/upper(L) 1.045
+01992_world 0.3296 0.2291 0.2748 0.2339 0.2353 fore/upper(L) 1.199
+pooled L upper  observed 0.2388  rest 0.2676  ratio 0.893
+pooled L fore   observed 0.2677  rest 0.2531  ratio 1.058
+pooled R upper  observed 0.2429  rest 0.2749  ratio 0.884
+pooled R fore   observed 0.2458  rest 0.2498  ratio 0.984
+ratio std 0.071  range 0.174
+
+========================================================================
+4. Forearm length drift: world landmarks vs presentation's image-space table
+========================================================================
+01986_world L upper: cv  6.1% range  23.8% | L fore: cv  8.9% range  39.6% | R upper: cv  6.5% range  27.9% | R fore: cv 12.2% range  50.5%
+01987_world L upper: cv  4.0% range  23.5% | L fore: cv 11.3% range  49.3% | R upper: cv  5.7% range  22.6% | R fore: cv  6.4% range  22.3%
+01988_world L upper: cv  6.3% range  20.8% | L fore: cv  8.7% range  38.5% | R upper: cv  5.9% range  24.8% | R fore: cv  9.8% range  45.3%
+01991_world L upper: cv  3.0% range   8.1% | L fore: cv  6.5% range  18.1% | R upper: cv  5.4% range  20.7% | R fore: cv  5.0% range  17.8%
+01992_world L upper: cv  4.3% range  17.1% | L fore: cv  3.4% range  17.1% | R upper: cv  3.3% range  12.0% | R fore: cv  9.5% range  41.3%
+
+Cached image-space pose_landmarks: median fore/upper (left arm), xy vs xyz
+01986_landmarks shape (83, 543, 3)  xyz ratio-of-medians 1.582  median-of-ratios 1.567   xy ratio-of-medians 0.465  median-of-ratios 0.455   forearm xy range 119.5%
+01987_landmarks shape (75, 543, 3)  xyz ratio-of-medians 1.046  median-of-ratios 1.063   xy ratio-of-medians 0.467  median-of-ratios 0.468   forearm xy range 160.3%
+01988_landmarks shape (144, 543, 3)  xyz ratio-of-medians 1.155  median-of-ratios 1.259   xy ratio-of-medians 0.657  median-of-ratios 0.649   forearm xy range 62.8%
+01991_landmarks shape (49, 543, 3)  xyz ratio-of-medians 0.969  median-of-ratios 0.987   xy ratio-of-medians 0.811  median-of-ratios 0.839   forearm xy range 35.8%
+01992_landmarks shape (59, 543, 3)  xyz ratio-of-medians 1.479  median-of-ratios 1.520   xy ratio-of-medians 0.530  median-of-ratios 0.531   forearm xy range 18.8%
+
+========================================================================
+5. Root-rotation counterexample table (doc lines 525-530)
+========================================================================
+Single axes, rest arms (mm): raw mean/max | similarity-aligned mean/max | rigid-aligned mean/max
+      10 deg axis x: raw   75.87/  76.27 | sim   0.20/  0.36 | rigid   0.20/  0.36
+      10 deg axis y: raw   28.01/  28.47 | sim  10.84/ 19.56 | rigid  11.04/ 19.40
+      10 deg axis z: raw   80.55/  81.12 | sim  10.89/ 19.45 | rigid  10.91/ 19.39
+      20 deg axis x: raw  151.16/ 151.95 | sim   0.40/  0.73 | rigid   0.40/  0.73
+      20 deg axis y: raw   55.80/  56.73 | sim  21.82/ 39.31 | rigid  22.97/ 38.79
+      20 deg axis z: raw  160.48/ 161.62 | sim  21.87/ 38.99 | rigid  22.32/ 38.80
+      30 deg axis x: raw  225.30/ 226.48 | sim   0.59/  1.08 | rigid   0.59/  1.08
+      30 deg axis y: raw   83.18/  84.55 | sim  33.06/ 59.41 | rigid  36.32/ 58.46
+      30 deg axis z: raw  239.19/ 240.89 | sim  33.06/ 58.77 | rigid  34.86/ 58.57
+  40.107 deg axis x: raw  298.49/ 300.06 | sim   0.79/  1.43 | rigid   0.79/  1.43
+  40.107 deg axis y: raw  110.19/ 112.02 | sim  44.84/ 80.24 | rigid  51.51/ 78.50
+  40.107 deg axis z: raw  316.89/ 319.15 | sim  44.70/ 79.18 | rigid  49.14/ 78.78
+      45 deg axis x: raw  333.13/ 334.87 | sim   0.88/  1.60 | rigid   0.88/  1.60
+      45 deg axis y: raw  122.98/ 125.01 | sim  50.74/ 90.56 | rigid  59.51/ 88.26
+      45 deg axis z: raw  353.66/ 356.18 | sim  50.51/ 89.26 | rigid  56.68/ 88.64
+Random axes + random arm poses (200 trials, seed 42), pooled over joints*trials (mm)
+   10 deg: raw mean   63.66 max   81.26 | sim mean   8.22 max  22.61 | rigid mean   8.93 max  22.49
+   20 deg: raw mean  126.84 max  161.91 | sim mean  16.51 max  45.42 | rigid mean  18.12 max  45.88
+   30 deg: raw mean  189.05 max  241.32 | sim mean  24.93 max  68.56 | rigid mean  27.78 max  70.03
+   45 deg: raw mean  279.52 max  356.81 | sim mean  37.97 max 104.54 | rigid mean  43.49 max 109.74
+
+========================================================================
+6. Real data: aligned residual, Procrustes scale, post-alignment direction error, length error
+========================================================================
+baseline aligned pooled median: 5.94%  (doc 5.94%)
+Procrustes scale median 0.9726  p5 0.910  p95 1.024  (doc 0.9726, 0.91-1.02)
+post-alignment direction error L upper: median 2.57 deg
+post-alignment direction error L fore: median 2.65 deg
+post-alignment direction error R upper: median 2.81 deg
+post-alignment direction error R fore: median 2.13 deg
+aligned length error pooled median 6.66%  (doc 6.66%)
+unaligned (rest-skeleton vs observed) length error pooled median 7.86%
+
+========================================================================
+7. Oracle decomposition attempt (doc lines 651-656: 5.94 / 5.13 / 3.86 / 2.64)
+========================================================================
+baseline       pooled median  5.94%   reduction   0.0%
+root           pooled median  4.84%   reduction  18.6%
+len_frame      pooled median  2.58%   reduction  56.7%
+len_clip       pooled median  3.86%   reduction  35.0%
+both_frame     pooled median  1.49%   reduction  74.9%
+both_clip      pooled median  2.34%   reduction  60.6%

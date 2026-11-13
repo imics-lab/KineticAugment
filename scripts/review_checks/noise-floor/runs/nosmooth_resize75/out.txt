@@ -1,0 +1,42 @@
+Clips: 5
+
+clip       frames  shoulderW     A_xy     B_xy      A_z      B_z
+----------------------------------------------------------------
+01986          83     0.3318    0.30%    0.25%    0.19%    0.20%
+01987          75     0.3447    0.50%    0.35%    0.32%    0.35%
+01988         144     0.3251    0.53%    0.39%    0.26%    0.40%
+01991          49     0.3457    0.26%    0.15%    0.31%    0.15%
+01992          59     0.3321    0.30%    0.24%    0.24%    0.25%
+
+================================================================
+NOISE FLOOR  (as % of shoulder width, pooled over all clips/landmarks)
+================================================================
+band         method A (p10 step)     method B (2nd diff)
+----------------------------------------------------------------
+xy                         0.33%                   0.29%
+z                          0.26%                   0.28%
+xyz                        0.64%                   0.42%
+
+Per-landmark (method B, 3-D, median across clips):
+  landmark          observed    noise
+  left_shoulder         100%    0.34%
+  right_shoulder        100%    0.35%
+  left_elbow             99%    0.41%
+  right_elbow            99%    0.49%
+  left_wrist             87%    0.63%
+  right_wrist            88%    0.49%
+  left_hip               59%    0.15%
+  right_hip              60%    0.12%
+  left_knee               2%       --   EXCLUDED (low visibility)
+  right_knee              0%       --   EXCLUDED (low visibility)
+  left_ankle              0%       --   EXCLUDED (low visibility)
+  right_ankle             0%       --   EXCLUDED (low visibility)
+
+  4 landmark(s) excluded: MediaPipe reports visibility below 0.5 in over
+  50% of frames. The detector is stating that these coordinates are
+  its prior rather than an observation.
+
+================================================================
+z is 0.9x noisier than x/y
+PROPOSED V1 ERROR BUDGET: 0.64% of shoulder width (~2.0 mm at SMPL-X scale)
+================================================================

@@ -1,0 +1,2659 @@
+{
+  "environment": {
+    "python": "3.11.15",
+    "packages": {
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "torch": "2.14.1",
+      "smplx": "0.1.28"
+    },
+    "assets": {
+      "models/mano/MANO_LEFT.npz": "756eacde1ffde913bb4bd4c03571220fd58765eb403cd9298d93879eb4f6aa53",
+      "models/mano/MANO_RIGHT.npz": "7f8e41933f35e49b823369cd8ba27f11daac4014b3ef9314ae85d98495af628d",
+      "models/smplx/SMPLX_NEUTRAL.npz": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992"
+    },
+    "data": {
+      "data/test_output/01986_hands.npz": "4337a205b4277db95ae99aa2684ced7713de3dea2341b174996e032787a6b258",
+      "data/test_output/01987_hands.npz": "478183c080ab0f9a828f517d4df6c1f6552e5898c7af3d2c90de3688897d39f4",
+      "data/test_output/01988_hands.npz": "e2b5058626a19c99b600c0ec9415021027028605f9c532e58993e59622a8c02f",
+      "data/test_output/01991_hands.npz": "dff8a85b695d91b5e5e305dab4e75941713227e7a1f883c3e8b317d75949a25b",
+      "data/test_output/01992_hands.npz": "38b9c73a5b0c9e48202e419c4d49aa2d5c9c310e2c8d8377d66fce80119600ff"
+    }
+  },
+  "targets_mm": {
+    "mean": 5.0,
+    "tips": 8.0,
+    "p95": 15.0
+  },
+  "splits": {
+    "held-out shape (time halves)": "The shape is fitted on the first half of the track in time and scored on the second half, then the reverse, so drift of the hand's size between the halves (half_span_ratio) counts as error.",
+    "held-out shape (interleaved frames)": "The shape is fitted on the even-indexed frames of the track and scored on the odd-indexed ones, then the reverse, so every frame is scored once but neighbouring frames share size and pose."
+  },
+  "observability_settings": {
+    "stride": 5,
+    "thresholds": [
+      1e-06,
+      0.001,
+      0.01,
+      0.03
+    ],
+    "joint_weight_threshold": 0.01,
+    "meaning": "A rotation direction is weak at threshold t when its singular value in the Jacobian of the 20 wrist-relative landmarks with respect to the 48 rotation parameters is below t times the largest; weak_counts is the median number of weak directions over the sampled frames, and joint_weak_weight the trace of the weak projector at joint_weight_threshold over each joint's three parameters, averaged over the frames."
+  },
+  "tracks": [
+    {
+      "clip": "01986",
+      "side": "left",
+      "frames_in_clip": 83,
+      "frames_with_hand": 48,
+      "hand_scale_mm": 96.89129407693444,
+      "half_span_ratio": 1.0468856043593904,
+      "rows": {
+        "rigid reference": {
+          "frames": 48,
+          "mean_mm": 6.239915972521818,
+          "tips_mm": 6.838403691263175,
+          "p95_mm": 17.0824668712192,
+          "mean_pct_hand": 6.440120376106391,
+          "thumb_mm": 5.144639284435531,
+          "index_mm": 7.651446413774682,
+          "middle_mm": 6.456694801479664,
+          "ring_mm": 6.048316776200886,
+          "pinky_mm": 5.898482586718327
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 48,
+          "mean_mm": 2.7955767640053812,
+          "tips_mm": 3.457971427459996,
+          "p95_mm": 7.023569217970061,
+          "mean_pct_hand": 2.8852713658521414,
+          "thumb_mm": 2.4407643624241975,
+          "index_mm": 3.728589843312704,
+          "middle_mm": 1.9215082292245313,
+          "ring_mm": 2.627635284418348,
+          "pinky_mm": 3.259386100647125
+        },
+        "mano: swing start": {
+          "frames": 48,
+          "mean_mm": 12.664999510429459,
+          "tips_mm": 14.537600751801909,
+          "p95_mm": 22.147997052605827,
+          "mean_pct_hand": 13.071349320995845,
+          "thumb_mm": 14.826377765282077,
+          "index_mm": 13.332424894731007,
+          "middle_mm": 10.378625177802396,
+          "ring_mm": 12.792629694992861,
+          "pinky_mm": 11.994940019338946
+        },
+        "mano: refined": {
+          "frames": 48,
+          "mean_mm": 6.795545550294329,
+          "tips_mm": 4.69972189771968,
+          "p95_mm": 17.984435146313878,
+          "mean_pct_hand": 7.013577035000145,
+          "thumb_mm": 11.64869995021664,
+          "index_mm": 6.423577889738266,
+          "middle_mm": 5.730588116931105,
+          "ring_mm": 5.469140615230618,
+          "pinky_mm": 4.705721179355017
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 48,
+          "mean_mm": 4.956642324127155,
+          "tips_mm": 2.7573923711847903,
+          "p95_mm": 13.29135217817802,
+          "mean_pct_hand": 5.1156735714474415,
+          "thumb_mm": 6.055694870893356,
+          "index_mm": 4.098554352185018,
+          "middle_mm": 4.249827028081633,
+          "ring_mm": 5.587432318026257,
+          "pinky_mm": 4.7917030514495105
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 48,
+          "mean_mm": 4.9158106426958925,
+          "tips_mm": 2.7239435010104085,
+          "p95_mm": 13.107857474423511,
+          "mean_pct_hand": 5.073531827114002,
+          "thumb_mm": 5.897744629816548,
+          "index_mm": 4.105963966654585,
+          "middle_mm": 4.225792932384528,
+          "ring_mm": 5.5639336576159835,
+          "pinky_mm": 4.785618027007821
+        },
+        "mano: in-sample shape": {
+          "frames": 48,
+          "mean_mm": 4.914127113117825,
+          "tips_mm": 2.7264913885140705,
+          "p95_mm": 13.06860528586592,
+          "mean_pct_hand": 5.071794282379868,
+          "thumb_mm": 5.901963389236751,
+          "index_mm": 4.098155095110853,
+          "middle_mm": 4.2323580950184025,
+          "ring_mm": 5.556922732402964,
+          "pinky_mm": 4.781236253820151
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 48,
+          "mean_mm": 4.151381926980952,
+          "tips_mm": 2.394015392686541,
+          "p95_mm": 10.221396782363382,
+          "mean_pct_hand": 4.2845768203742205,
+          "thumb_mm": 4.899128385743928,
+          "index_mm": 3.050770215879415,
+          "middle_mm": 3.3426094565418474,
+          "ring_mm": 5.034260505034703,
+          "pinky_mm": 4.4301410717048695
+        },
+        "smplx: swing start": {
+          "frames": 48,
+          "mean_mm": 13.449382767544046,
+          "tips_mm": 14.76048589621187,
+          "p95_mm": 28.099931592618063,
+          "mean_pct_hand": 13.8808991000418,
+          "thumb_mm": 10.22110413314284,
+          "index_mm": 11.646983169422922,
+          "middle_mm": 15.334225645139332,
+          "ring_mm": 12.967492735392995,
+          "pinky_mm": 17.077108154622145
+        },
+        "smplx: refined": {
+          "frames": 48,
+          "mean_mm": 5.863065694651141,
+          "tips_mm": 2.640283647411715,
+          "p95_mm": 17.53025389622935,
+          "mean_pct_hand": 6.051179056392518,
+          "thumb_mm": 7.435339784858287,
+          "index_mm": 4.02573305634298,
+          "middle_mm": 6.067943259593453,
+          "ring_mm": 5.753910228115646,
+          "pinky_mm": 6.032402144345338
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 48,
+          "mean_mm": 5.121027750385717,
+          "tips_mm": 3.3256303673284813,
+          "p95_mm": 14.480819707289161,
+          "mean_pct_hand": 5.285333217161364,
+          "thumb_mm": 7.988322333849706,
+          "index_mm": 4.26652378432028,
+          "middle_mm": 4.942144054282976,
+          "ring_mm": 3.9617276380458084,
+          "pinky_mm": 4.446420941429815
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 48,
+          "mean_mm": 5.064423339349655,
+          "tips_mm": 3.2647966314296855,
+          "p95_mm": 13.878092781095349,
+          "mean_pct_hand": 5.22691268353621,
+          "thumb_mm": 7.711974619448388,
+          "index_mm": 4.153381909604975,
+          "middle_mm": 4.922914212608659,
+          "ring_mm": 4.053872699711069,
+          "pinky_mm": 4.479973255375185
+        },
+        "smplx: in-sample shape": {
+          "frames": 48,
+          "mean_mm": 5.062671116970496,
+          "tips_mm": 3.263082990238617,
+          "p95_mm": 13.940295961541167,
+          "mean_pct_hand": 5.225104242028795,
+          "thumb_mm": 7.7115557354176545,
+          "index_mm": 4.152522811393819,
+          "middle_mm": 4.919947089062496,
+          "ring_mm": 4.054789858253183,
+          "pinky_mm": 4.474540090725333
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 48,
+          "mean_mm": 4.402096115517536,
+          "tips_mm": 3.3908194563545435,
+          "p95_mm": 10.150692061357843,
+          "mean_pct_hand": 4.543335041043158,
+          "thumb_mm": 6.888805357157931,
+          "index_mm": 2.6958851800444195,
+          "middle_mm": 4.267035891063808,
+          "ring_mm": 3.8023753342803297,
+          "pinky_mm": 4.35637881504119
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.273862651031746,
+            4.273662250047051
+          ],
+          "interleaved_norms": [
+            4.273297854863279,
+            4.273602810591483
+          ],
+          "in_sample_norm": 4.273747378133559,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 10,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 26.0
+          },
+          "joint_weak_weight": {
+            "wrist": 2.8427317041314427e-06,
+            "index MCP": 0.6914574390636116,
+            "index PIP": 1.1044600804703113,
+            "index DIP": 1.20409791114981,
+            "middle MCP": 0.881749667429586,
+            "middle PIP": 0.9724247291266168,
+            "middle DIP": 1.1458424358286394,
+            "pinky MCP": 0.5963549827035701,
+            "pinky PIP": 1.340540185981354,
+            "pinky DIP": 1.06305058557522,
+            "ring MCP": 0.6293521461828335,
+            "ring PIP": 1.215339396269027,
+            "ring DIP": 1.1553215289695817,
+            "thumb CMC": 0.9822377137906319,
+            "thumb MCP": 0.9961422700655576,
+            "thumb IP": 1.0216260846619492
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 6.795545550294329,
+          "other_side": 8.590106718867052
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.269347556768606,
+            4.272118952207409
+          ],
+          "interleaved_norms": [
+            4.271475375394662,
+            4.270574748977995
+          ],
+          "in_sample_norm": 4.272035058124494,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 10,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 26.5
+          },
+          "joint_weak_weight": {
+            "wrist": 3.2859502273659635e-06,
+            "index MCP": 0.6722904096592224,
+            "index PIP": 1.160397603384828,
+            "index DIP": 1.1673081177636129,
+            "middle MCP": 0.9132599084457134,
+            "middle PIP": 0.9889616752036338,
+            "middle DIP": 1.0977829250268563,
+            "pinky MCP": 0.570142187368835,
+            "pinky PIP": 1.2504445620109912,
+            "pinky DIP": 1.1794249988658005,
+            "ring MCP": 0.6269463950987572,
+            "ring PIP": 1.1585837551166531,
+            "ring DIP": 1.2144752840464732,
+            "thumb CMC": 0.8721531480428301,
+            "thumb MCP": 1.0638871909904917,
+            "thumb IP": 1.0639385530250736
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 5.863065694651141,
+          "other_side": 7.672343257771136
+        }
+      }
+    },
+    {
+      "clip": "01986",
+      "side": "right",
+      "frames_in_clip": 83,
+      "frames_with_hand": 52,
+      "hand_scale_mm": 68.89708060481334,
+      "half_span_ratio": 0.6552663777353167,
+      "rows": {
+        "rigid reference": {
+          "frames": 52,
+          "mean_mm": 17.582665945195366,
+          "tips_mm": 20.54899384647158,
+          "p95_mm": 36.25883130229265,
+          "mean_pct_hand": 25.520190102172478,
+          "thumb_mm": 12.484529045064953,
+          "index_mm": 19.991245336266157,
+          "middle_mm": 19.469503260990056,
+          "ring_mm": 18.534931289364877,
+          "pinky_mm": 17.433120794290804
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 52,
+          "mean_mm": 6.6591558558420285,
+          "tips_mm": 8.357402379976156,
+          "p95_mm": 16.32782413358981,
+          "mean_pct_hand": 9.665367236731363,
+          "thumb_mm": 5.937567432087198,
+          "index_mm": 6.9298331704817,
+          "middle_mm": 5.539551109191053,
+          "ring_mm": 6.6983929239420155,
+          "pinky_mm": 8.190434643508175
+        },
+        "mano: swing start": {
+          "frames": 52,
+          "mean_mm": 25.583369691477078,
+          "tips_mm": 29.73875275870208,
+          "p95_mm": 49.58809417406109,
+          "mean_pct_hand": 37.13273402427701,
+          "thumb_mm": 17.79102606690736,
+          "index_mm": 27.722636171242627,
+          "middle_mm": 29.350918273884716,
+          "ring_mm": 26.29449530251939,
+          "pinky_mm": 26.757772642831313
+        },
+        "mano: refined": {
+          "frames": 52,
+          "mean_mm": 8.384773513323227,
+          "tips_mm": 2.968238214716694,
+          "p95_mm": 31.230817081379822,
+          "mean_pct_hand": 12.169998263667276,
+          "thumb_mm": 8.793845733767622,
+          "index_mm": 9.124659142994618,
+          "middle_mm": 8.64830117743417,
+          "ring_mm": 8.033114567780398,
+          "pinky_mm": 7.3239469446393235
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 52,
+          "mean_mm": 12.24985301451955,
+          "tips_mm": 8.58791325435306,
+          "p95_mm": 31.627411824466055,
+          "mean_pct_hand": 17.779930451311085,
+          "thumb_mm": 13.105397974712709,
+          "index_mm": 13.036895988287265,
+          "middle_mm": 12.481584880077332,
+          "ring_mm": 12.6780390983881,
+          "pinky_mm": 9.947347131132338
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 52,
+          "mean_mm": 8.406567174383056,
+          "tips_mm": 3.9639691428371746,
+          "p95_mm": 24.20483866068687,
+          "mean_pct_hand": 12.201630461822141,
+          "thumb_mm": 9.147312988118063,
+          "index_mm": 9.351568930754869,
+          "middle_mm": 8.49550786816067,
+          "ring_mm": 8.502997807789095,
+          "pinky_mm": 6.535448277092592
+        },
+        "mano: in-sample shape": {
+          "frames": 52,
+          "mean_mm": 8.402608075515868,
+          "tips_mm": 3.9626833697060273,
+          "p95_mm": 23.998673525101037,
+          "mean_pct_hand": 12.195884066136816,
+          "thumb_mm": 9.149313452202868,
+          "index_mm": 9.340387621504371,
+          "middle_mm": 8.491732811341949,
+          "ring_mm": 8.492350111015272,
+          "pinky_mm": 6.539256381514889
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 52,
+          "mean_mm": 4.709864441720132,
+          "tips_mm": 1.9297038456743338,
+          "p95_mm": 14.880147117367828,
+          "mean_pct_hand": 6.8360871032191275,
+          "thumb_mm": 4.144051332943128,
+          "index_mm": 5.1722774085693874,
+          "middle_mm": 5.3265161319297505,
+          "ring_mm": 4.5143162627791815,
+          "pinky_mm": 4.39216107237921
+        },
+        "smplx: swing start": {
+          "frames": 52,
+          "mean_mm": 34.50576674411105,
+          "tips_mm": 37.72516504074434,
+          "p95_mm": 61.22501178148705,
+          "mean_pct_hand": 50.08306076426174,
+          "thumb_mm": 24.6902256679035,
+          "index_mm": 36.47776436967898,
+          "middle_mm": 40.38776972865828,
+          "ring_mm": 35.70080260427301,
+          "pinky_mm": 35.272271350041486
+        },
+        "smplx: refined": {
+          "frames": 52,
+          "mean_mm": 11.295951054222959,
+          "tips_mm": 2.550891006392863,
+          "p95_mm": 43.60080349138159,
+          "mean_pct_hand": 16.39539869477981,
+          "thumb_mm": 10.068485494432714,
+          "index_mm": 11.781959235835645,
+          "middle_mm": 12.32662251065375,
+          "ring_mm": 10.48364069476084,
+          "pinky_mm": 11.819047335431845
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 52,
+          "mean_mm": 12.332097123697533,
+          "tips_mm": 8.367806642416868,
+          "p95_mm": 33.69785997705072,
+          "mean_pct_hand": 17.899302866594876,
+          "thumb_mm": 12.749870355564191,
+          "index_mm": 12.93983440801512,
+          "middle_mm": 12.587988139868694,
+          "ring_mm": 12.484255236438766,
+          "pinky_mm": 10.898537478600899
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 52,
+          "mean_mm": 8.364989085621081,
+          "tips_mm": 4.028907158338968,
+          "p95_mm": 25.357428845130265,
+          "mean_pct_hand": 12.141282347799047,
+          "thumb_mm": 8.632681270226776,
+          "index_mm": 9.089585016854329,
+          "middle_mm": 8.587302449857898,
+          "ring_mm": 8.327771028904758,
+          "pinky_mm": 7.1876056622616495
+        },
+        "smplx: in-sample shape": {
+          "frames": 52,
+          "mean_mm": 8.363363842680453,
+          "tips_mm": 4.024334956179693,
+          "p95_mm": 25.25041748255915,
+          "mean_pct_hand": 12.138923404682208,
+          "thumb_mm": 8.633099737175625,
+          "index_mm": 9.085231642860021,
+          "middle_mm": 8.586313386691662,
+          "ring_mm": 8.32945894875251,
+          "pinky_mm": 7.182715497922448
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 52,
+          "mean_mm": 4.729246932081128,
+          "tips_mm": 2.0045944546409373,
+          "p95_mm": 13.96865742441175,
+          "mean_pct_hand": 6.864219631028502,
+          "thumb_mm": 4.568246995512032,
+          "index_mm": 4.856584372117306,
+          "middle_mm": 5.276907120795486,
+          "ring_mm": 4.482360222114856,
+          "pinky_mm": 4.4621359498659565
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.2750213536894694,
+            4.274063246141892
+          ],
+          "interleaved_norms": [
+            4.272467218014163,
+            4.272230632134753
+          ],
+          "in_sample_norm": 4.273237630875877,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 11,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 22.0
+          },
+          "joint_weak_weight": {
+            "wrist": 1.7903352845891278e-07,
+            "index MCP": 0.5966447225079726,
+            "index PIP": 1.0997564748587807,
+            "index DIP": 1.3035997075102428,
+            "middle MCP": 0.6453656481516507,
+            "middle PIP": 1.1800315606730165,
+            "middle DIP": 1.1746041041244137,
+            "pinky MCP": 0.6396707220716884,
+            "pinky PIP": 1.1959637443014126,
+            "pinky DIP": 0.9825476935887166,
+            "ring MCP": 0.6245599828682006,
+            "ring PIP": 1.1126588006863143,
+            "ring DIP": 1.2627812156925569,
+            "thumb CMC": 0.5642312360165989,
+            "thumb MCP": 1.1773755331491655,
+            "thumb IP": 1.2583904929475596
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 8.384773513323227,
+          "other_side": 9.703133628595108
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.265801122148544,
+            4.274195969069731
+          ],
+          "interleaved_norms": [
+            4.267917969005692,
+            4.2665947886097015
+          ],
+          "in_sample_norm": 4.269494160092097,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 11,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 24.0
+          },
+          "joint_weak_weight": {
+            "wrist": 8.962818973442092e-06,
+            "index MCP": 0.6119017871072924,
+            "index PIP": 1.0539730209770994,
+            "index DIP": 1.334138057453314,
+            "middle MCP": 0.6894396092501244,
+            "middle PIP": 1.1632050503245377,
+            "middle DIP": 1.1473642326841786,
+            "pinky MCP": 0.6407728142942001,
+            "pinky PIP": 1.0650359919846784,
+            "pinky DIP": 1.2032247135693668,
+            "ring MCP": 0.6691804532745679,
+            "ring PIP": 1.1350203543125021,
+            "ring DIP": 1.1958297341904358,
+            "thumb CMC": 0.5933421236648619,
+            "thumb MCP": 1.2377767876533612,
+            "thumb IP": 1.1688772155314189
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 11.295951054222959,
+          "other_side": 12.273713378306775
+        }
+      }
+    },
+    {
+      "clip": "01987",
+      "side": "left",
+      "frames_in_clip": 75,
+      "frames_with_hand": 49,
+      "hand_scale_mm": 87.54626404826872,
+      "half_span_ratio": 1.5507855845083511,
+      "rows": {
+        "rigid reference": {
+          "frames": 49,
+          "mean_mm": 24.74767317902332,
+          "tips_mm": 27.85283968125377,
+          "p95_mm": 55.56168558086679,
+          "mean_pct_hand": 28.268108808593666,
+          "thumb_mm": 19.029405258871982,
+          "index_mm": 30.45230057399441,
+          "middle_mm": 28.22539430516958,
+          "ring_mm": 24.655406995923208,
+          "pinky_mm": 21.375858761157446
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 49,
+          "mean_mm": 7.635473205565615,
+          "tips_mm": 10.542780797133265,
+          "p95_mm": 16.326105346166592,
+          "mean_pct_hand": 8.721643680141268,
+          "thumb_mm": 8.04102515098249,
+          "index_mm": 9.129241077669509,
+          "middle_mm": 7.6797099928461865,
+          "ring_mm": 5.940102909185278,
+          "pinky_mm": 7.387286897144616
+        },
+        "mano: swing start": {
+          "frames": 49,
+          "mean_mm": 27.0249594292024,
+          "tips_mm": 30.77634931630265,
+          "p95_mm": 72.34097279121683,
+          "mean_pct_hand": 30.86934630848686,
+          "thumb_mm": 21.601795162245036,
+          "index_mm": 31.8150145972205,
+          "middle_mm": 29.707357993951927,
+          "ring_mm": 27.157947270173583,
+          "pinky_mm": 24.842682122420953
+        },
+        "mano: refined": {
+          "frames": 49,
+          "mean_mm": 10.709280436615956,
+          "tips_mm": 3.824255075076377,
+          "p95_mm": 36.98437156806491,
+          "mean_pct_hand": 12.2327098169619,
+          "thumb_mm": 11.967168084528785,
+          "index_mm": 11.28426582887477,
+          "middle_mm": 10.807726842349156,
+          "ring_mm": 9.991301854526865,
+          "pinky_mm": 9.495939572800195
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 49,
+          "mean_mm": 17.5492842321642,
+          "tips_mm": 9.899996866542974,
+          "p95_mm": 39.512214949545175,
+          "mean_pct_hand": 20.045726020345523,
+          "thumb_mm": 18.38210892052738,
+          "index_mm": 18.608927970370797,
+          "middle_mm": 18.220352024780375,
+          "ring_mm": 17.58651238436249,
+          "pinky_mm": 14.94851986077997
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 49,
+          "mean_mm": 10.695131546323264,
+          "tips_mm": 3.9852503690472187,
+          "p95_mm": 33.93690630488459,
+          "mean_pct_hand": 12.216548201790191,
+          "thumb_mm": 11.652487387626772,
+          "index_mm": 11.506249811755438,
+          "middle_mm": 10.954489828174694,
+          "ring_mm": 10.21359653269761,
+          "pinky_mm": 9.148834171361816
+        },
+        "mano: in-sample shape": {
+          "frames": 49,
+          "mean_mm": 10.663310648592006,
+          "tips_mm": 3.959656051154369,
+          "p95_mm": 33.12031662901663,
+          "mean_pct_hand": 12.180200679623265,
+          "thumb_mm": 11.616461608902329,
+          "index_mm": 11.481041427915702,
+          "middle_mm": 10.918645249562434,
+          "ring_mm": 10.169328091334776,
+          "pinky_mm": 9.131076865244788
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 49,
+          "mean_mm": 6.091733942712729,
+          "tips_mm": 2.3874133620389375,
+          "p95_mm": 21.966705210577715,
+          "mean_pct_hand": 6.9583025717168745,
+          "thumb_mm": 6.104295102565844,
+          "index_mm": 6.001599626570588,
+          "middle_mm": 6.215342204176586,
+          "ring_mm": 6.317420156097959,
+          "pinky_mm": 5.820012624152668
+        },
+        "smplx: swing start": {
+          "frames": 49,
+          "mean_mm": 31.160780767642954,
+          "tips_mm": 34.618492719489275,
+          "p95_mm": 86.23549409290878,
+          "mean_pct_hand": 35.59350145479929,
+          "thumb_mm": 24.449945362911887,
+          "index_mm": 33.87095597873777,
+          "middle_mm": 36.76359792091373,
+          "ring_mm": 30.426415139117655,
+          "pinky_mm": 30.29298943653374
+        },
+        "smplx: refined": {
+          "frames": 49,
+          "mean_mm": 11.400256891750717,
+          "tips_mm": 3.1581542734152253,
+          "p95_mm": 48.688748526299406,
+          "mean_pct_hand": 13.021979881934392,
+          "thumb_mm": 10.589661491005728,
+          "index_mm": 10.977320601398803,
+          "middle_mm": 12.71050813557574,
+          "ring_mm": 10.76637275733827,
+          "pinky_mm": 11.957421473435039
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 49,
+          "mean_mm": 17.958283182886195,
+          "tips_mm": 10.348404267311956,
+          "p95_mm": 41.225699680531854,
+          "mean_pct_hand": 20.512906379402867,
+          "thumb_mm": 18.22690981174377,
+          "index_mm": 18.633184473465498,
+          "middle_mm": 18.748150362182162,
+          "ring_mm": 18.151271722829147,
+          "pinky_mm": 16.031899544210397
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 49,
+          "mean_mm": 10.993604682276162,
+          "tips_mm": 4.600304497346962,
+          "p95_mm": 36.0337016064832,
+          "mean_pct_hand": 12.557480095569613,
+          "thumb_mm": 11.500197004976165,
+          "index_mm": 11.955223632451363,
+          "middle_mm": 11.554535955393257,
+          "ring_mm": 10.402579483285985,
+          "pinky_mm": 9.555487335274037
+        },
+        "smplx: in-sample shape": {
+          "frames": 49,
+          "mean_mm": 10.957040097396028,
+          "tips_mm": 4.5621470212157496,
+          "p95_mm": 35.446930288422415,
+          "mean_pct_hand": 12.515714081591023,
+          "thumb_mm": 11.463308030763923,
+          "index_mm": 11.934046869907045,
+          "middle_mm": 11.520772322551354,
+          "ring_mm": 10.330475098924186,
+          "pinky_mm": 9.536598164833642
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 49,
+          "mean_mm": 6.106267503282863,
+          "tips_mm": 2.230860351681385,
+          "p95_mm": 22.322682288768043,
+          "mean_pct_hand": 6.974903577742811,
+          "thumb_mm": 7.097545190283881,
+          "index_mm": 5.683098762048384,
+          "middle_mm": 6.662063235134204,
+          "ring_mm": 5.157908906833864,
+          "pinky_mm": 5.930721422113987
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.272914239067253,
+            4.274526612217545
+          ],
+          "interleaved_norms": [
+            4.275497344040657,
+            4.277298721796169
+          ],
+          "in_sample_norm": 4.276038135986668,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 10,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 13.5,
+            "0.01": 15.0,
+            "0.03": 24.0
+          },
+          "joint_weak_weight": {
+            "wrist": 2.2231478435554304e-06,
+            "index MCP": 0.6357053686349541,
+            "index PIP": 1.0262369655853285,
+            "index DIP": 1.3380828238435358,
+            "middle MCP": 0.6791072057779581,
+            "middle PIP": 1.0096084724247416,
+            "middle DIP": 1.3113138030709988,
+            "pinky MCP": 0.6484865213811292,
+            "pinky PIP": 1.1435170117630702,
+            "pinky DIP": 1.2079156230937655,
+            "ring MCP": 0.6273762560211695,
+            "ring PIP": 1.0419043195446975,
+            "ring DIP": 1.3307366049742884,
+            "thumb CMC": 0.8094439375544807,
+            "thumb MCP": 1.0018267167435202,
+            "thumb IP": 1.18873614643852
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 10.709280436615956,
+          "other_side": 11.242975679670977
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.27264985726411,
+            4.273732527269569
+          ],
+          "interleaved_norms": [
+            4.270192855502854,
+            4.268993313043141
+          ],
+          "in_sample_norm": 4.271569633086445,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 10,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 24.0
+          },
+          "joint_weak_weight": {
+            "wrist": 1.7840621730474045e-06,
+            "index MCP": 0.6528577979138668,
+            "index PIP": 1.0502315907531063,
+            "index DIP": 1.2968983538115944,
+            "middle MCP": 0.741025515247344,
+            "middle PIP": 0.9664695432144154,
+            "middle DIP": 1.2925046345782352,
+            "pinky MCP": 0.6954812625468201,
+            "pinky PIP": 0.9512537419852318,
+            "pinky DIP": 1.3532683708029793,
+            "ring MCP": 0.7110840405141872,
+            "ring PIP": 1.0124356728734705,
+            "ring DIP": 1.2764856707869117,
+            "thumb CMC": 0.7195308949264861,
+            "thumb MCP": 1.0852443584351266,
+            "thumb IP": 1.1952267675480548
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 11.400256891750717,
+          "other_side": 11.981179923442511
+        }
+      }
+    },
+    {
+      "clip": "01987",
+      "side": "right",
+      "frames_in_clip": 75,
+      "frames_with_hand": 27,
+      "hand_scale_mm": 82.73139531294521,
+      "half_span_ratio": 1.1414501540483488,
+      "rows": {
+        "rigid reference": {
+          "frames": 27,
+          "mean_mm": 14.796075503507062,
+          "tips_mm": 16.912775139933274,
+          "p95_mm": 30.850481601452856,
+          "mean_pct_hand": 17.884474748115213,
+          "thumb_mm": 13.77107349727824,
+          "index_mm": 16.327006444053378,
+          "middle_mm": 14.992025763000607,
+          "ring_mm": 13.443831203562908,
+          "pinky_mm": 15.44644060964017
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 27,
+          "mean_mm": 7.976065721392542,
+          "tips_mm": 9.106155352857117,
+          "p95_mm": 15.437131423849037,
+          "mean_pct_hand": 9.640917684540135,
+          "thumb_mm": 10.723490589286587,
+          "index_mm": 8.494447438985786,
+          "middle_mm": 5.432837212441725,
+          "ring_mm": 5.899542634579971,
+          "pinky_mm": 9.330010731668645
+        },
+        "mano: swing start": {
+          "frames": 27,
+          "mean_mm": 20.141345737235437,
+          "tips_mm": 22.959203314057305,
+          "p95_mm": 45.263279165312404,
+          "mean_pct_hand": 24.345468441632654,
+          "thumb_mm": 18.368031575431605,
+          "index_mm": 22.811047116378244,
+          "middle_mm": 20.8413076960093,
+          "ring_mm": 17.70000860810004,
+          "pinky_mm": 20.986333690257975
+        },
+        "mano: refined": {
+          "frames": 27,
+          "mean_mm": 7.8853790519998475,
+          "tips_mm": 2.836809200106288,
+          "p95_mm": 24.62929011270199,
+          "mean_pct_hand": 9.531301898356837,
+          "thumb_mm": 8.809381989674147,
+          "index_mm": 8.05604437709823,
+          "middle_mm": 8.101261787117705,
+          "ring_mm": 7.171355213947638,
+          "pinky_mm": 7.288851892161516
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 27,
+          "mean_mm": 8.334559178792524,
+          "tips_mm": 3.665248609811359,
+          "p95_mm": 22.263670610885125,
+          "mean_pct_hand": 10.074239830315532,
+          "thumb_mm": 8.915596210378778,
+          "index_mm": 8.463787712348111,
+          "middle_mm": 8.671793359857677,
+          "ring_mm": 8.239755116372377,
+          "pinky_mm": 7.381863495005674
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 27,
+          "mean_mm": 7.554769895264272,
+          "tips_mm": 3.1161516239826277,
+          "p95_mm": 20.382178542896888,
+          "mean_pct_hand": 9.131684370470369,
+          "thumb_mm": 8.970059052161153,
+          "index_mm": 7.360455016382011,
+          "middle_mm": 7.473867131461857,
+          "ring_mm": 7.124704662817142,
+          "pinky_mm": 6.8447636134991985
+        },
+        "mano: in-sample shape": {
+          "frames": 27,
+          "mean_mm": 7.545502384919064,
+          "tips_mm": 3.1444262210946228,
+          "p95_mm": 20.74443973795887,
+          "mean_pct_hand": 9.120482443668395,
+          "thumb_mm": 8.971021739959367,
+          "index_mm": 7.355153469008091,
+          "middle_mm": 7.462640281619885,
+          "ring_mm": 7.125746111098278,
+          "pinky_mm": 6.812950322909701
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 27,
+          "mean_mm": 5.107617230580644,
+          "tips_mm": 2.1677268704078294,
+          "p95_mm": 16.08514997302998,
+          "mean_pct_hand": 6.173735147654932,
+          "thumb_mm": 6.852177142825311,
+          "index_mm": 5.144499482824737,
+          "middle_mm": 4.6092743230535795,
+          "ring_mm": 4.285182381919834,
+          "pinky_mm": 4.646952822279756
+        },
+        "smplx: swing start": {
+          "frames": 27,
+          "mean_mm": 27.40785147413976,
+          "tips_mm": 30.6004612969256,
+          "p95_mm": 55.25276075323414,
+          "mean_pct_hand": 33.12871899532822,
+          "thumb_mm": 22.71926022657756,
+          "index_mm": 30.120634674361686,
+          "middle_mm": 31.72075603957631,
+          "ring_mm": 25.76443812786568,
+          "pinky_mm": 26.714168302317564
+        },
+        "smplx: refined": {
+          "frames": 27,
+          "mean_mm": 9.975137411270532,
+          "tips_mm": 2.7519322356776996,
+          "p95_mm": 32.49788097153485,
+          "mean_pct_hand": 12.05725755444825,
+          "thumb_mm": 9.739201553815512,
+          "index_mm": 10.068879366249744,
+          "middle_mm": 11.3194392725034,
+          "ring_mm": 9.530529217608048,
+          "pinky_mm": 9.217637646175952
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 27,
+          "mean_mm": 8.213317485068954,
+          "tips_mm": 3.66544436809691,
+          "p95_mm": 21.674407571068286,
+          "mean_pct_hand": 9.927691239825846,
+          "thumb_mm": 8.473688426785094,
+          "index_mm": 8.27537873801738,
+          "middle_mm": 8.730300571358539,
+          "ring_mm": 7.8397909826915155,
+          "pinky_mm": 7.7474287064922365
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 27,
+          "mean_mm": 7.534792899053008,
+          "tips_mm": 3.2409893082965078,
+          "p95_mm": 21.254484570473533,
+          "mean_pct_hand": 9.107537556391266,
+          "thumb_mm": 8.614450540356952,
+          "index_mm": 7.161065417316091,
+          "middle_mm": 7.824273214074255,
+          "ring_mm": 6.911201336674521,
+          "pinky_mm": 7.162973986843223
+        },
+        "smplx: in-sample shape": {
+          "frames": 27,
+          "mean_mm": 7.556882206963495,
+          "tips_mm": 3.2652409525132327,
+          "p95_mm": 20.975965672960925,
+          "mean_pct_hand": 9.134237587047016,
+          "thumb_mm": 8.61911830759281,
+          "index_mm": 7.200780829352448,
+          "middle_mm": 7.853238225021946,
+          "ring_mm": 6.938181945729944,
+          "pinky_mm": 7.173091727120327
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 27,
+          "mean_mm": 5.043455267220063,
+          "tips_mm": 2.1722110853715666,
+          "p95_mm": 16.36650511057703,
+          "mean_pct_hand": 6.096180595217036,
+          "thumb_mm": 6.739598849367468,
+          "index_mm": 4.799243967954362,
+          "middle_mm": 5.111332103175112,
+          "ring_mm": 3.838112620515018,
+          "pinky_mm": 4.728988795088352
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.272424347384761,
+            4.276483538542494
+          ],
+          "interleaved_norms": [
+            4.275648310909892,
+            4.276163120580024
+          ],
+          "in_sample_norm": 4.2746540728293185,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 6,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 13.5,
+            "0.01": 15.0,
+            "0.03": 25.0
+          },
+          "joint_weak_weight": {
+            "wrist": 3.6780142331859044e-05,
+            "index MCP": 0.5938759274935718,
+            "index PIP": 1.0989713346724561,
+            "index DIP": 1.3071920911187132,
+            "middle MCP": 0.6212703992538183,
+            "middle PIP": 1.1251454262404466,
+            "middle DIP": 1.2536593154679385,
+            "pinky MCP": 0.7552139513886645,
+            "pinky PIP": 1.187916546445459,
+            "pinky DIP": 1.0564849993950458,
+            "ring MCP": 0.584085467583796,
+            "ring PIP": 1.0627905403587514,
+            "ring DIP": 1.3532605603085157,
+            "thumb CMC": 0.7807450573224181,
+            "thumb MCP": 0.9788205586616091,
+            "thumb IP": 1.2405310441464668
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 7.8853790519998475,
+          "other_side": 9.05809932485314
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.267666460250803,
+            4.263085498840373
+          ],
+          "interleaved_norms": [
+            4.264694018033329,
+            4.263931702209599
+          ],
+          "in_sample_norm": 4.264225899590946,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 6,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 25.0
+          },
+          "joint_weak_weight": {
+            "wrist": 6.7411747414409904e-06,
+            "index MCP": 0.5477374102694536,
+            "index PIP": 1.1410070342952572,
+            "index DIP": 1.3112587637150093,
+            "middle MCP": 0.547994445941243,
+            "middle PIP": 1.2103249922942811,
+            "middle DIP": 1.2416841565978138,
+            "pinky MCP": 0.5815415460771228,
+            "pinky PIP": 1.2895036356574936,
+            "pinky DIP": 1.128916512350828,
+            "ring MCP": 0.49432204691691534,
+            "ring PIP": 1.0990177166532549,
+            "ring DIP": 1.406676177162132,
+            "thumb CMC": 0.6123072518000506,
+            "thumb MCP": 1.142002119681484,
+            "thumb IP": 1.2456994494129225
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 9.975137411270532,
+          "other_side": 10.82760854051655
+        }
+      }
+    },
+    {
+      "clip": "01988",
+      "side": "left",
+      "frames_in_clip": 144,
+      "frames_with_hand": 92,
+      "hand_scale_mm": 92.70792652276295,
+      "half_span_ratio": 1.290443348729151,
+      "rows": {
+        "rigid reference": {
+          "frames": 92,
+          "mean_mm": 13.441331255447297,
+          "tips_mm": 14.82657008766072,
+          "p95_mm": 33.688807496724344,
+          "mean_pct_hand": 14.498578233380067,
+          "thumb_mm": 8.889747803792886,
+          "index_mm": 16.018813925739483,
+          "middle_mm": 14.81566377574903,
+          "ring_mm": 14.306182477994165,
+          "pinky_mm": 13.176248293960922
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 92,
+          "mean_mm": 3.828748221253376,
+          "tips_mm": 5.026137317288778,
+          "p95_mm": 7.849456197314776,
+          "mean_pct_hand": 4.12990384410473,
+          "thumb_mm": 3.4495827574587166,
+          "index_mm": 4.699881808465742,
+          "middle_mm": 3.439941717316014,
+          "ring_mm": 3.568923556581839,
+          "pinky_mm": 3.9854112664445696
+        },
+        "mano: swing start": {
+          "frames": 92,
+          "mean_mm": 15.850653587517437,
+          "tips_mm": 17.929261359763373,
+          "p95_mm": 39.048945967932745,
+          "mean_pct_hand": 17.097409231373074,
+          "thumb_mm": 14.41645900242191,
+          "index_mm": 16.15385332632004,
+          "middle_mm": 16.135202327718737,
+          "ring_mm": 16.35165244441989,
+          "pinky_mm": 16.196100836706616
+        },
+        "mano: refined": {
+          "frames": 92,
+          "mean_mm": 6.777960282428727,
+          "tips_mm": 3.3078895338383387,
+          "p95_mm": 23.30447068523839,
+          "mean_pct_hand": 7.311090363739833,
+          "thumb_mm": 10.14207977897055,
+          "index_mm": 6.277200408739314,
+          "middle_mm": 6.317703635119767,
+          "ring_mm": 5.864215759990035,
+          "pinky_mm": 5.288601829323967
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 92,
+          "mean_mm": 8.048940605617341,
+          "tips_mm": 3.640145593464063,
+          "p95_mm": 26.98191379850409,
+          "mean_pct_hand": 8.68204144727695,
+          "thumb_mm": 10.720134922901355,
+          "index_mm": 7.683854198759204,
+          "middle_mm": 7.917839866206155,
+          "ring_mm": 7.500015886453981,
+          "pinky_mm": 6.422858153766
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 92,
+          "mean_mm": 6.14589734426356,
+          "tips_mm": 2.788168174631443,
+          "p95_mm": 21.07849571898649,
+          "mean_pct_hand": 6.629311618521134,
+          "thumb_mm": 7.9793585983284965,
+          "index_mm": 5.80376939855996,
+          "middle_mm": 5.903780894512087,
+          "ring_mm": 5.9520144100024925,
+          "pinky_mm": 5.090563419914765
+        },
+        "mano: in-sample shape": {
+          "frames": 92,
+          "mean_mm": 6.143348457787452,
+          "tips_mm": 2.7790952729788763,
+          "p95_mm": 21.082889372482235,
+          "mean_pct_hand": 6.626562245763369,
+          "thumb_mm": 7.9784288300880375,
+          "index_mm": 5.799552732858212,
+          "middle_mm": 5.902431716891385,
+          "ring_mm": 5.954512475826059,
+          "pinky_mm": 5.081816533273573
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 92,
+          "mean_mm": 4.100857466068483,
+          "tips_mm": 2.284638894359284,
+          "p95_mm": 10.740647325231933,
+          "mean_pct_hand": 4.423416227588246,
+          "thumb_mm": 4.915067763256917,
+          "index_mm": 3.1389176931633496,
+          "middle_mm": 4.217691480345755,
+          "ring_mm": 4.152554844721592,
+          "pinky_mm": 4.080055548854801
+        },
+        "smplx: swing start": {
+          "frames": 92,
+          "mean_mm": 20.649531742751503,
+          "tips_mm": 22.421748477019825,
+          "p95_mm": 51.88402119536278,
+          "mean_pct_hand": 22.273749955653834,
+          "thumb_mm": 14.614228915472633,
+          "index_mm": 20.24263714836561,
+          "middle_mm": 24.485772444862175,
+          "ring_mm": 20.525110818925487,
+          "pinky_mm": 23.37990938613162
+        },
+        "smplx: refined": {
+          "frames": 92,
+          "mean_mm": 7.426542666698314,
+          "tips_mm": 2.3461989214646044,
+          "p95_mm": 32.34108046963895,
+          "mean_pct_hand": 8.010687915530983,
+          "thumb_mm": 8.073749569438107,
+          "index_mm": 6.093204179744886,
+          "middle_mm": 8.3676273747984,
+          "ring_mm": 6.617047195762411,
+          "pinky_mm": 7.981085013747766
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 92,
+          "mean_mm": 8.318850540132457,
+          "tips_mm": 4.527011725023885,
+          "p95_mm": 29.0704075793151,
+          "mean_pct_hand": 8.97318153058886,
+          "thumb_mm": 11.318279812022631,
+          "index_mm": 8.104163733144526,
+          "middle_mm": 8.296327919297774,
+          "ring_mm": 6.978600438394984,
+          "pinky_mm": 6.896880797802368
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 92,
+          "mean_mm": 6.234508024347351,
+          "tips_mm": 3.1800625177935338,
+          "p95_mm": 22.790384311455067,
+          "mean_pct_hand": 6.724892097351101,
+          "thumb_mm": 8.654342674983797,
+          "index_mm": 5.959072938973103,
+          "middle_mm": 6.468553910417092,
+          "ring_mm": 4.892284872990826,
+          "pinky_mm": 5.198285724371935
+        },
+        "smplx: in-sample shape": {
+          "frames": 92,
+          "mean_mm": 6.230387971949401,
+          "tips_mm": 3.1725555327623534,
+          "p95_mm": 22.775983386951687,
+          "mean_pct_hand": 6.720447976387034,
+          "thumb_mm": 8.655238328766774,
+          "index_mm": 5.9558266656269145,
+          "middle_mm": 6.463864013144903,
+          "ring_mm": 4.883950928748979,
+          "pinky_mm": 5.193059923459435
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 92,
+          "mean_mm": 4.281952847793833,
+          "tips_mm": 2.6495503136472096,
+          "p95_mm": 11.548250919798118,
+          "mean_pct_hand": 4.618755923467307,
+          "thumb_mm": 6.312041947296516,
+          "index_mm": 2.842938327121609,
+          "middle_mm": 4.806822791989389,
+          "ring_mm": 3.1642631379059876,
+          "pinky_mm": 4.2836980346556635
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.275184108772472,
+            4.274938370011061
+          ],
+          "interleaved_norms": [
+            4.275788843057427,
+            4.275642487882859
+          ],
+          "in_sample_norm": 4.276036247856069,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 19,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 26.0
+          },
+          "joint_weak_weight": {
+            "wrist": 2.7208726439966406e-06,
+            "index MCP": 0.6226764007684885,
+            "index PIP": 1.0843064359431138,
+            "index DIP": 1.2930173626024386,
+            "middle MCP": 0.7751114055174819,
+            "middle PIP": 1.0698271999196727,
+            "middle DIP": 1.1550668876879853,
+            "pinky MCP": 0.6177971053257177,
+            "pinky PIP": 1.3258853321623343,
+            "pinky DIP": 1.0036838702837776,
+            "ring MCP": 0.6199727719013262,
+            "ring PIP": 1.254010425260022,
+            "ring DIP": 1.1260186321471644,
+            "thumb CMC": 0.856586269723679,
+            "thumb MCP": 1.0085981685125696,
+            "thumb IP": 1.1348074324242174
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 6.777960282428727,
+          "other_side": 8.211498197557514
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.270063501466727,
+            4.2731713328697545
+          ],
+          "interleaved_norms": [
+            4.270201027309113,
+            4.268801969586612
+          ],
+          "in_sample_norm": 4.2716675953142325,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 19,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 15.0,
+            "0.01": 15.0,
+            "0.03": 26.0
+          },
+          "joint_weak_weight": {
+            "wrist": 3.1863355676825386e-06,
+            "index MCP": 0.641330295681948,
+            "index PIP": 1.166880487551099,
+            "index DIP": 1.1917940634035111,
+            "middle MCP": 0.8370799616530173,
+            "middle PIP": 1.0767143377769348,
+            "middle DIP": 1.0862085303340714,
+            "pinky MCP": 0.628428824128612,
+            "pinky PIP": 1.1879429182608234,
+            "pinky DIP": 1.1310219683740117,
+            "ring MCP": 0.6803499700008718,
+            "ring PIP": 1.2230169367998953,
+            "ring DIP": 1.0966364766063867,
+            "thumb CMC": 0.7356451446136036,
+            "thumb MCP": 1.1257776031155353,
+            "thumb IP": 1.138537716416743
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 7.426542666698314,
+          "other_side": 8.495811359257635
+        }
+      }
+    },
+    {
+      "clip": "01988",
+      "side": "right",
+      "frames_in_clip": 144,
+      "frames_with_hand": 101,
+      "hand_scale_mm": 82.54489757105439,
+      "half_span_ratio": 0.6130294168088798,
+      "rows": {
+        "rigid reference": {
+          "frames": 101,
+          "mean_mm": 22.40887567486356,
+          "tips_mm": 25.818665148562186,
+          "p95_mm": 40.95329318446558,
+          "mean_pct_hand": 27.14749952360662,
+          "thumb_mm": 14.03883614806773,
+          "index_mm": 25.95354853992825,
+          "middle_mm": 26.85228957176949,
+          "ring_mm": 23.57451475291491,
+          "pinky_mm": 21.625189361637425
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 101,
+          "mean_mm": 7.373973033963979,
+          "tips_mm": 9.35692107354183,
+          "p95_mm": 18.287105176523436,
+          "mean_pct_hand": 8.933287521032401,
+          "thumb_mm": 9.942081097544145,
+          "index_mm": 6.9510286494469415,
+          "middle_mm": 6.63993362467779,
+          "ring_mm": 5.60122423391305,
+          "pinky_mm": 7.735597564237966
+        },
+        "mano: swing start": {
+          "frames": 101,
+          "mean_mm": 24.03761930465989,
+          "tips_mm": 27.381777600080056,
+          "p95_mm": 55.213350570247464,
+          "mean_pct_hand": 29.120660406621,
+          "thumb_mm": 16.844866758476098,
+          "index_mm": 26.42626125381618,
+          "middle_mm": 28.09765354174247,
+          "ring_mm": 24.763414853245987,
+          "pinky_mm": 24.05590011601874
+        },
+        "mano: refined": {
+          "frames": 101,
+          "mean_mm": 10.395219448600846,
+          "tips_mm": 5.275520394247385,
+          "p95_mm": 30.751254612928488,
+          "mean_pct_hand": 12.593412499728007,
+          "thumb_mm": 8.646364349432993,
+          "index_mm": 10.576559850015855,
+          "middle_mm": 11.611644823885543,
+          "ring_mm": 11.56007693899522,
+          "pinky_mm": 9.58145128067462
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 101,
+          "mean_mm": 16.018019104920576,
+          "tips_mm": 11.392102545915588,
+          "p95_mm": 37.68457047063093,
+          "mean_pct_hand": 19.405220160497883,
+          "thumb_mm": 12.590251089823736,
+          "index_mm": 16.662388421960273,
+          "middle_mm": 18.165368777378163,
+          "ring_mm": 18.162304070338763,
+          "pinky_mm": 14.509783165101934
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 101,
+          "mean_mm": 9.73986935130606,
+          "tips_mm": 4.119297422100886,
+          "p95_mm": 30.23028227850211,
+          "mean_pct_hand": 11.799480813362221,
+          "thumb_mm": 8.879023959295399,
+          "index_mm": 10.050348225643054,
+          "middle_mm": 10.807542219550102,
+          "ring_mm": 10.563218900620953,
+          "pinky_mm": 8.3992134514208
+        },
+        "mano: in-sample shape": {
+          "frames": 101,
+          "mean_mm": 9.736468849321442,
+          "tips_mm": 4.111806256858405,
+          "p95_mm": 30.263984890278348,
+          "mean_pct_hand": 11.795361234702995,
+          "thumb_mm": 8.875140979919463,
+          "index_mm": 10.046735675348168,
+          "middle_mm": 10.805930516939197,
+          "ring_mm": 10.559354224030601,
+          "pinky_mm": 8.39518285036979
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 101,
+          "mean_mm": 4.995144706220473,
+          "tips_mm": 2.190810881843908,
+          "p95_mm": 15.244134788512179,
+          "mean_pct_hand": 6.051427590567507,
+          "thumb_mm": 6.125288323172306,
+          "index_mm": 4.790436987524771,
+          "middle_mm": 5.228243380766648,
+          "ring_mm": 4.41141530602782,
+          "pinky_mm": 4.420339533610822
+        },
+        "smplx: swing start": {
+          "frames": 101,
+          "mean_mm": 27.45007354085047,
+          "tips_mm": 30.194140049619563,
+          "p95_mm": 67.3389257704258,
+          "mean_pct_hand": 33.254718763472376,
+          "thumb_mm": 21.325960791739487,
+          "index_mm": 29.26422960858516,
+          "middle_mm": 32.31413776088627,
+          "ring_mm": 27.368617736093015,
+          "pinky_mm": 26.977421806948435
+        },
+        "smplx: refined": {
+          "frames": 101,
+          "mean_mm": 9.758458426280862,
+          "tips_mm": 2.485623265128429,
+          "p95_mm": 42.372711940306175,
+          "mean_pct_hand": 11.82200076980023,
+          "thumb_mm": 9.234284196941216,
+          "index_mm": 9.369783582959592,
+          "middle_mm": 10.81912336183995,
+          "ring_mm": 9.311759756216476,
+          "pinky_mm": 10.057341233447074
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 101,
+          "mean_mm": 16.858818165636993,
+          "tips_mm": 12.603560803207769,
+          "p95_mm": 41.12593112021182,
+          "mean_pct_hand": 20.423816203933104,
+          "thumb_mm": 12.279506207097928,
+          "index_mm": 17.61548059947562,
+          "middle_mm": 19.24496251222364,
+          "ring_mm": 18.842140123697153,
+          "pinky_mm": 16.31200138569061
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 101,
+          "mean_mm": 10.003533586442508,
+          "tips_mm": 4.746524077738563,
+          "p95_mm": 33.05635051607834,
+          "mean_pct_hand": 12.118899993584092,
+          "thumb_mm": 8.076119826684385,
+          "index_mm": 10.200399033174135,
+          "middle_mm": 11.557537338363451,
+          "ring_mm": 11.04044517699518,
+          "pinky_mm": 9.143166556995386
+        },
+        "smplx: in-sample shape": {
+          "frames": 101,
+          "mean_mm": 10.001190454060158,
+          "tips_mm": 4.739442492803383,
+          "p95_mm": 33.049207380793135,
+          "mean_pct_hand": 12.116061377932128,
+          "thumb_mm": 8.07508723863727,
+          "index_mm": 10.19913176823869,
+          "middle_mm": 11.552485949182906,
+          "ring_mm": 11.037229448518197,
+          "pinky_mm": 9.142017865723716
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 101,
+          "mean_mm": 5.017082926749077,
+          "tips_mm": 2.0234452725964602,
+          "p95_mm": 15.153134134802357,
+          "mean_pct_hand": 6.078004909304524,
+          "thumb_mm": 6.660056450033855,
+          "index_mm": 4.1286597964956115,
+          "middle_mm": 5.350868210348489,
+          "ring_mm": 4.319112304071901,
+          "pinky_mm": 4.62671787279553
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.263590782732473,
+            4.274426689970677
+          ],
+          "interleaved_norms": [
+            4.2744774060693285,
+            4.2746948842683565
+          ],
+          "in_sample_norm": 4.274741344290718,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 21,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 25.0
+          },
+          "joint_weak_weight": {
+            "wrist": 1.0723893520169797e-05,
+            "index MCP": 0.698050541737398,
+            "index PIP": 1.0174989779938177,
+            "index DIP": 1.284468984195713,
+            "middle MCP": 0.7643408896705863,
+            "middle PIP": 1.0599713339173864,
+            "middle DIP": 1.1757039417237085,
+            "pinky MCP": 0.7850371747343403,
+            "pinky PIP": 1.0757680373810081,
+            "pinky DIP": 0.9962715982089018,
+            "ring MCP": 0.7839754005996207,
+            "ring PIP": 1.0212523715539534,
+            "ring DIP": 1.1947971311520464,
+            "thumb CMC": 0.7295430760271744,
+            "thumb MCP": 1.1317403407152424,
+            "thumb IP": 1.1387123336384395
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 10.395219448600846,
+          "other_side": 12.001689776326705
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.273318219294423,
+            4.272847346384658
+          ],
+          "interleaved_norms": [
+            4.2705330343956085,
+            4.270197234216879
+          ],
+          "in_sample_norm": 4.272479802210862,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 21,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 25.0
+          },
+          "joint_weak_weight": {
+            "wrist": 3.902204264976519e-05,
+            "index MCP": 0.6628194150433149,
+            "index PIP": 0.991851055211087,
+            "index DIP": 1.3454649375903445,
+            "middle MCP": 0.7539114499199058,
+            "middle PIP": 1.055904381752303,
+            "middle DIP": 1.1903832087576027,
+            "pinky MCP": 0.7483226464147703,
+            "pinky PIP": 1.0884796316320526,
+            "pinky DIP": 1.1148892497748188,
+            "ring MCP": 0.7707411651676133,
+            "ring PIP": 1.0326296988371202,
+            "ring DIP": 1.1968988547140003,
+            "thumb CMC": 0.6376242370256617,
+            "thumb MCP": 1.1893374381691306,
+            "thumb IP": 1.1730845603285796
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 9.758458426280862,
+          "other_side": 10.968034100138421
+        }
+      }
+    },
+    {
+      "clip": "01991",
+      "side": "right",
+      "frames_in_clip": 49,
+      "frames_with_hand": 49,
+      "hand_scale_mm": 99.88546859485325,
+      "half_span_ratio": 1.0394958083807673,
+      "rows": {
+        "rigid reference": {
+          "frames": 49,
+          "mean_mm": 4.353156979926948,
+          "tips_mm": 4.763627457909396,
+          "p95_mm": 8.313130810396943,
+          "mean_pct_hand": 4.358148428560559,
+          "thumb_mm": 5.543217078673801,
+          "index_mm": 5.11651257654026,
+          "middle_mm": 3.217790007713266,
+          "ring_mm": 3.5164754718122597,
+          "pinky_mm": 4.371789764895156
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 49,
+          "mean_mm": 3.876418413888037,
+          "tips_mm": 4.252960641768596,
+          "p95_mm": 7.279733478904167,
+          "mean_pct_hand": 3.880863221066949,
+          "thumb_mm": 4.592510339940138,
+          "index_mm": 3.674922258386617,
+          "middle_mm": 2.415440414850337,
+          "ring_mm": 3.666480944895915,
+          "pinky_mm": 5.0327381113671805
+        },
+        "mano: swing start": {
+          "frames": 49,
+          "mean_mm": 11.515939883891878,
+          "tips_mm": 11.883151884186086,
+          "p95_mm": 20.073448639431998,
+          "mean_pct_hand": 11.529144374945902,
+          "thumb_mm": 12.10278248079472,
+          "index_mm": 14.730839378194206,
+          "middle_mm": 7.172692436588451,
+          "ring_mm": 14.125282723142195,
+          "pinky_mm": 9.448102400739824
+        },
+        "mano: refined": {
+          "frames": 49,
+          "mean_mm": 6.383126342668392,
+          "tips_mm": 3.103680705736111,
+          "p95_mm": 17.85087048264529,
+          "mean_pct_hand": 6.390445409591133,
+          "thumb_mm": 9.238300765071873,
+          "index_mm": 9.276589723328952,
+          "middle_mm": 4.21155420200339,
+          "ring_mm": 5.346250595247763,
+          "pinky_mm": 3.8429364276899833
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 49,
+          "mean_mm": 4.212700245654298,
+          "tips_mm": 1.9542831339690732,
+          "p95_mm": 10.865153594728978,
+          "mean_pct_hand": 4.217530642761948,
+          "thumb_mm": 6.926702323365482,
+          "index_mm": 5.346822625423574,
+          "middle_mm": 2.7557786988667456,
+          "ring_mm": 3.4022101730208774,
+          "pinky_mm": 2.631987407594814
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 49,
+          "mean_mm": 3.6160735913905175,
+          "tips_mm": 1.5458765425091407,
+          "p95_mm": 9.908193381535337,
+          "mean_pct_hand": 3.620219880088585,
+          "thumb_mm": 5.534005510701384,
+          "index_mm": 4.245419354511072,
+          "middle_mm": 2.6102648560877406,
+          "ring_mm": 3.189305033332645,
+          "pinky_mm": 2.501373202319746
+        },
+        "mano: in-sample shape": {
+          "frames": 49,
+          "mean_mm": 3.609661785012888,
+          "tips_mm": 1.5410916571186317,
+          "p95_mm": 9.863432273874107,
+          "mean_pct_hand": 3.6138007217587216,
+          "thumb_mm": 5.522897769366364,
+          "index_mm": 4.241743746801611,
+          "middle_mm": 2.6052208778579504,
+          "ring_mm": 3.1849847860051383,
+          "pinky_mm": 2.4934617450333763
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 49,
+          "mean_mm": 3.2308392228559075,
+          "tips_mm": 1.20779770707895,
+          "p95_mm": 9.098587422126183,
+          "mean_pct_hand": 3.234543791310182,
+          "thumb_mm": 4.560799203742129,
+          "index_mm": 3.6418805058499917,
+          "middle_mm": 2.2470081715358803,
+          "ring_mm": 3.1869103666906504,
+          "pinky_mm": 2.5175978664608856
+        },
+        "smplx: swing start": {
+          "frames": 49,
+          "mean_mm": 7.957945680432736,
+          "tips_mm": 8.93826002828043,
+          "p95_mm": 14.005680778271001,
+          "mean_pct_hand": 7.9670704782004504,
+          "thumb_mm": 8.797286412118401,
+          "index_mm": 6.35831921676592,
+          "middle_mm": 10.185699095677773,
+          "ring_mm": 5.996500841595434,
+          "pinky_mm": 8.451922836006151
+        },
+        "smplx: refined": {
+          "frames": 49,
+          "mean_mm": 3.9364624551581926,
+          "tips_mm": 1.4375452930602968,
+          "p95_mm": 11.399847386550192,
+          "mean_pct_hand": 3.9409761104740153,
+          "thumb_mm": 6.25415196634774,
+          "index_mm": 3.823844422349253,
+          "middle_mm": 3.9354945514375705,
+          "ring_mm": 2.423081869157739,
+          "pinky_mm": 3.2457394664986587
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 49,
+          "mean_mm": 4.442316356936682,
+          "tips_mm": 2.4073087482529756,
+          "p95_mm": 13.902445498706788,
+          "mean_pct_hand": 4.447410038146009,
+          "thumb_mm": 7.564532242443312,
+          "index_mm": 5.935529792999615,
+          "middle_mm": 3.528408813684185,
+          "ring_mm": 2.451044779882288,
+          "pinky_mm": 2.732066155674009
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 49,
+          "mean_mm": 3.6219126072250085,
+          "tips_mm": 1.4327042624843898,
+          "p95_mm": 10.821385297528899,
+          "mean_pct_hand": 3.626065591098036,
+          "thumb_mm": 5.949598272798747,
+          "index_mm": 4.184670671899785,
+          "middle_mm": 3.173691472704155,
+          "ring_mm": 2.2254553700889077,
+          "pinky_mm": 2.5761472486334482
+        },
+        "smplx: in-sample shape": {
+          "frames": 49,
+          "mean_mm": 3.6183809818219963,
+          "tips_mm": 1.4273686437932471,
+          "p95_mm": 10.768308991357925,
+          "mean_pct_hand": 3.6225299162369233,
+          "thumb_mm": 5.94744173038526,
+          "index_mm": 4.180550907714435,
+          "middle_mm": 3.167566936908689,
+          "ring_mm": 2.221581878296283,
+          "pinky_mm": 2.574763455805313
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 49,
+          "mean_mm": 3.2074632179125135,
+          "tips_mm": 0.9478454845916587,
+          "p95_mm": 9.463101804979225,
+          "mean_pct_hand": 3.2111409828013593,
+          "thumb_mm": 4.648985483573419,
+          "index_mm": 3.09676017848755,
+          "middle_mm": 3.069790786360947,
+          "ring_mm": 2.517038528605315,
+          "pinky_mm": 2.7047411125353356
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.270931428545099,
+            4.273671057655415
+          ],
+          "interleaved_norms": [
+            4.269302348157233,
+            4.270380753894081
+          ],
+          "in_sample_norm": 4.271897047105389,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 10,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 12.5,
+            "0.01": 15.0,
+            "0.03": 25.0
+          },
+          "joint_weak_weight": {
+            "wrist": 1.4279889234271865e-05,
+            "index MCP": 0.722905281123009,
+            "index PIP": 1.0722289234721365,
+            "index DIP": 1.2048742017829557,
+            "middle MCP": 0.5105033798966006,
+            "middle PIP": 1.0895581366241118,
+            "middle DIP": 1.3999555575878122,
+            "pinky MCP": 0.5306087049202136,
+            "pinky PIP": 1.0347306807839745,
+            "pinky DIP": 1.4345323912211208,
+            "ring MCP": 0.5111120733193067,
+            "ring PIP": 1.1052745169089158,
+            "ring DIP": 1.3836707351637039,
+            "thumb CMC": 0.9791900817585166,
+            "thumb MCP": 0.999273296463554,
+            "thumb IP": 1.0215677590848364
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 6.383126342668392,
+          "other_side": 9.982857013413154
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.26007611327323,
+            4.27657148100507
+          ],
+          "interleaved_norms": [
+            4.276383352302697,
+            4.276657453147231
+          ],
+          "in_sample_norm": 4.276091813475198,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 10,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 13.5,
+            "0.01": 15.0,
+            "0.03": 25.0
+          },
+          "joint_weak_weight": {
+            "wrist": 2.6475557392957117e-05,
+            "index MCP": 0.6435012058301084,
+            "index PIP": 1.0912717536349095,
+            "index DIP": 1.265256625300247,
+            "middle MCP": 0.5890840740871274,
+            "middle PIP": 0.9793466403011364,
+            "middle DIP": 1.431605253401692,
+            "pinky MCP": 0.658581952140475,
+            "pinky PIP": 0.854626125266782,
+            "pinky DIP": 1.4866425474437324,
+            "ring MCP": 0.5954526840938018,
+            "ring PIP": 1.0458549000559172,
+            "ring DIP": 1.358790242803653,
+            "thumb CMC": 0.8465448134684243,
+            "thumb MCP": 1.0938147514722507,
+            "thumb IP": 1.0595999551423514
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 3.9364624551581926,
+          "other_side": 7.286094093270811
+        }
+      }
+    },
+    {
+      "clip": "01992",
+      "side": "left",
+      "frames_in_clip": 59,
+      "frames_with_hand": 59,
+      "hand_scale_mm": 80.95035148841181,
+      "half_span_ratio": 0.83502157731265,
+      "rows": {
+        "rigid reference": {
+          "frames": 59,
+          "mean_mm": 8.788541870255685,
+          "tips_mm": 10.087400143599371,
+          "p95_mm": 18.817684251097994,
+          "mean_pct_hand": 10.856706251008413,
+          "thumb_mm": 6.407297720873055,
+          "index_mm": 10.41077233264363,
+          "middle_mm": 10.362270206233372,
+          "ring_mm": 9.115734564500407,
+          "pinky_mm": 7.646634527027969
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 59,
+          "mean_mm": 2.658574523157246,
+          "tips_mm": 3.570657863014656,
+          "p95_mm": 5.397149170706867,
+          "mean_pct_hand": 3.2842038042760393,
+          "thumb_mm": 3.0321004841646486,
+          "index_mm": 2.7728767514525825,
+          "middle_mm": 2.3505735097978406,
+          "ring_mm": 1.8620378038707655,
+          "pinky_mm": 3.275284066500393
+        },
+        "mano: swing start": {
+          "frames": 59,
+          "mean_mm": 19.814296473371645,
+          "tips_mm": 23.34615646370781,
+          "p95_mm": 37.596640148749216,
+          "mean_pct_hand": 24.477097516010286,
+          "thumb_mm": 14.58092130746926,
+          "index_mm": 22.990841805272115,
+          "middle_mm": 19.723021447387072,
+          "ring_mm": 19.863299446671498,
+          "pinky_mm": 21.91339836005826
+        },
+        "mano: refined": {
+          "frames": 59,
+          "mean_mm": 6.9799433879292305,
+          "tips_mm": 2.484020442008981,
+          "p95_mm": 22.70554886891281,
+          "mean_pct_hand": 8.622499173371004,
+          "thumb_mm": 8.420684611850309,
+          "index_mm": 7.428889930572674,
+          "middle_mm": 6.474927298437468,
+          "ring_mm": 6.883898994188306,
+          "pinky_mm": 5.6913161045974014
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 59,
+          "mean_mm": 8.354671772604057,
+          "tips_mm": 4.534384129492125,
+          "p95_mm": 20.302545736716553,
+          "mean_pct_hand": 10.320735634853968,
+          "thumb_mm": 8.621506103846276,
+          "index_mm": 9.514916925870335,
+          "middle_mm": 8.932613780768861,
+          "ring_mm": 8.36817138414458,
+          "pinky_mm": 6.336150668390235
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 59,
+          "mean_mm": 5.752580645673579,
+          "tips_mm": 2.512770942988639,
+          "p95_mm": 14.935818984673197,
+          "mean_pct_hand": 7.106307186939232,
+          "thumb_mm": 6.1174843216674555,
+          "index_mm": 6.502406215280185,
+          "middle_mm": 5.82532225500486,
+          "ring_mm": 5.641186378783064,
+          "pinky_mm": 4.676504057632328
+        },
+        "mano: in-sample shape": {
+          "frames": 59,
+          "mean_mm": 5.744680720440967,
+          "tips_mm": 2.503549575860672,
+          "p95_mm": 15.087285313445886,
+          "mean_pct_hand": 7.096548211113483,
+          "thumb_mm": 6.122761436067541,
+          "index_mm": 6.493764006582512,
+          "middle_mm": 5.812821029915894,
+          "ring_mm": 5.630819995425273,
+          "pinky_mm": 4.663237134213609
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 59,
+          "mean_mm": 3.6245150026926023,
+          "tips_mm": 2.1892310338710677,
+          "p95_mm": 9.298986149267163,
+          "mean_pct_hand": 4.477454311253309,
+          "thumb_mm": 3.8217770365958894,
+          "index_mm": 3.715230975557713,
+          "middle_mm": 3.385526427217402,
+          "ring_mm": 3.657204561927651,
+          "pinky_mm": 3.542836012164353
+        },
+        "smplx: swing start": {
+          "frames": 59,
+          "mean_mm": 30.470408826015934,
+          "tips_mm": 33.506410995855845,
+          "p95_mm": 50.09971121247309,
+          "mean_pct_hand": 37.64086043576701,
+          "thumb_mm": 24.05409169999699,
+          "index_mm": 33.404999584032765,
+          "middle_mm": 32.94525606957735,
+          "ring_mm": 30.67487905755718,
+          "pinky_mm": 31.272817718915373
+        },
+        "smplx: refined": {
+          "frames": 59,
+          "mean_mm": 9.57203771643071,
+          "tips_mm": 1.8954994207322964,
+          "p95_mm": 34.40702153606064,
+          "mean_pct_hand": 11.824578325396109,
+          "thumb_mm": 11.267972325457226,
+          "index_mm": 9.670761691354064,
+          "middle_mm": 9.200064574781784,
+          "ring_mm": 9.045604783207589,
+          "pinky_mm": 8.675785207352888
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 59,
+          "mean_mm": 8.563824456859129,
+          "tips_mm": 5.118385058052696,
+          "p95_mm": 21.315559540644564,
+          "mean_pct_hand": 10.5791071927403,
+          "thumb_mm": 9.254961419101361,
+          "index_mm": 9.123031019913165,
+          "middle_mm": 8.987990895543687,
+          "ring_mm": 8.49315861553502,
+          "pinky_mm": 6.9599803342024105
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 59,
+          "mean_mm": 5.883700368791924,
+          "tips_mm": 2.521098350936739,
+          "p95_mm": 15.845939135153287,
+          "mean_pct_hand": 7.268282670315751,
+          "thumb_mm": 6.642953537228962,
+          "index_mm": 6.283227445292421,
+          "middle_mm": 6.126773000293194,
+          "ring_mm": 5.368964235587533,
+          "pinky_mm": 4.996583625557509
+        },
+        "smplx: in-sample shape": {
+          "frames": 59,
+          "mean_mm": 5.877986610472409,
+          "tips_mm": 2.5186067753970014,
+          "p95_mm": 15.71370820862815,
+          "mean_pct_hand": 7.261224321322252,
+          "thumb_mm": 6.645422526270503,
+          "index_mm": 6.274164009332473,
+          "middle_mm": 6.117435606282745,
+          "ring_mm": 5.356625562265912,
+          "pinky_mm": 4.996285348210404
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 59,
+          "mean_mm": 3.804668005392814,
+          "tips_mm": 1.6434051792009483,
+          "p95_mm": 10.683396551458562,
+          "mean_pct_hand": 4.700001834998158,
+          "thumb_mm": 4.669047766075367,
+          "index_mm": 3.6026562094483796,
+          "middle_mm": 3.952143970242703,
+          "ring_mm": 3.0213655326474447,
+          "pinky_mm": 3.7781265485501763
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.270805408938711,
+            4.270732456857678
+          ],
+          "interleaved_norms": [
+            4.270230287895209,
+            4.269695545763778
+          ],
+          "in_sample_norm": 4.271186903569538,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 12,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 24.0
+          },
+          "joint_weak_weight": {
+            "wrist": 5.617266028378915e-06,
+            "index MCP": 0.6116666378599742,
+            "index PIP": 1.0846035147975661,
+            "index DIP": 1.3037554212535458,
+            "middle MCP": 0.6815177659963,
+            "middle PIP": 1.0650090762745767,
+            "middle DIP": 1.2534864319832695,
+            "pinky MCP": 0.5806495397267153,
+            "pinky PIP": 1.327301525464642,
+            "pinky DIP": 1.0919904192991712,
+            "ring MCP": 0.5338126199039251,
+            "ring PIP": 1.1530172983694447,
+            "ring DIP": 1.3131868375376088,
+            "thumb CMC": 0.6180612205893214,
+            "thumb MCP": 0.9541069954783369,
+            "thumb IP": 1.4278290781995748
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 6.9799433879292305,
+          "other_side": 7.7782563047464715
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.260607669789808,
+            4.267191871654659
+          ],
+          "interleaved_norms": [
+            4.263414069747865,
+            4.261864887679468
+          ],
+          "in_sample_norm": 4.265480884758788,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 12,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 23.5
+          },
+          "joint_weak_weight": {
+            "wrist": 2.905669840613103e-06,
+            "index MCP": 0.5644542577666996,
+            "index PIP": 1.1269919763386758,
+            "index DIP": 1.3085586187377583,
+            "middle MCP": 0.6052883098755417,
+            "middle PIP": 1.2264342703520736,
+            "middle DIP": 1.168280452416746,
+            "pinky MCP": 0.6011566944526785,
+            "pinky PIP": 1.2866602112222092,
+            "pinky DIP": 1.11215785824452,
+            "ring MCP": 0.5682621861691269,
+            "ring PIP": 1.1965808682143886,
+            "ring DIP": 1.2351642801220701,
+            "thumb CMC": 0.4761194127902911,
+            "thumb MCP": 1.1269447048764434,
+            "thumb IP": 1.3969429927509383
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 9.57203771643071,
+          "other_side": 9.76771861319818
+        }
+      }
+    },
+    {
+      "clip": "01992",
+      "side": "right",
+      "frames_in_clip": 59,
+      "frames_with_hand": 58,
+      "hand_scale_mm": 80.14648249569953,
+      "half_span_ratio": 0.781194302340879,
+      "rows": {
+        "rigid reference": {
+          "frames": 58,
+          "mean_mm": 13.776903034603261,
+          "tips_mm": 16.661421605298322,
+          "p95_mm": 34.81235231271845,
+          "mean_pct_hand": 17.189654000526467,
+          "thumb_mm": 7.222934265081535,
+          "index_mm": 16.280691786242663,
+          "middle_mm": 17.0172294408941,
+          "ring_mm": 14.761149040044723,
+          "pinky_mm": 13.602510640753284
+        },
+        "rigid reference, per-frame scale": {
+          "frames": 58,
+          "mean_mm": 5.2670539584548965,
+          "tips_mm": 6.533031967517158,
+          "p95_mm": 11.76649999939759,
+          "mean_pct_hand": 6.5717843059893655,
+          "thumb_mm": 7.670822211219069,
+          "index_mm": 4.811020975810023,
+          "middle_mm": 4.860127566118267,
+          "ring_mm": 3.257811648340619,
+          "pinky_mm": 5.735487390786502
+        },
+        "mano: swing start": {
+          "frames": 58,
+          "mean_mm": 18.721008742001374,
+          "tips_mm": 21.812750423598025,
+          "p95_mm": 33.65627827726071,
+          "mean_pct_hand": 23.358490802145802,
+          "thumb_mm": 13.311214145891405,
+          "index_mm": 20.154659760521586,
+          "middle_mm": 20.59638709815172,
+          "ring_mm": 18.218922476333475,
+          "pinky_mm": 21.32386022910866
+        },
+        "mano: refined": {
+          "frames": 58,
+          "mean_mm": 8.880293892047254,
+          "tips_mm": 4.858518931450667,
+          "p95_mm": 19.94835049811482,
+          "mean_pct_hand": 11.080079394031733,
+          "thumb_mm": 6.511094091384084,
+          "index_mm": 10.08142781964796,
+          "middle_mm": 10.042358886939187,
+          "ring_mm": 9.921949464597859,
+          "pinky_mm": 7.844639197667177
+        },
+        "mano: held-out shape (time halves)": {
+          "frames": 58,
+          "mean_mm": 14.23460208085961,
+          "tips_mm": 11.07745166745401,
+          "p95_mm": 35.08723353477312,
+          "mean_pct_hand": 17.76073214644623,
+          "thumb_mm": 9.48332199727539,
+          "index_mm": 16.007902766744866,
+          "middle_mm": 16.62033713281876,
+          "ring_mm": 16.536395175981102,
+          "pinky_mm": 12.525053331477913
+        },
+        "mano: held-out shape (interleaved frames)": {
+          "frames": 58,
+          "mean_mm": 8.376873672741075,
+          "tips_mm": 4.183028681477443,
+          "p95_mm": 19.714348648738742,
+          "mean_pct_hand": 10.45195423665731,
+          "thumb_mm": 6.536186765472998,
+          "index_mm": 9.472315649596627,
+          "middle_mm": 9.550127668081597,
+          "ring_mm": 9.36304980683527,
+          "pinky_mm": 6.962688473718882
+        },
+        "mano: in-sample shape": {
+          "frames": 58,
+          "mean_mm": 8.361974278278078,
+          "tips_mm": 4.175374714959439,
+          "p95_mm": 19.7322303611475,
+          "mean_pct_hand": 10.433364032821729,
+          "thumb_mm": 6.530595582019142,
+          "index_mm": 9.452108648989261,
+          "middle_mm": 9.534414684904606,
+          "ring_mm": 9.344492353544254,
+          "pinky_mm": 6.948260121933121
+        },
+        "mano: per-frame shape (diagnostic)": {
+          "frames": 58,
+          "mean_mm": 3.9105401340916788,
+          "tips_mm": 2.0547205424476562,
+          "p95_mm": 11.062057607922378,
+          "mean_pct_hand": 4.879241124900908,
+          "thumb_mm": 5.457825467848719,
+          "index_mm": 3.7199229611843987,
+          "middle_mm": 3.180551999002611,
+          "ring_mm": 3.5266401519555037,
+          "pinky_mm": 3.667760090467164
+        },
+        "smplx: swing start": {
+          "frames": 58,
+          "mean_mm": 22.47499478392306,
+          "tips_mm": 25.278303445572853,
+          "p95_mm": 44.191801298172,
+          "mean_pct_hand": 28.042396976222904,
+          "thumb_mm": 16.471492707087997,
+          "index_mm": 23.163756975710513,
+          "middle_mm": 26.389398350283017,
+          "ring_mm": 22.312136019688516,
+          "pinky_mm": 24.038189866845258
+        },
+        "smplx: refined": {
+          "frames": 58,
+          "mean_mm": 8.170915813996938,
+          "tips_mm": 2.8245458536702417,
+          "p95_mm": 28.37312443481597,
+          "mean_pct_hand": 10.194977445748002,
+          "thumb_mm": 8.727696802905282,
+          "index_mm": 8.464699068494241,
+          "middle_mm": 8.820221154997979,
+          "ring_mm": 7.917301187589155,
+          "pinky_mm": 6.924660855998041
+        },
+        "smplx: held-out shape (time halves)": {
+          "frames": 58,
+          "mean_mm": 13.7774397094003,
+          "tips_mm": 10.505405812404813,
+          "p95_mm": 35.201003952849305,
+          "mean_pct_hand": 17.190323617932403,
+          "thumb_mm": 10.364783458896278,
+          "index_mm": 15.678035533085849,
+          "middle_mm": 15.74470313587695,
+          "ring_mm": 15.407432128333399,
+          "pinky_mm": 11.692244290809015
+        },
+        "smplx: held-out shape (interleaved frames)": {
+          "frames": 58,
+          "mean_mm": 8.155397455264675,
+          "tips_mm": 4.013546865359736,
+          "p95_mm": 21.172371138555558,
+          "mean_pct_hand": 10.175614950665205,
+          "thumb_mm": 6.830653485297377,
+          "index_mm": 9.247118228889976,
+          "middle_mm": 9.476074395181548,
+          "ring_mm": 8.793434922114791,
+          "pinky_mm": 6.4297062448396725
+        },
+        "smplx: in-sample shape": {
+          "frames": 58,
+          "mean_mm": 8.13953099304128,
+          "tips_mm": 3.997510633412964,
+          "p95_mm": 21.029966169721654,
+          "mean_pct_hand": 10.155818121497756,
+          "thumb_mm": 6.821832119380851,
+          "index_mm": 9.226008354079752,
+          "middle_mm": 9.463329653410542,
+          "ring_mm": 8.77650517738714,
+          "pinky_mm": 6.409979660948116
+        },
+        "smplx: per-frame shape (diagnostic)": {
+          "frames": 58,
+          "mean_mm": 3.943390923052476,
+          "tips_mm": 2.193584641296662,
+          "p95_mm": 11.686755522994119,
+          "mean_pct_hand": 4.920229559998555,
+          "thumb_mm": 5.9905340192313625,
+          "index_mm": 3.41599681527741,
+          "middle_mm": 3.785981679372264,
+          "ring_mm": 2.8052003930989557,
+          "pinky_mm": 3.7192417082823903
+        }
+      },
+      "mano": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.266653547423501,
+            4.271050640488242
+          ],
+          "interleaved_norms": [
+            4.272100483502452,
+            4.2720829546672325
+          ],
+          "in_sample_norm": 4.273519932598343,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 12,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 24.0
+          },
+          "joint_weak_weight": {
+            "wrist": 2.413062047259101e-06,
+            "index MCP": 0.6368245261874915,
+            "index PIP": 1.076400882072242,
+            "index DIP": 1.2867815317750413,
+            "middle MCP": 0.7047752840838791,
+            "middle PIP": 1.0460347389308078,
+            "middle DIP": 1.249191098138254,
+            "pinky MCP": 0.6679996124777335,
+            "pinky PIP": 1.218981554503549,
+            "pinky DIP": 1.029672504538275,
+            "ring MCP": 0.6682361148833763,
+            "ring PIP": 1.0338431138632285,
+            "ring DIP": 1.2979285378365049,
+            "thumb CMC": 0.8255673040186383,
+            "thumb MCP": 1.0859936724299784,
+            "thumb IP": 1.0884337778656201
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 8.880293892047254,
+          "other_side": 10.385802160940788
+        }
+      },
+      "smplx": {
+        "shape": {
+          "radius": 4.278672463892877,
+          "held_out_norms": [
+            4.273269930925259,
+            4.267847945239406
+          ],
+          "interleaved_norms": [
+            4.264698624790011,
+            4.264538032007185
+          ],
+          "in_sample_norm": 4.266218525683378,
+          "failed_neutral_fits": 0
+        },
+        "observability": {
+          "frames": 12,
+          "weak_counts": {
+            "1e-06": 10.0,
+            "0.001": 14.0,
+            "0.01": 15.0,
+            "0.03": 25.0
+          },
+          "joint_weak_weight": {
+            "wrist": 1.8959937897303583e-05,
+            "index MCP": 0.6034657795894202,
+            "index PIP": 1.1044177352500204,
+            "index DIP": 1.2922852385125967,
+            "middle MCP": 0.6895024310160583,
+            "middle PIP": 1.1318241553758162,
+            "middle DIP": 1.178857397980002,
+            "pinky MCP": 0.6902004234223217,
+            "pinky PIP": 1.2869329861292944,
+            "pinky DIP": 1.0221775198258436,
+            "ring MCP": 0.6763308610716064,
+            "ring PIP": 1.0488348915557062,
+            "ring DIP": 1.275082150182191,
+            "thumb CMC": 0.5944432469531593,
+            "thumb MCP": 1.1934221407747911,
+            "thumb IP": 1.2122040824232783
+          }
+        },
+        "chirality_mean_mm": {
+          "own_side": 8.170915813996938,
+          "other_side": 9.043624403541378
+        }
+      }
+    }
+  ],
+  "pooled": {
+    "rigid reference": {
+      "frames": 535,
+      "mean_mm": 14.685481452764309,
+      "tips_mm": 16.79418984195062,
+      "p95_mm": 35.89568401892256,
+      "mean_pct_hand": 17.628140815665436,
+      "thumb_mm": 10.289262947238436,
+      "index_mm": 17.278635847928037,
+      "middle_mm": 16.712769739872968,
+      "ring_mm": 15.119086125921196,
+      "pinky_mm": 14.027652602860915,
+      "track_mean_mm": 14.015015490593813
+    },
+    "rigid reference, per-frame scale": {
+      "frames": 535,
+      "mean_mm": 5.269647462148048,
+      "tips_mm": 6.670025059742664,
+      "p95_mm": 13.071002326225793,
+      "mean_pct_hand": 6.310400831765041,
+      "thumb_mm": 6.130469349879297,
+      "index_mm": 5.557307825362799,
+      "middle_mm": 4.540779808209777,
+      "ring_mm": 4.2940768346609,
+      "pinky_mm": 5.825603492627465,
+      "track_mean_mm": 5.341226633058122
+    },
+    "mano: swing start": {
+      "frames": 535,
+      "mean_mm": 19.647658468208707,
+      "tips_mm": 22.452426853226648,
+      "p95_mm": 46.560551764815564,
+      "mean_pct_hand": 23.56312186618056,
+      "thumb_mm": 15.783609707831053,
+      "index_mm": 21.792178351527898,
+      "middle_mm": 20.700579208635514,
+      "ring_mm": 20.030331923789298,
+      "pinky_mm": 19.93159314925978,
+      "track_mean_mm": 19.4837991510874
+    },
+    "mano: refined": {
+      "frames": 535,
+      "mean_mm": 8.248580918905716,
+      "tips_mm": 3.8532755905668714,
+      "p95_mm": 24.145858889627057,
+      "mean_pct_hand": 9.785604479937872,
+      "thumb_mm": 9.297489442010127,
+      "index_mm": 8.741255021087436,
+      "middle_mm": 8.220450687772832,
+      "ring_mm": 8.06374971632258,
+      "pinky_mm": 6.919959727335608,
+      "track_mean_mm": 8.132391322878645
+    },
+    "mano: held-out shape (time halves)": {
+      "frames": 535,
+      "mean_mm": 10.92175055353438,
+      "tips_mm": 6.830400687143481,
+      "p95_mm": 33.251750096495456,
+      "mean_pct_hand": 13.137819968445738,
+      "thumb_mm": 10.784254590779335,
+      "index_mm": 11.507771072382297,
+      "middle_mm": 11.531121903293117,
+      "ring_mm": 11.50579959320504,
+      "pinky_mm": 9.279805608012122,
+      "track_mean_mm": 10.439919173251035
+    },
+    "mano: held-out shape (interleaved frames)": {
+      "frames": 535,
+      "mean_mm": 7.388296325430497,
+      "tips_mm": 3.2812460875703344,
+      "p95_mm": 20.93136916245847,
+      "mean_pct_hand": 8.83682453558888,
+      "thumb_mm": 7.876625387571281,
+      "index_mm": 7.73084141910962,
+      "middle_mm": 7.557725021010903,
+      "ring_mm": 7.5676471477191365,
+      "pinky_mm": 6.208642651741545,
+      "track_mean_mm": 7.2448415404490305
+    },
+    "mano: in-sample shape": {
+      "frames": 535,
+      "mean_mm": 7.380224331850452,
+      "tips_mm": 3.2751731271934643,
+      "p95_mm": 20.887477114829167,
+      "mean_pct_hand": 8.82728572208355,
+      "thumb_mm": 7.872012894461761,
+      "index_mm": 7.7215901883566,
+      "middle_mm": 7.550017224770789,
+      "ring_mm": 7.5581305300115735,
+      "pinky_mm": 6.199370821651542,
+      "track_mean_mm": 7.235742479220622
+    },
+    "mano: per-frame shape (diagnostic)": {
+      "frames": 535,
+      "mean_mm": 4.413714484010883,
+      "tips_mm": 2.1116792645223423,
+      "p95_mm": 11.670093274378342,
+      "mean_pct_hand": 5.219795900400001,
+      "thumb_mm": 5.179675351118781,
+      "index_mm": 4.176441366262293,
+      "middle_mm": 4.255753160194266,
+      "ring_mm": 4.309736933504686,
+      "pinky_mm": 4.146965608974387,
+      "track_mean_mm": 4.4358326748804
+    },
+    "smplx: swing start": {
+      "frames": 535,
+      "mean_mm": 24.05648223449511,
+      "tips_mm": 26.516138501477947,
+      "p95_mm": 58.34238870816863,
+      "mean_pct_hand": 29.074256328030863,
+      "thumb_mm": 18.48599664245984,
+      "index_mm": 24.995875230483986,
+      "middle_mm": 28.007396289601445,
+      "ring_mm": 23.7676755877621,
+      "pinky_mm": 25.025467422168187,
+      "track_mean_mm": 23.947415147490165
+    },
+    "smplx: refined": {
+      "frames": 535,
+      "mean_mm": 8.592811467546795,
+      "tips_mm": 2.432575275546886,
+      "p95_mm": 34.92922178276775,
+      "mean_pct_hand": 10.317219258811091,
+      "thumb_mm": 9.000424865040912,
+      "index_mm": 8.170961323735176,
+      "middle_mm": 9.290569072831815,
+      "ring_mm": 7.9758781329500215,
+      "pinky_mm": 8.526223943176054,
+      "track_mean_mm": 8.599869792273374
+    },
+    "smplx: held-out shape (time halves)": {
+      "frames": 535,
+      "mean_mm": 11.17551282714093,
+      "tips_mm": 7.32616096095236,
+      "p95_mm": 35.162554058318946,
+      "mean_pct_hand": 13.430106809429997,
+      "thumb_mm": 11.154607500296123,
+      "index_mm": 11.733267758761887,
+      "middle_mm": 11.905711102711795,
+      "ring_mm": 11.215601642377944,
+      "pinky_mm": 9.868376131556895,
+      "track_mean_mm": 10.620663863444884
+    },
+    "smplx: held-out shape (interleaved frames)": {
+      "frames": 535,
+      "mean_mm": 7.479914977263164,
+      "tips_mm": 3.5566967392200475,
+      "p95_mm": 23.01251645650236,
+      "mean_pct_hand": 8.939904786093594,
+      "thumb_mm": 8.049914262473482,
+      "index_mm": 7.741575007480726,
+      "middle_mm": 8.017361277057034,
+      "ring_mm": 7.149475539380845,
+      "pinky_mm": 6.441248799923728,
+      "track_mean_mm": 7.317429116485708
+    },
+    "smplx: in-sample shape": {
+      "frames": 535,
+      "mean_mm": 7.473541164107202,
+      "tips_mm": 3.5486979286537363,
+      "p95_mm": 22.86634908635367,
+      "mean_pct_hand": 8.932486897959496,
+      "thumb_mm": 8.045851819733556,
+      "index_mm": 7.736676704277791,
+      "middle_mm": 8.010635893303549,
+      "ring_mm": 7.138888506835854,
+      "pinky_mm": 6.435652896385251,
+      "track_mean_mm": 7.311937141706191
+    },
+    "smplx: per-frame shape (diagnostic)": {
+      "frames": 535,
+      "mean_mm": 4.492756401907448,
+      "tips_mm": 2.1564858822142177,
+      "p95_mm": 12.309258254033058,
+      "mean_pct_hand": 5.308803786662869,
+      "thumb_mm": 5.9851570556648594,
+      "index_mm": 3.7962000904636444,
+      "middle_mm": 4.72806079373374,
+      "ring_mm": 3.6702858940381407,
+      "pinky_mm": 4.284078175636856,
+      "track_mean_mm": 4.503958193222478
+    }
+  }
+}

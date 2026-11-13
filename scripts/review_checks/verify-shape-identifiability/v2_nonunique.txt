@@ -1,0 +1,10 @@
+chi2(10) median radius 3.0564387390543217
+[height_cm] hi |b|=3.06 lo |b|=3.06  max|dL|=1.40e-11 mm
+   hi {'height_cm': 178.1, 'Lleg_cm': 80.8, 'vol_L': 71.23, 'hipW_cm': 11.87}
+   lo {'height_cm': 165.83, 'Lleg_cm': 76.91, 'vol_L': 82.45, 'hipW_cm': 12.73}
+[Lleg_cm] hi |b|=3.06 lo |b|=3.06  max|dL|=1.72e-12 mm
+   hi {'height_cm': 175.14, 'Lleg_cm': 82.72, 'vol_L': 68.58, 'hipW_cm': 11.42}
+   lo {'height_cm': 168.83, 'Lleg_cm': 75.15, 'vol_L': 84.04, 'hipW_cm': 13.02}
+[vol_L] hi |b|=3.06 lo |b|=3.06  max|dL|=1.67e-13 mm
+   hi {'height_cm': 169.59, 'Lleg_cm': 76.83, 'vol_L': 90.91, 'hipW_cm': 13.57}
+   lo {'height_cm': 174.4, 'Lleg_cm': 80.93, 'vol_L': 62.52, 'hipW_cm': 10.86}

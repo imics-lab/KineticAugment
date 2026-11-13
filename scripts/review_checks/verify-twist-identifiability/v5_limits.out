@@ -1,0 +1,12 @@
+rest L wrist [ 0.67   0.036 -0.061]
+L elbow 90deg about local x : wrist moves    33 mm, dir [ 0.   -0.63  0.78]
+L elbow 90deg about local +y: wrist moves   356 mm, dir [-0.71  0.   -0.7 ]
+L elbow 90deg about local -y: wrist moves   356 mm, dir [-0.7   0.    0.71]
+L elbow 90deg about local z : wrist moves   358 mm, dir [-0.77  0.64  0.  ]
+L elbow 90deg about local -z: wrist moves   358 mm, dir [-0.64 -0.77  0.  ]
+L shoulder 90deg about local x: elbow moves   118 mm
+L shoulder 90deg about local y: elbow moves   364 mm
+L shoulder 90deg about local z: elbow moves   374 mm
+clamp(left_elbow,[0,-1.571,0]) -> [ 0.   -0.17  0.  ] wrist moves 325 mm
+L: zero-noise clamp (shoulders+elbows) moves wrist median 247 mm, >50mm in 88% (n=355)
+R: zero-noise clamp (shoulders+elbows) moves wrist median 283 mm, >50mm in 100% (n=363)

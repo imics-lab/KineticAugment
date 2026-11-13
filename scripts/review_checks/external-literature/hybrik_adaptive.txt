@@ -1,0 +1,2 @@
+naive     pooled direct median 6.55%  p95 13.73%  median 21.6 mm  | per joint median %: 11:6.43 12:7.80 13:6.04 14:4.98 15:7.85 16:7.01
+adaptive  pooled direct median 5.82%  p95 12.30%  median 19.3 mm  | per joint median %: 11:6.64 12:6.74 13:4.99 14:4.19 15:6.36 16:4.37

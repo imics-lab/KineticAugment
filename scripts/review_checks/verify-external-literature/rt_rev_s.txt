@@ -1,0 +1,38 @@
+======================================================================
+PART A - synthetic ground truth (joint positions; twist not claimed)
+======================================================================
+  root rotated  0 deg   worst error 5.320e-15 m   exact
+  root rotated 30 deg   worst error 7.003e-02 m   NOT exact -- root not yet estimated (Step 8)
+
+======================================================================
+PART B - real clips, world landmarks, identity round trip
+======================================================================
+  frames: 410   skipped (under 3 valid correspondences): 1
+
+  joint         coverage  direct med  direct p95  aligned med
+  ----------------------------------------------------------
+  L shoulder        100%       6.46%      14.01%        6.45%
+  R shoulder        100%       7.41%      13.35%        7.02%
+  L elbow           100%       5.56%       8.93%        5.37%
+  R elbow           100%       5.49%       9.46%        4.85%
+  L wrist            90%       7.21%      17.39%        6.43%
+  R wrist            92%       7.22%      16.85%        6.85%
+
+  clip         direct median
+  01986                6.47%
+  01987                7.24%
+  01988                5.48%
+  01991                8.80%
+  01992                6.17%
+
+  bone            length error
+  L upper arm            7.62%
+  L forearm              6.93%
+  R upper arm           10.74%
+  R forearm              5.84%
+
+======================================================================
+  DIRECT  round-trip error : 6.45% of shoulder width   <- the real number
+  ALIGNED round-trip error : 6.09%   (diagnostic; free scale hides 0.36 pts)
+  noise-floor reference    : 0.18%   (reference scale, NOT a threshold)
+======================================================================

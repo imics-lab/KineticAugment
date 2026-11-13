@@ -1,0 +1,23 @@
+registered: ['FrameDropping', 'GaussianNoise', 'GlobalOrientPerturbation', 'GlobalRotation', 'GlobalScaling', 'HandPosePerturbation', 'JointAnglePerturbation', 'JointCoupledNoise', 'LimbLengthScaling', 'PoseFlipping', 'SpeedVariation', 'TimeWarping', 'TrajectoryJittering']
+SMPLXAugmentation subclasses: ['JointAnglePerturbation', 'HandPosePerturbation', 'JointCoupledNoise', 'LimbLengthScaling', 'GlobalOrientPerturbation']
+landmark chain + JointAnglePerturbation: ValueError
+landmark chain + HandPosePerturbation: ValueError
+landmark chain + JointCoupledNoise: ValueError
+landmark chain + LimbLengthScaling: ValueError
+landmark chain + GlobalOrientPerturbation: ValueError
+preset 'none': mode=landmark, ops=[]
+preset 'conservative': mode=landmark, ops=['GlobalRotation', 'GlobalScaling', 'GaussianNoise']
+preset 'moderate': mode=landmark, ops=['GlobalRotation', 'GlobalScaling', 'TrajectoryJittering', 'TimeWarping', 'GaussianNoise']
+preset 'aggressive': mode=landmark, ops=['GlobalRotation', 'GlobalScaling', 'PoseFlipping', 'TrajectoryJittering', 'TimeWarping', 'SpeedVariation', 'GaussianNoise']
+configs/har_running_profile.yaml: FAILS -> ValueError: Invalid configuration: ["Plan step 3: unknown operation 'RateAlteration'. Available: ['FrameDropping', 'GaussianNoise', 'GlobalOrientPerturbation', 'GlobalRotat
+configs/slr_profile.yaml: FAILS -> ValueError: Invalid configuration: ["Plan step 6: unknown operation 'DynamicTrajectoryJittering'. Available: ['FrameDropping', 'GaussianNoise', 'GlobalOrientPerturbation', 
+configs/slr_profile_extended.yaml: FAILS -> ValueError: Invalid configuration: ["Plan step 2: unknown operation 'GlobalTranslation'. Available: ['FrameDropping', 'GaussianNoise', 'GlobalOrientPerturbation', 'GlobalRo
+smplx chain on dict: GlobalRotation validate(dict) -> False (silently skipped)
+  body_pose changed: True
+dataset with smplx pipeline: FAILS -> ValueError: Invalid configuration: ["smplx_model_path required when mode='smplx'"]
+lstm_classifier lines with '543': ['...     input_dim=543 * 3,', '>>> logits = model(x)  # x: (batch, seq_len, 543, 3)', 'input_dim: int = 1629,  # 543 * 3']
+lstm_classifier lines with 'input_size': ['input_size=input_dim,', 'input_size=input_dim,']
+lstm_classifier lines with 'num_landmarks': []
+dataset(5b) with smplx pipeline: FAILS -> AttributeError: 'dict' object has no attribute 'astype'
+slr_profile top-level keys: ['profile_name', 'kinematic_chains', 'joint_limits', 'plan'] mode: None
+slr_profile (registered ops only): FAILS -> ValueError: Cannot add SMPL-X augmentation 'JointAnglePerturbation' to landmark-mode chain. Use mode='smplx' or choose a LandmarkAugmentation instead.

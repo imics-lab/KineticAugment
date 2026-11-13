@@ -1,0 +1,32 @@
+rest nose [8.16337206e-07 2.75882304e-01 1.12938017e-01]  rest hip-centre [ 0.00058422 -0.44974321 -0.01158923]  pelvis [ 0.00312326 -0.35140747  0.01203655]
+
+=== pooled medians, % shoulder width ===
+  base_d   median  6.55%   n=2354
+  base_a   median  5.94%   n=2354
+  sl_d     median  6.02%   n=2354
+  sl_a     median  5.13%   n=2354
+  nose_d   median  6.02%   n=2354
+  hip_d    median  6.02%   n=2354
+  reduction aligned (sl vs base): 13.7%
+
+=== per clip medians (%) ===
+   01986 {'base_a': 6.31, 'sl_a': 4.74, 'base_d': 6.38, 'sl_d': 4.97}
+   01987 {'base_a': 6.38, 'sl_a': 5.91, 'base_d': 7.42, 'sl_d': 7.43}
+   01988 {'base_a': 5.06, 'sl_a': 5.11, 'base_d': 5.57, 'sl_d': 5.4}
+   01991 {'base_a': 9.2, 'sl_a': 5.07, 'base_d': 9.23, 'sl_d': 7.52}
+   01992 {'base_a': 6.19, 'sl_a': 5.2, 'base_d': 6.83, 'sl_d': 6.7}
+
+=== realism: observed vs rest shoulder-line angle (deg): median 4.79 p95 10.29 max 20.05  frac>=20: 0.0024449877750611247  frac>=30: 0.0
+=== converter global_orient: from identity median 3.57 p95 6.41 max 8.63 | from Rx(180) median 178.48 p95 179.93 max 180.00
+=== head (joint15) below shoulder midpoint in camera vertical: conv 1.000 nose-root 0.000 hip-root 0.000
+=== cos(fitted shoulder->head, observed shoulder->nose) conv median -0.668
+=== nose-root vs hip-root angle (deg): median 8.49 p95 18.41 max 22.16
+=== shoulder-line minimal root vs nose-root (deg): median 162.51 p95 169.13 max 172.14 min 150.81
+=== nose pitch about shoulder axis wrt hip torso frame (std, range) per clip: [('01986', 4.3, 14.5), ('01987', 4.9, 17.4), ('01988', 6.5, 26.2), ('01991', 3.2, 11.7), ('01992', 3.2, 16.1)]
+=== |hip midpoint| (mm): median nan max nan, n=410; both hips vis>=0.5: 0.422
+=== L wrist height sign agreement (conv vs MP torso axis): 0.014  corr -0.937  n=355
+=== L wrist height sign agreement (conv_cam): 0.000  corr -0.995  n=355
+=== L wrist height sign agreement (nose vs MP torso axis): 0.935  corr +0.964  n=355
+=== L wrist height sign agreement (nose_cam): 0.944  corr +0.983  n=355
+=== L wrist height sign agreement (hip vs MP torso axis): 0.986  corr +0.995  n=355
+=== L wrist height sign agreement (hip_cam): 1.000  corr +0.963  n=355

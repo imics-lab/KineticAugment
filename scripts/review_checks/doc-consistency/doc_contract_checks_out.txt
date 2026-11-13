@@ -1,0 +1,78 @@
+
+============================================================================
+P1. World -> image-normalised: is a 7-number similarity an adequate 'camera'?
+============================================================================
+residual = per-landmark RMS after fit, as % of that frame's target shoulder width
+clip   aspect | sim/frame norm  sim/frame px  sim/clip px  affine/frame |  |Ay|/|Ax| (W/H)
+01986   1.333 |          47.8%         53.1%        59.0%         10.2% |    1.458 (1.333)
+01987   1.778 |          51.5%         58.1%        60.9%         18.7% |    2.011 (1.778)
+01988   1.333 |          45.3%         49.1%        57.3%         11.2% |    1.392 (1.333)
+01991   1.500 |          58.8%         64.0%        64.1%         11.4% |    1.608 (1.500)
+01992   1.500 |          70.9%         78.6%        81.8%         16.0% |    1.476 (1.500)
+pooled        |          49.8%         54.2%        61.7%         11.8%
+compare: converter direct round trip 6.55%, aligned 5.94% (world->SMPL-X->world)
+
+============================================================================
+P2. Synthetic: positions recovered, rotations NOT (twist), vs doc lines 176/686/749
+============================================================================
+worst joint POSITION error over 200 poses: 2.993e-16 m
+  L shoulder  local ROTATION error: median  13.81 deg  p95  44.87  max  75.24
+  L elbow     local ROTATION error: median  19.64 deg  p95  42.86  max  62.37
+  R shoulder  local ROTATION error: median  16.51 deg  p95  49.87  max  74.00
+  R elbow     local ROTATION error: median  20.65 deg  p95  51.23  max  68.53
+re-solve of the IK's own (zero-twist) output: worst rotation diff 3.05e-14 deg
+
+============================================================================
+P3. Bone-direction error in the DIRECT converter output (doc line 600)
+============================================================================
+  L upper  direct-output direction error: median  2.57 deg  p95  4.55
+  L fore   direct-output direction error: median  2.65 deg  p95  4.73
+  R upper  direct-output direction error: median  2.81 deg  p95  5.41
+  R fore   direct-output direction error: median  2.13 deg  p95  5.35
+  fitted |global_orient| (rigid frame fold-in): median 3.6 deg
+
+============================================================================
+P4. Does fit_body refuse image-space input? (contract: world landmarks in metres)
+============================================================================
+  accepted image-space frame silently: warnings=0, max landmark error 0.496 (image units), |transl|=0.797
+
+============================================================================
+P5. fore/upper (left arm) ratio: doc Finding 9 (xyz 1.228, xy 0.614) vs presentation (1.42 / 0.53)
+============================================================================
+  01986: image xyz 1.567  image xy 0.455  world(vis>=.5) 1.132
+  01987: image xyz 1.063  image xy 0.468  world(vis>=.5) 0.792
+  01988: image xyz 1.259  image xy 0.649  world(vis>=.5) 1.025
+  01991: image xyz 0.987  image xy 0.839  world(vis>=.5) 1.045
+  01992: image xyz 1.520  image xy 0.531  world(vis>=.5) 1.192
+  pooled median-of-ratios: image xyz 1.228  xy 0.614
+  mean of clip medians:    image xyz 1.279  xy 0.588
+  median of clip medians:  image xyz 1.259  xy 0.531
+  reference: SMPL-X rest L 0.946 / R 0.909; Winter/Drillis-Contini segment table 0.146H/0.186H = 0.785
+
+============================================================================
+P6. Presentation 'drift' table, clip 01986 image-space (thigh 3.5/3.7, shoulders 2.0/3.2, upper 7.7/11.9, forearm 30.0/28.1)
+============================================================================
+  bone           cv xy  cv xyz  rng xy  rng xyz p95-p5 xy p95-p5 xyz
+  Thigh L         3.5%    3.7%   14.4%    15.3%      9.5%      10.8%
+  Shoulders       2.0%    3.2%    5.7%    12.3%      5.5%       9.3%
+  Upper arm L     7.7%   11.9%   20.1%    40.7%     17.3%      28.7%
+  Forearm L      30.0%   28.1%  110.1%    72.8%     91.2%      58.3%
+  Thigh R         2.8%    2.9%   15.0%    13.2%      9.3%       9.8%
+  Upper arm R     7.5%   18.7%   24.4%    64.1%     17.4%      51.2%
+  Forearm R      20.7%   28.2%  102.0%    85.3%     64.4%      69.5%
+  01986 image-space knee y>1 (below frame): L 100%  R 100%; hip y>1: L 100%
+  01986 world visibility mean: knee L 0.004 R 0.002; hip L 0.092
+
+============================================================================
+P7. Presentation hand-block depth claim (frame 0: pose wrist z=-1.196, hand wrist z~0)
+============================================================================
+  01986 frame0: pose Lwrist z -0.632  Rwrist z -0.772 | Lhand[0] z +0.0000 (present False)  Rhand[0] z +0.0000 (present False) | 1.196 image-widths = 383 px
+  01987 frame0: pose Lwrist z -0.145  Rwrist z -0.229 | Lhand[0] z +0.0000 (present False)  Rhand[0] z +0.0000 (present False) | 1.196 image-widths = 1531 px
+  01988 frame0: pose Lwrist z -0.751  Rwrist z -0.648 | Lhand[0] z +0.0000 (present False)  Rhand[0] z +0.0000 (present False) | 1.196 image-widths = 765 px
+  01991 frame0: pose Lwrist z -0.285  Rwrist z -1.139 | Lhand[0] z +0.0000 (present False)  Rhand[0] z -0.0000 (present True) | 1.196 image-widths = 344 px
+  01992 frame0: pose Lwrist z -1.196  Rwrist z -1.222 | Lhand[0] z +0.0000 (present True)  Rhand[0] z +0.0000 (present True) | 1.196 image-widths = 344 px
+
+============================================================================
+P8. How many body_pose numbers does V1 actually set on the real clips? (presentation: 24)
+============================================================================
+  nonzero body_pose joints per frame: {2: 42, 3: 16, 4: 351} -> numbers = {6: 42, 9: 16, 12: 351} + 3 global_orient + 3 transl

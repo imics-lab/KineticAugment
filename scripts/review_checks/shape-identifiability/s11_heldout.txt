@@ -1,0 +1,11 @@
+clip 01986: half-medians differ by up to 34.2 mm (per segment: [27.7  8.4 17.8 34.2 -5.1])
+clip 01987: half-medians differ by up to 29.5 mm (per segment: [  0.6  15.4  -3.4  20.9 -29.5])
+clip 01988: half-medians differ by up to 7.7 mm (per segment: [ 4.3 -7.7 -1.7  6.4 -1.5])
+clip 01991: half-medians differ by up to 29.5 mm (per segment: [-14.8  29.5 -24.6 -17.8  16.2])
+clip 01992: half-medians differ by up to 10.3 mm (per segment: [  5.8   9.5 -10.3  -9.5  -0. ])
+
+Pooled direct median error, % shoulder width (fit half -> other half)
+  betas=0   in-sample  6.55% ( +0.0%)   held-out  6.55% ( +0.0% vs betas=0)
+  MAP 10mm  in-sample  5.31% (+18.9%)   held-out  5.89% (+10.1% vs betas=0)
+  MAP 3mm   in-sample  4.66% (+28.9%)   held-out  5.40% (+17.6% vs betas=0)
+  MAP 1mm   in-sample  4.33% (+33.9%)   held-out  4.91% (+25.0% vs betas=0)

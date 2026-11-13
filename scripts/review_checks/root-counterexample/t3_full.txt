@@ -1,0 +1,36 @@
+rest nose (SMPL-X 127-joint #55): [8.16337206e-07 2.75882304e-01 1.12938017e-01]  rest head(15): [ 0.01109687  0.26819041 -0.00395225]  rest[0]-vs-127[0] diff 0.0
+
+== Current converter (zero-root IK + rigid fit) on real frames ==
+  |global_orient| vs identity: median 3.6 deg; vs Rx(180) convention flip: median 178.5 deg, min 177.5
+  cos(fitted SMPL-X shoulder->head, observed shoulder->nose): median -0.668; frames with cos<0 (fitted head points AWAY from real head): 100.0%
+
+== Nose and hip-centre direction about the shoulder axis (deg) ==
+  clip     n nose std nose rng    nose p5..p95 hip std hip rng nose-hip std nose-hip rng
+  01986   83     3.96    13.55    -4.38.. 6.88    4.33   17.25         4.19        14.36
+  01987   75     2.52     9.70    -5.36.. 3.10    4.41   17.09         4.91        17.24
+  01988  143     2.80    12.42    -6.73.. 3.81    6.67   24.93         6.28        25.97
+  01991   49     3.47    10.65    -6.45.. 2.32    0.94    4.04         3.25        11.79
+  01992   59     1.21     6.56    -1.38.. 2.20    3.14   13.73         3.17        15.97
+  angle between nose-based and hip-based root, all frames: median 6.04 deg, p95 15.23, max 18.95
+  frame-to-frame root change: nose-based median 0.548 p95 2.740 max 5.46 deg; hip-based median 0.526 p95 3.040 max 9.41 deg
+
+== Six-landmark direct error, median % shoulder width (pooled, then per clip) ==
+  current converter (zero-root IK + rigid)                   median  6.55%  p95  13.73%  n=2354
+  shoulder-only root + IK + translation                      median  6.02%  p95  12.69%  n=2354
+  shoulders+nose root + IK + translation                     median  6.02%  p95  12.69%  n=2354
+  shoulders+hip-centre root + IK + translation               median  6.02%  p95  12.69%  n=2354
+  3-dof optimised root + IK + translation (every 4th frame)  median  5.57%  p95  11.48%  n=598
+  clip      conv      sh    nose     hip     opt
+  01986     6.38    4.97    4.97    4.97    5.12
+  01987     7.42    7.43    7.43    7.43    7.60
+  01988     5.57    5.40    5.40    5.40    4.98
+  01991     9.23    7.52    7.52    7.52    7.30
+  01992     6.83    6.70    6.70    6.70    6.23
+  max |sh - nose| per-landmark difference: 1.02e-13 %;  max |sh - hip|: 1.08e-13 %   (gauge check)
+(a) Current converter output, MediaPipe world frame (y DOWN; observed nose y ~ -0.6, hip centre y = 0, shoulders y ~ -0.45):
+    fitted SMPL-X pelvis y: median -0.894 m; head(15) y: median -0.275; shoulder-mid y: median -0.461
+    shoulder local rotation magnitude: current converter median 89.3 deg (p5 49.8, p95 105.4); with shoulders+hip root median 74.5 deg (p5 45.7, p95 88.9)
+(b) Same subsample (every 4th frame):
+    shoulder-only root + translation: median 6.01%  p95 12.65%  n=598
+    3-dof optimised root + translation: median 5.57%  p95 11.48%
+    all frames: shoulder-only root + IK + RIGID post-fit: median 5.72%  p95 12.48%  n=2354

@@ -1,0 +1,14 @@
+(1) 180deg about fitted shoulder axis: frames 21, worst arm-landmark change 2.93e-02 m; last frame up y old 1.00 new -1.00
+(2) reconstruct_body change when betas set: 0.00e+00 m; real forward with betas vs reconstruct_body: max 49.6 mm
+    'betas' referenced in reconstruct_body source: False
+    reconstruct_body with SMPLXSkeleton(betas=b) vs real forward: max 5.57e-08 m
+(3) fit_body with SyntheticSkeleton: IndexError index 16 is out of bounds for axis 0 with size 4
+(4) yaml configs/har_running_profile.yaml FAILS: ValueError Invalid configuration: ["Plan step 3: unknown operation 'RateAlteration'. Available: ['FrameDropping', 'Gaussi
+(4) yaml configs/slr_profile.yaml FAILS: ValueError Invalid configuration: ["Plan step 6: unknown operation 'DynamicTrajectoryJittering'. Available: ['FrameDroppi
+(4) yaml configs/slr_profile_extended.yaml FAILS: ValueError Invalid configuration: ["Plan step 2: unknown operation 'GlobalTranslation'. Available: ['FrameDropping', 'Gau
+(4) preset none mode landmark
+(4) preset conservative mode landmark
+(4) preset moderate mode landmark
+(4) preset aggressive mode landmark
+(4) landmark chain + JAP: ValueError Cannot add SMPL-X augmentation 'JointAnglePerturbation' to landmark-mode chain. Use mode='smplx' or 
+(4) LimbLengthScaling(scale_range=[0.9,1.1]) on zero betas -> [0.901 1.047 0.    0.    0.    0.    0.    0.    0.    0.   ]

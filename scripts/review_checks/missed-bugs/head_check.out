@@ -1,0 +1,3 @@
+frames 409
+SMPL-X head joint -> MediaPipe nose distance, CURRENT fit : median 380 mm (116% shoulder width), min 352 mm
+SMPL-X head joint -> MediaPipe nose distance, with C first: median 192 mm (58% shoulder width), max 236 mm

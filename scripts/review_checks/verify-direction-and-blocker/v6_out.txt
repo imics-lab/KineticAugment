@@ -1,0 +1,14 @@
+left rest forearm dir [ 0.996  0.092 -0.01 ] angle to x-axis 5.3 deg
+   rot +60 deg about local x: forearm moves 5.3 deg, new dir [1.   0.05 0.07]
+   rot -60 deg about local x: forearm moves 5.3 deg, new dir [ 1.    0.04 -0.08]
+   rot +60 deg about local y: forearm moves 59.7 deg, new dir [ 0.49  0.09 -0.87]
+   rot -60 deg about local y: forearm moves 59.7 deg, new dir [0.51 0.09 0.86]
+   rot +60 deg about local z: forearm moves 60.0 deg, new dir [ 0.42  0.91 -0.01]
+   rot -60 deg about local z: forearm moves 60.0 deg, new dir [ 0.58 -0.82 -0.01]
+right rest forearm dir [-0.998 -0.018 -0.061] angle to x-axis 3.7 deg
+   rot +60 deg about local x: forearm moves 3.7 deg, new dir [-1.    0.04 -0.05]
+   rot -60 deg about local x: forearm moves 3.7 deg, new dir [-1.   -0.06 -0.01]
+   rot +60 deg about local y: forearm moves 60.0 deg, new dir [-0.55 -0.02  0.83]
+   rot -60 deg about local y: forearm moves 60.0 deg, new dir [-0.45 -0.02 -0.89]
+   rot +60 deg about local z: forearm moves 59.9 deg, new dir [-0.48 -0.87 -0.06]
+   rot -60 deg about local z: forearm moves 59.9 deg, new dir [-0.51  0.86 -0.06]

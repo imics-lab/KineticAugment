@@ -1,0 +1,8 @@
+bend  0 deg, 1 rad about arm axis   : L-arm max err 2.1e-13 mm, R sh err 293 mm
+bend  0 deg, 1 rad about random axis: L-arm max err 2e-13 mm, R sh err 288 mm
+bend  1 deg, 1 rad about arm axis   : L-arm max err 1.8e-13 mm, R sh err 293 mm
+bend  1 deg, 1 rad about random axis: L-arm max err 1.2e-13 mm, R sh err 288 mm
+bend 30 deg, 1 rad about arm axis   : L-arm max err 1.6e-13 mm, R sh err 295 mm
+bend 30 deg, 1 rad about random axis: L-arm max err 1.9e-13 mm, R sh err 288 mm
+bend 90 deg, 1 rad about arm axis   : L-arm max err 7.9e-14 mm, R sh err 301 mm
+bend 90 deg, 1 rad about random axis: L-arm max err 2.3e-13 mm, R sh err 288 mm

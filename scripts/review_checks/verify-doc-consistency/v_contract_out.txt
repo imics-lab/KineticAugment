@@ -1,0 +1,31 @@
+== F5d rotation recovery ==
+300 poses N(0,0.4) seed 2026: worst position err 6.691e-15 m
+  L shoulder: local-rot err median 14.8 deg, p95 46.8, max 76.0
+  L elbow: local-rot err median 23.1 deg, p95 52.0, max 79.1
+  R shoulder: local-rot err median 16.6 deg, p95 42.1, max 57.7
+  R elbow: local-rot err median 20.0 deg, p95 51.6, max 97.3
+  zero-twist truth family: worst local-rot err 3.67e-14 deg
+== F5-contract: real SMPL-X forward vs reconstruct_body (all real frames) ==
+frames 410, fitted 409; worst |SMPL-X fwd (flat_hand_mean=False instance) - reconstruct_body| = 1.700e-07 m
+nonzero body_pose joints per frame: {2: 42, 3: 16, 4: 351}
+invalid-wrist instances emitted finite: 100; dist to MP's own estimate (% SW): median 67.6, p95 104.4, n=100
+  direct-output direction err L upper: median 2.57 deg, p95 4.55
+  direct-output direction err L fore: median 2.65 deg, p95 4.73
+  direct-output direction err R upper: median 2.81 deg, p95 5.41
+  direct-output direction err R fore: median 2.13 deg, p95 5.35
+  median |global_orient| 3.6 deg
+== betas contract ==
+betas N(0,1) seed 99 = [ 0.08 -0.46  0.05  0.69 -1.76  1.68 -0.46 -0.6  -1.05  0.93]
+  reconstruct_body change from betas: 0.000e+00 m; SMPL-X fwd arm-joint change: 10.9 mm
+  shaped-skeleton fit returns betas=[0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+  shaped: reconstruct vs input 5.02e-02 m; SMPL-X fwd(returned betas) vs reconstruct max 53.9 mm; with true betas 0.0001 mm
+== image-space input ==
+  fit_body on image-normalised frame: no exception, 0 warnings; max landmark err 0.186 (image units)
+== visibility>=0.5 coverage over finite frames ==
+  L wrist: 86.6% of 410 frames (86.8% of 409)
+  R wrist: 88.5% of 410 frames (88.8% of 409)
+  L hip: 42.2% of 410 frames (42.3% of 409)
+  R hip: 42.2% of 410 frames (42.3% of 409)
+  L knee: 0.0% of 410 frames (0.0% of 409)
+  L ankle: 0.0% of 410 frames (0.0% of 409)
+  nose: 99.8% of 410 frames (100.0% of 409)

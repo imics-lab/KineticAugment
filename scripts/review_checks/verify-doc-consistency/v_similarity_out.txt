@@ -1,0 +1,8 @@
+sim_norm               median   56.3%  p95   86.6%  (n=409)
+sim_px                 median   61.7%  p95  100.3%  (n=409)
+sim_px_xy_only_resid   median   32.8%  p95   58.2%  (n=409)
+simz_px                median   19.2%  p95   25.9%  (n=409)
+ortho6_px              median    9.3%  p95   12.6%  (n=409)
+affine_px              median   17.6%  p95   24.6%  (n=409)
+per-clip similarity (px) median %: {'01986': 59.7, '01987': 80.1, '01988': 54.6, '01991': 93.5, '01992': 97.0}
+fitted z gain kz (pred_z*kz = image z): median 3.03, p5 2.69, p95 3.52

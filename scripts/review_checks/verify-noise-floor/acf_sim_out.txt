@@ -1,0 +1,10 @@
+iid+motion s=0.5 mm filt=False D-ACF lag1=-0.010 lag2=+0.398
+iid+motion s=0.5 mm filt=True  D-ACF lag1=+0.688 lag2=+0.497
+iid+motion s=1.0 mm filt=False D-ACF lag1=-0.414 lag2=+0.237
+iid+motion s=1.0 mm filt=True  D-ACF lag1=+0.397 lag2=+0.394
+iid+motion s=1.5 mm filt=False D-ACF lag1=-0.548 lag2=+0.211
+iid+motion s=1.5 mm filt=True  D-ACF lag1=+0.136 lag2=+0.289
+iid+motion s=2.0 mm filt=False D-ACF lag1=-0.597 lag2=+0.197
+iid+motion s=2.0 mm filt=True  D-ACF lag1=-0.078 lag2=+0.231
+iid+motion s=3.0 mm filt=False D-ACF lag1=-0.627 lag2=+0.171
+iid+motion s=3.0 mm filt=True  D-ACF lag1=-0.270 lag2=+0.126

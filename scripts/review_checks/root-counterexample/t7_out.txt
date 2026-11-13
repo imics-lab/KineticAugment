@@ -1,0 +1,18 @@
+method                                         direct med    p95 aligned med     n | head-up% torso-cos med  head-vs-nose cos med | root jitter med/p95/max deg
+shipped converter (zero-root IK + rigid)            6.55% 13.73%       5.94%  2354 |    0.0%  -0.966        -0.668            | 0.29/1.55/4.94
+proto: nose apex + IK + translation                 6.02% 12.69%       5.13%  2354 |  100.0%  +0.994        +0.867            | 0.55/2.74/5.46
+proto: hip-centre apex + IK + translation           6.02% 12.69%       5.13%  2354 |  100.0%  +0.997        +0.781            | 0.53/3.04/9.41
+proto: shoulder-only (no apex) + IK + transl        6.02% 12.69%       5.13%  2354 |    0.0%  -0.965        -0.674            | 0.37/2.17/5.47
+proto: nose apex + IK + rigid post-fit              5.72% 12.48%       5.13%  2354 |  100.0%  +0.995        +0.854            | 0.54/2.73/5.66
+
+per-clip direct median (% shoulder width)
+    clip        0        1        2        3        4
+   01986     6.38     4.97     4.97     4.97     4.81
+   01987     7.42     7.43     7.43     7.43     7.72
+   01988     5.57     5.40     5.40     5.40     5.51
+   01991     9.23     7.52     7.52     7.52     5.03
+   01992     6.83     6.70     6.70     6.70     6.11
+  columns: {0: 'shipped converter (zero-root IK + rigid)', 1: 'proto: nose apex + IK + translation', 2: 'proto: hip-centre apex + IK + translation', 3: 'proto: shoulder-only (no apex) + IK + transl', 4: 'proto: nose apex + IK + rigid post-fit'}
+
+gauge check: max |nose - hip| per-landmark 1.33e-15, max |nose - shoulder-only| 1.15e-15 (fraction of width)
+nose-root vs hip-root torso orientation: median 8.62, p95 18.48, max 22.20 deg

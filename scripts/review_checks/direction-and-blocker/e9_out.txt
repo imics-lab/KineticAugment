@@ -1,0 +1,4 @@
+frames: 409; torso-root body UP y-comp (upright => -1): median -0.95, p5 -0.98, p95 -0.91; FRONT z-comp (facing camera => -1): median -0.95, p5 -0.98, p95 -0.90
+arms: 718; elbow local-y has the anatomical flexion sign: 100.0%
+achieved bend change for +10 deg local-y flex (R2): median 9.71, p5 7.85, p95 13.07
+R2 vs R3 wrist-motion direction disagreement (deg): median 13.39, p5 3.08, p95 22.05; magnitude ratio median 0.99, p5 0.84, p95 1.34

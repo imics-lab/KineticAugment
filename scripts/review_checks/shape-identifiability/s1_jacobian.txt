@@ -1,0 +1,59 @@
+Rest lengths (betas=0), m: {'L upper arm': 0.2676, 'L forearm': 0.2531, 'R upper arm': 0.2749, 'R forearm': 0.2498, 'shoulder width': 0.3159}
+
+--- Jacobian of the 5 observed lengths (m per unit beta; scale col = m per unit scale) ---
+betas=0 [10 betas + scale]                   shape=(5, 11) rank(tol 1e-6)=5 sv=[0.6124 0.0198 0.0048 0.0005 0.0001] cond=4.3e+03
+betas~N(0,I) #0 [10 betas + scale]           shape=(5, 11) rank(tol 1e-6)=5 sv=[0.6137 0.0195 0.005  0.0005 0.0001] cond=4.32e+03
+betas~N(0,I) #1 [10 betas + scale]           shape=(5, 11) rank(tol 1e-6)=5 sv=[0.5996 0.0203 0.0046 0.0005 0.0001] cond=4.36e+03
+betas~N(0,I) #2 [10 betas + scale]           shape=(5, 11) rank(tol 1e-6)=5 sv=[0.622  0.0193 0.0048 0.0005 0.0001] cond=4.15e+03
+betas~N(0,I) #3 [10 betas + scale]           shape=(5, 11) rank(tol 1e-6)=5 sv=[0.5709 0.0205 0.0049 0.0005 0.0001] cond=3.99e+03
+betas~N(0,I) #4 [10 betas + scale]           shape=(5, 11) rank(tol 1e-6)=5 sv=[0.5692 0.0193 0.0053 0.0005 0.0002] cond=3.7e+03
+betas~N(0,2^2) #0 [10 betas + scale]         shape=(5, 11) rank(tol 1e-6)=5 sv=[0.6178 0.0205 0.0047 0.0005 0.0001] cond=4.85e+03
+betas~N(0,2^2) #1 [10 betas + scale]         shape=(5, 11) rank(tol 1e-6)=5 sv=[0.5493 0.02   0.0056 0.0005 0.0001] cond=4.06e+03
+betas~N(0,2^2) #2 [10 betas + scale]         shape=(5, 11) rank(tol 1e-6)=5 sv=[0.6235 0.0186 0.005  0.0005 0.0002] cond=4.02e+03
+
+betas=0 [10 betas only]                      shape=(5, 10) rank(tol 1e-6)=5 sv=[0.0415 0.0175 0.0029 0.0005 0.    ] cond=923
+betas=0 [4 arm lengths, 10 betas]            shape=(4, 10) rank(tol 1e-6)=4 sv=[0.0318 0.0029 0.0005 0.0001] cond=313
+betas=0 [4 arm lengths, 10 betas+scale]      shape=(4, 11) rank(tol 1e-6)=4 sv=[0.524  0.0048 0.0005 0.0002] cond=2.97e+03
+
+--- d(length)/d(beta_k) at betas=0, in mm per 1 sigma ---
+            b0     b1     b2     b3     b4     b5     b6     b7     b8     b9    
+L upper arm    13.36  -0.27  -3.34   1.44   1.60   1.17   0.52   0.27   1.36  -0.12
+L forearm      16.75  -0.81  -4.80  -0.36  -0.11   1.19  -0.73  -0.31   1.62   0.59
+R upper arm    14.45  -0.18  -3.93   0.95   1.38   1.02   0.63   0.54   1.44  -0.22
+R forearm      15.98  -0.85  -4.64  -0.26  -0.04   1.22  -0.69  -0.34   1.59   0.56
+shoulder width 25.65  16.74   2.69  -3.11   0.77  -5.56   2.48   0.06  -4.92  -1.56
+
+--- Left/right duplication ---
+cos(L upper, R upper) = 0.998403   |L-R|/|L| = 0.0990
+cos(L fore , R fore ) = 0.999940   |L-R|/|L| = 0.0454
+max |d/dbeta| per 1 sigma (mm) of symmetric/antisymmetric combos:
+  upper mean   norm= 14.625 mm/sigma   row=[13.904  -0.2264 -3.6306  1.196   1.4926  1.0929  0.5759  0.4052  1.3974 -0.1713]
+  fore mean    norm= 17.202 mm/sigma   row=[16.3659 -0.8299 -4.7208 -0.3061 -0.0751  1.2091 -0.7103 -0.322   1.6046  0.5739]
+  shoulder W   norm= 31.928 mm/sigma   row=[25.651  16.7382  2.6893 -3.1149  0.7725 -5.5622  2.4774  0.0613 -4.9243 -1.5574]
+  upper L-R    norm=  1.394 mm/sigma   row=[-1.0833 -0.0854  0.5897  0.488   0.2202  0.1486 -0.1175 -0.2696 -0.0814  0.1071]
+  fore L-R     norm=  0.798 mm/sigma   row=[ 0.7678  0.0452 -0.1594 -0.1011 -0.0736 -0.031  -0.0397  0.032   0.0212  0.0284]
+SVD (10 betas, 5 lengths), mm per unit-norm beta: [41.5199 17.5477  2.8672  0.4729  0.045 ]
+left singular vectors (columns, in [Lup,Lfo,Rup,Rfo,SW]):
+[[-0.311  -0.3023 -0.6048  0.6644  0.0684]
+ [-0.3873 -0.3987  0.4712 -0.0042  0.6849]
+ [-0.3384 -0.319  -0.4843 -0.7395 -0.0484]
+ [-0.369  -0.3886  0.4209  0.1082 -0.7238]
+ [-0.7089  0.7049  0.02    0.0075 -0.0043]]
+nb=10   sv(mm/sigma)=[41.52  17.548  2.867  0.473  0.045] | antisym norms upper=1.394 fore=0.798 mm/sigma-ball
+nb=16   sv(mm/sigma)=[41.545 17.917  3.812  0.592  0.084] | antisym norms upper=1.448 fore=0.806 mm/sigma-ball
+nb=50   sv(mm/sigma)=[41.562 18.22   5.197  0.809  0.191] | antisym norms upper=1.638 fore=0.841 mm/sigma-ball
+nb=100  sv(mm/sigma)=[41.576 18.303  5.429  0.847  0.297] | antisym norms upper=1.674 fore=0.905 mm/sigma-ball
+nb=300  sv(mm/sigma)=[41.579 18.326  5.55   0.899  0.34 ] | antisym norms upper=1.722 fore=0.940 mm/sigma-ball
+
+Template L-R asymmetry at betas=0 (mm): upper -7.314169274375059  fore 3.287280152144745
+
+--- Scale vs betas in LENGTH space ---
+scale column L0 = [0.2676 0.2531 0.2749 0.2498 0.3159]  best beta combo: [  1.9336  31.6287 -42.6639   4.0333  32.7199  32.8581  18.6766 -49.4882   9.6379 -16.6549]  residual norm: 6.231111271582837e-16
+cos(d/d beta0, d/d scale) = 0.9828234723091105
+
+--- Scale vs betas in FULL 55-joint space (root-relative) ---
+best beta approx of 1% uniform scale: beta=[ 0.1627 -0.0233  0.0462  0.0645  0.1181 -0.0024  0.0111 -0.0216  0.0468  0.0916]  relative residual=0.0188
+cos(dJ/dbeta0, uniform-scale direction) = 0.9980
+cos(dJ/dbeta0, scale) = 0.9980
+cos(dJ/dbeta1, scale) = 0.4112
+cos(dJ/dbeta2, scale) = -0.1335

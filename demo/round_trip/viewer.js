@@ -61,6 +61,9 @@ async function fetchVariant(id, v) {
   ]);
   const arrays = {};
   for (const [name, m] of Object.entries(meta.arrays)) arrays[name] = view(buf, m);
+  // Exports from before the finger-curl measurement lack these; show them as all missing.
+  for (const k of ['curl_deg', 'mano_curl_deg']) meta.series[k] ??= Array.from({ length: meta.n }, () => [null, null]);
+  for (const k of ['curl_deg_median', 'mano_curl_deg_median']) meta.summary[k] ??= [null, null];
   return { meta, arrays };
 }
 
@@ -114,6 +117,7 @@ function summaryChips() {
     chip('body', (m) => `${fmt(m.body_pct_median)}%`),
     chip('hands L/R', (m) => `${pair(m.hand_mm_median)} mm`),
     chip('MANO L/R', (m) => `${pair(m.mano_mm_median)} mm`),
+    chip('curl L/R', (m) => `${pair(m.curl_deg_median)} °`),
     chip('face rigid/non', (m) => `${fmt(m.face_rigid_mm_median)} / ${fmt(m.face_nonrigid_mm_median)} mm`),
     chip('jitter arm/hand/face', (m) => m.jitter_rt_median.map((v) => fmt(v)).join(' / ')),
     chip('wrist gap L/R', (m) => `${pair(m.wrist_gap_px_median)} px`),
@@ -418,6 +422,11 @@ const STRIPS = [
     { label: 'R on SMPL-X', col: C.handR, get: (m) => m.series.hand_mm.map(col(1)) },
     { label: 'L MANO', col: C.handL, dash: [3, 3], get: (m) => m.series.mano_mm.map(col(0)) },
     { label: 'R MANO', col: C.handR, dash: [3, 3], get: (m) => m.series.mano_mm.map(col(1)) }] },
+  { title: 'hands · finger curl error (° per joint, mean |Δ angle| over 15 joints)', ref: null, series: [
+    { label: 'L on SMPL-X', col: C.handL, get: (m) => m.series.curl_deg.map(col(0)) },
+    { label: 'R on SMPL-X', col: C.handR, get: (m) => m.series.curl_deg.map(col(1)) },
+    { label: 'L MANO', col: C.handL, dash: [3, 3], get: (m) => m.series.mano_curl_deg.map(col(0)) },
+    { label: 'R MANO', col: C.handR, dash: [3, 3], get: (m) => m.series.mano_curl_deg.map(col(1)) }] },
   { title: 'face · 105 embedded pts, RMS (mm)', ref: 10, series: [
     { label: 'rigid', col: C.face, get: (m) => m.series.face_rigid_mm },
     { label: 'non-rigid', col: C.face, dash: [3, 3], get: (m) => m.series.face_nonrigid_mm }] },
@@ -531,6 +540,9 @@ function readout(f) {
     ${row(`${sw(C.handL)}L hand mm`, fmt(s.hand_mm[f][0]), fmt(m.hand_mm_median[0]), fmt(r.hand_mm_median[0]), fl.hand_present[f][0] ? '' : 'missing')}
     ${row(`${sw(C.handR)}R hand mm`, fmt(s.hand_mm[f][1]), fmt(m.hand_mm_median[1]), fmt(r.hand_mm_median[1]), fl.hand_present[f][1] ? '' : 'missing')}
     ${row('&nbsp;&nbsp;MANO L / R', `${fmt(s.mano_mm[f][0])} / ${fmt(s.mano_mm[f][1])}`, `${fmt(m.mano_mm_median[0])} / ${fmt(m.mano_mm_median[1])}`, `${fmt(r.mano_mm_median[0])} / ${fmt(r.mano_mm_median[1])}`)}
+    ${row(`${sw(C.handL)}L curl °`, fmt(s.curl_deg[f][0]), fmt(m.curl_deg_median[0]), fmt(r.curl_deg_median[0]), fl.hand_present[f][0] ? '' : 'missing')}
+    ${row(`${sw(C.handR)}R curl °`, fmt(s.curl_deg[f][1]), fmt(m.curl_deg_median[1]), fmt(r.curl_deg_median[1]), fl.hand_present[f][1] ? '' : 'missing')}
+    ${row('&nbsp;&nbsp;MANO curl L / R', `${fmt(s.mano_curl_deg[f][0])} / ${fmt(s.mano_curl_deg[f][1])}`, `${fmt(m.mano_curl_deg_median[0])} / ${fmt(m.mano_curl_deg_median[1])}`, `${fmt(r.mano_curl_deg_median[0])} / ${fmt(r.mano_curl_deg_median[1])}`)}
     ${row(`${sw(C.face)}face rigid mm`, fmt(s.face_rigid_mm[f]), fmt(m.face_rigid_mm_median), fmt(r.face_rigid_mm_median), fl.face_valid[f] ? (fl.head_reliable[f] ? '' : 'unreliable') : 'no face')}
     ${row('&nbsp;&nbsp;non-rigid mm', fmt(s.face_nonrigid_mm[f]), fmt(m.face_nonrigid_mm_median), fmt(r.face_nonrigid_mm_median))}
     <tr><th colspan="${span}">jitter, arms / hands / face (mm per frame²)</th></tr>

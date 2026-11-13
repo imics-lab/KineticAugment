@@ -1,0 +1,2956 @@
+{
+  "settings": {
+    "hand_backends": [
+      "mano"
+    ],
+    "targets_mm": {
+      "mean": 5.0,
+      "tips": 8.0,
+      "p95": 15.0
+    },
+    "visibility_threshold": 0.5,
+    "body_units": "% of the clip's median shoulder width",
+    "hand_units": "mm, wrist-relative landmarks 1-20, no registration"
+  },
+  "clips": {
+    "05631": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/05631.mp4",
+      "body": {
+        "frames": 24,
+        "frames_with_shoulders": 24,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 83.33333333333334,
+          "R wrist": 70.83333333333334
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3094498958263973,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 24,
+          "with_nose": 24,
+          "nose_masked": 24
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 5.517993985334062,
+            "p95_pct": 20.01507390470901,
+            "n": 133
+          },
+          "template": {
+            "median_pct": 5.999192406382975,
+            "p95_pct": 19.729319386624137,
+            "n": 133
+          },
+          "floor": {
+            "median_pct": 2.362716662546589,
+            "p95_pct": 10.670082108643737,
+            "n": 133
+          },
+          "held_out_direct": {
+            "median_pct": 5.730342021948752,
+            "p95_pct": 19.83501591250181,
+            "n": 133
+          },
+          "held_out_floor": {
+            "median_pct": 3.3781535568425296,
+            "p95_pct": 10.198210411263126,
+            "n": 133
+          },
+          "gap_to_floor_pts": 3.155277322787473,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 4.371231647976994,
+            "R shoulder": 4.380613933644728,
+            "L elbow": 5.498928441839037,
+            "R elbow": 5.845947718653748,
+            "L wrist": 12.602236622291407,
+            "R wrist": 19.7413712239195
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 17,
+          "hand_scale_mm": 89.85835527581727,
+          "half_span_ratio": 1.0461293402493836,
+          "fit_status": {
+            "mano": {
+              "ok": 17
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 17,
+              "mean_mm": 10.62667893542796,
+              "tips_mm": 13.571970656351079,
+              "p95_mm": 38.49266888076487,
+              "mean_pct_hand": 11.826033208386372,
+              "thumb_mm": 7.47566817025329,
+              "index_mm": 11.929072471907821,
+              "middle_mm": 11.577736101921708,
+              "ring_mm": 10.93354708403183,
+              "pinky_mm": 11.217370849025142
+            },
+            "mano: in-sample shape": {
+              "frames": 17,
+              "mean_mm": 5.198905815260633,
+              "tips_mm": 3.122890575133936,
+              "p95_mm": 18.4114415635383,
+              "mean_pct_hand": 5.7856676758691625,
+              "thumb_mm": 5.7667832694950345,
+              "index_mm": 5.543402627560895,
+              "middle_mm": 5.778555428213169,
+              "ring_mm": 5.244201469637045,
+              "pinky_mm": 3.6615862813970175
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 17,
+              "mean_mm": 6.937802836690956,
+              "tips_mm": 4.710961295609586,
+              "p95_mm": 20.854045772675633,
+              "mean_pct_hand": 7.72082108046113,
+              "thumb_mm": 6.209558424172657,
+              "index_mm": 7.507985553766919,
+              "middle_mm": 7.9376811097912405,
+              "ring_mm": 7.853940019833648,
+              "pinky_mm": 5.1798490758903215
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 17,
+              "mean_mm": 5.209244122950564,
+              "tips_mm": 3.0620494768536535,
+              "p95_mm": 18.339954959895003,
+              "mean_pct_hand": 5.797172791512777,
+              "thumb_mm": 5.953084878281599,
+              "index_mm": 5.485355776640551,
+              "middle_mm": 5.698081201443809,
+              "ring_mm": 5.229711125875826,
+              "pinky_mm": 3.679987632511038
+            }
+          }
+        }
+      }
+    },
+    "07389": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/07389.mp4",
+      "body": {
+        "frames": 82,
+        "frames_with_shoulders": 82,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.34178164520132137,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 82,
+          "with_nose": 82,
+          "nose_masked": 82
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 1.4440211070341376,
+            "p95_pct": 4.865914728775105,
+            "n": 492
+          },
+          "template": {
+            "median_pct": 5.346756014878443,
+            "p95_pct": 8.899082710116927,
+            "n": 492
+          },
+          "floor": {
+            "median_pct": 1.2257986568401904,
+            "p95_pct": 5.946458629509619,
+            "n": 492
+          },
+          "held_out_direct": {
+            "median_pct": 1.6601252264056647,
+            "p95_pct": 4.981319621539611,
+            "n": 492
+          },
+          "held_out_floor": {
+            "median_pct": 1.4379904990510277,
+            "p95_pct": 5.957076800182697,
+            "n": 492
+          },
+          "gap_to_floor_pts": 0.21822245019394715,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 1.3352181396986074,
+            "R shoulder": 1.3495767463671742,
+            "L elbow": 1.164190108021276,
+            "R elbow": 1.4893554257669714,
+            "L wrist": 1.059801212486758,
+            "R wrist": 2.7708216472414957
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 52,
+          "hand_scale_mm": 92.94391005552355,
+          "half_span_ratio": 0.991471968587668,
+          "fit_status": {
+            "mano": {
+              "ok": 52
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 52,
+              "mean_mm": 14.17375827268791,
+              "tips_mm": 17.102771648426877,
+              "p95_mm": 33.231220159239435,
+              "mean_pct_hand": 15.249797715870445,
+              "thumb_mm": 11.710874471179173,
+              "index_mm": 16.7313903441819,
+              "middle_mm": 16.13637572359432,
+              "ring_mm": 13.218655518151886,
+              "pinky_mm": 13.071495306332274
+            },
+            "mano: in-sample shape": {
+              "frames": 52,
+              "mean_mm": 7.796916588663451,
+              "tips_mm": 3.7380756490828837,
+              "p95_mm": 20.263104747940652,
+              "mean_pct_hand": 8.38884073631685,
+              "thumb_mm": 8.31246798925885,
+              "index_mm": 9.314301953580529,
+              "middle_mm": 8.43909299619866,
+              "ring_mm": 7.234199476099525,
+              "pinky_mm": 5.684520528179693
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 52,
+              "mean_mm": 8.36228766424116,
+              "tips_mm": 4.3338316494268545,
+              "p95_mm": 21.06640564657004,
+              "mean_pct_hand": 8.997133496154436,
+              "thumb_mm": 8.793908435408966,
+              "index_mm": 10.415883346018212,
+              "middle_mm": 9.512926438560731,
+              "ring_mm": 7.359807127297502,
+              "pinky_mm": 5.728912973920392
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 52,
+              "mean_mm": 7.804803097712079,
+              "tips_mm": 3.735619067711736,
+              "p95_mm": 20.216139166425986,
+              "mean_pct_hand": 8.39732597116862,
+              "thumb_mm": 8.312068375789046,
+              "index_mm": 9.312441348965065,
+              "middle_mm": 8.451004497492303,
+              "ring_mm": 7.232559842968412,
+              "pinky_mm": 5.715941423345573
+            }
+          }
+        }
+      }
+    },
+    "08917": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/08917.mp4",
+      "body": {
+        "frames": 32,
+        "frames_with_shoulders": 32,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 84.375,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3253401839692367,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 32,
+          "with_nose": 32,
+          "nose_masked": 32
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 4.6799437526274845,
+            "p95_pct": 14.369572726609839,
+            "n": 187
+          },
+          "template": {
+            "median_pct": 6.067887213607083,
+            "p95_pct": 15.965488941896936,
+            "n": 187
+          },
+          "floor": {
+            "median_pct": 0.8324738449594289,
+            "p95_pct": 10.460190675170475,
+            "n": 187
+          },
+          "held_out_direct": {
+            "median_pct": 4.885410340129952,
+            "p95_pct": 15.017449362922743,
+            "n": 187
+          },
+          "held_out_floor": {
+            "median_pct": 0.9307986252113574,
+            "p95_pct": 10.541476235923295,
+            "n": 187
+          },
+          "gap_to_floor_pts": 3.8474699076680556,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 3.492875174031016,
+            "R shoulder": 3.4334361333706322,
+            "L elbow": 4.201499152136943,
+            "R elbow": 6.181265871664469,
+            "L wrist": 9.101316501362799,
+            "R wrist": 13.977732932132552
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 23,
+          "hand_scale_mm": 102.13794422570565,
+          "half_span_ratio": 0.9788439575376436,
+          "fit_status": {
+            "mano": {
+              "ok": 23
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 23,
+              "mean_mm": 4.819063873586282,
+              "tips_mm": 5.73089872706898,
+              "p95_mm": 16.320566553314123,
+              "mean_pct_hand": 4.7181915693711804,
+              "thumb_mm": 4.091410249152585,
+              "index_mm": 5.4795042957858735,
+              "middle_mm": 5.065916850678021,
+              "ring_mm": 4.537333861534477,
+              "pinky_mm": 4.921154110780456
+            },
+            "mano: in-sample shape": {
+              "frames": 23,
+              "mean_mm": 4.2472164410766995,
+              "tips_mm": 2.3516610395377993,
+              "p95_mm": 10.176200829098507,
+              "mean_pct_hand": 4.1583140068799,
+              "thumb_mm": 5.426573787571725,
+              "index_mm": 3.843734483373705,
+              "middle_mm": 4.5022528901255745,
+              "ring_mm": 3.96948341384708,
+              "pinky_mm": 3.494037630465409
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 23,
+              "mean_mm": 4.273676423160549,
+              "tips_mm": 2.3615341331901454,
+              "p95_mm": 10.322075278482968,
+              "mean_pct_hand": 4.184220130489926,
+              "thumb_mm": 5.44305518215445,
+              "index_mm": 3.887000514554893,
+              "middle_mm": 4.541807313509056,
+              "ring_mm": 3.9984968148816806,
+              "pinky_mm": 3.4980222907026657
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 23,
+              "mean_mm": 4.269208508795524,
+              "tips_mm": 2.357190088482704,
+              "p95_mm": 10.370189873016633,
+              "mean_pct_hand": 4.1798457381924345,
+              "thumb_mm": 5.482425368334278,
+              "index_mm": 3.865442009897704,
+              "middle_mm": 4.512796830939285,
+              "ring_mm": 3.9881612523929846,
+              "pinky_mm": 3.4972170824133686
+            }
+          }
+        }
+      }
+    },
+    "08918": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/08918.mp4",
+      "body": {
+        "frames": 30,
+        "frames_with_shoulders": 30,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3276129353954193,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 30,
+          "with_nose": 30,
+          "nose_masked": 30
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 5.161877140338477,
+            "p95_pct": 14.740003377686243,
+            "n": 180
+          },
+          "template": {
+            "median_pct": 6.249220348517724,
+            "p95_pct": 14.756259378279804,
+            "n": 180
+          },
+          "floor": {
+            "median_pct": 1.3208144769056889,
+            "p95_pct": 9.318681737293755,
+            "n": 180
+          },
+          "held_out_direct": {
+            "median_pct": 5.3103981181253825,
+            "p95_pct": 15.179024035122278,
+            "n": 180
+          },
+          "held_out_floor": {
+            "median_pct": 1.7531779163061714,
+            "p95_pct": 9.597115270053036,
+            "n": 180
+          },
+          "gap_to_floor_pts": 3.8410626634327887,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 3.5378159842739954,
+            "R shoulder": 3.5384787666529873,
+            "L elbow": 4.523106349374437,
+            "R elbow": 6.309185387477494,
+            "L wrist": 8.545591526024106,
+            "R wrist": 13.665631906492026
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 24,
+          "hand_scale_mm": 103.11193383080102,
+          "half_span_ratio": 1.01246777572475,
+          "fit_status": {
+            "mano": {
+              "ok": 24
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 24,
+              "mean_mm": 10.350408397347998,
+              "tips_mm": 12.385734382559091,
+              "p95_mm": 37.318630334598744,
+              "mean_pct_hand": 10.038031499178597,
+              "thumb_mm": 8.127701348119988,
+              "index_mm": 12.153311954634544,
+              "middle_mm": 11.50705649576711,
+              "ring_mm": 10.356922867325487,
+              "pinky_mm": 9.607049320892862
+            },
+            "mano: in-sample shape": {
+              "frames": 24,
+              "mean_mm": 5.814590819401668,
+              "tips_mm": 3.313201070323868,
+              "p95_mm": 16.391961989552186,
+              "mean_pct_hand": 5.639105584949049,
+              "thumb_mm": 7.341879858265993,
+              "index_mm": 5.49177569329498,
+              "middle_mm": 6.642890062044525,
+              "ring_mm": 4.923224069852012,
+              "pinky_mm": 4.673184413550829
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 24,
+              "mean_mm": 5.810819491902094,
+              "tips_mm": 3.294907323360561,
+              "p95_mm": 16.338597945855184,
+              "mean_pct_hand": 5.635448076686462,
+              "thumb_mm": 7.329048318663671,
+              "index_mm": 5.484578466307103,
+              "middle_mm": 6.6423264273941385,
+              "ring_mm": 4.92363526745353,
+              "pinky_mm": 4.674508979692024
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 24,
+              "mean_mm": 5.836056554350906,
+              "tips_mm": 3.3231704901702064,
+              "p95_mm": 16.708256888174585,
+              "mean_pct_hand": 5.659923480755814,
+              "thumb_mm": 7.4178761068785235,
+              "index_mm": 5.491061000822289,
+              "middle_mm": 6.660650766131518,
+              "ring_mm": 4.934734344948524,
+              "pinky_mm": 4.675960552973673
+            }
+          }
+        }
+      }
+    },
+    "08938": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/08938.mp4",
+      "body": {
+        "frames": 56,
+        "frames_with_shoulders": 55,
+        "coverage_pct": {
+          "L shoulder": 98.21428571428571,
+          "R shoulder": 98.21428571428571,
+          "L elbow": 98.21428571428571,
+          "R elbow": 98.21428571428571,
+          "L wrist": 87.5,
+          "R wrist": 94.64285714285714
+        },
+        "skipped_frames": 1,
+        "shoulder_width_m": 0.3272098514878938,
+        "betas_norm": 3.327235743604043,
+        "upright": {
+          "fitted": 55,
+          "with_nose": 55,
+          "nose_masked": 55
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 3.2221892430249963,
+            "p95_pct": 11.093716934473875,
+            "n": 322
+          },
+          "template": {
+            "median_pct": 4.80769383226511,
+            "p95_pct": 14.744979936910424,
+            "n": 322
+          },
+          "floor": {
+            "median_pct": 2.8313132412017947,
+            "p95_pct": 7.85950994462961,
+            "n": 322
+          },
+          "held_out_direct": {
+            "median_pct": 3.4270863070431403,
+            "p95_pct": 11.839072072221011,
+            "n": 322
+          },
+          "held_out_floor": {
+            "median_pct": 3.8263633926429175,
+            "p95_pct": 11.751090569394734,
+            "n": 322
+          },
+          "gap_to_floor_pts": 0.3908760018232016,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 2.8664347731262483,
+            "R shoulder": 3.343658671458247,
+            "L elbow": 2.2266725204895774,
+            "R elbow": 2.4721960409545534,
+            "L wrist": 8.249146362535518,
+            "R wrist": 4.656496210910243
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 35,
+          "hand_scale_mm": 91.17320551046296,
+          "half_span_ratio": 0.9557019151039599,
+          "fit_status": {
+            "mano": {
+              "ok": 35
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 35,
+              "mean_mm": 7.901908984285801,
+              "tips_mm": 9.668680936599417,
+              "p95_mm": 16.373202083144776,
+              "mean_pct_hand": 8.666920220742908,
+              "thumb_mm": 6.761552887106607,
+              "index_mm": 8.50375524210038,
+              "middle_mm": 9.521969041229188,
+              "ring_mm": 7.042938528884888,
+              "pinky_mm": 7.679329222107948
+            },
+            "mano: in-sample shape": {
+              "frames": 35,
+              "mean_mm": 4.498525425995939,
+              "tips_mm": 1.709840516402927,
+              "p95_mm": 12.13353750472351,
+              "mean_pct_hand": 4.934043286960764,
+              "thumb_mm": 6.389090920634691,
+              "index_mm": 4.482010787238186,
+              "middle_mm": 5.103140783728474,
+              "ring_mm": 3.3363848404249716,
+              "pinky_mm": 3.181999797953375
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 35,
+              "mean_mm": 5.2348299950625865,
+              "tips_mm": 2.0083855166937408,
+              "p95_mm": 13.813481830015762,
+              "mean_pct_hand": 5.741632057087037,
+              "thumb_mm": 8.079444616957383,
+              "index_mm": 4.948998444163006,
+              "middle_mm": 5.670369413116434,
+              "ring_mm": 3.7836594654011093,
+              "pinky_mm": 3.691678035674997
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 35,
+              "mean_mm": 4.512122277185018,
+              "tips_mm": 1.7231433102217475,
+              "p95_mm": 12.058723386826227,
+              "mean_pct_hand": 4.948956496508407,
+              "thumb_mm": 6.440148493996528,
+              "index_mm": 4.484923766321033,
+              "middle_mm": 5.114065407014705,
+              "ring_mm": 3.3365694892531566,
+              "pinky_mm": 3.1849042293396663
+            }
+          }
+        },
+        "right": {
+          "frames_with_hand": 34,
+          "hand_scale_mm": 90.76481309512546,
+          "half_span_ratio": 0.9258653299187088,
+          "fit_status": {
+            "mano": {
+              "ok": 34
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 34,
+              "mean_mm": 9.050910318607416,
+              "tips_mm": 10.786115682467267,
+              "p95_mm": 17.1149876668509,
+              "mean_pct_hand": 9.971827198191518,
+              "thumb_mm": 8.019121364359954,
+              "index_mm": 9.62267950827904,
+              "middle_mm": 10.827734233169542,
+              "ring_mm": 7.661562188783544,
+              "pinky_mm": 9.123454298444999
+            },
+            "mano: in-sample shape": {
+              "frames": 34,
+              "mean_mm": 4.759100428737271,
+              "tips_mm": 1.585744699370669,
+              "p95_mm": 13.372568231838956,
+              "mean_pct_hand": 5.243331932771708,
+              "thumb_mm": 5.2065308137207795,
+              "index_mm": 5.283009672345399,
+              "middle_mm": 5.388257814467797,
+              "ring_mm": 4.042344699118274,
+              "pinky_mm": 3.875359144034106
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 34,
+              "mean_mm": 5.312940122576355,
+              "tips_mm": 1.5739862030254652,
+              "p95_mm": 14.673780718218527,
+              "mean_pct_hand": 5.8535240049557125,
+              "thumb_mm": 6.576377558062621,
+              "index_mm": 5.711984995511336,
+              "middle_mm": 5.724747686768928,
+              "ring_mm": 4.407638628276128,
+              "pinky_mm": 4.143951744262762
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 34,
+              "mean_mm": 4.7556083947243515,
+              "tips_mm": 1.5707347771442173,
+              "p95_mm": 13.369391269871498,
+              "mean_pct_hand": 5.239484589408307,
+              "thumb_mm": 5.206900805280178,
+              "index_mm": 5.281293124155409,
+              "middle_mm": 5.381390174474202,
+              "ring_mm": 4.039208549893954,
+              "pinky_mm": 3.8692493198180142
+            }
+          }
+        }
+      }
+    },
+    "09849": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/09849.mp4",
+      "body": {
+        "frames": 81,
+        "frames_with_shoulders": 81,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.34847846581298286,
+        "betas_norm": 3.327235743604042,
+        "upright": {
+          "fitted": 81,
+          "with_nose": 81,
+          "nose_masked": 81
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 2.1190705073655622,
+            "p95_pct": 5.854447027365684,
+            "n": 486
+          },
+          "template": {
+            "median_pct": 5.9539512216636075,
+            "p95_pct": 13.17886904300574,
+            "n": 486
+          },
+          "floor": {
+            "median_pct": 1.7639380010916812,
+            "p95_pct": 6.61518627892887,
+            "n": 486
+          },
+          "held_out_direct": {
+            "median_pct": 2.24696364287939,
+            "p95_pct": 5.948388292285488,
+            "n": 486
+          },
+          "held_out_floor": {
+            "median_pct": 2.36955280681065,
+            "p95_pct": 7.768607274207512,
+            "n": 486
+          },
+          "gap_to_floor_pts": 0.35513250627388104,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 2.308543673266603,
+            "R shoulder": 2.3863781956548866,
+            "L elbow": 1.1709305735589477,
+            "R elbow": 1.5940248115356521,
+            "L wrist": 3.954093441250413,
+            "R wrist": 2.694011165003399
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 55,
+          "hand_scale_mm": 91.32992451936693,
+          "half_span_ratio": 1.0224069166714194,
+          "fit_status": {
+            "mano": {
+              "ok": 55
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 55,
+              "mean_mm": 7.304362426481264,
+              "tips_mm": 9.59015418481801,
+              "p95_mm": 17.993969865183374,
+              "mean_pct_hand": 7.997775608510813,
+              "thumb_mm": 5.769858209809905,
+              "index_mm": 7.803501230635675,
+              "middle_mm": 8.756106466256595,
+              "ring_mm": 7.136178424231012,
+              "pinky_mm": 7.056167801473134
+            },
+            "mano: in-sample shape": {
+              "frames": 55,
+              "mean_mm": 4.916719316349046,
+              "tips_mm": 2.756674674366697,
+              "p95_mm": 11.455933033767918,
+              "mean_pct_hand": 5.383470250549078,
+              "thumb_mm": 5.841927510886792,
+              "index_mm": 5.063933095199705,
+              "middle_mm": 5.305800426744566,
+              "ring_mm": 4.935001322895832,
+              "pinky_mm": 3.4369342260183395
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 55,
+              "mean_mm": 5.116775730848078,
+              "tips_mm": 2.8026651502210287,
+              "p95_mm": 12.141210697588336,
+              "mean_pct_hand": 5.602518295920677,
+              "thumb_mm": 6.211069162706451,
+              "index_mm": 5.418028261438434,
+              "middle_mm": 5.5033945472609265,
+              "ring_mm": 4.973165778602448,
+              "pinky_mm": 3.478220904232126
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 55,
+              "mean_mm": 4.931592732106978,
+              "tips_mm": 2.765229895377621,
+              "p95_mm": 11.580475028628392,
+              "mean_pct_hand": 5.399755620143113,
+              "thumb_mm": 5.85897173718054,
+              "index_mm": 5.068115602481142,
+              "middle_mm": 5.328910899297121,
+              "ring_mm": 4.949343596794577,
+              "pinky_mm": 3.4526218247815113
+            }
+          }
+        },
+        "right": {
+          "frames_with_hand": 49,
+          "hand_scale_mm": 101.67951158406927,
+          "half_span_ratio": 1.0503670593019208,
+          "fit_status": {
+            "mano": {
+              "ok": 49
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 49,
+              "mean_mm": 16.45308388367492,
+              "tips_mm": 19.119743396361727,
+              "p95_mm": 40.630670623441894,
+              "mean_pct_hand": 16.181316793670284,
+              "thumb_mm": 13.558822791686799,
+              "index_mm": 20.260022766597366,
+              "middle_mm": 19.33062720205904,
+              "ring_mm": 14.919701900743696,
+              "pinky_mm": 14.196244757287712
+            },
+            "mano: in-sample shape": {
+              "frames": 49,
+              "mean_mm": 8.33398351734173,
+              "tips_mm": 3.3572601591524096,
+              "p95_mm": 22.1418541099894,
+              "mean_pct_hand": 8.196325284716911,
+              "thumb_mm": 10.080822516449098,
+              "index_mm": 9.100532402413728,
+              "middle_mm": 8.553325866501783,
+              "ring_mm": 7.591900196849492,
+              "pinky_mm": 6.343336604494549
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 49,
+              "mean_mm": 8.423486135721484,
+              "tips_mm": 3.4036043090668717,
+              "p95_mm": 22.466066433193532,
+              "mean_pct_hand": 8.284349525771367,
+              "thumb_mm": 10.359129857172547,
+              "index_mm": 9.184421408215755,
+              "middle_mm": 8.560649077172345,
+              "ring_mm": 7.619794672849086,
+              "pinky_mm": 6.393435663197692
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 49,
+              "mean_mm": 8.348379397049804,
+              "tips_mm": 3.3515288671611723,
+              "p95_mm": 22.62841166794148,
+              "mean_pct_hand": 8.210483377614683,
+              "thumb_mm": 10.101356769440423,
+              "index_mm": 9.115664923930993,
+              "middle_mm": 8.541809026402142,
+              "ring_mm": 7.6168644468754065,
+              "pinky_mm": 6.366201818600053
+            }
+          }
+        }
+      }
+    },
+    "12328": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/12328.mp4",
+      "body": {
+        "frames": 88,
+        "frames_with_shoulders": 88,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3176836759766179,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 88,
+          "with_nose": 88,
+          "nose_masked": 88
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 4.683963516415159,
+            "p95_pct": 18.428003151514126,
+            "n": 528
+          },
+          "template": {
+            "median_pct": 10.23344107696885,
+            "p95_pct": 27.00566292392183,
+            "n": 528
+          },
+          "floor": {
+            "median_pct": 2.249061145864326,
+            "p95_pct": 6.933546532013292,
+            "n": 528
+          },
+          "held_out_direct": {
+            "median_pct": 4.678264637871957,
+            "p95_pct": 18.410659363479855,
+            "n": 528
+          },
+          "held_out_floor": {
+            "median_pct": 2.571420824387788,
+            "p95_pct": 7.160640174627694,
+            "n": 528
+          },
+          "gap_to_floor_pts": 2.434902370550833,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 4.190507361143633,
+            "R shoulder": 3.967061681869466,
+            "L elbow": 4.737229387656135,
+            "R elbow": 4.679217365136067,
+            "L wrist": 3.570610108009953,
+            "R wrist": 17.150218538822127
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 88,
+          "hand_scale_mm": 91.77549131436454,
+          "half_span_ratio": 0.9826423924616413,
+          "fit_status": {
+            "mano": {
+              "ok": 88
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 88,
+              "mean_mm": 3.204490272674947,
+              "tips_mm": 4.106967725917581,
+              "p95_mm": 8.292705649722722,
+              "mean_pct_hand": 3.491662345558466,
+              "thumb_mm": 2.8914861661517763,
+              "index_mm": 2.9425196812569308,
+              "middle_mm": 3.6827942974272387,
+              "ring_mm": 3.478335455207488,
+              "pinky_mm": 3.027315763331302
+            },
+            "mano: in-sample shape": {
+              "frames": 88,
+              "mean_mm": 3.1477928962642108,
+              "tips_mm": 2.296047624586804,
+              "p95_mm": 7.4255035050099325,
+              "mean_pct_hand": 3.429884004087619,
+              "thumb_mm": 3.5222775141519986,
+              "index_mm": 3.0626434226764214,
+              "middle_mm": 4.362836406236832,
+              "ring_mm": 2.729278130384218,
+              "pinky_mm": 2.061929007871586
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 88,
+              "mean_mm": 3.24503274532998,
+              "tips_mm": 2.32750221228221,
+              "p95_mm": 7.583721896178688,
+              "mean_pct_hand": 3.535838053118735,
+              "thumb_mm": 3.545153790376045,
+              "index_mm": 3.1692558613633355,
+              "middle_mm": 4.407993258943652,
+              "ring_mm": 2.8669395148529198,
+              "pinky_mm": 2.2358213011139507
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 88,
+              "mean_mm": 3.14723066969549,
+              "tips_mm": 2.2990894699174937,
+              "p95_mm": 7.394388630336735,
+              "mean_pct_hand": 3.429271393290695,
+              "thumb_mm": 3.5224630316118466,
+              "index_mm": 3.061517621528971,
+              "middle_mm": 4.361906529666521,
+              "ring_mm": 2.725558749099289,
+              "pinky_mm": 2.064707416570822
+            }
+          }
+        },
+        "right": {
+          "frames_with_hand": 88,
+          "hand_scale_mm": 94.67449950388752,
+          "half_span_ratio": 0.9864145461924209,
+          "fit_status": {
+            "mano": {
+              "ok": 88
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 88,
+              "mean_mm": 2.760523520671071,
+              "tips_mm": 3.631462893881667,
+              "p95_mm": 6.570261148301296,
+              "mean_pct_hand": 2.915804715247234,
+              "thumb_mm": 2.7765902959947777,
+              "index_mm": 3.2315658726674417,
+              "middle_mm": 3.0659762183847334,
+              "ring_mm": 2.546849142977227,
+              "pinky_mm": 2.181636073331178
+            },
+            "mano: in-sample shape": {
+              "frames": 88,
+              "mean_mm": 2.695826453374872,
+              "tips_mm": 1.8531609253809005,
+              "p95_mm": 6.216617398631806,
+              "mean_pct_hand": 2.847468396982839,
+              "thumb_mm": 3.2624784450915425,
+              "index_mm": 2.936300419204957,
+              "middle_mm": 2.704554839090861,
+              "ring_mm": 2.7451972363279,
+              "pinky_mm": 1.8306013271590986
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 88,
+              "mean_mm": 2.7241455205881,
+              "tips_mm": 1.8429649121001823,
+              "p95_mm": 6.3222282701845405,
+              "mean_pct_hand": 2.8773804296438255,
+              "thumb_mm": 3.2866197315649233,
+              "index_mm": 3.0339586858409646,
+              "middle_mm": 2.716219478279661,
+              "ring_mm": 2.7356747393758827,
+              "pinky_mm": 1.8482549678790667
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 88,
+              "mean_mm": 2.6951081199231153,
+              "tips_mm": 1.8456290295061442,
+              "p95_mm": 6.165909071267151,
+              "mean_pct_hand": 2.8467096568199435,
+              "thumb_mm": 3.26047542533955,
+              "index_mm": 2.9340412542007543,
+              "middle_mm": 2.706781124268355,
+              "ring_mm": 2.7368866822697395,
+              "pinky_mm": 1.8373561135371796
+            }
+          }
+        }
+      }
+    },
+    "13630": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/13630.mp4",
+      "body": {
+        "frames": 106,
+        "frames_with_shoulders": 106,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 0.0,
+          "R wrist": 47.16981132075472
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.31668606831657165,
+        "betas_norm": 3.080215745168048,
+        "upright": {
+          "fitted": 106,
+          "with_nose": 106,
+          "nose_masked": 106
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 3.9845720272528196,
+            "p95_pct": 8.614105117666725,
+            "n": 474
+          },
+          "template": {
+            "median_pct": 6.092658302784006,
+            "p95_pct": 10.810779198697494,
+            "n": 474
+          },
+          "floor": {
+            "median_pct": 3.3418664808629774,
+            "p95_pct": 9.438911979176877,
+            "n": 474
+          },
+          "held_out_direct": {
+            "median_pct": 4.574494988860286,
+            "p95_pct": 9.161194761037514,
+            "n": 474
+          },
+          "held_out_floor": {
+            "median_pct": 4.829644879411596,
+            "p95_pct": 11.008718233774589,
+            "n": 474
+          },
+          "gap_to_floor_pts": 0.6427055463898421,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 4.24848453678294,
+            "R shoulder": 3.373936439085676,
+            "L elbow": 4.75487796796931,
+            "R elbow": 3.7616360181622164,
+            "L wrist": NaN,
+            "R wrist": 5.619404260714962
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 47,
+          "hand_scale_mm": 89.63873795534829,
+          "half_span_ratio": 0.9862842114406154,
+          "fit_status": {
+            "mano": {
+              "ok": 47
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 47,
+              "mean_mm": 7.735183020975746,
+              "tips_mm": 9.488686116111406,
+              "p95_mm": 27.942567841687058,
+              "mean_pct_hand": 8.629285950934369,
+              "thumb_mm": 7.796817810552407,
+              "index_mm": 9.241692302606976,
+              "middle_mm": 7.81529329387839,
+              "ring_mm": 6.108457566433527,
+              "pinky_mm": 7.713654131407421
+            },
+            "mano: in-sample shape": {
+              "frames": 47,
+              "mean_mm": 4.177617965196477,
+              "tips_mm": 1.9068475512163698,
+              "p95_mm": 11.780445796464393,
+              "mean_pct_hand": 4.6605051125078,
+              "thumb_mm": 5.884274408529389,
+              "index_mm": 3.762078923169398,
+              "middle_mm": 4.0264850965013625,
+              "ring_mm": 3.9005179681359436,
+              "pinky_mm": 3.3147334296462914
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 47,
+              "mean_mm": 4.276695533244427,
+              "tips_mm": 1.9638982879979423,
+              "p95_mm": 11.846573055543963,
+              "mean_pct_hand": 4.77103496858108,
+              "thumb_mm": 6.006761306455643,
+              "index_mm": 3.982912430934393,
+              "middle_mm": 4.144719391566127,
+              "ring_mm": 3.9064006314128616,
+              "pinky_mm": 3.342683905853114
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 47,
+              "mean_mm": 4.22824163080213,
+              "tips_mm": 1.9379427723371987,
+              "p95_mm": 11.742174962157009,
+              "mean_pct_hand": 4.7169803226238445,
+              "thumb_mm": 5.90543296223112,
+              "index_mm": 3.8593878565539184,
+              "middle_mm": 4.079082669511419,
+              "ring_mm": 3.947219040070541,
+              "pinky_mm": 3.350085625643654
+            }
+          }
+        }
+      }
+    },
+    "17083": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/17083.mp4",
+      "body": {
+        "frames": 62,
+        "frames_with_shoulders": 62,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 40.32258064516129,
+          "R wrist": 82.25806451612904
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3302393811019546,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 62,
+          "with_nose": 62,
+          "nose_masked": 62
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 1.7154867001658989,
+            "p95_pct": 6.727497500590361,
+            "n": 324
+          },
+          "template": {
+            "median_pct": 5.477927905815345,
+            "p95_pct": 16.468960582803167,
+            "n": 324
+          },
+          "floor": {
+            "median_pct": 1.1148997321459115,
+            "p95_pct": 6.204117156853465,
+            "n": 324
+          },
+          "held_out_direct": {
+            "median_pct": 2.0110715351075314,
+            "p95_pct": 8.365745135726254,
+            "n": 324
+          },
+          "held_out_floor": {
+            "median_pct": 1.356692910638276,
+            "p95_pct": 6.074873858936321,
+            "n": 324
+          },
+          "gap_to_floor_pts": 0.6005869680199873,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 1.1705944056374236,
+            "R shoulder": 1.2935048253252555,
+            "L elbow": 1.2044955161309137,
+            "R elbow": 2.4128290768323386,
+            "L wrist": 6.294708514025358,
+            "R wrist": 6.201135363584679
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 35,
+          "hand_scale_mm": 103.42896310819951,
+          "half_span_ratio": 0.9721975941876122,
+          "fit_status": {
+            "mano": {
+              "ok": 35
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 35,
+              "mean_mm": 4.77537670516668,
+              "tips_mm": 6.010899469717543,
+              "p95_mm": 9.59577485510046,
+              "mean_pct_hand": 4.617059440275975,
+              "thumb_mm": 3.498740833921803,
+              "index_mm": 5.594460973581818,
+              "middle_mm": 4.56820175455252,
+              "ring_mm": 4.530993121905458,
+              "pinky_mm": 5.684486841871805
+            },
+            "mano: in-sample shape": {
+              "frames": 35,
+              "mean_mm": 5.0240103212686185,
+              "tips_mm": 2.7653775086945074,
+              "p95_mm": 13.577950056462345,
+              "mean_pct_hand": 4.857450147704643,
+              "thumb_mm": 6.50620356747908,
+              "index_mm": 7.133180250944638,
+              "middle_mm": 3.573694591920701,
+              "ring_mm": 3.4986072450062156,
+              "pinky_mm": 4.408365950992457
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 35,
+              "mean_mm": 5.237580808037878,
+              "tips_mm": 2.8097324294350865,
+              "p95_mm": 14.168220640921636,
+              "mean_pct_hand": 5.06394016786064,
+              "thumb_mm": 6.600474932703865,
+              "index_mm": 7.191160247296017,
+              "middle_mm": 3.9126539223912027,
+              "ring_mm": 3.828693181410233,
+              "pinky_mm": 4.65492175638807
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 35,
+              "mean_mm": 5.023811047048327,
+              "tips_mm": 2.761988278577704,
+              "p95_mm": 13.608912588904229,
+              "mean_pct_hand": 4.857257479989235,
+              "thumb_mm": 6.510731221818558,
+              "index_mm": 7.13012057099868,
+              "middle_mm": 3.5716734615571606,
+              "ring_mm": 3.5021823115715516,
+              "pinky_mm": 4.404347669295686
+            }
+          }
+        }
+      }
+    },
+    "21871": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/21871.mp4",
+      "body": {
+        "frames": 79,
+        "frames_with_shoulders": 79,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 94.9367088607595,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.33492903079957675,
+        "betas_norm": 3.327235743604043,
+        "upright": {
+          "fitted": 79,
+          "with_nose": 79,
+          "nose_masked": 79
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 2.7238278102137476,
+            "p95_pct": 10.487977121454763,
+            "n": 470
+          },
+          "template": {
+            "median_pct": 6.081288508621244,
+            "p95_pct": 11.465952092652206,
+            "n": 470
+          },
+          "floor": {
+            "median_pct": 2.556389862953835,
+            "p95_pct": 12.298735253376432,
+            "n": 470
+          },
+          "held_out_direct": {
+            "median_pct": 3.3086907894062905,
+            "p95_pct": 10.146985293395122,
+            "n": 470
+          },
+          "held_out_floor": {
+            "median_pct": 3.4388662099994747,
+            "p95_pct": 15.727001365904398,
+            "n": 470
+          },
+          "gap_to_floor_pts": 0.1674379472599128,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 2.5742996830920766,
+            "R shoulder": 2.557883205318596,
+            "L elbow": 2.461357923139217,
+            "R elbow": 2.118357889398484,
+            "L wrist": 2.5723952640637386,
+            "R wrist": 6.610653252228711
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 41,
+          "hand_scale_mm": 94.51220421918916,
+          "half_span_ratio": 1.0076080166146157,
+          "fit_status": {
+            "mano": {
+              "ok": 41
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 41,
+              "mean_mm": 9.681479201580677,
+              "tips_mm": 11.805595381519092,
+              "p95_mm": 28.795398030701882,
+              "mean_pct_hand": 10.243628620836898,
+              "thumb_mm": 6.991941646690738,
+              "index_mm": 11.923511671636021,
+              "middle_mm": 10.324692023192366,
+              "ring_mm": 9.362644105873287,
+              "pinky_mm": 9.804606560510983
+            },
+            "mano: in-sample shape": {
+              "frames": 41,
+              "mean_mm": 4.93740318437252,
+              "tips_mm": 2.558198686636315,
+              "p95_mm": 13.489397243970092,
+              "mean_pct_hand": 5.224090608364058,
+              "thumb_mm": 6.101961709083108,
+              "index_mm": 4.987573506783006,
+              "middle_mm": 4.923828925072961,
+              "ring_mm": 5.138067611897565,
+              "pinky_mm": 3.535584169025956
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 41,
+              "mean_mm": 5.0524929731574,
+              "tips_mm": 2.640626975528542,
+              "p95_mm": 14.201912661976598,
+              "mean_pct_hand": 5.345863018324966,
+              "thumb_mm": 6.545543852606801,
+              "index_mm": 4.947744921652882,
+              "middle_mm": 4.914678036673588,
+              "ring_mm": 5.233605806417635,
+              "pinky_mm": 3.6208922484361024
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 41,
+              "mean_mm": 4.965358145107004,
+              "tips_mm": 2.5580029049627226,
+              "p95_mm": 13.503588999596046,
+              "mean_pct_hand": 5.253668757519961,
+              "thumb_mm": 6.18034427015072,
+              "index_mm": 5.000469932508055,
+              "middle_mm": 4.963969053849059,
+              "ring_mm": 5.138933581498182,
+              "pinky_mm": 3.543073887529002
+            }
+          }
+        }
+      }
+    },
+    "21942": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/21942.mp4",
+      "body": {
+        "frames": 68,
+        "frames_with_shoulders": 68,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 88.23529411764706,
+          "R wrist": 88.23529411764706
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3406900253415418,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 68,
+          "with_nose": 68,
+          "nose_masked": 68
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 2.404178571175232,
+            "p95_pct": 5.82410636258615,
+            "n": 392
+          },
+          "template": {
+            "median_pct": 5.706765961290808,
+            "p95_pct": 11.920316293000507,
+            "n": 392
+          },
+          "floor": {
+            "median_pct": 2.247067013981045,
+            "p95_pct": 6.151522878435821,
+            "n": 392
+          },
+          "held_out_direct": {
+            "median_pct": 2.808529023183776,
+            "p95_pct": 6.058117289457348,
+            "n": 392
+          },
+          "held_out_floor": {
+            "median_pct": 3.1966402720654234,
+            "p95_pct": 7.367893661816634,
+            "n": 392
+          },
+          "gap_to_floor_pts": 0.1571115571941868,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 2.4727213061219513,
+            "R shoulder": 2.6138870899493414,
+            "L elbow": 2.113039129800163,
+            "R elbow": 1.7954707775707246,
+            "L wrist": 1.7689953705924855,
+            "R wrist": 3.614925634394893
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 27,
+          "hand_scale_mm": 99.95017304652768,
+          "half_span_ratio": 1.0559167966079195,
+          "fit_status": {
+            "mano": {
+              "ok": 27
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 27,
+              "mean_mm": 10.859830993766746,
+              "tips_mm": 13.591145127319205,
+              "p95_mm": 34.63586236913229,
+              "mean_pct_hand": 10.865244814244994,
+              "thumb_mm": 8.525085341337247,
+              "index_mm": 11.911170325893007,
+              "middle_mm": 12.693168277678907,
+              "ring_mm": 11.304220920747381,
+              "pinky_mm": 9.865510103177188
+            },
+            "mano: in-sample shape": {
+              "frames": 27,
+              "mean_mm": 6.136724754302621,
+              "tips_mm": 3.094190307088625,
+              "p95_mm": 14.924859679415839,
+              "mean_pct_hand": 6.13978402163038,
+              "thumb_mm": 6.523226885126669,
+              "index_mm": 5.538093647864758,
+              "middle_mm": 7.097865950601705,
+              "ring_mm": 6.595309223949456,
+              "pinky_mm": 4.929128063970518
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 27,
+              "mean_mm": 6.241671521215859,
+              "tips_mm": 3.132898655386881,
+              "p95_mm": 15.372290355791087,
+              "mean_pct_hand": 6.244783106388725,
+              "thumb_mm": 6.569798251232845,
+              "index_mm": 5.739735917465737,
+              "middle_mm": 7.231495002444751,
+              "ring_mm": 6.707083955455274,
+              "pinky_mm": 4.96024447948069
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 27,
+              "mean_mm": 6.1499550517257715,
+              "tips_mm": 3.081788655512442,
+              "p95_mm": 15.135946243501783,
+              "mean_pct_hand": 6.153020914594028,
+              "thumb_mm": 6.555557081794426,
+              "index_mm": 5.545839951033658,
+              "middle_mm": 7.11624487069111,
+              "ring_mm": 6.606802996319426,
+              "pinky_mm": 4.925330358790232
+            }
+          }
+        },
+        "right": {
+          "frames_with_hand": 32,
+          "hand_scale_mm": 96.87732869813198,
+          "half_span_ratio": 1.062299967163127,
+          "fit_status": {
+            "mano": {
+              "ok": 32
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 32,
+              "mean_mm": 13.314244285914231,
+              "tips_mm": 16.100993073011203,
+              "p95_mm": 40.324778609899184,
+              "mean_pct_hand": 13.743405670692237,
+              "thumb_mm": 11.067131068763066,
+              "index_mm": 14.405096468972408,
+              "middle_mm": 14.957424291781404,
+              "ring_mm": 13.064619472056581,
+              "pinky_mm": 13.076950127997684
+            },
+            "mano: in-sample shape": {
+              "frames": 32,
+              "mean_mm": 6.121575629258193,
+              "tips_mm": 2.8955997655675216,
+              "p95_mm": 16.517620061492448,
+              "mean_pct_hand": 6.318893916174044,
+              "thumb_mm": 6.278234126030565,
+              "index_mm": 5.858079144800998,
+              "middle_mm": 6.560621684469643,
+              "ring_mm": 6.8111263190849485,
+              "pinky_mm": 5.099816871904811
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 32,
+              "mean_mm": 6.619495368289162,
+              "tips_mm": 3.2733059778422984,
+              "p95_mm": 17.680335241881014,
+              "mean_pct_hand": 6.8328632273866585,
+              "thumb_mm": 7.606053161926743,
+              "index_mm": 6.628113565930686,
+              "middle_mm": 6.846954931707762,
+              "ring_mm": 6.899931242852386,
+              "pinky_mm": 5.116423939028234
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 32,
+              "mean_mm": 6.136573816577419,
+              "tips_mm": 2.8708285197316705,
+              "p95_mm": 16.48552989974469,
+              "mean_pct_hand": 6.334375543837375,
+              "thumb_mm": 6.30688415973164,
+              "index_mm": 5.877521473386578,
+              "middle_mm": 6.573943632764767,
+              "ring_mm": 6.826618683702581,
+              "pinky_mm": 5.09790113330153
+            }
+          }
+        }
+      }
+    },
+    "28111": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/28111.mp4",
+      "body": {
+        "frames": 35,
+        "frames_with_shoulders": 35,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 88.57142857142857,
+          "R wrist": 94.28571428571428
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3331316417163461,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 35,
+          "with_nose": 35,
+          "nose_masked": 35
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 5.341463464289166,
+            "p95_pct": 18.293277936548524,
+            "n": 204
+          },
+          "template": {
+            "median_pct": 6.695036467875405,
+            "p95_pct": 18.69858242141715,
+            "n": 204
+          },
+          "floor": {
+            "median_pct": 2.5929532788773217,
+            "p95_pct": 8.771169368881994,
+            "n": 204
+          },
+          "held_out_direct": {
+            "median_pct": 5.518261476184564,
+            "p95_pct": 17.82750675114399,
+            "n": 204
+          },
+          "held_out_floor": {
+            "median_pct": 3.6862355715227544,
+            "p95_pct": 8.78431864845088,
+            "n": 204
+          },
+          "gap_to_floor_pts": 2.7485101854118446,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 4.1144718579599715,
+            "R shoulder": 3.918411114543686,
+            "L elbow": 3.190977926049597,
+            "R elbow": 6.015830461060456,
+            "L wrist": 13.847854959784911,
+            "R wrist": 15.282262459470836
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 19,
+          "hand_scale_mm": 85.11769403532259,
+          "half_span_ratio": 1.2210128019573574,
+          "fit_status": {
+            "mano": {
+              "ok": 19
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 19,
+              "mean_mm": 12.317688833633806,
+              "tips_mm": 14.28479536293527,
+              "p95_mm": 25.148761807689663,
+              "mean_pct_hand": 14.471361064506924,
+              "thumb_mm": 9.228730928138335,
+              "index_mm": 15.007489676694906,
+              "middle_mm": 14.325124111324705,
+              "ring_mm": 12.341660555374284,
+              "pinky_mm": 10.685438896636805
+            },
+            "mano: in-sample shape": {
+              "frames": 19,
+              "mean_mm": 7.235317330202744,
+              "tips_mm": 3.0238232317307463,
+              "p95_mm": 17.9981765644975,
+              "mean_pct_hand": 8.500368122285119,
+              "thumb_mm": 7.24267687378278,
+              "index_mm": 7.884565289964295,
+              "middle_mm": 7.633087104282798,
+              "ring_mm": 7.674221404208653,
+              "pinky_mm": 5.74203597877519
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 19,
+              "mean_mm": 8.542050285145308,
+              "tips_mm": 3.988146611096023,
+              "p95_mm": 21.25227410285785,
+              "mean_pct_hand": 10.035575307762077,
+              "thumb_mm": 7.5993839974142166,
+              "index_mm": 8.943301832415802,
+              "middle_mm": 9.222812087429329,
+              "ring_mm": 9.700385144120618,
+              "pinky_mm": 7.244368364346577
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 19,
+              "mean_mm": 7.221521072582001,
+              "tips_mm": 2.979008540397319,
+              "p95_mm": 17.805049067864253,
+              "mean_pct_hand": 8.48415967376322,
+              "thumb_mm": 7.212301115090547,
+              "index_mm": 7.86350182627186,
+              "middle_mm": 7.632782226688673,
+              "ring_mm": 7.673837648457056,
+              "pinky_mm": 5.725182546401863
+            }
+          }
+        }
+      }
+    },
+    "57641": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/57641.mp4",
+      "body": {
+        "frames": 29,
+        "frames_with_shoulders": 29,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3389326702132076,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 29,
+          "with_nose": 29,
+          "nose_masked": 29
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 3.1818340771954605,
+            "p95_pct": 6.245496208841122,
+            "n": 174
+          },
+          "template": {
+            "median_pct": 8.04596695730075,
+            "p95_pct": 9.875328882521679,
+            "n": 174
+          },
+          "floor": {
+            "median_pct": 0.5875377359277713,
+            "p95_pct": 4.607416298797156,
+            "n": 174
+          },
+          "held_out_direct": {
+            "median_pct": 3.3853677959827673,
+            "p95_pct": 6.274225761181121,
+            "n": 174
+          },
+          "held_out_floor": {
+            "median_pct": 3.0131273566701346,
+            "p95_pct": 6.7445108402785,
+            "n": 174
+          },
+          "gap_to_floor_pts": 2.594296341267689,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 3.086021924658273,
+            "R shoulder": 3.3678590666741983,
+            "L elbow": 5.84734139134358,
+            "R elbow": 2.0628920239787463,
+            "L wrist": 2.9332406248777287,
+            "R wrist": 1.3879340802572924
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 29,
+          "hand_scale_mm": 95.35939348967163,
+          "half_span_ratio": 1.0425840741016803,
+          "fit_status": {
+            "mano": {
+              "ok": 29
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 29,
+              "mean_mm": 3.9244818184084234,
+              "tips_mm": 5.052598523568516,
+              "p95_mm": 11.607284059898268,
+              "mean_pct_hand": 4.115464323746441,
+              "thumb_mm": 4.978550285620647,
+              "index_mm": 3.4885485892694956,
+              "middle_mm": 3.7310543766072106,
+              "ring_mm": 3.9795886632649076,
+              "pinky_mm": 3.444667177279853
+            },
+            "mano: in-sample shape": {
+              "frames": 29,
+              "mean_mm": 3.4608437698315844,
+              "tips_mm": 2.1505455930309365,
+              "p95_mm": 10.30709001826725,
+              "mean_pct_hand": 3.629263613349667,
+              "thumb_mm": 7.151664457512861,
+              "index_mm": 3.3249868506258573,
+              "middle_mm": 2.9267348264082296,
+              "ring_mm": 2.271618460090797,
+              "pinky_mm": 1.6292142545201753
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 29,
+              "mean_mm": 3.6296803305926995,
+              "tips_mm": 2.3110132867309945,
+              "p95_mm": 10.83293696661884,
+              "mean_pct_hand": 3.8063165019876406,
+              "thumb_mm": 7.414573377859642,
+              "index_mm": 3.3121266445374418,
+              "middle_mm": 3.0173485851037043,
+              "ring_mm": 2.7211755649713707,
+              "pinky_mm": 1.6831774804913386
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 29,
+              "mean_mm": 3.459876261195048,
+              "tips_mm": 2.1445503010648985,
+              "p95_mm": 10.296204951690987,
+              "mean_pct_hand": 3.628249021497591,
+              "thumb_mm": 7.158283582043575,
+              "index_mm": 3.3229276909846033,
+              "middle_mm": 2.9146170744614026,
+              "ring_mm": 2.2730658462310664,
+              "pinky_mm": 1.6304871122545967
+            }
+          }
+        }
+      }
+    },
+    "57949": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/57949.mp4",
+      "body": {
+        "frames": 53,
+        "frames_with_shoulders": 53,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.3393659092155224,
+        "betas_norm": 3.3272357436040423,
+        "upright": {
+          "fitted": 53,
+          "with_nose": 53,
+          "nose_masked": 53
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 4.436290649652473,
+            "p95_pct": 10.122864340744767,
+            "n": 318
+          },
+          "template": {
+            "median_pct": 7.92503233948272,
+            "p95_pct": 12.959678031764291,
+            "n": 318
+          },
+          "floor": {
+            "median_pct": 0.827014467965467,
+            "p95_pct": 3.823332989107337,
+            "n": 318
+          },
+          "held_out_direct": {
+            "median_pct": 4.416986784573437,
+            "p95_pct": 10.146010544261495,
+            "n": 318
+          },
+          "held_out_floor": {
+            "median_pct": 1.645718848000129,
+            "p95_pct": 5.976854594777483,
+            "n": 318
+          },
+          "gap_to_floor_pts": 3.609276181687006,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 4.135205790168082,
+            "R shoulder": 4.563489422234833,
+            "L elbow": 3.2702822587416756,
+            "R elbow": 4.002413116825886,
+            "L wrist": 6.095333740944583,
+            "R wrist": 8.992801816364091
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 53,
+          "hand_scale_mm": 84.4428767029143,
+          "half_span_ratio": 0.9575034149239536,
+          "fit_status": {
+            "mano": {
+              "ok": 53
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 53,
+              "mean_mm": 5.960610698110625,
+              "tips_mm": 6.820987814798149,
+              "p95_mm": 12.473657980695071,
+              "mean_pct_hand": 7.058748980190667,
+              "thumb_mm": 5.361760078609057,
+              "index_mm": 8.613452354416422,
+              "middle_mm": 6.201112226929499,
+              "ring_mm": 4.342102916091445,
+              "pinky_mm": 5.284625914506702
+            },
+            "mano: in-sample shape": {
+              "frames": 53,
+              "mean_mm": 3.826953682716977,
+              "tips_mm": 1.952504473409711,
+              "p95_mm": 9.919350892465653,
+              "mean_pct_hand": 4.532002973064158,
+              "thumb_mm": 5.398782525985936,
+              "index_mm": 3.4120080052635937,
+              "middle_mm": 4.093850947960018,
+              "ring_mm": 3.50565842916194,
+              "pinky_mm": 2.7244685052133977
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 53,
+              "mean_mm": 4.3207018487310735,
+              "tips_mm": 1.7800094603853684,
+              "p95_mm": 11.926077026973394,
+              "mean_pct_hand": 5.116715604007788,
+              "thumb_mm": 6.679135207039167,
+              "index_mm": 4.173625004466215,
+              "middle_mm": 4.1848142500731695,
+              "ring_mm": 3.703799533314862,
+              "pinky_mm": 2.8621352487619545
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 53,
+              "mean_mm": 3.82961454800561,
+              "tips_mm": 1.9570229584201184,
+              "p95_mm": 9.840705203047042,
+              "mean_pct_hand": 4.535154056249059,
+              "thumb_mm": 5.401626509904742,
+              "index_mm": 3.413335356372897,
+              "middle_mm": 4.097335993651426,
+              "ring_mm": 3.5065142354655174,
+              "pinky_mm": 2.729260644633468
+            }
+          }
+        }
+      }
+    },
+    "63229": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/63229.mp4",
+      "body": {
+        "frames": 47,
+        "frames_with_shoulders": 47,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 61.702127659574465,
+          "L wrist": 51.06382978723404,
+          "R wrist": 55.319148936170215
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.31590805343241407,
+        "betas_norm": 3.327235743604043,
+        "upright": {
+          "fitted": 47,
+          "with_nose": 47,
+          "nose_masked": 47
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 4.749857719981996,
+            "p95_pct": 20.28574477617538,
+            "n": 220
+          },
+          "template": {
+            "median_pct": 5.194529876788071,
+            "p95_pct": 18.276966284621324,
+            "n": 220
+          },
+          "floor": {
+            "median_pct": 1.7409943737844755,
+            "p95_pct": 15.782427261363951,
+            "n": 220
+          },
+          "held_out_direct": {
+            "median_pct": 4.812630903549053,
+            "p95_pct": 19.669509875415724,
+            "n": 220
+          },
+          "held_out_floor": {
+            "median_pct": 2.149568563977421,
+            "p95_pct": 16.321015359033083,
+            "n": 220
+          },
+          "gap_to_floor_pts": 3.0088633461975207,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 4.067653957638486,
+            "R shoulder": 4.286310653643721,
+            "L elbow": 4.064150062562838,
+            "R elbow": 5.299366818010576,
+            "L wrist": 12.711059606038413,
+            "R wrist": 20.259636257308642
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 19,
+          "hand_scale_mm": 87.3925952712248,
+          "half_span_ratio": 1.1977266211571815,
+          "fit_status": {
+            "mano": {
+              "ok": 19
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 19,
+              "mean_mm": 11.367432552659183,
+              "tips_mm": 12.958097543294848,
+              "p95_mm": 24.136372070661245,
+              "mean_pct_hand": 13.007317745147756,
+              "thumb_mm": 9.32528586655184,
+              "index_mm": 15.829084198789877,
+              "middle_mm": 12.692731249390528,
+              "ring_mm": 9.188151677278356,
+              "pinky_mm": 9.801909771285311
+            },
+            "mano: in-sample shape": {
+              "frames": 19,
+              "mean_mm": 7.150759039256076,
+              "tips_mm": 4.055103961164839,
+              "p95_mm": 17.31372148912751,
+              "mean_pct_hand": 8.182339724622596,
+              "thumb_mm": 8.594497951800946,
+              "index_mm": 8.49837467394137,
+              "middle_mm": 5.868707922264072,
+              "ring_mm": 6.548490952618087,
+              "pinky_mm": 6.243723695655902
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 19,
+              "mean_mm": 7.406231489692827,
+              "tips_mm": 3.89345214850403,
+              "p95_mm": 18.61032781483505,
+              "mean_pct_hand": 8.474667066136927,
+              "thumb_mm": 9.098020318368425,
+              "index_mm": 8.589631111508098,
+              "middle_mm": 6.029914493343709,
+              "ring_mm": 6.758772466052534,
+              "pinky_mm": 6.554819059191361
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 19,
+              "mean_mm": 7.145681518563559,
+              "tips_mm": 4.011771174998529,
+              "p95_mm": 17.409792686854498,
+              "mean_pct_hand": 8.176529712141837,
+              "thumb_mm": 8.595297055823414,
+              "index_mm": 8.460276532367997,
+              "middle_mm": 5.874734192315986,
+              "ring_mm": 6.556567729243002,
+              "pinky_mm": 6.241532083067391
+            }
+          }
+        }
+      }
+    },
+    "63665": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/63665.mp4",
+      "body": {
+        "frames": 72,
+        "frames_with_shoulders": 72,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.33772201658139134,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 72,
+          "with_nose": 72,
+          "nose_masked": 72
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 3.2821944305562636,
+            "p95_pct": 13.70756447541205,
+            "n": 432
+          },
+          "template": {
+            "median_pct": 7.246372237235832,
+            "p95_pct": 15.817213580796855,
+            "n": 432
+          },
+          "floor": {
+            "median_pct": 3.147970610095179,
+            "p95_pct": 11.873650863280915,
+            "n": 432
+          },
+          "held_out_direct": {
+            "median_pct": 3.3499188808186418,
+            "p95_pct": 14.117595872033409,
+            "n": 432
+          },
+          "held_out_floor": {
+            "median_pct": 3.850823671476597,
+            "p95_pct": 17.710083796805172,
+            "n": 432
+          },
+          "gap_to_floor_pts": 0.1342238204610844,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 3.0397307945242256,
+            "R shoulder": 2.8872850773884586,
+            "L elbow": 2.4493954388391868,
+            "R elbow": 3.1540116057358265,
+            "L wrist": 5.575631517146045,
+            "R wrist": 8.437551149680214
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 43,
+          "hand_scale_mm": 99.14091277142717,
+          "half_span_ratio": 0.9113839274821067,
+          "fit_status": {
+            "mano": {
+              "ok": 43
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 43,
+              "mean_mm": 10.657652820862308,
+              "tips_mm": 12.605812832292072,
+              "p95_mm": 26.241235539478502,
+              "mean_pct_hand": 10.750004738642962,
+              "thumb_mm": 7.931504302830897,
+              "index_mm": 12.192882322559864,
+              "middle_mm": 12.271806630464992,
+              "ring_mm": 10.456299774177156,
+              "pinky_mm": 10.43577107427863
+            },
+            "mano: in-sample shape": {
+              "frames": 43,
+              "mean_mm": 5.868043653354151,
+              "tips_mm": 2.4650849940922526,
+              "p95_mm": 16.06198969073899,
+              "mean_pct_hand": 5.918892099453563,
+              "thumb_mm": 6.880956711232557,
+              "index_mm": 5.89046798485631,
+              "middle_mm": 5.8529498735489485,
+              "ring_mm": 6.406440465303604,
+              "pinky_mm": 4.309403231829336
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 43,
+              "mean_mm": 6.865878444543996,
+              "tips_mm": 3.247266375827636,
+              "p95_mm": 17.50414492125785,
+              "mean_pct_hand": 6.925373443326589,
+              "thumb_mm": 7.832726900200723,
+              "index_mm": 7.113371067483889,
+              "middle_mm": 7.241637781646334,
+              "ring_mm": 7.432771722085847,
+              "pinky_mm": 4.708884751303188
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 43,
+              "mean_mm": 5.86864355259434,
+              "tips_mm": 2.471230372631675,
+              "p95_mm": 16.057755526429457,
+              "mean_pct_hand": 5.919497197009576,
+              "thumb_mm": 6.876844072771947,
+              "index_mm": 5.889552059013165,
+              "middle_mm": 5.8462954704234935,
+              "ring_mm": 6.413300641879368,
+              "pinky_mm": 4.317225518883727
+            }
+          }
+        }
+      }
+    },
+    "63669": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/63669.mp4",
+      "body": {
+        "frames": 94,
+        "frames_with_shoulders": 93,
+        "coverage_pct": {
+          "L shoulder": 98.93617021276596,
+          "R shoulder": 98.93617021276596,
+          "L elbow": 70.2127659574468,
+          "R elbow": 77.6595744680851,
+          "L wrist": 42.5531914893617,
+          "R wrist": 69.14893617021278
+        },
+        "skipped_frames": 1,
+        "shoulder_width_m": 0.3179725838313213,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 93,
+          "with_nose": 93,
+          "nose_masked": 93
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 3.386300569684534,
+            "p95_pct": 11.381993108078102,
+            "n": 430
+          },
+          "template": {
+            "median_pct": 5.6395161759173975,
+            "p95_pct": 12.818316117785445,
+            "n": 430
+          },
+          "floor": {
+            "median_pct": 1.517920181614939,
+            "p95_pct": 7.378240113077707,
+            "n": 430
+          },
+          "held_out_direct": {
+            "median_pct": 4.149191423668337,
+            "p95_pct": 13.160271440933258,
+            "n": 430
+          },
+          "held_out_floor": {
+            "median_pct": 3.0334513055803156,
+            "p95_pct": 8.065902235177948,
+            "n": 430
+          },
+          "gap_to_floor_pts": 1.868380388069595,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 2.6999672668532115,
+            "R shoulder": 2.88874650123909,
+            "L elbow": 3.1788573870414236,
+            "R elbow": 3.523667416553613,
+            "L wrist": 7.225586695190447,
+            "R wrist": 10.02632068673304
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 55,
+          "hand_scale_mm": 88.37973934603531,
+          "half_span_ratio": 0.8690451728427171,
+          "fit_status": {
+            "mano": {
+              "ok": 55
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 55,
+              "mean_mm": 8.415345788027249,
+              "tips_mm": 10.07456286191857,
+              "p95_mm": 21.149944841637478,
+              "mean_pct_hand": 9.521804262262467,
+              "thumb_mm": 6.888460396349494,
+              "index_mm": 10.821118563650375,
+              "middle_mm": 8.917092547213,
+              "ring_mm": 8.022186995154865,
+              "pinky_mm": 7.427870437768512
+            },
+            "mano: in-sample shape": {
+              "frames": 55,
+              "mean_mm": 4.967524187029931,
+              "tips_mm": 2.536828359019195,
+              "p95_mm": 13.07082523339586,
+              "mean_pct_hand": 5.620659467641634,
+              "thumb_mm": 6.450599625235743,
+              "index_mm": 5.71895711909148,
+              "middle_mm": 4.924251363910237,
+              "ring_mm": 4.282967028425213,
+              "pinky_mm": 3.460845798486983
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 55,
+              "mean_mm": 6.027833625079074,
+              "tips_mm": 2.289838257740911,
+              "p95_mm": 14.720723077380459,
+              "mean_pct_hand": 6.820379500643416,
+              "thumb_mm": 8.15525774093655,
+              "index_mm": 7.195289381612754,
+              "middle_mm": 5.8821614858905935,
+              "ring_mm": 4.86085687323537,
+              "pinky_mm": 4.045602643720108
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 55,
+              "mean_mm": 5.002142305240419,
+              "tips_mm": 2.5306140692573154,
+              "p95_mm": 13.034935882109425,
+              "mean_pct_hand": 5.659829212276143,
+              "thumb_mm": 6.460928031324668,
+              "index_mm": 5.753917288421526,
+              "middle_mm": 4.977656441901743,
+              "ring_mm": 4.316360203546234,
+              "pinky_mm": 3.5018495610079197
+            }
+          }
+        }
+      }
+    },
+    "69257": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/69257.mp4",
+      "body": {
+        "frames": 56,
+        "frames_with_shoulders": 56,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 82.14285714285714,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.33673511616287766,
+        "betas_norm": 3.327235743604043,
+        "upright": {
+          "fitted": 56,
+          "with_nose": 56,
+          "nose_masked": 56
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 2.6024491151181417,
+            "p95_pct": 9.78750467110804,
+            "n": 326
+          },
+          "template": {
+            "median_pct": 5.373938983770053,
+            "p95_pct": 14.914855301206861,
+            "n": 326
+          },
+          "floor": {
+            "median_pct": 2.616157808541791,
+            "p95_pct": 9.518393381973942,
+            "n": 326
+          },
+          "held_out_direct": {
+            "median_pct": 2.8494168512558695,
+            "p95_pct": 9.837779898098473,
+            "n": 326
+          },
+          "held_out_floor": {
+            "median_pct": 3.315675779853433,
+            "p95_pct": 15.780213279167048,
+            "n": 326
+          },
+          "gap_to_floor_pts": -0.013708693423649443,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 2.2315485373025514,
+            "R shoulder": 2.2293473464227627,
+            "L elbow": 2.140493304412972,
+            "R elbow": 2.3683227600549603,
+            "L wrist": 5.23991924607901,
+            "R wrist": 5.539472587080035
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 39,
+          "hand_scale_mm": 86.04202896971137,
+          "half_span_ratio": 0.85300584617484,
+          "fit_status": {
+            "mano": {
+              "ok": 39
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 39,
+              "mean_mm": 13.013044499425805,
+              "tips_mm": 14.790871804926853,
+              "p95_mm": 28.566395931640734,
+              "mean_pct_hand": 15.124055830908723,
+              "thumb_mm": 8.556577255743882,
+              "index_mm": 15.773199096199924,
+              "middle_mm": 12.645673639613804,
+              "ring_mm": 13.334747546474214,
+              "pinky_mm": 14.755024959097204
+            },
+            "mano: in-sample shape": {
+              "frames": 39,
+              "mean_mm": 7.227510693378507,
+              "tips_mm": 3.0321709855652412,
+              "p95_mm": 20.04710195671608,
+              "mean_pct_hand": 8.399977057633945,
+              "thumb_mm": 6.809861232379832,
+              "index_mm": 7.736163273051773,
+              "middle_mm": 6.930994472284813,
+              "ring_mm": 7.695076160048702,
+              "pinky_mm": 6.965458329127416
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 39,
+              "mean_mm": 9.026211239670456,
+              "tips_mm": 3.459952447327335,
+              "p95_mm": 24.938268442212657,
+              "mean_pct_hand": 10.490467679287146,
+              "thumb_mm": 8.322440901009328,
+              "index_mm": 9.13271099903278,
+              "middle_mm": 8.99938318598384,
+              "ring_mm": 9.827163060188978,
+              "pinky_mm": 8.849358052137351
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 39,
+              "mean_mm": 7.247840767755156,
+              "tips_mm": 3.040095346295253,
+              "p95_mm": 19.874130999748264,
+              "mean_pct_hand": 8.423605131750847,
+              "thumb_mm": 6.839315983390035,
+              "index_mm": 7.75507947811301,
+              "middle_mm": 6.941211138094422,
+              "ring_mm": 7.708572345082792,
+              "pinky_mm": 6.995024894095522
+            }
+          }
+        },
+        "right": {
+          "frames_with_hand": 35,
+          "hand_scale_mm": 71.40961233967536,
+          "half_span_ratio": 0.7045511337569579,
+          "fit_status": {
+            "mano": {
+              "ok": 35
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 35,
+              "mean_mm": 18.69864152939936,
+              "tips_mm": 20.142935235711448,
+              "p95_mm": 44.62057229586262,
+              "mean_pct_hand": 26.18504836639527,
+              "thumb_mm": 17.294050126202997,
+              "index_mm": 22.098794627881503,
+              "middle_mm": 20.135893790575047,
+              "ring_mm": 17.0536475061065,
+              "pinky_mm": 16.910821596230736
+            },
+            "mano: in-sample shape": {
+              "frames": 35,
+              "mean_mm": 9.305907776784311,
+              "tips_mm": 3.2052260794264624,
+              "p95_mm": 24.029419090687924,
+              "mean_pct_hand": 13.0317298636474,
+              "thumb_mm": 10.340574715185106,
+              "index_mm": 9.65627318805725,
+              "middle_mm": 9.53714156452649,
+              "ring_mm": 8.621828701249262,
+              "pinky_mm": 8.37372071490345
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 35,
+              "mean_mm": 12.917022733571402,
+              "tips_mm": 4.50273947778116,
+              "p95_mm": 35.259130287580774,
+              "mean_pct_hand": 18.088633043026157,
+              "thumb_mm": 14.383777696701419,
+              "index_mm": 13.711033002035984,
+              "middle_mm": 12.789337336973565,
+              "ring_mm": 11.81730665649834,
+              "pinky_mm": 11.883658975647693
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 35,
+              "mean_mm": 9.309533112807165,
+              "tips_mm": 3.172175239214832,
+              "p95_mm": 24.143639629373276,
+              "mean_pct_hand": 13.036806681605194,
+              "thumb_mm": 10.356863982439679,
+              "index_mm": 9.67233803703752,
+              "middle_mm": 9.52963500927671,
+              "ring_mm": 8.632181761293616,
+              "pinky_mm": 8.3566467739883
+            }
+          }
+        }
+      }
+    },
+    "69364": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/69364.mp4",
+      "body": {
+        "frames": 75,
+        "frames_with_shoulders": 75,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 100.0,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.33669079084981984,
+        "betas_norm": 3.3272357436040427,
+        "upright": {
+          "fitted": 75,
+          "with_nose": 75,
+          "nose_masked": 75
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 2.236204484920219,
+            "p95_pct": 5.316364182146805,
+            "n": 450
+          },
+          "template": {
+            "median_pct": 4.732705625945625,
+            "p95_pct": 11.74366606066724,
+            "n": 450
+          },
+          "floor": {
+            "median_pct": 1.9343538581101063,
+            "p95_pct": 5.35760403113038,
+            "n": 450
+          },
+          "held_out_direct": {
+            "median_pct": 2.3290208751298183,
+            "p95_pct": 5.352824286712372,
+            "n": 450
+          },
+          "held_out_floor": {
+            "median_pct": 2.42253514721897,
+            "p95_pct": 7.38538250250282,
+            "n": 450
+          },
+          "gap_to_floor_pts": 0.30185062681011265,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 1.936536172097695,
+            "R shoulder": 1.877036119455755,
+            "L elbow": 1.9770728376090736,
+            "R elbow": 2.0083843322913557,
+            "L wrist": 3.8279126546373776,
+            "R wrist": 4.068971651416824
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 3,
+          "hand_scale_mm": 58.22524640852151,
+          "half_span_ratio": 1.3511846169136497,
+          "fit_status": {
+            "mano": {
+              "ok": 3
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 3,
+              "mean_mm": 13.842694817218243,
+              "tips_mm": 15.323180510671902,
+              "p95_mm": 28.18454223615232,
+              "mean_pct_hand": 23.774385976994857,
+              "thumb_mm": 13.857844437161575,
+              "index_mm": 16.656327085486705,
+              "middle_mm": 15.18343885108695,
+              "ring_mm": 12.518835431426401,
+              "pinky_mm": 10.997028280929591
+            },
+            "mano: in-sample shape": {
+              "frames": 3,
+              "mean_mm": 7.61155462253961,
+              "tips_mm": 1.925835973701571,
+              "p95_mm": 18.168778424828535,
+              "mean_pct_hand": 13.072601821442232,
+              "thumb_mm": 7.733561373372385,
+              "index_mm": 8.924050741233174,
+              "middle_mm": 7.637420914541965,
+              "ring_mm": 7.3392350813411875,
+              "pinky_mm": 6.423505002209342
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 3,
+              "mean_mm": 9.041324912897194,
+              "tips_mm": 3.6558130720078688,
+              "p95_mm": 20.35946141358346,
+              "mean_pct_hand": 15.528186603902393,
+              "thumb_mm": 8.91731496424497,
+              "index_mm": 10.218040949201272,
+              "middle_mm": 8.998651377285112,
+              "ring_mm": 8.910444106191788,
+              "pinky_mm": 8.16217316756284
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 3,
+              "mean_mm": 8.854908372206548,
+              "tips_mm": 3.5466607674261326,
+              "p95_mm": 20.83318981905445,
+              "mean_pct_hand": 15.2080221525874,
+              "thumb_mm": 8.563711661295907,
+              "index_mm": 10.188860899344007,
+              "middle_mm": 8.861290986150774,
+              "ring_mm": 8.57217583629488,
+              "pinky_mm": 8.088502477947177
+            }
+          }
+        },
+        "right": {
+          "frames_with_hand": 57,
+          "hand_scale_mm": 98.97947943393652,
+          "half_span_ratio": 1.022708889846101,
+          "fit_status": {
+            "mano": {
+              "ok": 57
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 57,
+              "mean_mm": 4.443110832256307,
+              "tips_mm": 5.276982743848206,
+              "p95_mm": 10.681535405941235,
+              "mean_pct_hand": 4.488921196258508,
+              "thumb_mm": 5.142257025156215,
+              "index_mm": 4.901213433082021,
+              "middle_mm": 4.124693129891198,
+              "ring_mm": 3.974044522207461,
+              "pinky_mm": 4.0733460509446395
+            },
+            "mano: in-sample shape": {
+              "frames": 57,
+              "mean_mm": 4.389675231513055,
+              "tips_mm": 2.2453838728200193,
+              "p95_mm": 11.061073653888325,
+              "mean_pct_hand": 4.4349346517253885,
+              "thumb_mm": 5.742018351960938,
+              "index_mm": 3.7358833332685637,
+              "middle_mm": 3.3403771270706213,
+              "ring_mm": 4.785885452023136,
+              "pinky_mm": 4.344211893242019
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 57,
+              "mean_mm": 4.537841577688587,
+              "tips_mm": 2.369751525219348,
+              "p95_mm": 11.377949834408867,
+              "mean_pct_hand": 4.584628656000715,
+              "thumb_mm": 6.310287810031466,
+              "index_mm": 3.8814046231360773,
+              "middle_mm": 3.3515384939248616,
+              "ring_mm": 4.772424898515182,
+              "pinky_mm": 4.3735520628353495
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 57,
+              "mean_mm": 4.389904356353619,
+              "tips_mm": 2.2370250589830616,
+              "p95_mm": 11.072496357222088,
+              "mean_pct_hand": 4.435166138940591,
+              "thumb_mm": 5.74556085485703,
+              "index_mm": 3.741301842494117,
+              "middle_mm": 3.3394805921633868,
+              "ring_mm": 4.781914230905464,
+              "pinky_mm": 4.341264261348096
+            }
+          }
+        }
+      }
+    },
+    "69411": {
+      "source": "/private/tmp/claude-501/-Users-bemnetbeshah-Workspace-cv-research-KineticAugment/c23b2df1-6f4b-46bc-8f47-90acc949482b/scratchpad/random20/69411.mp4",
+      "body": {
+        "frames": 67,
+        "frames_with_shoulders": 67,
+        "coverage_pct": {
+          "L shoulder": 100.0,
+          "R shoulder": 100.0,
+          "L elbow": 100.0,
+          "R elbow": 100.0,
+          "L wrist": 82.08955223880598,
+          "R wrist": 100.0
+        },
+        "skipped_frames": 0,
+        "shoulder_width_m": 0.33254854593702415,
+        "betas_norm": 3.327235743604042,
+        "upright": {
+          "fitted": 67,
+          "with_nose": 67,
+          "nose_masked": 67
+        },
+        "summary": {
+          "direct": {
+            "median_pct": 1.945475071876244,
+            "p95_pct": 9.137957356102348,
+            "n": 390
+          },
+          "template": {
+            "median_pct": 7.440427484550047,
+            "p95_pct": 17.61146810826996,
+            "n": 390
+          },
+          "floor": {
+            "median_pct": 1.181930644992023,
+            "p95_pct": 13.435819401287524,
+            "n": 390
+          },
+          "held_out_direct": {
+            "median_pct": 2.026238066571801,
+            "p95_pct": 9.002523223589478,
+            "n": 390
+          },
+          "held_out_floor": {
+            "median_pct": 1.416851286776755,
+            "p95_pct": 11.948510304883849,
+            "n": 390
+          },
+          "gap_to_floor_pts": 0.7635444268842209,
+          "per_landmark_direct_median_pct": {
+            "L shoulder": 1.478281975299102,
+            "R shoulder": 1.4545592744967837,
+            "L elbow": 1.2432875774672751,
+            "R elbow": 2.1905173612086304,
+            "L wrist": 7.198822277352081,
+            "R wrist": 7.6639520553861225
+          }
+        }
+      },
+      "hands": {
+        "left": {
+          "frames_with_hand": 0,
+          "note": "fewer than two frames with this hand: not scored"
+        },
+        "right": {
+          "frames_with_hand": 45,
+          "hand_scale_mm": 95.22689603532147,
+          "half_span_ratio": 1.0342300436163996,
+          "fit_status": {
+            "mano": {
+              "ok": 45
+            }
+          },
+          "rows": {
+            "rigid reference": {
+              "frames": 45,
+              "mean_mm": 6.143137628258044,
+              "tips_mm": 6.741105889191919,
+              "p95_mm": 23.787462362126647,
+              "mean_pct_hand": 6.4510530995144855,
+              "thumb_mm": 4.800365935189684,
+              "index_mm": 6.941226380491765,
+              "middle_mm": 6.2271216843077974,
+              "ring_mm": 5.30607304943685,
+              "pinky_mm": 7.440901091864119
+            },
+            "mano: in-sample shape": {
+              "frames": 45,
+              "mean_mm": 3.5828938334714424,
+              "tips_mm": 1.9280597490569404,
+              "p95_mm": 8.704137398796142,
+              "mean_pct_hand": 3.7624809614108163,
+              "thumb_mm": 4.0485020548999,
+              "index_mm": 3.8582362818065716,
+              "middle_mm": 3.954537311156677,
+              "ring_mm": 3.469138186457845,
+              "pinky_mm": 2.584055333036217
+            },
+            "mano: held-out shape (time halves)": {
+              "frames": 45,
+              "mean_mm": 3.6609499529646645,
+              "tips_mm": 1.9233531847579823,
+              "p95_mm": 9.037649318894882,
+              "mean_pct_hand": 3.844449525695712,
+              "thumb_mm": 4.151913180310558,
+              "index_mm": 3.8931203186613863,
+              "middle_mm": 3.9776710970685736,
+              "ring_mm": 3.5965256308018425,
+              "pinky_mm": 2.6855195379809644
+            },
+            "mano: held-out shape (interleaved frames)": {
+              "frames": 45,
+              "mean_mm": 3.589002771095594,
+              "tips_mm": 1.9294750546984643,
+              "p95_mm": 8.81636673726206,
+              "mean_pct_hand": 3.768896100282807,
+              "thumb_mm": 4.066607451016695,
+              "index_mm": 3.8622519311786063,
+              "middle_mm": 3.9492731467526863,
+              "ring_mm": 3.471573604412559,
+              "pinky_mm": 2.5953077221174228
+            }
+          }
+        }
+      }
+    }
+  },
+  "pooled": {
+    "body": {
+      "direct": {
+        "median_pct": 3.13382512765417,
+        "p95_pct": 11.404428271021004,
+        "n": 6932
+      },
+      "template": {
+        "median_pct": 6.15217370304729,
+        "p95_pct": 16.030359916988253,
+        "n": 6932
+      },
+      "floor": {
+        "median_pct": 1.9139514978055938,
+        "p95_pct": 8.185580060214127,
+        "n": 6932
+      },
+      "held_out_direct": {
+        "median_pct": 3.365404409041833,
+        "p95_pct": 12.100894704231267,
+        "n": 6932
+      },
+      "held_out_floor": {
+        "median_pct": 2.787689392241784,
+        "p95_pct": 9.893964561396873,
+        "n": 6932
+      },
+      "gap_to_floor_pts": 1.2198736298485764,
+      "per_landmark_direct_median_pct": {
+        "L shoulder": 2.6087164728418837,
+        "R shoulder": 2.6493861477469793,
+        "L elbow": 2.4985608051941797,
+        "R elbow": 2.912230992910409,
+        "L wrist": 4.315998106869042,
+        "R wrist": 6.694367637198552
+      }
+    },
+    "hands": {
+      "rigid reference": {
+        "frames": 1044,
+        "mean_mm": 8.405221717775191,
+        "tips_mm": 10.03439173235152,
+        "p95_mm": 26.840788883954996,
+        "mean_pct_hand": 9.222308554363106,
+        "thumb_mm": 7.0552057305771365,
+        "index_mm": 9.842453889074545,
+        "middle_mm": 9.244925782100397,
+        "ring_mm": 7.859190969138378,
+        "pinky_mm": 8.024332217985497
+      },
+      "mano: in-sample shape": {
+        "frames": 1044,
+        "mean_mm": 5.099105787992128,
+        "tips_mm": 2.529140442490783,
+        "p95_mm": 14.587914090228328,
+        "mean_pct_hand": 5.564132836072633,
+        "thumb_mm": 6.112108538369404,
+        "index_mm": 5.330437311142634,
+        "middle_mm": 5.257449044914519,
+        "ring_mm": 4.83945509755181,
+        "pinky_mm": 3.9560789479822756,
+        "meets_target": {
+          "mean": false,
+          "tips": true,
+          "p95": true
+        }
+      },
+      "mano: held-out shape (time halves)": {
+        "frames": 1044,
+        "mean_mm": 5.617201018204646,
+        "tips_mm": 2.7209076701418797,
+        "p95_mm": 16.502838645866564,
+        "mean_pct_hand": 6.174556392842007,
+        "thumb_mm": 6.797019653449943,
+        "index_mm": 5.91531180213917,
+        "middle_mm": 5.759505869798341,
+        "ring_mm": 5.2825743258200974,
+        "pinky_mm": 4.331593439815683,
+        "meets_target": {
+          "mean": false,
+          "tips": true,
+          "p95": false
+        }
+      },
+      "mano: held-out shape (interleaved frames)": {
+        "frames": 1044,
+        "mean_mm": 5.112853244921362,
+        "tips_mm": 2.5301718552039003,
+        "p95_mm": 14.579305413999004,
+        "mean_pct_hand": 5.581289547890368,
+        "thumb_mm": 6.132599299587646,
+        "index_mm": 5.342215364101101,
+        "middle_mm": 5.268916387165847,
+        "ring_mm": 4.850207069859507,
+        "pinky_mm": 3.970328103892711,
+        "meets_target": {
+          "mean": false,
+          "tips": true,
+          "p95": true
+        }
+      }
+    }
+  }
+}

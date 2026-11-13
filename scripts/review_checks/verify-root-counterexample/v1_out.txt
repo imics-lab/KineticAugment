@@ -1,0 +1,27 @@
+SMPL-X forward truth vs repo FK at rest (max diff over 55 joints): 2.60838840970834e-07
+
+== the reviewer's exact case: root rotvec [0,0,0.7], T-pose arms ==
+z 0.7rad T-pose                    raw max/mean  319.15/ 316.89 mm | sim  79.18/ 44.70 | rigid  78.78/ 49.14 | conv  78.78/ 49.14 | dir max 0.00e+00 deg | shoulder-line  40.10 deg | len diff 1.9e-08
+
+== axis sensitivity (T-pose) ==
+x 10deg T-pose                     raw max/mean   76.27/  75.87 mm | sim   0.36/  0.20 | rigid   0.36/  0.20 | conv   0.36/  0.20 | dir max 0.00e+00 deg | shoulder-line   0.19 deg | len diff 2.0e-08
+x 20deg T-pose                     raw max/mean  151.95/ 151.16 mm | sim   0.73/  0.40 | rigid   0.73/  0.40 | conv   0.73/  0.40 | dir max 1.21e-06 deg | shoulder-line   0.37 deg | len diff 2.0e-08
+x 30deg T-pose                     raw max/mean  226.48/ 225.30 mm | sim   1.08/  0.59 | rigid   1.08/  0.59 | conv   1.08/  0.59 | dir max 0.00e+00 deg | shoulder-line   0.55 deg | len diff 2.0e-08
+x 40deg T-pose                     raw max/mean  299.29/ 297.73 mm | sim   1.43/  0.79 | rigid   1.43/  0.79 | conv   1.43/  0.79 | dir max 1.21e-06 deg | shoulder-line   0.73 deg | len diff 1.9e-08
+x 45deg T-pose                     raw max/mean  334.87/ 333.13 mm | sim   1.60/  0.88 | rigid   1.60/  0.88 | conv   1.60/  0.88 | dir max 0.00e+00 deg | shoulder-line   0.82 deg | len diff 1.9e-08
+y 10deg T-pose                     raw max/mean   28.47/  28.01 mm | sim  19.56/ 10.84 | rigid  19.40/ 11.04 | conv  19.40/ 11.04 | dir max 1.21e-06 deg | shoulder-line  10.00 deg | len diff 2.0e-08
+y 20deg T-pose                     raw max/mean   56.73/  55.80 mm | sim  39.31/ 21.82 | rigid  38.79/ 22.97 | conv  38.79/ 22.97 | dir max 0.00e+00 deg | shoulder-line  20.00 deg | len diff 1.9e-08
+y 30deg T-pose                     raw max/mean   84.55/  83.18 mm | sim  59.41/ 33.06 | rigid  58.46/ 36.32 | conv  58.46/ 36.32 | dir max 1.21e-06 deg | shoulder-line  30.00 deg | len diff 1.9e-08
+y 40deg T-pose                     raw max/mean  111.73/ 109.91 mm | sim  80.02/ 44.71 | rigid  78.29/ 51.34 | conv  78.29/ 51.34 | dir max 1.21e-06 deg | shoulder-line  40.00 deg | len diff 1.9e-08
+y 45deg T-pose                     raw max/mean  125.01/ 122.98 mm | sim  90.56/ 50.74 | rigid  88.26/ 59.51 | conv  88.26/ 59.51 | dir max 1.21e-06 deg | shoulder-line  44.99 deg | len diff 1.9e-08
+z 10deg T-pose                     raw max/mean   81.12/  80.55 mm | sim  19.45/ 10.89 | rigid  19.39/ 10.91 | conv  19.39/ 10.91 | dir max 0.00e+00 deg | shoulder-line  10.00 deg | len diff 2.0e-08
+z 20deg T-pose                     raw max/mean  161.62/ 160.48 mm | sim  38.99/ 21.87 | rigid  38.80/ 22.32 | conv  38.80/ 22.32 | dir max 1.21e-06 deg | shoulder-line  20.00 deg | len diff 1.9e-08
+z 30deg T-pose                     raw max/mean  240.89/ 239.19 mm | sim  58.77/ 33.06 | rigid  58.57/ 34.86 | conv  58.57/ 34.86 | dir max 1.21e-06 deg | shoulder-line  30.00 deg | len diff 1.9e-08
+z 40deg T-pose                     raw max/mean  318.33/ 316.08 mm | sim  78.96/ 44.58 | rigid  78.56/ 48.98 | conv  78.56/ 48.98 | dir max 1.21e-06 deg | shoulder-line  40.00 deg | len diff 1.9e-08
+z 45deg T-pose                     raw max/mean  356.18/ 353.66 mm | sim  89.26/ 50.51 | rigid  88.64/ 56.68 | conv  88.64/ 56.68 | dir max 0.00e+00 deg | shoulder-line  45.00 deg | len diff 1.9e-08
+
+== random arm poses N(0,0.4), random axis, per angle: pooled stats over 200 trials ==
+10 deg: raw mean/max  64.18/  81.3 | sim mean/max   8.38/  23.3 | converter mean/max   9.19/  25.9 mm
+20 deg: raw mean/max 126.05/ 161.9 | sim mean/max  16.79/  45.2 | converter mean/max  18.41/  48.3 mm
+30 deg: raw mean/max 185.48/ 241.3 | sim mean/max  25.11/  70.5 | converter mean/max  28.64/  75.2 mm
+45 deg: raw mean/max 283.24/ 356.8 | sim mean/max  39.87/ 118.1 | converter mean/max  45.59/ 123.2 mm

@@ -1,0 +1,18 @@
+== config U ==
+  shoulders vis median=1.000 spearman(vis,|D2|)=+0.01  [0.00,0.50):n=0,med=nanmm [0.50,0.90):n=0,med=nanmm [0.90,0.99):n=0,med=nanmm [0.99,1.01):n=798,med=8.7mm
+  elbows    vis median=0.993 spearman(vis,|D2|)=+0.07  [0.00,0.50):n=4,med=10.2mm [0.50,0.90):n=128,med=10.5mm [0.90,0.99):n=195,med=10.8mm [0.99,1.01):n=471,med=11.9mm
+  wrists    vis median=0.994 spearman(vis,|D2|)=-0.01  [0.00,0.50):n=127,med=11.6mm [0.50,0.90):n=67,med=18.8mm [0.90,0.99):n=116,med=22.1mm [0.99,1.01):n=488,med=16.1mm
+  hips      vis median=0.216 spearman(vis,|D2|)=+0.07  [0.00,0.50):n=445,med=2.9mm [0.50,0.90):n=207,med=2.4mm [0.90,0.99):n=44,med=4.9mm [0.99,1.01):n=102,med=3.7mm
+  knees     vis median=0.009 spearman(vis,|D2|)=+0.02  [0.00,0.50):n=793,med=18.5mm [0.50,0.90):n=5,med=17.9mm [0.90,0.99):n=0,med=nanmm [0.99,1.01):n=0,med=nanmm
+== config I ==
+  shoulders vis median=1.000 spearman(vis,|D2|)=+0.12  [0.00,0.50):n=0,med=nanmm [0.50,0.90):n=0,med=nanmm [0.90,0.99):n=0,med=nanmm [0.99,1.01):n=798,med=16.0mm
+  elbows    vis median=0.994 spearman(vis,|D2|)=+0.18  [0.00,0.50):n=15,med=19.1mm [0.50,0.90):n=116,med=16.1mm [0.90,0.99):n=209,med=18.6mm [0.99,1.01):n=458,med=21.7mm
+  wrists    vis median=0.995 spearman(vis,|D2|)=+0.09  [0.00,0.50):n=128,med=17.7mm [0.50,0.90):n=67,med=24.2mm [0.90,0.99):n=101,med=29.7mm [0.99,1.01):n=502,med=24.5mm
+  hips      vis median=0.284 spearman(vis,|D2|)=+0.10  [0.00,0.50):n=476,med=4.4mm [0.50,0.90):n=153,med=5.1mm [0.90,0.99):n=70,med=4.1mm [0.99,1.01):n=99,med=5.7mm
+  knees     vis median=0.003 spearman(vis,|D2|)=-0.10  [0.00,0.50):n=771,med=30.5mm [0.50,0.90):n=27,med=14.4mm [0.90,0.99):n=0,med=nanmm [0.99,1.01):n=0,med=nanmm
+== config S ==
+  shoulders vis median=1.000 spearman(vis,|D2|)=-0.15  [0.00,0.50):n=0,med=nanmm [0.50,0.90):n=0,med=nanmm [0.90,0.99):n=0,med=nanmm [0.99,1.01):n=798,med=2.7mm
+  elbows    vis median=0.972 spearman(vis,|D2|)=-0.06  [0.00,0.50):n=0,med=nanmm [0.50,0.90):n=196,med=4.7mm [0.90,0.99):n=296,med=5.1mm [0.99,1.01):n=306,med=3.9mm
+  wrists    vis median=0.960 spearman(vis,|D2|)=-0.11  [0.00,0.50):n=91,med=5.1mm [0.50,0.90):n=223,med=8.6mm [0.90,0.99):n=255,med=8.1mm [0.99,1.01):n=229,med=5.3mm
+  hips      vis median=0.201 spearman(vis,|D2|)=+0.04  [0.00,0.50):n=462,med=0.4mm [0.50,0.90):n=245,med=0.5mm [0.90,0.99):n=91,med=0.4mm [0.99,1.01):n=0,med=nanmm
+  knees     vis median=0.022 spearman(vis,|D2|)=+0.02  [0.00,0.50):n=798,med=7.0mm [0.50,0.90):n=0,med=nanmm [0.90,0.99):n=0,med=nanmm [0.99,1.01):n=0,med=nanmm

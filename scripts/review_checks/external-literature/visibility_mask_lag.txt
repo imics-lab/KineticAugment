@@ -1,0 +1,5 @@
+L wrist  observed frac smoothed=0.856 unsmoothed=0.832 mask disagreement=28/410 (6.8%)
+R wrist  observed frac smoothed=0.868 unsmoothed=0.834 mask disagreement=30/410 (7.3%)
+L elbow  observed frac smoothed=0.998 unsmoothed=0.985 mask disagreement=5/410 (1.2%)
+R elbow  observed frac smoothed=0.998 unsmoothed=0.998 mask disagreement=0/410 (0.0%)
+L hip    observed frac smoothed=0.439 unsmoothed=0.441 mask disagreement=3/410 (0.7%)

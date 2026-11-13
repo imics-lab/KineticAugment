@@ -1,0 +1,3 @@
+bent elbows (>15 deg) analysed: 718; local rotation magnitude median 88.9 deg
+angle between elbow rotation axis and SMPL-X flexion axis (local y): median 15.4 deg, p5 1.8, p95 38.8
+fraction of bent elbows whose axis is >30 deg off the flexion axis: 17.7%

@@ -1,0 +1,5 @@
+frames used: 409 (every 1)
+  sl_D   pooled median  6.02%   mean  6.72%  n=2354
+  opt_D  pooled median  5.59%   mean  6.28%  n=2354
+  sl_A   pooled median  5.13%   mean  5.54%  n=2354
+  opt_A  pooled median  4.84%   mean  5.23%  n=2354

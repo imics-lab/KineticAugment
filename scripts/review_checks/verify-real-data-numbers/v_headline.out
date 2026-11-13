@@ -1,0 +1,21 @@
+frames 410 skipped 1
+direct             median   6.551%  p95  13.729%  n=2354
+sim                median   5.944%  p95  12.065%  n=2354
+rigid_on_direct    median   6.551%  p95  13.729%  n=2354
+transl_only        median   7.394%  p95  15.438%  n=2354
+loo                median  10.591%  p95  19.431%  n=2354
+ikframe_sim        median   5.944%  p95  12.065%  n=2354
+per-joint direct med/p95/cov:
+  11: 6.43 / 12.56  cov 100%
+  12: 7.80 / 12.62  cov 100%
+  13: 6.04 / 9.58  cov 100%
+  14: 4.98 / 10.73  cov 100%
+  15: 7.85 / 17.33  cov 87%
+  16: 7.01 / 16.63  cov 89%
+per-clip direct: {'01986': 6.38, '01987': 7.42, '01988': 5.57, '01991': 9.23, '01992': 6.83}
+sim scale median 0.9726 p5 0.9102 p95 1.0241
+converter rigid rotation vs IK frame: median 3.57 p95 6.41 deg
+direction err direct (deg): {'L up': (2.572, 4.55), 'L fore': (2.647, 4.73), 'R up': (2.814, 5.41), 'R fore': (2.127, 5.35)} pooled 2.581
+direction err IK frame: median 0.00e+00 max 1.48e-06 n=1536
+length err aligned: {'L up': 5.89, 'L fore': 8.21, 'R up': 7.18, 'R fore': 4.38} pooled 6.66
+length err direct: {'L up': 8.58, 'L fore': 7.53, 'R up': 9.64, 'R fore': 4.99} pooled 7.86

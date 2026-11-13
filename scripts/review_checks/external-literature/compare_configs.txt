@@ -1,0 +1,34 @@
+scripts/review_checks/external-literature/compare_configs.py:24: RuntimeWarning: All-NaN slice encountered
+  per_frame = np.nanmax(d, axis=1)
+== 1. Stored npz vs re-extracted S (shared instance, default smoothing) ==
+  01986: T=83  max|dL|=0.000e+00 m  max|dVis|=0.000e+00  presence field range S: [0.000,0.000]
+  01987: T=75  max|dL|=0.000e+00 m  max|dVis|=0.000e+00  presence field range S: [0.000,0.000]
+  01988: T=144  max|dL|=0.000e+00 m  max|dVis|=0.000e+00  presence field range S: [0.000,0.000]
+  01991: T=49  max|dL|=0.000e+00 m  max|dVis|=0.000e+00  presence field range S: [0.000,0.000]
+  01992: T=59  max|dL|=0.000e+00 m  max|dVis|=0.000e+00  presence field range S: [0.000,0.000]
+
+== 2. Cross-clip state leakage: S (shared) vs F (fresh per clip), arm landmarks, mm ==
+  01986: frames differing(>1um)=0/83  first5 max-dev mm=[0.0, 0.0, 0.0, 0.0, 0.0]  overall max=0.00 mm  last differing frame=None
+  01987: frames differing(>1um)=75/75  first5 max-dev mm=[113.95, 89.83, 75.42, 70.03, 70.39]  overall max=113.95 mm  last differing frame=74
+  01988: frames differing(>1um)=143/144  first5 max-dev mm=[78.53, 46.29, 34.89, 33.17, 30.78]  overall max=78.53 mm  last differing frame=142
+  01991: frames differing(>1um)=49/49  first5 max-dev mm=[23.64, 13.98, 7.49, 9.4, 13.62]  overall max=23.64 mm  last differing frame=48
+  01992: frames differing(>1um)=59/59  first5 max-dev mm=[102.56, 91.59, 87.42, 84.38, 71.0]  overall max=102.56 mm  last differing frame=58
+
+== 3. Smoothing effect: F (smoothed) vs U (unsmoothed), arm landmarks ==
+  01986: median |F-U| = 6.97 mm, p95 = 22.08 mm, max = 65.31 mm
+  01987: median |F-U| = 8.54 mm, p95 = 21.38 mm, max = 37.23 mm
+  01988: median |F-U| = 8.17 mm, p95 = 18.37 mm, max = 29.63 mm
+  01991: median |F-U| = 8.27 mm, p95 = 17.02 mm, max = 20.17 mm
+  01992: median |F-U| = 7.57 mm, p95 = 18.66 mm, max = 61.02 mm
+
+== 4. Raw frame-to-frame step on arms (median, mm) per config ==
+  F: per-clip median step mm = [3.47, 4.97, 4.24, 3.76, 3.23]
+  U: per-clip median step mm = [6.62, 11.53, 9.13, 9.13, 6.79]
+  I: per-clip median step mm = [11.89, 13.36, 13.58, 14.68, 11.43]
+
+== 5. Static (I) vs tracked/unsmoothed (U): per-frame diff in arms (mm) ==
+  01986: detected I=83/83 median |I-U| = 25.59 mm, p95=48.25
+  01987: detected I=75/75 median |I-U| = 37.87 mm, p95=66.93
+  01988: detected I=143/144 median |I-U| = 27.07 mm, p95=54.30
+  01991: detected I=49/49 median |I-U| = 31.08 mm, p95=86.30
+  01992: detected I=59/59 median |I-U| = 42.44 mm, p95=72.67

@@ -1,0 +1,14 @@
+measure_round_trip.run_synthetic replica (seed 42, 200 poses, root 0 deg)
+  worst joint POSITION error (what the harness reports): 5.320e-15 m
+  L shoulder  ROTATION error deg: median  13.81  p95  44.87  max  75.24  | frac < 1e-6 deg: 0.00 | |truth local twist| median  13.8
+  L elbow     ROTATION error deg: median  19.64  p95  42.86  max  62.37  | frac < 1e-6 deg: 0.00 | |truth local twist| median  14.9
+  R shoulder  ROTATION error deg: median  16.51  p95  49.87  max  74.00  | frac < 1e-6 deg: 0.00 | |truth local twist| median  16.5
+  R elbow     ROTATION error deg: median  20.65  p95  51.23  max  68.53  | frac < 1e-6 deg: 0.00 | |truth local twist| median  16.7
+  ALL arm joints: rotation error median 18.06 deg, max 75.24 deg; poses with every arm joint < 1e-6 deg: 0.00
+
+tests/test_swing_ik.py::test_recovers_arm_rotations_from_their_own_landmarks fixture (seed 7):
+  L shoulder  rotation error   0.51 deg
+  L elbow     rotation error  13.24 deg
+  R shoulder  rotation error   2.75 deg
+  R elbow     rotation error   8.43 deg
+  max child-joint position error 1.31e-16 m

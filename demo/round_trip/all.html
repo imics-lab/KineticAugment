@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Augmentations</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body class="all-page">
+<header>
+  <div class="title">
+    <h1>All augmentations</h1>
+    <span class="sub">every exported augmentation of one clip side by side: the original in blue, the augmentation in orange</span>
+  </div>
+  <nav class="pages"><a href="index.html">round trip</a><a href="augment.html">augmentations</a><a class="on" href="all.html">all augmentations</a></nav>
+  <label class="clip-pick">clip <select id="clip"></select></label>
+  <div id="summary" class="chips"></div>
+</header>
+
+<section id="bar" class="grid-bar">
+  <div class="transport">
+    <button id="play" title="space">▶</button>
+    <button id="prev" title="←">◀︎◀︎</button>
+    <button id="next" title="→">▶︎▶︎</button>
+    <input type="range" id="scrub" min="0" value="0">
+    <span id="frame-label" class="mono"></span>
+    <label title="playback: every panel plays its own frames at the clip's frame rate, so a time warp runs ahead or behind the original; source time: every panel shows the frame drawn from the same source moment">clock
+      <select id="clock"><option value="play">playback</option><option value="source">source time</option></select></label>
+    <label>speed <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option></select></label>
+  </div>
+  <div class="grid-controls">
+    <span id="groups" class="toggles"></span>
+    <span class="toggles">
+      <label><input type="checkbox" id="t-orig" checked> original</label>
+      <label><input type="checkbox" id="t-mesh" checked> meshes</label>
+      <label><input type="checkbox" id="t-pts" checked> points</label>
+      <label><input type="checkbox" id="t-solid"> solid augmented mesh</label>
+    </span>
+    <span class="cams">view
+      <button data-cam="front">front</button><button data-cam="side">side</button>
+      <button data-cam="hands">hands</button><button data-cam="face">face</button>
+      <button id="zoom-in" title="closer">＋</button><button id="zoom-out" title="farther">－</button>
+    </span>
+    <label>columns <select id="cols"><option>3</option><option>4</option><option selected>5</option><option>6</option><option>8</option></select></label>
+  </div>
+</section>
+
+<main>
+  <section id="grid" class="aug-grid"></section>
+  <p class="grid-note">Drag any panel to orbit; all panels share one camera. Click a title to open that augmentation on the augmentations page.
+    Tier 1 panels compare with the round trip (face read back off the mesh); week-4 panels compare with the week-4 original (observed face carried on the head).</p>
+</main>
+
+<canvas id="gl"></canvas>
+<script type="module" src="all.js"></script>
+</body>
+</html>

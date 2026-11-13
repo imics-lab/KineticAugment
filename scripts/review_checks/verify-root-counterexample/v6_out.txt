@@ -1,0 +1,4 @@
+pooled direct median: translation-only 6.02%  rigid post-fit 5.72%
+per clip (transl, rigid): {'01986': (4.97, 4.81), '01987': (7.43, 7.72), '01988': (5.4, 5.51), '01991': (7.52, 5.03), '01992': (6.7, 6.11)}
+shaped synthetic, translation: worst segment direction error 1.21e-06 deg, worst pos 45.74 mm
+shaped synthetic, rigid      : worst segment direction error 1.63e-01 deg, worst pos 45.75 mm

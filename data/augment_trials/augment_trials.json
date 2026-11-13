@@ -1,0 +1,294 @@
+{
+  "seed": 20261011,
+  "clips": [
+    "17083",
+    "57641"
+  ],
+  "pool": [
+    "05631",
+    "07389",
+    "08917",
+    "08918",
+    "08938",
+    "09849",
+    "12328",
+    "13630",
+    "17083",
+    "21871",
+    "21942",
+    "28111",
+    "57641",
+    "57949",
+    "63229",
+    "63665",
+    "63669",
+    "69257",
+    "69364",
+    "69411"
+  ],
+  "ranges": {
+    "mirror_p": 0.5,
+    "yaw_deg": 20.0,
+    "pitch_deg": 5.0,
+    "duration": [
+      0.8,
+      1.25
+    ],
+    "arm_joint_p": 0.3,
+    "arm_joint_deg": 4.0,
+    "scale": [
+      0.85,
+      1.15
+    ],
+    "uncentre": 0.1
+  },
+  "results": {
+    "17083": {
+      "frames": 62,
+      "draw": {
+        "mirror": false,
+        "yaw_deg": 2.3862603277030416,
+        "pitch_deg": -3.4219328591746088,
+        "duration": 0.8296272456333644,
+        "arm_joints": [],
+        "scale": 1.0146257983960287,
+        "uncentre_u": [
+          0.7537439923103807,
+          0.5921261617262739
+        ]
+      },
+      "uncentre_shift": [
+        0.05074879846207614,
+        0.01842523234525477
+      ],
+      "combined_uncentre_shift": [
+        0.05074879846207614,
+        0.01842523234525477
+      ],
+      "camera": {
+        "scale_per_m": [
+          0.9952876494542,
+          1.4162737875297353
+        ],
+        "residual_frame_pct": 2.1072224904418837
+      },
+      "round_trip_hand_points_in_frame_pct": 95.43773119605426,
+      "identity_max_abs_diff_m": {
+        "view": 2.7755575615628914e-17,
+        "mirror": 2.7755575615628914e-17,
+        "duration": 0.0,
+        "arm_joints": 3.3306690738754696e-16,
+        "scale": 2.7755575615628914e-17,
+        "uncentre": 0.0,
+        "combined": 3.3306690738754696e-16
+      },
+      "view": {
+        "frames": 62,
+        "upper arm_change_pct": -2.220446049250313e-14,
+        "forearm_change_pct": -1.1102230246251565e-14,
+        "wrist_moved_mm_median": 19.998274372735455,
+        "wrist_moved_mm_max": 34.27503880314641,
+        "normalised_pose_change_pct_max": 10.316905683421448,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.43773119605426,
+        "wrist_jitter_mm": 1.0447792946614796,
+        "round_trip_jitter_mm": 1.044779294661498
+      },
+      "mirror": {
+        "frames": 62,
+        "upper arm_change_pct": 0.0,
+        "forearm_change_pct": 0.0,
+        "hand_points_in_frame_pct": 95.43773119605426,
+        "wrist_jitter_mm": 1.0447792946614967,
+        "round_trip_jitter_mm": 1.044779294661498
+      },
+      "duration": {
+        "frames": 52,
+        "upper arm_change_pct": -0.22087396109784496,
+        "forearm_change_pct": -5.368177012909925e-05,
+        "hand_points_in_frame_pct": 95.39568345323741,
+        "wrist_jitter_mm": 1.190406540661796,
+        "round_trip_jitter_mm": 1.044779294661498
+      },
+      "arm_joints": {
+        "frames": 62,
+        "upper arm_change_pct": 0.0,
+        "forearm_change_pct": 0.0,
+        "wrist_moved_mm_median": 0.0,
+        "wrist_moved_mm_max": 0.0,
+        "normalised_pose_change_pct_max": 0.0,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.43773119605426,
+        "wrist_jitter_mm": 1.044779294661498,
+        "round_trip_jitter_mm": 1.044779294661498
+      },
+      "scale": {
+        "frames": 62,
+        "upper arm_change_pct": 1.4625798396028733,
+        "forearm_change_pct": 1.4625798396028733,
+        "wrist_moved_mm_median": 5.771777150738747,
+        "wrist_moved_mm_max": 6.972710514867051,
+        "normalised_pose_change_pct_max": 4.972820174300706e-14,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.43773119605426,
+        "wrist_jitter_mm": 1.0600600259935613,
+        "round_trip_jitter_mm": 1.044779294661498
+      },
+      "uncentre": {
+        "frames": 62,
+        "upper arm_change_pct": 0.0,
+        "forearm_change_pct": 0.0,
+        "wrist_moved_mm_median": 52.622590816374355,
+        "wrist_moved_mm_max": 52.62259081637439,
+        "normalised_pose_change_pct_max": 2.220446049250313e-14,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.43773119605426,
+        "wrist_jitter_mm": 1.0447792946614995,
+        "round_trip_jitter_mm": 1.044779294661498
+      },
+      "combined": {
+        "frames": 52,
+        "upper arm_change_pct": 1.2384754204790793,
+        "forearm_change_pct": 1.462525372693979,
+        "hand_points_in_frame_pct": 95.39568345323741,
+        "wrist_jitter_mm": 1.2078171867347813,
+        "round_trip_jitter_mm": 1.044779294661498
+      },
+      "video": "data/augment_trials/17083_augmentations.mp4"
+    },
+    "57641": {
+      "frames": 29,
+      "draw": {
+        "mirror": true,
+        "yaw_deg": -15.88703492043102,
+        "pitch_deg": 0.6449622334412197,
+        "duration": 1.2192443612148003,
+        "arm_joints": [
+          {
+            "side": "left",
+            "joint": "elbow",
+            "angle_deg": -3.463591038493056,
+            "axis": [
+              -0.07582424270682414,
+              -0.8614330567537412,
+              0.5021790248007602
+            ]
+          },
+          {
+            "side": "right",
+            "joint": "shoulder",
+            "angle_deg": -1.5603816102303822,
+            "axis": [
+              -0.4630099319669159,
+              -0.8860189074375947,
+              -0.02433718478137549
+            ]
+          }
+        ],
+        "scale": 0.9804325538689471,
+        "uncentre_u": [
+          0.8652053476621885,
+          0.9376140740575462
+        ]
+      },
+      "uncentre_shift": [
+        0.07304106953243769,
+        0.08752281481150923
+      ],
+      "combined_uncentre_shift": [
+        0.07304106953243769,
+        0.08752281481150923
+      ],
+      "camera": {
+        "scale_per_m": [
+          0.7939212387128591,
+          1.2693975034531129
+        ],
+        "residual_frame_pct": 2.246742150036746
+      },
+      "round_trip_hand_points_in_frame_pct": 95.65217391304348,
+      "identity_max_abs_diff_m": {
+        "view": 5.551115123125783e-17,
+        "mirror": 2.7755575615628914e-17,
+        "duration": 0.0,
+        "arm_joints": 2.7755575615628914e-16,
+        "scale": 5.551115123125783e-17,
+        "uncentre": 0.0,
+        "combined": 2.7755575615628914e-16
+      },
+      "view": {
+        "frames": 29,
+        "upper arm_change_pct": 0.0,
+        "forearm_change_pct": 0.0,
+        "wrist_moved_mm_median": 71.78491118781591,
+        "wrist_moved_mm_max": 108.49373537342271,
+        "normalised_pose_change_pct_max": 33.96206310043223,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.65217391304348,
+        "wrist_jitter_mm": 4.147892175835945,
+        "round_trip_jitter_mm": 4.147892175835986
+      },
+      "mirror": {
+        "frames": 29,
+        "upper arm_change_pct": 0.0,
+        "forearm_change_pct": 0.0,
+        "hand_points_in_frame_pct": 95.65217391304348,
+        "wrist_jitter_mm": 4.147892175835986,
+        "round_trip_jitter_mm": 4.147892175835986
+      },
+      "duration": {
+        "frames": 35,
+        "upper arm_change_pct": -0.037913004662992744,
+        "forearm_change_pct": -0.1273680770061847,
+        "hand_points_in_frame_pct": 95.65217391304348,
+        "wrist_jitter_mm": 2.5025743810194285,
+        "round_trip_jitter_mm": 4.147892175835986
+      },
+      "arm_joints": {
+        "frames": 29,
+        "upper arm_change_pct": 0.0,
+        "forearm_change_pct": -2.220446049250313e-14,
+        "wrist_moved_mm_median": 12.31314241906548,
+        "wrist_moved_mm_max": 14.38340788231942,
+        "normalised_pose_change_pct_max": 4.405725496932064,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.65217391304348,
+        "wrist_jitter_mm": 4.041455660715668,
+        "round_trip_jitter_mm": 4.147892175835986
+      },
+      "scale": {
+        "frames": 29,
+        "upper arm_change_pct": -1.9567446131052657,
+        "forearm_change_pct": -1.9567446131052657,
+        "wrist_moved_mm_median": 8.697165721608018,
+        "wrist_moved_mm_max": 10.285223626692227,
+        "normalised_pose_change_pct_max": 4.552252871008668e-14,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.65217391304348,
+        "wrist_jitter_mm": 4.06672851912784,
+        "round_trip_jitter_mm": 4.147892175835986
+      },
+      "uncentre": {
+        "frames": 29,
+        "upper arm_change_pct": 0.0,
+        "forearm_change_pct": 0.0,
+        "wrist_moved_mm_median": 114.96931256343439,
+        "wrist_moved_mm_max": 114.9693125634344,
+        "normalised_pose_change_pct_max": 3.152427400121712e-14,
+        "hand_points_leaving_frame_pct": 0.0,
+        "hand_points_in_frame_pct": 95.65217391304348,
+        "wrist_jitter_mm": 4.147892175835985,
+        "round_trip_jitter_mm": 4.147892175835986
+      },
+      "combined": {
+        "frames": 35,
+        "upper arm_change_pct": -1.9946199488441119,
+        "forearm_change_pct": -2.0793975734148984,
+        "hand_points_in_frame_pct": 95.65217391304348,
+        "wrist_jitter_mm": 2.440268614092255,
+        "round_trip_jitter_mm": 4.147892175835986
+      },
+      "video": "data/augment_trials/57641_augmentations.mp4"
+    }
+  }
+}

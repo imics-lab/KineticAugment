@@ -1,0 +1,2 @@
+frames with all 6 arm landmarks valid: n=351, worst change after 180deg flip 5.61e-16 m
+frames with some arm landmark invalid: n=58, worst change 5.36e-16 m, median 1.85e-16

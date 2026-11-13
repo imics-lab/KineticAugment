@@ -1,0 +1,9 @@
+video meta {"01986": {"fps": 25.0, "w": 320, "h": 240, "n": 83}, "01987": {"fps": 29.97002997002997, "w": 1280, "h": 720, "n": 75}, "01988": {"fps": 29.997916811332548, "w": 640, "h": 480, "n": 144}, "01991": {"fps": 29.97, "w": 288, "h": 192, "n": 50}, "01992": {"fps": 29.97, "w": 288, "h": 192, "n": 60}}
+done shared_s
+done fresh_s
+done fresh_s2
+done shared_u
+done fresh_u
+done static
+done rev_s
+presence HasField on any landmark: False

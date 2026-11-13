@@ -1,0 +1,8 @@
+01986 sim  55.6%  sim+refl  55.6%  sim+zs  12.2%  sim xy   6.7%  affine  10.5%
+01987 sim  60.1%  sim+refl  60.1%  sim+zs  17.5%  sim xy   8.9%  affine  16.9%
+01988 sim  50.9%  sim+refl  50.9%  sim+zs  12.5%  sim xy   8.6%  affine  10.9%
+01991 sim  71.6%  sim+refl  71.6%  sim+zs  12.1%  sim xy   7.2%  affine  11.9%
+01992 sim  79.7%  sim+refl  79.7%  sim+zs  15.0%  sim xy   9.4%  affine  14.8%
+pooled sim  56.0%  sim+refl  56.0%  sim+zs  13.3%  sim xy   8.3%  affine  11.6%
+affine det sign counts: {1: 409}
+(residual = RMS per landmark / image-plane shoulder width in px)

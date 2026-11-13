@@ -1,0 +1,1 @@
+frames 409: per-frame median landmark residual, weak-perspective: median 6.60 p95 9.40 %SW; 2x3 affine: median 5.91 p95 9.58 %SW

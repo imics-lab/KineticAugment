@@ -1,0 +1,11 @@
+[serialize] real SMPL-X forward on 79 saved numbers: direct median 6.551%  p95 13.729%  n=2354  max|smplx-reconstruct_body| 1.70e-07 m
+[count] direct median by #valid arm landmarks: {4: (5.99, 168), 5: (6.53, 80), 6: (6.67, 2106)}
+[torso] |global_orient| from identity median 3.6 deg; from x-flip median 178.5 (min 177.5)
+[torso] cos(fit pelvis->neck, obs hipmid->shouldermid) median -0.965 max -0.838
+[torso] fitted head distance BELOW fitted shoulder-mid along observed up: median 0.184 m; observed nose ABOVE shoulder-mid median 0.177 m
+[synthetic 180x] worst arm error 5.09 mm; fitted root error median 179.9 deg
+[rest] L shoulder [ 0.16408102  0.0852433  -0.01575559], R shoulder [-0.15179482  0.08043467 -0.0191426 ] (y,z asymmetry 4.8 mm, 3.4 mm)
+[betas] fit.betas = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+[betas] max |SMPL-X(betas=fit.betas) - reconstruct_body(shaped)| 5.219e-02 m; with true betas 2.752e-08 m
+[betas] reconstruct_body change when betas[0] 0->2: 0.00e+00 m
+[step4] cached landmarks n=1636: float64 FK median 1.20e-14 max 4.68e-14 deg; real SMPL-X (float32) median 0.0000 max 0.0000 deg

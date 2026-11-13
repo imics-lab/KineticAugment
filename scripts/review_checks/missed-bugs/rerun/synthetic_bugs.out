@@ -1,0 +1,32 @@
+========================================================================
+B. Valid wrist whose ELBOW is invalid: wrist still used as a Kabsch correspondence
+========================================================================
+  seed 0, per-landmark error mm, elbow invalid (wrist kept): {11: 49.93, 12: 19.1, 14: 3.76, 16: 30.06, 15: 39.68}
+  seed 0, per-landmark error mm, elbow+wrist invalid       : {11: 0.0, 12: 0.0, 14: 0.0, 16: 0.0}
+  20 seeds: max error over the VALID landmarks 25.3..153.3 mm (median 56.5); dropping the orphaned wrist too: max 1.25e-12 mm
+
+========================================================================
+C. A valid landmark exactly at the origin: IK drops it, Kabsch still uses it
+========================================================================
+  left shoulder landmark: [0. 0. 0.]  validity: True
+  error mm (should be ~0, the input is exact SMPL-X): {11: 71.97, 12: 35.78, 13: 50.44, 14: 2.14, 15: 29.25, 16: 38.18}
+  same pose shifted by 1e-9 m                     : {11: 0.0, 12: 0.0, 13: 0.0, 14: 0.0, 15: 0.0, 16: 0.0}
+
+========================================================================
+D. Three collinear correspondences: Kabsch rotation about the line is arbitrary
+========================================================================
+  observed-landmark error mm: {11: 0.06, 13: 0.17, 15: 0.21}
+  6 fits with 0.1 mm noise: max pairwise global_orient disagreement 0.0 deg
+  (fit_body accepts this frame: 3 correspondences, no rank / conditioning check)
+
+========================================================================
+E. betas: BodyFit.betas is never read by reconstruct_body, and a shaped skeleton is not recorded
+========================================================================
+  set fit.betas=[3,-2,0..]: reconstruct_body changes by 0.0e+00 m; real SMPL-X with the same params differs from reconstruct_body by 111.0 mm
+  shaped skeleton: fit.betas = [0. 0. 0.]...; reconstruct_body vs SMPL-X(fit params): 50.7 mm; vs SMPL-X(fit params but true betas): 4.98e-05 mm
+
+========================================================================
+H. Swing near 180 degrees: numeric accuracy and parameter continuity
+========================================================================
+  20000 near-antiparallel pairs: max |R a - b| = 7.48e-05
+  direction moving 0.2 mrad in total through the antipode: max step in rotvec = 4.43 rad

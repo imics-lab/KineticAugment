@@ -1,0 +1,20 @@
+frames analysed: 409
+--- MediaPipe world-frame convention, measured from the data ---
+  data 'up' (hip->shoulder) y-component: median -0.984 (−1 => y is DOWN)
+  data 'forward' (toward nose) z-comp  : median -0.980 (−1 => facing −z)
+  subject-left (R->L shoulder) x-comp  : median +0.996
+  chirality (left x up . forward)      : min +1.000 max +1.000 (+1 = proper rotation from SMPL-X)
+--- CURRENT fit_body on raw MP world landmarks ---
+  |global_orient| median 3.6 deg  (range 0.6..8.6)
+  angle(fitted body up, true up)      : median 169.5 deg
+  angle(fitted body fwd, true fwd)    : median 168.7 deg
+  body-local: elbow ABOVE shoulder    : 100.0% of arms (truth 0.0%)
+  body-local: wrist IN FRONT of shldr : 9.9% of arms (truth 100.0%)
+--- fit_body after applying the 180-deg x convention C=diag(1,-1,-1) first ---
+  |global_orient| median 3.8 deg
+  angle(fitted body up, true up)      : median 10.7 deg
+  angle(fitted body fwd, true fwd)    : median 11.2 deg
+  body-local: elbow ABOVE shoulder    : 0.0% of arms
+  body-local: wrist IN FRONT of shldr : 92.4% of arms
+--- direct round-trip error cannot see the difference ---
+  mean per-frame direct error raw 23.2977 mm, with C 23.4270 mm, max |diff| 2.32e+00 mm

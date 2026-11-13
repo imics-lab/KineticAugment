@@ -1,0 +1,6 @@
+repo      every 1 frame(s) (~30 fps): A_xyz=0.175%  B_xyz=0.098%  budget=max=0.175%
+repo      every 2 frame(s) (~15 fps): A_xyz=0.434%  B_xyz=0.192%  budget=max=0.434%
+repo      every 3 frame(s) (~10 fps): A_xyz=0.660%  B_xyz=0.352%  budget=max=0.660%
+nosmooth  every 1 frame(s) (~30 fps): A_xyz=0.743%  B_xyz=0.472%  budget=max=0.743%
+nosmooth  every 2 frame(s) (~15 fps): A_xyz=1.050%  B_xyz=0.759%  budget=max=1.050%
+nosmooth  every 3 frame(s) (~10 fps): A_xyz=1.516%  B_xyz=1.053%  budget=max=1.516%

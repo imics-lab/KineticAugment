@@ -353,6 +353,8 @@ def perturb_arm_joints(
     out = np.array(rotations, dtype=np.float64, copy=True)
     parents = np.asarray(parents, dtype=int)
     for j in joints:
+        if j.angle_deg == 0.0:
+            continue  # nothing drawn: not even the elbow's bend limits apply
         index = SMPLX_ARM[j.side][j.joint]
         if j.joint != "elbow":
             delta = Rotation.from_rotvec(np.asarray(j.axis) * np.radians(j.angle_deg))

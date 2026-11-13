@@ -1,0 +1,23 @@
+D'. EXACTLY collinear single arm (shoulder, elbow, wrist on one line), other arm unobserved
+  dir [ 0.3 -0.9  0.3]: |global_orient| =   27.08 deg, observed max err 1.8 mm
+  dir [ 0. -1.  0.]: |global_orient| =  180.00 deg, observed max err 1.8 mm
+  dir [0.52 0.21 0.83]: |global_orient| =  178.05 deg, observed max err 1.8 mm
+  dir [1. 0. 0.]: |global_orient| =   82.87 deg, observed max err 1.8 mm
+
+Swing angles and temporal parameter jumps on real data (current fit vs C-converted fit)
+  [current] SMPL-X head joint above the observed shoulder midpoint: 0.0% of frames
+  [current] L shoulder  swing angle median   98.3  max  108.6 deg;  frame-to-frame |d rotvec| p99 0.22  max 0.54 rad
+  [current] R shoulder  swing angle median   80.0  max  108.0 deg;  frame-to-frame |d rotvec| p99 0.27  max 0.45 rad
+  [current] L elbow     swing angle median   88.4  max  109.4 deg;  frame-to-frame |d rotvec| p99 0.85  max 1.59 rad
+  [current] R elbow     swing angle median   84.9  max  108.5 deg;  frame-to-frame |d rotvec| p99 0.71  max 1.58 rad
+  [with C] SMPL-X head joint above the observed shoulder midpoint: 100.0% of frames
+  [with C] L shoulder  swing angle median   74.6  max   87.2 deg;  frame-to-frame |d rotvec| p99 0.16  max 0.40 rad
+  [with C] R shoulder  swing angle median   70.0  max  102.0 deg;  frame-to-frame |d rotvec| p99 0.25  max 0.39 rad
+  [with C] L elbow     swing angle median   70.5  max   91.3 deg;  frame-to-frame |d rotvec| p99 0.61  max 1.56 rad
+  [with C] R elbow     swing angle median   82.5  max  110.2 deg;  frame-to-frame |d rotvec| p99 0.65  max 1.52 rad
+
+Exact zeros in real world landmarks (arm landmarks 11-16):
+  0 of 2460 arm landmark rows are exactly (0,0,0)
+
+FK on a SHAPED SMPLXSkeleton vs real SMPL-X with the same betas (not covered by the suite):
+  max |FK - SMPL-X| over 22 body joints: 1.46e-07 m

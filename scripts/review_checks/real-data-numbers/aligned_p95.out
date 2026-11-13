@@ -1,0 +1,7 @@
+L shoulder  aligned median 6.18  p95 11.62
+R shoulder  aligned median 6.52  p95 10.56
+L elbow     aligned median 5.68  p95 9.06
+R elbow     aligned median 4.22  p95 8.91
+L wrist     aligned median 6.93  p95 15.54
+R wrist     aligned median 6.46  p95 14.83
+IK-frame direction error: median 1.28e-14 deg, max 6.06e-14 deg (n=1536)

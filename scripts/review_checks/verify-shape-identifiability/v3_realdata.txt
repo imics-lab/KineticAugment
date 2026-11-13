@@ -1,0 +1,33 @@
+clip  seg         n   median(mm)  half1-half2(mm)   r(len,|dz|)  shift-null p   r(len,|dz|) 1-reg
+01986 L upper      83     243.3           27.7           0.96        0.014
+01986 L fore       54     276.5            8.4           0.71        0.022
+01986 R upper      83     248.7           17.8           0.87        0.014
+01986 R fore       62     248.7           34.2           0.79        0.019
+01986 shoulder W   83     332.7           -5.1          -0.37        0.716
+   01986: L-R upper -5.5 mm, L-R fore +27.8 mm; pooled fore/upper 1.068; L fore/upper 1.137  R 1.000
+01987 L upper      75     240.6            0.6           0.05        0.803
+01987 L fore       69     190.9           15.4          -0.68        0.017
+01987 R upper      75     250.6           -3.4          -0.68        0.045
+01987 R fore       73     220.7           20.9          -0.06        0.922
+01987 shoulder W   75     333.7          -29.5          -0.48        0.015
+   01987: L-R upper -10.0 mm, L-R fore -29.8 mm; pooled fore/upper 0.838; L fore/upper 0.794  R 0.881
+01988 L upper     143     256.9            4.3           0.88        0.007
+01988 L fore      124     271.5           -7.7           0.88        0.009
+01988 R upper     143     236.2           -1.7          -0.14        0.709
+01988 R fore      121     256.9            6.4           0.61        0.009
+01988 shoulder W  143     325.3           -1.5           0.27        0.545
+   01988: L-R upper +20.7 mm, L-R fore +14.6 mm; pooled fore/upper 1.072; L fore/upper 1.057  R 1.088
+01991 L upper      49     228.5          -14.8           0.95        0.025
+01991 L fore       49     238.8           29.5          -0.75        0.025
+01991 R upper      49     259.8          -24.6          -0.49        0.375
+01991 R fore       48     271.8          -17.8           0.70        0.205
+01991 shoulder W   49     346.7           16.2           0.91        0.025
+   01991: L-R upper -31.3 mm, L-R fore -33.0 mm; pooled fore/upper 1.046; L fore/upper 1.045  R 1.046
+01992 L upper      59     229.1            5.8           0.45        0.420
+01992 L fore       59     274.8            9.5          -0.69        0.040
+01992 R upper      59     233.9          -10.3           0.44        0.060
+01992 R fore       59     235.3           -9.5           0.26        0.680
+01992 shoulder W   59     329.6           -0.0           0.07        0.920
+   01992: L-R upper -4.8 mm, L-R fore +39.5 mm; pooled fore/upper 1.102; L fore/upper 1.199  R 1.006
+
+1-regressor |dz| test: 12/20 arm segments p<0.05 under circular-shift null

@@ -1,0 +1,4 @@
+f64_arccos                   median 0.0000 max 0.0000 deg  n=1636
+f32joints_arccos64           median 0.0000 max 0.0000 deg  n=1636
+f32joints_f32norm_arccos     median 0.0000 max 0.0280 deg  n=1636
+f32_all                      median 0.0000 max 0.0280 deg  n=1636

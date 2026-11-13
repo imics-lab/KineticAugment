@@ -1,0 +1,26 @@
+01986 L upper    n= 83 lag1 0.96  AR(1) n_eff   1.8  gaps 0
+01986 L fore     n= 54 lag1 0.93  AR(1) n_eff   1.8  gaps 0
+01986 R upper    n= 83 lag1 0.94  AR(1) n_eff   2.3  gaps 0
+01986 R fore     n= 62 lag1 0.96  AR(1) n_eff   1.3  gaps 0
+01986 shoulder W n= 83 lag1 0.91  AR(1) n_eff   4.0  gaps 0
+01987 L upper    n= 75 lag1 0.79  AR(1) n_eff   8.8  gaps 0
+01987 L fore     n= 69 lag1 0.91  AR(1) n_eff   3.3  gaps 0
+01987 R upper    n= 75 lag1 0.88  AR(1) n_eff   4.6  gaps 0
+01987 R fore     n= 73 lag1 0.89  AR(1) n_eff   4.1  gaps 0
+01987 shoulder W n= 75 lag1 0.98  AR(1) n_eff   0.8  gaps 0
+01988 L upper    n=143 lag1 0.98  AR(1) n_eff   1.6  gaps 0
+01988 L fore     n=124 lag1 0.93  AR(1) n_eff   4.7  gaps 1
+01988 R upper    n=143 lag1 0.97  AR(1) n_eff   2.1  gaps 0
+01988 R fore     n=121 lag1 0.93  AR(1) n_eff   4.3  gaps 1
+01988 shoulder W n=143 lag1 0.93  AR(1) n_eff   4.9  gaps 0
+01991 L upper    n= 49 lag1 0.96  AR(1) n_eff   1.0  gaps 0
+01991 L fore     n= 49 lag1 0.97  AR(1) n_eff   0.8  gaps 0
+01991 R upper    n= 49 lag1 0.88  AR(1) n_eff   3.1  gaps 0
+01991 R fore     n= 48 lag1 0.92  AR(1) n_eff   1.9  gaps 0
+01991 shoulder W n= 49 lag1 0.98  AR(1) n_eff   0.6  gaps 0
+01992 L upper    n= 59 lag1 0.93  AR(1) n_eff   2.0  gaps 0
+01992 L fore     n= 59 lag1 0.90  AR(1) n_eff   3.2  gaps 0
+01992 R upper    n= 59 lag1 0.90  AR(1) n_eff   3.0  gaps 0
+01992 R fore     n= 59 lag1 0.93  AR(1) n_eff   2.1  gaps 0
+01992 shoulder W n= 59 lag1 0.64  AR(1) n_eff  13.2  gaps 0
+lag-1 range 0.635071296256703 0.9793446001952916

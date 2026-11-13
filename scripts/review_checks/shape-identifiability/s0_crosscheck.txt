@@ -1,0 +1,7 @@
+max |SMPLXSkeleton.rest_joints - common.joints| over 5 random betas: 4.15e-07 m
+max |J_fd - J_analytic| = 0.0014 mm/sigma (|J| max 25.65)
+max |posed - rest| over 20 random full-body poses: 4 arm lengths 0.00015 mm; shoulder width 148.7 mm
+  (shoulder width uses two different branches: it is invariant only because collars/spine are rigid chains; check separately below)
+  left-collar z-rot 0.0 rad: shoulder width = 315.93 mm
+  left-collar z-rot 0.2 rad: shoulder width = 303.28 mm
+  left-collar z-rot 0.4 rad: shoulder width = 287.81 mm

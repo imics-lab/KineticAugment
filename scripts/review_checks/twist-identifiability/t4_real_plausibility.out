@@ -1,0 +1,48 @@
+frames fitted 409; delivered |global_orient| median 3.6 deg (a y-down, camera-facing input needs ~180 deg)
+
+=== DELIVERED parameterisation ===
+ L arm (n=355): elbow bend (bone angle, 0=straight) med 77 [p5 28, p95 85]; frac bend<25deg 0.02
+   shoulder |rotvec| med 98 p95 105 max 107 deg; humerus elevation from body-down med 152 [p5 141, p95 175]; frac above horizontal 1.00; frac pointing behind body (fwd<-0.2) 0.73
+   elbow |rotvec| med 90 max 109 deg; off-hinge (varus/valgus) med 23 p95 39 max 43 deg; frac >20deg 0.70; frac on hyperextension side 1.00
+ R arm (n=363): elbow bend (bone angle, 0=straight) med 85 [p5 36, p95 103]; frac bend<25deg 0.00
+   shoulder |rotvec| med 79 p95 95 max 108 deg; humerus elevation from body-down med 143 [p5 119, p95 167]; frac above horizontal 1.00; frac pointing behind body (fwd<-0.2) 0.82
+   elbow |rotvec| med 87 max 109 deg; off-hinge (varus/valgus) med 6 p95 32 max 46 deg; frac >20deg 0.13; frac on hyperextension side 1.00
+
+=== TORSO parameterisation ===
+ L arm (n=355): elbow bend (bone angle, 0=straight) med 77 [p5 28, p95 85]; frac bend<25deg 0.02
+   shoulder |rotvec| med 81 p95 93 max 94 deg; humerus elevation from body-down med 45 [p5 15, p95 62]; frac above horizontal 0.00; frac pointing behind body (fwd<-0.2) 0.00
+   elbow |rotvec| med 68 max 87 deg; off-hinge (varus/valgus) med 8 p95 25 max 43 deg; frac >20deg 0.14; frac on hyperextension side 0.00
+ R arm (n=363): elbow bend (bone angle, 0=straight) med 85 [p5 36, p95 103]; frac bend<25deg 0.00
+   shoulder |rotvec| med 69 p95 85 max 93 deg; humerus elevation from body-down med 53 [p5 13, p95 68]; frac above horizontal 0.00; frac pointing behind body (fwd<-0.2) 0.00
+   elbow |rotvec| med 82 max 107 deg; off-hinge (varus/valgus) med 10 p95 33 max 40 deg; frac >20deg 0.11; frac on hyperextension side 0.00
+
+=== HINGE (anatomical twist) member of the same equivalence class, TORSO frame ===
+ L: hinge-solvable with flexion in [0,160] deg: 0.99 of 355 frames
+   humerus twist the zero-twist policy discards: |psi| med 9 p95 46 max 81 deg; frac |psi|>90 0.00, >120 0.00
+   hinge flexion med 66 [p5 10, p95 75] deg
+ R: hinge-solvable with flexion in [0,160] deg: 1.00 of 363 frames
+   humerus twist the zero-twist policy discards: |psi| med 10 p95 36 max 44 deg; frac |psi|>90 0.00, >120 0.00
+   hinge flexion med 83 [p5 33, p95 101] deg
+
+=== repo JointLimitConstraint.check violations (frames with >=1 violation on that joint/axis) ===
+ DELIVERED n=409: right_elbow.y:363, left_elbow.x:355, left_elbow.y:355, left_shoulder.y:244, right_shoulder.y:197, left_shoulder.z:189, right_elbow.x:36
+ TORSO     n=409: right_elbow.y:363, left_elbow.y:353, right_elbow.x:319
+ HINGE     n=409: right_elbow.y:363, left_elbow.y:334, right_shoulder.x:24, left_shoulder.x:9, left_shoulder.y:2
+
+=== temporal stability, TORSO param. (consecutive frames) ===
+ L: n=349 bone-direction change med 1.1 max 28.9 deg; local-rotation change med 1.3 max 25.6 deg; frames with rot change > 3x dir change and >10deg: 0
+ R: n=357 bone-direction change med 1.6 max 40.5 deg; local-rotation change med 1.9 max 35.9 deg; frames with rot change > 3x dir change and >10deg: 0
+
+=== mesh: TORSO (zero twist) vs HINGE (anatomical twist), same arm joints ===
+  01986 f000: max arm-joint diff 0.0000 mm | vertex diff max    0.0 mm, verts moved >10 mm 0
+  01986 f020: max arm-joint diff 0.0000 mm | vertex diff max   27.5 mm, verts moved >10 mm 690
+  01986 f040: max arm-joint diff 0.0000 mm | vertex diff max   18.5 mm, verts moved >10 mm 454
+  01986 f060: max arm-joint diff 0.0000 mm | vertex diff max   36.7 mm, verts moved >10 mm 1904
+  01986 f080: max arm-joint diff 0.0000 mm | vertex diff max    0.0 mm, verts moved >10 mm 0
+  01987 f000: max arm-joint diff 0.0000 mm | vertex diff max    0.0 mm, verts moved >10 mm 0
+  01987 f020: max arm-joint diff 0.0000 mm | vertex diff max   33.5 mm, verts moved >10 mm 984
+  01987 f040: max arm-joint diff 0.0000 mm | vertex diff max   16.5 mm, verts moved >10 mm 351
+  01987 f060: max arm-joint diff 0.0000 mm | vertex diff max   15.9 mm, verts moved >10 mm 157
+  01988 f000: max arm-joint diff 0.0000 mm | vertex diff max   51.8 mm, verts moved >10 mm 1167
+  01988 f020: max arm-joint diff 0.0000 mm | vertex diff max    0.0 mm, verts moved >10 mm 0
+  01988 f040: max arm-joint diff 0.0000 mm | vertex diff max    7.8 mm, verts moved >10 mm 0

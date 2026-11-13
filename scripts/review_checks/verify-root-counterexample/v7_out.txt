@@ -1,0 +1,6 @@
+1986_ frames 83 zero-sentinel [0 0] in-frame L/R 0.000/0.000 | world vis>=0.5 L/R 0.000/0.000
+1987_ frames 75 zero-sentinel [0 0] in-frame L/R 1.000/1.000 | world vis>=0.5 L/R 0.907/0.907
+1988_ frames 144 zero-sentinel [1 1] in-frame L/R 0.000/0.000 | world vis>=0.5 L/R 0.042/0.042
+1991_ frames 49 zero-sentinel [0 0] in-frame L/R 0.449/0.367 | world vis>=0.5 L/R 0.816/0.816
+1992_ frames 59 zero-sentinel [0 0] in-frame L/R 0.136/0.237 | world vis>=0.5 L/R 1.000/1.000
+mean over clips: in-frame L 0.317 R 0.321 | visibility L 0.553 R 0.553

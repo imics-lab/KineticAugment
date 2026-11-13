@@ -1,0 +1,51 @@
+default           01986  frames=83 detected=83
+default           01987  frames=75 detected=75
+default           01988  frames=144 detected=143
+default           01991  frames=49 detected=49
+default           01992  frames=59 detected=59
+default_rerun     01986  frames=83 detected=83
+default_rerun     01987  frames=75 detected=75
+default_rerun     01988  frames=144 detected=143
+default_rerun     01991  frames=49 detected=49
+default_rerun     01992  frames=59 detected=59
+nosmooth          01986  frames=83 detected=83
+nosmooth          01987  frames=75 detected=75
+nosmooth          01988  frames=144 detected=143
+nosmooth          01991  frames=49 detected=49
+nosmooth          01992  frames=59 detected=59
+static            01986  frames=83 detected=83
+static            01987  frames=75 detected=75
+static            01988  frames=144 detected=143
+static            01991  frames=49 detected=49
+static            01992  frames=59 detected=59
+resize75          01986  frames=83 detected=83
+resize75          01987  frames=75 detected=75
+resize75          01988  frames=144 detected=143
+resize75          01991  frames=49 detected=49
+resize75          01992  frames=59 detected=59
+padshift          01986  frames=83 detected=83
+padshift          01987  frames=75 detected=75
+padshift          01988  frames=144 detected=143
+padshift          01991  frames=49 detected=49
+padshift          01992  frames=59 detected=59
+bright            01986  frames=83 detected=83
+bright            01987  frames=75 detected=75
+bright            01988  frames=144 detected=143
+bright            01991  frames=49 detected=49
+bright            01992  frames=59 detected=59
+nosmooth_resize75 01986  frames=83 detected=83
+nosmooth_resize75 01987  frames=75 detected=75
+nosmooth_resize75 01988  frames=144 detected=143
+nosmooth_resize75 01991  frames=49 detected=49
+nosmooth_resize75 01992  frames=59 detected=59
+Downloading model to /Users/bemnetbeshah/Workspace/cv-research/KineticAugment/.venv/lib/python3.11/site-packages/mediapipe/modules/pose_landmark/pose_landmark_heavy.tflite
+complexity2       01986  frames=83 detected=83
+complexity2       01987  frames=75 detected=75
+complexity2       01988  frames=144 detected=143
+complexity2       01991  frames=49 detected=49
+complexity2       01992  frames=59 detected=59
+default_sharedgraph 01986 frames=83
+default_sharedgraph 01987 frames=75
+default_sharedgraph 01988 frames=144
+default_sharedgraph 01991 frames=49
+default_sharedgraph 01992 frames=59

@@ -1,0 +1,2 @@
+invalid wrist instances: 100; reconstruct_body emitted a finite position for 100
+distance of that emitted (straight-arm default) wrist from MediaPipe's low-visibility estimate: median 67.5% shoulder width, p95 103.8%

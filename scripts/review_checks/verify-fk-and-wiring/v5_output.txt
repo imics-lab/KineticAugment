@@ -1,0 +1,4 @@
+frames 410: fitted 409, raised 1
+frames whose output contains a finite value for an INVALID modelled landmark: 58 (14.2% of fitted), rows 100
+  those defaulted values vs the (low-visibility) raw landmark: median 67.5% shoulder width, p95 103.8%
+orphan configurations: 0;  one-arm-only frames: 0

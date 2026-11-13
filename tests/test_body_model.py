@@ -35,9 +35,12 @@ try:
 except ImportError:
     SMPLX_AVAILABLE = False
 
-# Check if models are downloaded
-MODEL_PATH = Path(__file__).parent.parent / 'models' / 'smplx'
-MODELS_DOWNLOADED = MODEL_PATH.exists() and (MODEL_PATH / 'SMPLX_NEUTRAL.npz').exists()
+# smplx.create() appends the model type to the path it is given, so it must
+# receive the models/ root -- passing models/smplx resolves to models/smplx/smplx
+# and fails. The asset check needs the subdirectory, so the two are separate.
+MODEL_PATH = Path(__file__).parent.parent / 'models'
+SMPLX_ASSET_DIR = MODEL_PATH / 'smplx'
+MODELS_DOWNLOADED = SMPLX_ASSET_DIR.exists() and (SMPLX_ASSET_DIR / 'SMPLX_NEUTRAL.npz').exists()
 
 
 class TestJointMapping:
@@ -229,10 +232,33 @@ class TestSMPLXWrapper:
         """Test getting rest pose joint positions."""
         joints = smplx_wrapper.get_rest_pose_joints()
 
-        assert joints.shape == (1, smplx_wrapper.num_joints, 3)
+        assert joints.shape == (1, smplx_wrapper.num_output_joints, 3)
         # In rest pose, joints should be centered around origin
         center = joints.mean(axis=1)
         assert np.abs(center).max() < 1.0  # Should be near origin
+
+    def test_joint_counts_are_distinct(self, smplx_wrapper):
+        """num_model_joints is the kinematic chain; num_output_joints is wider."""
+        assert smplx_wrapper.num_model_joints == 55
+        assert smplx_wrapper.num_output_joints == 127
+        assert smplx_wrapper.num_output_joints > smplx_wrapper.num_model_joints
+
+    def test_num_joints_is_deprecated(self, smplx_wrapper):
+        """The ambiguous alias still works but warns and never sizes output."""
+        with pytest.deprecated_call():
+            assert smplx_wrapper.num_joints == smplx_wrapper.num_model_joints
+
+    def test_model_joints_is_leading_slice_of_joints(self, smplx_wrapper):
+        """model_joints must be exactly the kinematic prefix of joints."""
+        params = smplx_wrapper.get_default_params(batch_size=1)
+        output = smplx_wrapper.forward(**params, return_vertices=False)
+
+        assert output['joints'].shape == (1, smplx_wrapper.num_output_joints, 3)
+        assert output['model_joints'].shape == (1, smplx_wrapper.num_model_joints, 3)
+        np.testing.assert_array_equal(
+            output['model_joints'],
+            output['joints'][:, :smplx_wrapper.num_model_joints],
+        )
 
 
 class TestSMPLXParamsContainer:

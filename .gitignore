@@ -222,12 +222,26 @@ models/smplx/*.zip
 models/mano/*.pkl
 models/vposer/*.pt
 
+# Local research learning guide
+/docs/research-guide/
+
+# Personal presentation / findings notes
+/presentation_one.md
+
 # macOS metadata
 .DS_Store
 
 # Raw dataset videos (kept local; not redistributed)
 /data/metsis_new_unseen_sign_videos/
 
+# WLASL annotations (download from github.com/dxli94/WLASL; not redistributed)
+/data/wlasl/WLASL_v0.3.json
 # Round-trip viewer data (derived; source frames of signers)
 /demo/round_trip/clips/
 /demo/round_trip/clips.json
+
+# Brainstorm and plan-execution scratch
+.superpowers/
+
+# Personal notes kept out of the shared repo
+docs/Resume_Handoff.md

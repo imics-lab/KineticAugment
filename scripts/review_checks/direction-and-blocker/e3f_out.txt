@@ -1,0 +1,25 @@
+(a) oracle per-clip linear transfer, k=3, relative error
+  01986: n=150 relative error median 0.53 p95 1.38
+  01987: n=183 relative error median 0.49 p95 1.77
+  01988: n=286 relative error median 0.53 p95 1.55
+  01991: n=82 relative error median 0.53 p95 2.28
+  01992: n=71 relative error median 0.53 p95 1.32
+  pooled: median 0.52 p95 1.66
+
+(b) bone length CV over time and forearm/upper-arm ratio (frames with vis>0.5 on the bone)
+  clip   space      CV upperL  CV foreL CV upperR  CV foreR fore/upper L      R
+  01986  world            6.1       8.9       6.5      12.2         1.14   1.00
+  01986  image-iso       14.1      18.4      23.7      24.5         1.95   1.87
+  01986  image-xy         7.8      18.2       7.6      10.8         0.52   0.63
+  01987  world            2.1      13.9       5.1       5.7         0.79   0.88
+  01987  image-iso       15.2      16.9      23.1      23.4         1.54   1.65
+  01987  image-xy         1.7      26.1       7.3      24.3         0.59   0.63
+  01988  world            6.4       7.5       6.0       8.9         1.06   1.11
+  01988  image-iso       24.0      14.6      24.1      11.2         1.37   1.31
+  01988  image-xy         5.0      10.3       7.7      13.2         0.72   0.99
+  01991  world            3.1       5.8       5.6       5.6         1.04   1.05
+  01991  image-iso        5.0       5.0       6.4      24.6         1.15   1.72
+  01991  image-xy         2.5      11.6       9.2      46.0         0.81   0.67
+  01992  world            4.0       2.6       2.2      12.4         1.18   0.97
+  01992  image-iso       13.3       2.9      15.6      13.3         1.61   1.80
+  01992  image-xy         0.9       5.0       5.3      14.0         0.67   0.66

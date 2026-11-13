@@ -1,0 +1,11 @@
+xfail test case (seed 4, 30 deg about y) with current converter: max 62.20 mm, mean 32.84 mm; per landmark mm: [50.36 62.2  22.23 15.75 13.69 32.83]
+same case with shoulder-only root prototype: max 1.272e-16 m  -> PASSES the test's atol=1e-6
+nose landmark (index 0) present in the test fixture? False
+shoulder-only root prototype, 200 random poses, random root axis and angle 0-180 deg, random offset: worst 9.992e-16 m
+current converter with R shoulder invalid: runs; max err on valid landmarks (mm): 51.49
+
+tests/test_converter.py .....x..                                         [100%]
+
+=========================== short test summary info ============================
+XFAIL tests/test_converter.py::TestRoundTrip::test_exact_with_rotated_root - Step 8: the root is not yet estimated, so shoulders stay at rest position and no rigid transform can place them without rotating correct arm directions away. strict=True makes this fail loudly once Step 8 fixes it, so the marker gets removed rather than forgotten.
+========================= 7 passed, 1 xfailed in 1.54s =========================

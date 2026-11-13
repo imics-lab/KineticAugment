@@ -1,0 +1,4 @@
+01987 max-arm-dev mm at frames {0: 113.9, 5: 73.2, 10: 70.8, 20: 98.6, 40: 29.7, 74: 13.8} | median over 2nd half: 33.69 | frame after which always <5mm: None
+01988 max-arm-dev mm at frames {0: 78.5, 5: 27.7, 10: 26.9, 20: 6.3, 40: 5.2, 143: nan} | median over 2nd half: 5.95 | frame after which always <5mm: None
+01991 max-arm-dev mm at frames {0: 23.6, 5: 11.8, 10: 12.7, 20: 3.9, 40: 0.3, 48: 0.1} | median over 2nd half: 0.41 | frame after which always <5mm: 20
+01992 max-arm-dev mm at frames {0: 102.6, 5: 81.4, 10: 59.7, 20: 46.5, 40: 28.4, 58: 23.0} | median over 2nd half: 24.68 | frame after which always <5mm: None

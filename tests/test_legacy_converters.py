@@ -37,7 +37,7 @@ def projector():
 
 class TestMediaPipeToSMPLX:
     def test_emits_deprecation_warning(self):
-        with pytest.warns(DeprecationWarning):
+        with pytest.warns(DeprecationWarning, match="converter"):
             MediaPipeToSMPLX()
 
     def test_fit_single_frame(self, fitter, landmarks):
@@ -62,7 +62,7 @@ class TestMediaPipeToSMPLX:
 
 class TestSMPLXToMediaPipe:
     def test_emits_deprecation_warning(self):
-        with pytest.warns(DeprecationWarning):
+        with pytest.warns(DeprecationWarning, match="converter"):
             SMPLXToMediaPipe()
 
     def test_project_full_frame(self, fitter, projector, landmarks):

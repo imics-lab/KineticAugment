@@ -1,0 +1,33 @@
+rest lengths (m) [0.2676 0.2531 0.2749 0.2498 0.3159]
+max |dL| arm-only pose (mm) 1.5073581272062597e-07
+0.2 rad L collar (z): shoulder W 315.93059225274163 -> 303.2846503078353 mm
+  collar axis 0: dSW = 0.38 mm
+  collar axis 1: dSW = -4.82 mm
+  collar axis 2: dSW = -12.65 mm
+spine-only bend: max |dL| (mm) 7.799316747991725e-09
+betas=0, 10 betas: shape (5, 10) sv(mm/beta)=[41.5199 17.5477  2.8672  0.4729  0.045 ] rank(tol 1e-9 m)=5 cond=923
+J (mm per beta):
+ [[13.3624 -0.2691 -3.3357  1.44    1.6028  1.1672  0.5171  0.2704  1.3567 -0.1178]
+ [16.7499 -0.8073 -4.8005 -0.3566 -0.1119  1.1936 -0.7302 -0.306   1.6152  0.5881]
+ [14.4457 -0.1837 -3.9254  0.952   1.3825  1.0186  0.6346  0.54    1.4381 -0.2248]
+ [15.982  -0.8525 -4.6412 -0.2555 -0.0383  1.2246 -0.6905 -0.338   1.594   0.5597]
+ [25.651  16.7382  2.6893 -3.1149  0.7725 -5.5622  2.4774  0.0613 -4.9243 -1.5574]]
+autograd vs FD max diff (mm/beta): 1.8954343303234644e-09
+Jacobian change under arm pose (mm/beta max): 1.160455412319017e-08
+betas=0, 10 betas + scale(per 1%): shape (5, 11) sv(mm/beta)=[41.9382 17.6052  2.9366  0.4737  0.0583] rank(tol 1e-9 m)=5 cond=720
+betas~N(0,1.0^2) #0: shape (5, 10) sv(mm/beta)=[41.5557 17.5112  2.8831  0.487   0.0454] rank(tol 1e-9 m)=5 cond=916
+betas~N(0,1.0^2) #1: shape (5, 10) sv(mm/beta)=[41.5809 17.4719  2.8874  0.4989  0.0463] rank(tol 1e-9 m)=5 cond=899
+betas~N(0,1.0^2) #2: shape (5, 10) sv(mm/beta)=[41.463  17.6178  2.862   0.4515  0.0458] rank(tol 1e-9 m)=5 cond=906
+betas~N(0,2.0^2) #3: shape (5, 10) sv(mm/beta)=[41.5602 17.5432  2.8957  0.4605  0.0435] rank(tol 1e-9 m)=5 cond=955
+betas~N(0,2.0^2) #4: shape (5, 10) sv(mm/beta)=[41.55   17.5376  2.8714  0.4484  0.0437] rank(tol 1e-9 m)=5 cond=950
+betas~N(0,2.0^2) #5: shape (5, 10) sv(mm/beta)=[41.4341 17.6305  2.8435  0.4518  0.0456] rank(tol 1e-9 m)=5 cond=908
+4 arm lengths, 10 betas: shape (4, 10) sv(mm/beta)=[31.8144  2.9028  0.5034  0.1016] rank(tol 1e-9 m)=4 cond=313
+cos(L up,R up)=0.99840 cos(L fo,R fo)=0.99994
+norm of L-R rows (mm per unit-norm beta): upper 1.394 fore 0.798 ; means: upper 14.625 fore 17.202
+sigma_L=1 mm: eff dof = 3.07
+sigma_L=3 mm: eff dof = 2.47
+sigma_L=5 mm: eff dof = 2.17
+sigma_L=10 mm: eff dof = 1.78
+sigma_L=20 mm: eff dof = 1.27
+min-norm beta for +1% scale: |beta|=0.903  beta=[ 0.0193  0.3163 -0.4266  0.0403  0.3272  0.3286  0.1868 -0.4949  0.0964 -0.1666] resid=1.44e-14 mm
+cos(J[:,0], L_rest) = 0.9828234735591821

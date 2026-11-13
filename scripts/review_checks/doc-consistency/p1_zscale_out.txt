@@ -1,0 +1,6 @@
+01986: fitted z-scale (image z / metric-consistent z) median 2.93  p5 2.78  p95 3.15
+01987: fitted z-scale (image z / metric-consistent z) median 3.14  p5 2.55  p95 3.44
+01988: fitted z-scale (image z / metric-consistent z) median 2.81  p5 2.61  p95 3.18
+01991: fitted z-scale (image z / metric-consistent z) median 3.43  p5 3.14  p95 3.62
+01992: fitted z-scale (image z / metric-consistent z) median 3.29  p5 3.19  p95 3.57
+pooled median 3.03

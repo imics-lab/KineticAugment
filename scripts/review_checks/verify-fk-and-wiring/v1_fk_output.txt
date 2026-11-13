@@ -1,0 +1,10 @@
+f32          n= 60 max=4.322e-07 median=2.280e-07
+f64          n= 60 max=6.223e-07 median=2.820e-07
+f32_22       n= 60 max=4.083e-07 median=1.855e-07
+large        n= 60 max=1.252e-06 median=5.094e-07
+shape_blind  n=  5 max=1.902e-01 median=1.298e-01
+expr         n=  5 max=1.704e-03 median=8.184e-04
+betas=0 sigma0.3 20 poses, all 55 joints f32: max=2.365e-07 min=7.712e-08
+16 betas: RuntimeError einsum(): subscript l has size 10 for operand 1 which does not broadcast with previously seen size 16
+male AssertionError Path models/smplx/SMPLX_MALE.npz does not exist!
+female AssertionError Path models/smplx/SMPLX_FEMALE.npz does not exist!

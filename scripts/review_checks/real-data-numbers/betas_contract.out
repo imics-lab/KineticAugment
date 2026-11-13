@@ -1,0 +1,4 @@
+BodyFit.betas returned with a shaped skeleton: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+round trip through shaped skeleton, worst arm error (m): 3.48e-02
+real SMPL-X forward on the serialized BodyFit vs reconstruct_body, worst (m): 5.717e-02
+same but with the skeleton's true betas substituted, worst (m): 8.546e-08

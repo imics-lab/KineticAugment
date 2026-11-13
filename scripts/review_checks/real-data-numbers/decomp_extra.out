@@ -1,0 +1,23 @@
+frame-bootstrap 95% CI [sim, root=sh, len=clip]: root [11.3, 16.3]  len [31.7, 37.5]  both [53.0, 57.9]  interaction [3.8, 10.2]
+frame-bootstrap 95% CI [sim, root=opt, len=clip]: root [16.2, 20.7]  len [31.9, 37.5]  both [57.8, 63.0]  interaction [4.5, 10.1]
+frame-bootstrap 95% CI [rigid, root=sh, len=clip]: root [10.1, 14.7]  len [31.8, 36.7]  both [44.7, 49.5]  interaction [-2.0, 2.4]
+frame-bootstrap 95% CI [rigid, root=opt, len=clip]: root [15.3, 19.2]  len [31.9, 36.7]  both [48.2, 55.0]  interaction [-2.2, 2.9]
+clip-bootstrap 95% CI [sim, root=sh, len=clip]: root [2.7, 25.8]  len [26.9, 42.8]  both [48.6, 63.7]
+
+similarity scale (median, p5, p95) under each shape oracle (root none):
+  ('sim', 'none', 'rest', 'rest'): 0.9726  [0.9102, 1.0241]
+  ('sim', 'none', 'clip', 'rest'): 1.0184  [0.9489, 1.0792]
+  ('sim', 'none', 'rest', 'clip'): 0.9537  [0.8946, 0.9996]
+  ('sim', 'none', 'clip', 'clip'): 0.9953  [0.9351, 1.0515]
+  ('sim', 'sh', 'clip', 'clip'): 0.9978  [0.9373, 1.0439]
+  ('sim', 'none', 'frame', 'frame'): 0.9982  [0.9934, 1.0187]
+
+what the doc's 'unexplained 44.5%' consists of (sim, sh root):
+  ('sim', 'sh', 'clip', 'rest'): 2.645%  remaining 44.5% of baseline
+  ('sim', 'sh', 'clip', 'clip'): 2.293%  remaining 38.6% of baseline  (step 5.9 pts)
+  ('sim', 'sh', 'frame', 'clip'): 0.297%  remaining 5.0% of baseline  (step 33.6 pts)
+  ('sim', 'sh', 'frame', 'frame'): 0.000%  remaining 0.0% of baseline  (step 5.0 pts)
+
+shoulder-line root + translation only (Step-8-like, directions exact), lengths=rest: median 6.019%  p95 12.691%
+
+shoulder-line root + translation only (Step-8-like, directions exact), lengths=clip: median 3.594%  p95 9.825%

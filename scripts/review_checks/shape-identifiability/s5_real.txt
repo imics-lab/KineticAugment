@@ -1,0 +1,70 @@
+Template lengths (mm): [267.6 253.1 274.9 249.8 315.9] ['L upper arm', 'L forearm', 'R upper arm', 'R forearm', 'shoulder width']
+
+=== Per-clip observed length statistics (mm) ===
+clip 01986: frames=83
+   L upper arm     n=  83 median=  243.3 frame-std= 14.62 lag1-acf= 0.96 n_eff~   1.8 iid-SE(median)~ 2.01 block-boot-SE= 6.58
+   L forearm       n=  54 median=  276.5 frame-std= 24.13 lag1-acf= 0.93 n_eff~   1.8 iid-SE(median)~ 4.11 block-boot-SE= 4.64
+   R upper arm     n=  83 median=  248.7 frame-std= 16.33 lag1-acf= 0.94 n_eff~   2.3 iid-SE(median)~ 2.25 block-boot-SE= 4.48
+   R forearm       n=  62 median=  248.7 frame-std= 30.45 lag1-acf= 0.96 n_eff~   1.3 iid-SE(median)~ 4.85 block-boot-SE= 8.85
+   shoulder width  n=  83 median=  332.7 frame-std=  4.45 lag1-acf= 0.91 n_eff~   4.0 iid-SE(median)~ 0.61 block-boot-SE= 1.25
+clip 01987: frames=75
+   L upper arm     n=  75 median=  240.6 frame-std=  9.66 lag1-acf= 0.79 n_eff~   8.8 iid-SE(median)~ 1.40 block-boot-SE= 2.29
+   L forearm       n=  69 median=  190.9 frame-std= 22.53 lag1-acf= 0.91 n_eff~   3.3 iid-SE(median)~ 3.40 block-boot-SE= 8.27
+   R upper arm     n=  75 median=  250.6 frame-std= 14.19 lag1-acf= 0.88 n_eff~   4.6 iid-SE(median)~ 2.05 block-boot-SE= 3.03
+   R forearm       n=  73 median=  220.7 frame-std= 13.94 lag1-acf= 0.89 n_eff~   4.1 iid-SE(median)~ 2.04 block-boot-SE= 6.63
+   shoulder width  n=  75 median=  333.7 frame-std= 15.34 lag1-acf= 0.98 n_eff~   0.8 iid-SE(median)~ 2.22 block-boot-SE=10.65
+clip 01988: frames=144
+   L upper arm     n= 143 median=  256.9 frame-std= 15.90 lag1-acf= 0.98 n_eff~   1.6 iid-SE(median)~ 1.67 block-boot-SE= 6.32
+   L forearm       n= 124 median=  271.5 frame-std= 23.07 lag1-acf= 0.93 n_eff~   4.7 iid-SE(median)~ 2.60 block-boot-SE= 2.37
+   R upper arm     n= 143 median=  236.2 frame-std= 14.23 lag1-acf= 0.97 n_eff~   2.1 iid-SE(median)~ 1.49 block-boot-SE= 4.04
+   R forearm       n= 121 median=  256.9 frame-std= 24.46 lag1-acf= 0.93 n_eff~   4.3 iid-SE(median)~ 2.79 block-boot-SE= 2.83
+   shoulder width  n= 143 median=  325.3 frame-std=  5.52 lag1-acf= 0.93 n_eff~   4.9 iid-SE(median)~ 0.58 block-boot-SE= 2.00
+clip 01991: frames=49
+   L upper arm     n=  49 median=  228.5 frame-std=  6.83 lag1-acf= 0.96 n_eff~   1.0 iid-SE(median)~ 1.22 block-boot-SE= 5.15
+   L forearm       n=  49 median=  238.8 frame-std= 15.29 lag1-acf= 0.97 n_eff~   0.8 iid-SE(median)~ 2.74 block-boot-SE=11.56
+   R upper arm     n=  49 median=  259.8 frame-std= 13.60 lag1-acf= 0.88 n_eff~   3.1 iid-SE(median)~ 2.43 block-boot-SE= 9.59
+   R forearm       n=  48 median=  271.8 frame-std= 13.58 lag1-acf= 0.92 n_eff~   1.9 iid-SE(median)~ 2.46 block-boot-SE= 8.37
+   shoulder width  n=  49 median=  346.7 frame-std=  9.01 lag1-acf= 0.98 n_eff~   0.6 iid-SE(median)~ 1.61 block-boot-SE= 6.69
+clip 01992: frames=59
+   L upper arm     n=  59 median=  229.1 frame-std=  9.99 lag1-acf= 0.93 n_eff~   2.0 iid-SE(median)~ 1.63 block-boot-SE= 2.82
+   L forearm       n=  59 median=  274.8 frame-std=  9.26 lag1-acf= 0.90 n_eff~   3.2 iid-SE(median)~ 1.51 block-boot-SE= 3.67
+   R upper arm     n=  59 median=  233.9 frame-std=  7.78 lag1-acf= 0.90 n_eff~   3.0 iid-SE(median)~ 1.27 block-boot-SE= 3.37
+   R forearm       n=  59 median=  235.3 frame-std= 21.54 lag1-acf= 0.93 n_eff~   2.1 iid-SE(median)~ 3.51 block-boot-SE= 4.22
+   shoulder width  n=  59 median=  329.6 frame-std=  1.98 lag1-acf= 0.64 n_eff~  13.2 iid-SE(median)~ 0.32 block-boot-SE= 0.20
+
+=== Per-clip shape fits to the 5 median lengths ===
+
+--- clip 01986: observed [243.3 276.5 248.7 248.7 332.7] mm; template residual [ 24.3 -23.5  26.1   1.1 -16.7] mm
+  MAP sigma= 1.0mm |beta|=12.00 resid(mm)=[ -0.6 -12.8   4.7   9.8  -0.1] height=175.1cm leg=76.3cm vol= 40.9L
+  MAP sigma= 3.0mm |beta|= 6.50 resid(mm)=[  9.  -20.3  12.8   3.4  -0.8] height=171.5cm leg=76.1cm vol= 57.9L
+  MAP sigma=10.0mm |beta|= 1.30 resid(mm)=[ 19.6 -26.1  21.6  -1.7  -4.1] height=170.6cm leg=77.1cm vol= 78.6L
+  min-norm EXACT fit   |beta|= 354.9 resid(mm)=[-0.  0.  0.  0.  0.] height=1000.8cm vol=3976.5L  beta=[  55.36 -140.25  170.55   37.49  -83.26 -122.25  -53.54  206.95  -38.91   60.16]
+  unregularised LS, box |b_k|<=3, 20 inits: max|resid| 19.78-19.78 mm; among near-best (within 0.5mm) n=20: height range 165.1-165.1 cm, |beta| 8.5-8.5
+
+--- clip 01987: observed [240.6 190.9 250.6 220.7 333.7] mm; template residual [ 27.   62.1  24.3  29.1 -17.8] mm
+  MAP sigma= 1.0mm |beta|= 5.93 resid(mm)=[  1.9  16.3  -3.3 -15.1  -0.2] height=146.8cm leg=63.9cm vol= 92.5L
+  MAP sigma= 3.0mm |beta|= 4.25 resid(mm)=[ -0.2  19.5  -5.8 -12.2  -1.1] height=151.5cm leg=65.4cm vol= 99.4L
+  MAP sigma=10.0mm |beta|= 2.93 resid(mm)=[ 1.6 28.1 -3.2 -3.8 -9.5] height=155.4cm leg=67.7cm vol= 87.0L
+  min-norm EXACT fit   |beta|= 507.8 resid(mm)=[ 0. -0.  0. -0. -0.] height=1047.0cm vol=11616.2L  beta=[ -78.09  187.6  -215.29  -86.66  128.56  126.05   94.61 -330.56  101.39  -41.83]
+  unregularised LS, box |b_k|<=3, 20 inits: max|resid| 15.70-15.71 mm; among near-best (within 0.5mm) n=20: height range 137.7-137.8 cm, |beta| 8.8-8.8
+
+--- clip 01988: observed [256.9 271.5 236.2 256.9 325.3] mm; template residual [ 10.6 -18.5  38.7  -7.1  -9.3] mm
+  MAP sigma= 1.0mm |beta|=14.38 resid(mm)=[-10.3  -7.7  15.9   2.6  -0.2] height=186.8cm leg=82.5cm vol= 88.9L
+  MAP sigma= 3.0mm |beta|= 6.33 resid(mm)=[ -3.3 -14.6  25.9  -4.1  -0.8] height=173.1cm leg=77.3cm vol= 60.7L
+  MAP sigma=10.0mm |beta|= 1.11 resid(mm)=[  6.2 -20.7  34.4  -9.4  -2.9] height=170.8cm leg=77.5cm vol= 76.0L
+  min-norm EXACT fit   |beta|= 178.4 resid(mm)=[ 0. -0.  0.  0. -0.] height=679.5cm vol= 448.5L  beta=[ 33.37 -84.21 106.09  18.09 -24.19 -59.39 -36.78  65.4  -32.84  35.09]
+  unregularised LS, box |b_k|<=3, 20 inits: max|resid| 24.54-24.54 mm; among near-best (within 0.5mm) n=20: height range 187.9-187.9 cm, |beta| 9.0-9.0
+
+--- clip 01991: observed [228.5 238.8 259.8 271.8 346.7] mm; template residual [ 39.1  14.2  15.1 -22.  -30.7] mm
+  MAP sigma= 1.0mm |beta|=11.14 resid(mm)=[ 11.6  17.1  -7.4 -20.8  -0.1] height=160.9cm leg=69.7cm vol= 39.0L
+  MAP sigma= 3.0mm |beta|= 6.05 resid(mm)=[ 20.8  11.   -1.2 -25.9  -1.1] height=167.3cm leg=73.3cm vol= 63.9L
+  MAP sigma=10.0mm |beta|= 1.78 resid(mm)=[ 31.6   7.4   7.7 -28.8  -7.2] height=168.7cm leg=75.4cm vol= 85.0L
+  min-norm EXACT fit   |beta|= 645.3 resid(mm)=[ 0. -0.  0.  0.  0.] height=1315.8cm vol=27679.2L  beta=[ -93.5   227.32 -250.6  -134.48  165.26  143.78  119.44 -429.28  163.17  -44.48]
+  unregularised LS, box |b_k|<=3, 20 inits: max|resid| 24.82-24.82 mm; among near-best (within 0.5mm) n=20: height range 160.0-160.0 cm, |beta| 8.7-8.7
+
+--- clip 01992: observed [229.1 274.8 233.9 235.3 329.6] mm; template residual [ 38.5 -21.7  41.   14.5 -13.7] mm
+  MAP sigma= 1.0mm |beta|=14.99 resid(mm)=[ -0.8 -18.7   5.7  15.4  -0.2] height=170.0cm leg=72.3cm vol= 31.2L
+  MAP sigma= 3.0mm |beta|= 8.17 resid(mm)=[ 11.4 -28.   15.7   7.5  -1. ] height=166.0cm leg=72.2cm vol= 52.5L
+  MAP sigma=10.0mm |beta|= 1.87 resid(mm)=[ 25.3 -34.2  27.5   2.3  -5.8] height=165.5cm leg=73.9cm vol= 76.6L
+  min-norm EXACT fit   |beta|= 539.0 resid(mm)=[ 0. -0. -0.  0. -0.] height=1405.2cm vol=12913.0L  beta=[  82.09 -208.62  256.67   56.38 -132.   -182.92  -83.39  319.51  -56.15   90.28]
+  unregularised LS, box |b_k|<=3, 20 inits: max|resid| 29.83-29.84 mm; among near-best (within 0.5mm) n=20: height range 157.1-157.1 cm, |beta| 8.7-8.7

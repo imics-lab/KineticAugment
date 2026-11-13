@@ -2,11 +2,8 @@
 
 Date: 2026-10-11. This report measures the Tasks 1–5 face stream and classifier integration on
 the cached pilot and evaluation clips. Machine-readable counts, per-clip coverage, and cache hashes
-are in the evidence JSON. The earlier training-data audit
+are in [the evidence JSON](V1_3_Face_Integration_Evidence.json). The earlier training-data audit
 remains the source for broader contact-accuracy limitations.
-
-*Plans, ledgers, one-off scripts, tests and evidence files named here without a link are kept on
-the author's research branches and are not part of this repository.*
 
 ## Real-cache coverage
 

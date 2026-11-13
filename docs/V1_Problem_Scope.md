@@ -9,10 +9,7 @@ This document scopes the first deliverable for the MediaPipe ↔ SMPL-X conversi
 convert MediaPipe landmarks into genuine SMPL-X parameters and back, losing as little
 information as the representation allows, and measure precisely how much is lost.
 
-*Plans, ledgers, one-off scripts, tests and evidence files named here without a link are kept on
-the author's research branches and are not part of this repository.*
-
-Evidence labels:
+Evidence labels follow the [research guide](research-guide/index.md#how-to-interpret-evidence):
 **Code present**, **Verified now**, **Historical claim**, **Inference**, **Proposed work**.
 
 ---
@@ -92,7 +89,7 @@ error this study exists to quantify. It is retained as a documented fallback (Se
 ## 3. What exists today, and why it does not satisfy the ask
 
 **Verified now.** The current converter round-trips to a maximum absolute error of
-`3.7e-09` (05-project-status.md:17). That number is real
+`3.7e-09` ([05-project-status.md:17](research-guide/05-project-status.md:17)). That number is real
 and reproducible. It also does not mean what it appears to mean.
 
 [`mp_to_smplx.py:1-30`](../src/kinetic_augment/legacy/mp_to_smplx.py) states in its own module
@@ -112,7 +109,7 @@ Consequences that follow directly from this, and that V1 exists to fix:
 
 - Intrinsic augmentations treat displacements as angles. Zero-noise `JointAnglePerturbation`
   changes projected landmarks by `0.56` — a no-op operation that is not a no-op
-  (**Verified now**, 05-project-status.md:18).
+  (**Verified now**, [05-project-status.md:18](research-guide/05-project-status.md:18)).
 - Joint-limit clamping applies radian bounds to displacement values, which has no anatomical meaning.
 - No mesh, no collision geometry, and no body-shape variation is reachable through this path.
 
@@ -174,7 +171,7 @@ V1 policy, stated explicitly rather than left implicit:
   derived from the shoulder–hip frame.
 - **Wrists:** held at zero. Wrist rotation requires hand landmarks (out of scope).
 - **Feet, head:** held at zero. The existing `head → nose` and `foot → foot_index` entries in
-  [`joint_mapping.py:175-187`](../src/kinetic_augment/body_model/joint_mapping.py) are marked
+  [`joint_mapping.py:175-187`](../src/kinetic_augment/body_model/joint_mapping.py:175) are marked
   `# Approximate` in the source and are **excluded** from the V1 correspondence set.
 
 Reconstruction of unconstrained joints therefore reflects a documented default, not a fit.
@@ -212,7 +209,7 @@ Original criteria (2026-10-01), superseded:
    outcome; an unmeasured success is not.
 
 Point 5 is deliberate. The prior `0.5974 RMSE` figure in the roadmap is uninterpretable because
-no one recorded what it measured (05-project-status.md:36).
+no one recorded what it measured ([05-project-status.md:36](research-guide/05-project-status.md:36)).
 
 ---
 
@@ -262,7 +259,7 @@ Step 5a is what makes the math testable against known ground truth.
 ### Step 0 — Unblock the environment — ✅ **COMPLETE (2026-10-01)**
 
 **Verified now:** the weights were **never** in this repository.
-[`.gitignore:219-224`](../.gitignore) excludes `models/smplx/*.npz`, `*.pkl`, and
+[`.gitignore:219-224`](../.gitignore:219) excludes `models/smplx/*.npz`, `*.pkl`, and
 `models/vposer/*.pt`; there is no Git LFS; and the only files ever committed under `models/`
 were `version.txt`, `README.md`, and one vertex-ID array. **A fresh clone cannot produce them.**
 They are licensed assets requiring registration at `smpl-x.is.tue.mpg.de`.
@@ -291,7 +288,7 @@ the runnable scripts ([phase1_smoke.py:324](../scripts/legacy/phase1_smoke.py),
 SMPL-X returns its 55 model joints **plus 72 extra landmarks** appended after them.
 
 The wrapper docstring's `(1, 55, 3)` claim
-([smplx_wrapper.py:21](../src/kinetic_augment/body_model/smplx_wrapper.py)) is wrong, and
+([smplx_wrapper.py:21](../src/kinetic_augment/body_model/smplx_wrapper.py:21)) is wrong, and
 `SMPLXWrapper.num_joints` reports `55` — the `J_regressor` row count — while `forward()`
 returns 127. **Index into the first 55 only.** Anything that trusts `num_joints` to describe the
 `forward()` output is reading the wrong axis length.
@@ -304,7 +301,7 @@ returns 127. **Index into the first 55 only.** Anything that trusts `num_joints`
 [-1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 12, 13, 14, 16, 17, 18, 19]
 ```
 
-This matches [`SMPLX_BODY_JOINTS`](../src/kinetic_augment/body_model/joint_mapping.py) exactly
+This matches [`SMPLX_BODY_JOINTS`](../src/kinetic_augment/body_model/joint_mapping.py:32) exactly
 for all 22 body joints. That table can be trusted; Step 3 should read `model.parents` directly
 rather than re-deriving the tree.
 
@@ -323,13 +320,13 @@ The numbers `SkeletonSource` must supply, and the baseline Step 7 adjusts away f
 #### Note on `scripts/download_models.py --check`
 
 It exits `1` on a correct V1 install. Its `REQUIRED_FILES` list
-([download_models.py:25-30](../scripts/download_models.py)) demands `SMPLX_MALE.npz` and
+([download_models.py:25-30](../scripts/download_models.py:25)) demands `SMPLX_MALE.npz` and
 `SMPLX_FEMALE.npz`, which **no code path in this repository requests** — every call site
 defaults to `gender="neutral"`. Treat its failure as a false negative, or narrow the list.
 
 ### Step 1 — Measure the noise floor — ✅ **COMPLETE (2026-10-01)**
 
-Reproduce with `scripts/measure_noise_floor.py`.
+Reproduce with [`scripts/measure_noise_floor.py`](../scripts/measure_noise_floor.py).
 
 Two independent estimators were used, because each fails differently and agreement between
 them is the evidence that the number is real:
@@ -414,7 +411,7 @@ Record that as a limitation rather than quietly fitting them.
 
 Implemented test-first in [`skeleton.py`](../src/kinetic_augment/body_model/skeleton.py) and
 [`kinematics.py`](../src/kinetic_augment/body_model/kinematics.py), with 15 tests in
-`tests/test_kinematics.py`, all passing.
+[`tests/test_kinematics.py`](../tests/test_kinematics.py), all passing.
 
 #### Result — forward kinematics matches SMPL-X
 
@@ -436,7 +433,7 @@ whatever hand parameters it is given. Passing zeros does not produce a zero pose
 [`SMPLXSkeleton`](../src/kinetic_augment/body_model/skeleton.py) therefore constructs the model
 with `flat_hand_mean=True`, so a zero rotation means no rotation and the rest pose is genuinely
 the rest pose. Note that
-[`SMPLXWrapper`](../src/kinetic_augment/body_model/smplx_wrapper.py) does **not** pass this
+[`SMPLXWrapper`](../src/kinetic_augment/body_model/smplx_wrapper.py:121) does **not** pass this
 flag and so still carries the offset — harmless for V1, which touches no hand parameters, but it
 must be settled before V2 fits hands, and any hand pose is only comparable between the two paths
 once both agree on the flag.
@@ -447,11 +444,11 @@ once both agree on the flag.
 caused by this work, and both were previously hidden:
 
 - **10 errors** — `AssertionError: Path models/smplx/smplx does not exist!`
-  [`test_body_model.py:40`](../tests/test_body_model.py) sets `MODEL_PATH = models/smplx`,
+  [`test_body_model.py:40`](../tests/test_body_model.py:40) sets `MODEL_PATH = models/smplx`,
   the same wrong spelling as Finding 1. These tests were skipped while the weights were absent,
   so the bug sat undetected behind a skip marker.
 - **2 failures** — `ImportError: cannot import name 'SimpleFitter'`, already recorded in
-  05-project-status.md:36.
+  [05-project-status.md:36](research-guide/05-project-status.md:36).
 
 **Resolved 2026-10-04.** `MODEL_PATH` was serving two incompatible purposes: the asset check
 needs `models/smplx`, while `SMPLXWrapper` needs `models`. Splitting them into `MODEL_PATH` and
@@ -518,7 +515,7 @@ Build this before the inverse. It is the thing the inverse is checked against.
 ### Step 4 — ✅ **COMPLETE (2026-10-04)**
 
 Implemented test-first in [`swing_ik.py`](../src/kinetic_augment/body_model/swing_ik.py), with 11
-tests in `tests/test_swing_ik.py`. Full suite: **54 passed,
+tests in [`tests/test_swing_ik.py`](../tests/test_swing_ik.py). Full suite: **54 passed,
 7 xfailed**.
 
 #### Result — bone directions are reproduced essentially exactly
@@ -578,7 +575,7 @@ that passed for the wrong reason, and a test that failed against correct code.
 Real image-space landmarks are never exactly at `(0, 0, 0)`, so the sentinel is safe for actual
 MediaPipe input. It is **not** safe for synthetic or canonicalised data, where the origin is a
 natural place for a joint to sit. The same hazard is already noted for canonicalisation in
-03-math-and-geometry.md:142. Any future code
+[03-math-and-geometry.md:142](research-guide/03-math-and-geometry.md:142). Any future code
 generating synthetic landmarks must keep joints off the origin, or carry an explicit validity
 mask instead.
 
@@ -615,7 +612,7 @@ accumulating down the chain, which already argues against a kinematics fault.
 original rotations: twist is underdetermined, so many rotation vectors produce identical joint
 positions. Exact *position* recovery is the correct test, and rotation recovery should only be
 asserted for cases where the ambiguity is explicitly pinned
-(`test_recovers_a_known_single_rotation` uses a pure-swing rotation
+([`test_recovers_a_known_single_rotation`](../tests/test_swing_ik.py) uses a pure-swing rotation
 for exactly that reason). Analytic swing is well-founded — HybrIK
 ([arXiv:2011.14672](https://arxiv.org/abs/2011.14672)) uses the same decomposition, and resolves
 twist from additional image evidence rather than from positions.
@@ -835,7 +832,7 @@ depend on them, but now emit a `DeprecationWarning` naming what they actually do
 outside V1.
 
 The six legacy `xfail` tests are retired in favour of
-`tests/test_converter.py`, which encodes the correct contract. They
+[`tests/test_converter.py`](../tests/test_converter.py), which encodes the correct contract. They
 described an optimisation-based fitter that was removed in `f9c6d7b` and deliberately not
 rebuilt, so keeping them as permanent `xfail`s would have recorded a rejected design as pending
 work. Two tests replace them, asserting that each legacy class warns and names the converter.
@@ -852,7 +849,7 @@ the classifier's image-space format — recorded as V2 scope.
 ### Step 7 — implementation record
 
 Implemented test-first in [`converter.py`](../src/kinetic_augment/body_model/converter.py) with
-8 tests in `tests/test_converter.py`, plus a rigid mode for
+8 tests in [`tests/test_converter.py`](../tests/test_converter.py), plus a rigid mode for
 [`alignment.py`](../src/kinetic_augment/body_model/alignment.py). Full suite: **71 passed,
 8 xfailed.**
 
@@ -1081,7 +1078,7 @@ The largest *correctly understood* gap, and a prerequisite for interpreting any 
 
 ### Step 9 — ✅ **COMPLETE (2026-10-05)**
 
-Reproduce with `scripts/diagnose_residual.py` (add
+Reproduce with [`scripts/diagnose_residual.py`](../scripts/diagnose_residual.py) (add
 `--unsmoothed` for E6, which reruns MediaPipe); the floor itself is reported by
 [`scripts/measure_round_trip.py`](../scripts/measure_round_trip.py). **No library code changed**:
 the investigation found nothing in the converter to fix.
@@ -1225,7 +1222,7 @@ Implemented test-first: a new [`shape.py`](../src/kinetic_augment/body_model/sha
 [`skeleton.py`](../src/kinetic_augment/body_model/skeleton.py); `betas` carried through
 [`converter.py`](../src/kinetic_augment/body_model/converter.py). The headline comes from
 [`scripts/measure_round_trip.py`](../scripts/measure_round_trip.py), and every table below from
-`scripts/study_shape_fit.py` (sections S0–S6). Full suite:
+[`scripts/study_shape_fit.py`](../scripts/study_shape_fit.py) (sections S0–S6). Full suite:
 **98 passed, 2 xfailed**.
 
 The data were re-extracted first (Step 9, re-baseline box), so the gap to close is **3.55
@@ -1384,7 +1381,7 @@ augmentation.
 
 #### Context: MediaPipe against itself
 
-**Verified now** (`measure_detector_agreement.py`).
+**Verified now** ([`measure_detector_agreement.py`](../scripts/measure_detector_agreement.py)).
 Each clip was re-extracted with one setting changed and compared with the stored extraction,
 using the round trip's own statistic with no alignment:
 
@@ -1450,8 +1447,8 @@ As built, two points changed:
    1–2, the legacy classes, which the Step 7 decision deprecated.
 2. ✅ **A round-trip test suite**, covering synthetic exactness, the parameter contract and the
    shape fit. Real-data harnesses: [`measure_round_trip.py`](../scripts/measure_round_trip.py),
-   `diagnose_residual.py` and
-   `study_shape_fit.py`.
+   [`diagnose_residual.py`](../scripts/diagnose_residual.py) and
+   [`study_shape_fit.py`](../scripts/study_shape_fit.py).
 3. ✅ **Results documents:** this scope, the full record, and [`V1_Findings.md`](V1_Findings.md),
    the summary. The Step 6 verdict they were to record was retracted and superseded by Steps 9–10.
 
@@ -1497,7 +1494,7 @@ because it is the first thing that will break *after* V1 lands: a correct round-
 temporally incoherent augmenter still produces unusable training data.
 
 **The classifier is a sequence model.**
-[`lstm_classifier.py:114`](../src/kinetic_augment/evaluation/models/lstm_classifier.py) reads
+[`lstm_classifier.py:114`](../src/kinetic_augment/evaluation/models/lstm_classifier.py:114) reads
 `(batch, T, 543, 3)` and takes **only the final hidden state** (line 128), emitting one label for
 the whole clip. A training example is a clip, not a frame, and
 [`dataset.py`](../src/kinetic_augment/pipeline/dataset.py) multiplies the dataset by
@@ -1510,7 +1507,7 @@ applied to all `T` frames.
 applies it to the flattened `(T*J, 3)` clip, so every relative motion inside the clip survives.
 
 **Intrinsic augmentations do not.**
-[`intrinsic.py:133-136`](../src/kinetic_augment/augmentations/intrinsic.py) draws fresh noise
+[`intrinsic.py:133-136`](../src/kinetic_augment/augmentations/intrinsic.py:133) draws fresh noise
 *inside* the batch-row loop:
 
 ```python
@@ -1573,6 +1570,8 @@ Update it whenever a step proves or retracts something.
 | P23 | The MediaPipe→FLAME embedding transfers to SMPL-X: eye corners 1.25-1.48 mm and nose tip 3.89 mm from smplx's own landmarks (F1; five points compared; the rest rely on the triangle check) | V1.3 Task 1, [V1.3 findings](V1_3_Findings.md) §6 |
 | P24 | FaceLandmarker's facial-transformation-matrix convention and the OpenGL-to-image axis flip match the fit's: head-rotation agreement median 0.58° near / 0.57° far; 3.2-10.6° without the flip and 7.8-12.6° inverted on three clips. Not the face-to-pose-world axis match, and agreement is not independence (both rotations come from the same landmarks) (F2, matrix part) | V1.3 findings §3.2, §6 |
 | P25 | Signers differ too little in MediaPipe's arm proportions for a body-shape augmentation to add anything: upper arm / shoulder width CV is 5.7% (2.9% robust) across 25 clips, no larger than MediaPipe's frame-to-frame jitter in the same ratio (3.7%), and the 20.6% left/right forearm spread is detector error. Sampling SMPL-X's shape prior is 15% off in mean and about 2.5× too wide. Body-shape augmentation is dropped | [Augmentation grounding §6.1](Augmentation_Grounding.md#61-why-body-shape-was-dropped) (2026-10-18) |
+| P26 | MediaPipe's drift of hand size is most of the hand round-trip error: one scale per frame about the wrist, kept beside a per-track shape, brings the five pilot clips to 4.16 / 2.45 / 10.57 mm (MANO) and 4.25 / 2.47 / 11.20 (SMPL-X), held out over time halves 4.34 and 4.38; better than a per-frame shape (4.41 / 4.49). On the random 20 (26 tracks): 3.84 / 2.18 / 10.49 (MANO), held out 3.95 / 10.85, every track improved. The fitted shapes still sit on the bound | V1.2 findings §10 |
+| P27 | At the evidence ranges, Tier 1 keeps the round trip intact and the hands in place: every augmentation at zero strength reproduces it to ≤ 3.3e-16 m; the arm-joint edit (±4°, p = 0.3) moved the wrists 12–14 mm, against 94–115 mm for the first trial's +15° / +10°; no in-frame hand point left the frame. A weak-perspective camera fitted per clip from the reconstructed arm to MediaPipe's 2-D pose has a 2.1–2.3% residual, its pixel axis scales within 6–7%. Two clips (17083, 57641) | [Augmentation grounding §6.2](Augmentation_Grounding.md#62-tier-1-rework-2026-10-29), `data/augment_trials/augment_trials.json` (2026-10-29) |
 
 ### Disproven, retracted or superseded
 
@@ -1617,9 +1616,9 @@ Update it whenever a step proves or retracts something.
 | O8 | The per-clip body tail is wider than the pilot showed: direct 1.44–5.52% (pilot 2.67–4.40%), gap to floor up to 3.85 pp (`08917`, `08918`, `57949`), where `betas` cannot reach the clip's proportions (P17). Accept, or flag such clips before augmenting? | Open (2026-10-07) |
 | O9 | Does the round trip hold on another dataset, camera set-up or signer pool? The P21–P22 sample shares WLASL's sources and some signers | Untested |
 | O10 | F1: the MediaPipe→FLAME embedding transfers to SMPL-X correctly (V1.3 design §8) | **Proven**, now P23 |
-| O11 | F2: FaceLandmarker pixel axes (x·W, y·H, z·W) match the pose world axes | Matrix convention and axis flip **proven**, now P24. The face-to-pose-world axis match is untested (metric 2 never involves the pose-world frame); the depth gap in O16 bears on it (V1.3 findings §3.2, §6) |
+| O11 | F2: FaceLandmarker pixel axes (x·W, y·H, z·W) match the pose world axes | Matrix convention and axis flip **proven**, now P24. The face-to-pose-world axis match is untested (metric 2 never involves the pose-world frame); the depth gap in O16 bears on it (V1.3 findings §3.2, §6). **Roll part proven 2026-10-18** on 21 clips: whole-body pose-world→image roll median 1.3° (per-clip medians −2.4° to +4.2°), so no roll correction is needed. The 7.5-10° seen on 08925 ([08925 spike](V1_3_Head_Placement_Spike_08925.md) §4) is distortion of pose-world's face points (pose-world eye line 5.7° off the image; R_head 0.3°), not a frame offset. Pitch/yaw still open: an orthographic body fit suggests about −8° of pitch but rests on pose-world depth (O16). The earlier ~1° `head_camera_rotation_deg` check is circular ([O11 frame alignment](O11_Frame_Alignment.md)) |
 | O12 | F3: the 17-point rigid set gives head rotation under expression and partial occlusion | Partly supported: residual and agreement do not degrade on near frames (2.27% vs 2.14%; p95 2.66° vs 1.40°), but only 30 of 143 near frames lost any rigid point (18 lost two or more, 1 unreliable) and expression is unmeasured. Independent accuracy under real occlusion untested (V1.3 findings §6) |
 | O13 | F4: the neck swing to the observed ear midpoint fixes head placement without touching the arms | Partly supported: ear residual far 7.61% → 2.82%, near 7.15% → 4.56% of shoulder width (p95 ≈ 9-10%). Arms-unchanged only by a synthetic test; not re-measured on real data (V1.3 findings §3.4) |
 | O14 | F5: lip gap is a usable proxy for jaw pitch with expression at zero | Partly supported: Spearman median 0.92 over 8 of 20 clips; 69364 (0.496) and 63665 (0.687) below 0.7; 12 clips not scorable (V1.3 findings §3.3) |
 | O15 | F6: landmark rules on the rest template give sensible ASL-LEX regions | Tests pass and `docs/media/face_regions.png` rendered; **awaits the user's review of the render**. Eye 750 vertices after dropping eyeballs; Ear radius 3.5 cm is generous |
-| O16 | Why do fitted hands sit about 0.18 m from the head along the camera axis on near-face frames, with contact never observed? | Already present in MediaPipe's own pose-world observations: fingertip-to-nose depth is 0.217 m (median, 152 near hand-frames), before any fitting. Real distance versus pose-world depth error unresolved. Penetration is unmeasured (V1.3 findings §5) |
+| O16 | Why do fitted hands sit about 0.18 m from the head along the camera axis on near-face frames, with contact never observed? | Already present in MediaPipe's own pose-world observations: fingertip-to-nose depth is 0.217 m (median, 152 near hand-frames), before any fitting. Real distance versus pose-world depth error unresolved. Penetration is unmeasured (V1.3 findings §5). **2026-10-18, clip 08925, fingers on the cheek in all 41 frames by eye:** most of the gap is depth error there. Pose landmarks alone never reach contact (3-D median 24.0 cm, 21.1 cm of it depth). Pose hand points are wrist and knuckles, so even in the image they stay about 7 cm from the face. Placing the head from 11 pose face points moves it 1.0 cm and the gap 19.2 → 18.1 cm, so head placement is not the cause. Task-14 depth correction gives contact in 23 of 41 frames, all with the wrist reaching its target ([08925 spike](V1_3_Head_Placement_Spike_08925.md)) |

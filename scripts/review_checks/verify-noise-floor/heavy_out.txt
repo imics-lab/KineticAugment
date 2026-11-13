@@ -1,0 +1,9 @@
+floor T:default      A_xyz=0.175% B_xyz=0.084% budget=0.175%
+floor T:complexity2  A_xyz=0.210% B_xyz=0.093% budget=0.210%
+floor repo           A_xyz=0.175% B_xyz=0.098% budget=0.175%
+  01986: full-vs-heavy median= 40.45%  swapped-L/R median=105.13%  n=299
+  01987: full-vs-heavy median= 20.11%  swapped-L/R median= 94.61%  n=419
+  01988: full-vs-heavy median= 23.14%  swapped-L/R median= 98.07%  n=655
+  01991: full-vs-heavy median= 17.73%  swapped-L/R median=100.55%  n=196
+  01992: full-vs-heavy median= 40.02%  swapped-L/R median=112.49%  n=354
+  per-axis medians x/y/z: 8.63% / 8.98% / 20.51%

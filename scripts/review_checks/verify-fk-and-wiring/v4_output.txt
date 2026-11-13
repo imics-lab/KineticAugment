@@ -1,0 +1,8 @@
+orphan L wrist (L elbow invalid); error on clean joints 11,12,14,16: med 81.8 max 245.8 mm
+orphan L elbow (L shoulder invalid); clean joints 12,14,16:        med 27.9 max 125.9 mm
+L sh + R sh + L wrist only; clean joints 11,12:                   med 45.1 max 133.6 mm
+control: all valid:                                               med 2.4e-13 max 6.2e-12 mm
+collinear hanging arm, R sh dist to axis 306 mm, rot 0.5: R sh err 151 mm (2d sin(a/2)=151)
+collinear hanging arm, R sh dist to axis 306 mm, rot 1.0: R sh err 293 mm (2d sin(a/2)=293)
+collinear hanging arm, R sh dist to axis 306 mm, rot 2.0: R sh err 514 mm (2d sin(a/2)=514)
+1-deg bent arm, rot 1.0 about arm: R sh err 293.0 mm

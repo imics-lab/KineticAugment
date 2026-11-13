@@ -1,12 +1,9 @@
 # V1.2 findings: MediaPipe hands → MANO and SMPL-X → landmarks
 
 **Date:** 2026-10-06. **Scope:** the feasibility slice P0–P2 and the P3 pilot measurement of the
-V1.2 plan, built by the implementation plan
-on branch `feat/v1.2-hands`. **Ledger:** V1.2 assumptions. **Earlier
-measurements:** V1.2 feasibility probes.
-
-*Plans, ledgers, one-off scripts, tests and evidence files named here without a link are kept on
-the author's research branches and are not part of this repository.*
+[V1.2 plan](V1_2_Hand_Roundtrip_Plan.md), built by the [implementation plan](V1_2_Implementation_Plan.md)
+on branch `feat/v1.2-hands`. **Ledger:** [V1.2 assumptions](V1_2_Assumptions.md). **Earlier
+measurements:** [V1.2 feasibility probes](V1_2_Feasibility_Probes.md).
 
 The round trip fits genuine MANO or SMPL-X parameters to each hand MediaPipe detects (21 world
 landmarks, in metres), rebuilds the 21 landmarks from those parameters alone, and scores the
@@ -17,13 +14,16 @@ pilot clips, what limits the error, and which assumptions the evidence settles.
 
 - *Round-trip JSON*: `data/test_output/hand_round_trip.json`, written by
   `scripts/measure_hand_round_trip.py` at commit `6e1b594`. Committed.
+- *Round-trip-with-scale JSON* (§10 only): `data/test_output/hand_scale_drift.json` (pilot) and
+  `data/round_trip_eval/hand_scale_drift.json` (the random 20), written by
+  `scripts/measure_hand_scale_drift.py` on 2026-10-29.
 - *Hand clips*: `data/test_output/<clip>_hands.npz`, written by `scripts/extract_hand_landmarks.py`
   and read with `load_hand_clip`. Committed.
 - *Tests*: `tests/test_hand_model.py`, `tests/test_hand_converter.py`,
   `tests/test_hand_observations.py` and `tests/test_extract_hand_landmarks.py`. On 2026-10-06 all
   68 passed and none was skipped (implementation evidence §9).
-- *Probes*: V1.2 feasibility probes, measured before implementation.
-- *Implementation evidence*: V1.2 implementation evidence, which
+- *Probes*: [V1.2 feasibility probes](V1_2_Feasibility_Probes.md), measured before implementation.
+- *Implementation evidence*: [V1.2 implementation evidence](V1_2_Implementation_Evidence.md), which
   keeps the measurements taken while the code was built: the synthetic gates, batch coupling, the
   check-2 diagnosis, extraction determinism and the checks run for these findings. Each comes with
   its task, procedure, commit and date. Cited as "implementation evidence §n". Where a test or the
@@ -386,7 +386,7 @@ naming the opposite hand, matches the assigned side.
 - **Unassigned: 12.** Nine are a second detection at a side already taken. The seven in 01991 are
   duplicate detections of one hand. The other two are in 01988, at frames 28 and 30 by the clips;
   the probes describe that pair as overlapping hands at the frame edge
-  (probes, "Duplicates"). The extraction does not store unassigned
+  ([probes](V1_2_Feasibility_Probes.md), "Duplicates"). The extraction does not store unassigned
   detections, so the 01988 pair is not re-checked here. The last three lie beyond the 10% cap:
   01988 frames 126–128, with gaps of 10.3%, 11.5% and 13.8% of the height. The clips record which
   frames hold an unassigned detection, but not why; the reasons come from the Task 5 review and the
@@ -416,7 +416,7 @@ naming the opposite hand, matches the assigned side.
 
 ## 6. Assumptions
 
-Status changes in the ledger, all dated 2026-10-06. *Partly settled* means
+Status changes in the [ledger](V1_2_Assumptions.md), all dated 2026-10-06. *Partly settled* means
 part of the claim was tested; the evidence column names that part.
 
 | ID | Was | Now | Evidence |
@@ -531,3 +531,128 @@ earlier number bit for bit; the measurement took 895 s (implementation evidence 
 recorded environment was Python 3.11.15, numpy 1.26.4, scipy 1.17.1, torch 2.14.1 on CPU and smplx
 0.1.28 (round-trip JSON), with MediaPipe 0.10.21 (hand clips, `meta`). The SMPL-X asset is version
 1.1 by content, although `models/smplx/version.txt` says 1.0 (Probes).
+
+## 10. Follow-up, 2026-10-29: one scale per frame
+
+§4.2 left one question open: the model ladder had no scale-only row, so how much of the error
+is MediaPipe's change of hand size alone was not measured for the models. This follow-up adds
+that row. `per_frame_scale` in `hand_converter` gives each frame one more value, a factor scaling
+the model's hand about its wrist. It is not a MANO or SMPL-X parameter but a residual kept beside
+the fit (`HandFit.scale`, saved by `save_hand_fits`). When the track's shape is fitted with it, the
+log-scales are centred on their mean, so the shape carries the hand's size and the scales only its
+drift; with the shape fixed, each frame's scale is free. Same five pilot clips, same 535
+frame-sides, same metric.
+
+**Source.** `data/test_output/hand_scale_drift.json`, written by
+`scripts/measure_hand_scale_drift.py` (1,146 s on CPU). The script recomputes the `in-sample
+shape` row as a check: it matches the round-trip JSON exactly (7.38 and 7.47 mm), so the code path
+without a scale is unchanged. Tests: the five `per_frame_scale` tests in
+`tests/test_hand_converter.py` (synthetic hands scaled by known factors are recovered to ≤ 0.5 mm
+mean, and the scales to within 0.002); the whole suite passed (182 passed, 1 xfailed).
+
+### 10.1 Error ladder with a scale
+
+Pooled, in mm, except % of hand. Rows marked † come from the round-trip JSON (§2).
+
+| Row | MANO mean | tips | p95 | SMPL-X mean | tips | p95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| *Provisional target* | *≤ 5* | *≤ 8* | *≤ 15* | *≤ 5* | *≤ 8* | *≤ 15* |
+| held-out shape (time halves) † | 10.92 | 6.83 | 33.25 | 11.18 | 7.33 | 35.16 |
+| in-sample shape † | 7.38 | 3.28 | 20.89 | 7.47 | 3.55 | 22.87 |
+| per-frame shape (diagnostic) † | 4.41 | 2.11 | 11.67 | 4.49 | 2.16 | 12.31 |
+| neutral shape + per-frame scale | 4.76 | 2.53 | 12.77 | 4.93 | 3.60 | 12.71 |
+| held-out shape + per-frame scale (time halves) | 4.34 | 2.52 | 11.01 | 4.38 | 2.66 | 11.56 |
+| held-out shape + per-frame scale (interleaved) | 4.16 | 2.46 | 10.60 | 4.25 | 2.47 | 11.20 |
+| in-sample shape + per-frame scale | 4.16 | 2.45 | 10.57 | 4.25 | 2.47 | 11.20 |
+
+- **One value per frame meets all three targets on both backends, held out included.** The
+  time-halves row, the pessimistic one, goes from 10.92 to 4.34 mm (MANO) and from 11.18 to
+  4.38 mm (SMPL-X).
+- **It beats the per-frame-shape diagnostic, which has ten values per frame.** 4.16 against
+  4.41 mm (MANO) and 4.25 against 4.49 mm (SMPL-X). So of what a per-frame shape absorbed, almost
+  all was size; ten bounded betas were a poorer way to express it than one free scale.
+- **The time-halves penalty all but disappears.** Held out minus in-sample, with the scale, is
+  +0.18 mm (MANO) and +0.13 mm (SMPL-X) pooled, against +3.54 and +3.71 mm without it. Per track
+  it is −0.00 to +0.33 mm, including 01987 left (drift 1.55: 17.55 → 5.25 mm) and 01988 right
+  (drift 0.61: 16.02 → 4.80 mm). A shape fitted with scales generalises across the halves of a
+  clip; what failed to generalise before was MediaPipe's size.
+- **Every track improves.** In-sample with a scale, the per-track mean is 3.26–5.08 mm; 7 of 9
+  tracks are under 5 mm on both backends, and 01987 left and right sit at 4.92–5.08 mm.
+
+### 10.2 What the scale does, and what it does not explain
+
+From the in-sample fit with a scale (round-trip-with-scale JSON, `tracks[].<backend>.scale` and
+`.shape`):
+
+- **Spread.** The per-track 5th–95th percentile of the scale runs from 0.95–1.05 (01991 right) to
+  0.55–1.33 (01987 left). The ratio of its median over the second and first halves follows
+  half_span_ratio (1.49 against 1.55 on 01987 left; 0.69 against 0.61 on 01988 right).
+- **Mostly slow drift, not frame-to-frame jitter.** The lag-1 autocorrelation of the log-scale is
+  0.61–0.97 per track.
+- **The shapes still sit on the plausibility bound:** 99.8–100.0% of it with a scale, against
+  99.7–99.9% without. So size drift is not what pins the shape there. The pull comes from
+  MediaPipe's proportions, which a scale cannot change (§4.3, §4.4 stand).
+- **No consistent driver found.** Spearman correlation of the log-scale with how squarely the palm
+  faces the camera (|z| of the world palm normal) runs from −0.21 to +0.50 per track, and with the
+  hand's size in the image (wrist to middle MCP, in pixels) from −0.64 to +0.59. The sign changes
+  between tracks, so neither explains the drift on this pilot.
+
+### 10.3 What this means for the pipeline
+
+- The round trip can meet the provisional targets with one shape per track, as the contract
+  requires, if each frame also keeps a scale. The scale is a stored per-frame value, like the
+  pose, so this is an achievable result, unlike the per-frame-shape diagnostic. It is not a
+  parameter of MANO or SMPL-X: a consumer that reads only model parameters gets the hand at scale
+  1, the "clean" hand of one size per track.
+- That leaves a choice for augmentation: output the clean hand (scale 1), replay the stored scale
+  to reproduce MediaPipe's drift, or sample scales with the measured spread and autocorrelation.
+- The remaining ~4.2 mm is §4.3's non-rigid hand, model mismatch and detector noise, still not
+  separable.
+
+### 10.4 The random 20 clips
+
+The same measurement on the 20 clips behind ledger P21–P22 (seed 20261007; 26 tracks, 1,044
+frame-sides), from `data/round_trip_eval/hand_scale_drift.json`, written by
+`scripts/measure_hand_scale_drift.py --data-dir data/round_trip_eval` (2,207 s on CPU). The
+recomputed `in-sample shape` row matches P22 exactly (5.10 / 2.53 / 14.59 mm). Mean / tips / p95,
+in mm:
+
+| Row | MANO | SMPL-X |
+| --- | --- | --- |
+| in-sample shape | 5.10 / 2.53 / 14.59 | 5.29 / 2.61 / 14.58 |
+| held-out shape (time halves), from P22 | 5.62 / 2.72 / 16.50 | not measured |
+| neutral shape + per-frame scale | 4.27 / 2.14 / 12.35 | 4.55 / 2.59 / 12.04 |
+| held-out shape + per-frame scale (time halves) | 3.95 / 2.24 / 10.85 | 4.05 / 2.14 / 11.10 |
+| in-sample shape + per-frame scale | 3.84 / 2.18 / 10.49 | 4.00 / 2.11 / 10.84 |
+
+- **The pilot's result holds.** With a scale, every row meets all three targets on both
+  backends. Without it, P22 missed the mean by 0.1 mm and, held out, the p95 by 1.5 mm.
+- **The gain is smaller because the drift is smaller.** The ratio of the scale's median over the
+  second and first halves is 0.92–1.06 on 21 of 26 tracks (pilot: 0.69–1.49), so the scale takes
+  1.26 mm off the MANO mean here against 3.22 mm on the pilot.
+- **Every track improves** on both backends. Tracks under 5 mm: 13 → 22 of 26 (MANO) and
+  12 → 26 of 26 (SMPL-X). Per-track means with a scale: 2.43–5.32 mm (MANO), 3.24–4.95 mm (SMPL-X).
+- **More frame-to-frame jitter than on the pilot.** The lag-1 autocorrelation of the log-scale runs
+  from −0.01 (08917) to 1.00 (69364 left), so on these clips the scale carries jitter as well as
+  slow drift.
+- **The shapes still sit on the bound** (99.7–100.0% of it, with a scale or without).
+- **Still no consistent driver.** Correlation with how squarely the palm faces the camera runs
+  from −0.68 to +0.85 (positive on 17 and 18 of 26 tracks) and with the hand's image size from
+  −0.53 to +0.89 (positive on 19 and 20 of 26). Both lean positive here, unlike the pilot, but
+  the sign still changes between tracks.
+
+### 10.5 Two saved pipelines
+
+Whether a classifier is better served by the hand that keeps MediaPipe's drift or by one that does
+not is open. Both pipelines (one shape per track; the same with a per-frame scale) are saved per
+clip for the 20 clips and the pilot, with what differs between them, in
+[Hand pipeline variants](Hand_Pipeline_Variants.md).
+
+### 10.6 Limits
+
+- 25 clips from one dataset (WLASL); ledger O9 applies.
+- The scale is fitted on the frames it is scored on, as the pose is. It is not an oracle in the
+  sense of §2's rigid reference, because the round trip stores it, but it is fitted freely: there
+  is no prior or smoothing on it, so it also absorbs any part of the error that a uniform scale
+  about the wrist can reduce.
+- Two simple correlates were checked; the drift's cause is not established.

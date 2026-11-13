@@ -1,0 +1,20 @@
+rest angle between upper-arm and forearm bones: 22.70 deg
+base: angle between bones 100.0 deg
+theta=30
+  A  forearm twist                             arm3 1.0e-09 m | all55 4.1e-02 m | max vert   54.2 mm
+  A' forearm twist + wrist comp                arm3 1.0e-09 m | all55 1.6e-09 m | max vert   32.4 mm
+  B  humerus twist + elbow comp                arm3 4.2e-10 m | all55 7.0e-10 m | max vert   30.5 mm
+     B rotation diffs: shoulder 30.0 deg, elbow 30.0 deg
+  C  humerus twist, no comp                    arm3 1.3e-01 m | all55 2.1e-01 m | max vert  221.6 mm
+theta=60
+  A  forearm twist                             arm3 2.0e-09 m | all55 7.9e-02 m | max vert  104.5 mm
+  A' forearm twist + wrist comp                arm3 2.0e-09 m | all55 3.3e-09 m | max vert   63.6 mm
+  B  humerus twist + elbow comp                arm3 7.0e-10 m | all55 1.2e-09 m | max vert   59.7 mm
+     B rotation diffs: shoulder 60.0 deg, elbow 60.0 deg
+  C  humerus twist, no comp                    arm3 2.5e-01 m | all55 4.1e-01 m | max vert  428.1 mm
+theta=90
+  A  forearm twist                             arm3 3.1e-09 m | all55 1.1e-01 m | max vert  147.8 mm
+  A' forearm twist + wrist comp                arm3 3.1e-09 m | all55 5.0e-09 m | max vert   91.3 mm
+  B  humerus twist + elbow comp                arm3 9.5e-10 m | all55 1.6e-09 m | max vert   85.8 mm
+     B rotation diffs: shoulder 90.0 deg, elbow 90.0 deg
+  C  humerus twist, no comp                    arm3 3.5e-01 m | all55 5.7e-01 m | max vert  605.8 mm

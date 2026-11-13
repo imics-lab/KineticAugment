@@ -11,3 +11,4 @@ Print-based scripts for the deprecated stack; not run by pytest. Run from the re
 | `phase5_smoke.py` | Phase 5: evaluation metrics, models, benchmark runner |
 | `render_landmarks.py` | Overlay video of original vs legacy SMPL-X round-trip landmarks |
 | `render_augmented_from_yaml.py` | Render videos per pipeline in `configs/legacy/augments.yaml` (own copy of the augmentations) |
+| `index.md` | This index |

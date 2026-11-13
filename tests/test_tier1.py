@@ -229,6 +229,16 @@ class TestArmJoints:
         out = perturb_arm_joints(bent(), rest_pose(), PARENTS, joints)
         assert out == pytest.approx(bent(), abs=1e-12)
 
+    def test_zero_angle_leaves_a_straight_elbow_straight(self):
+        # The 5° floor limits a drawn bend; it must not lift an elbow nothing was drawn for.
+        out = perturb_arm_joints(
+            np.zeros((55, 3)),
+            rest_pose(),
+            PARENTS,
+            [ArmJointDraw("left", "elbow", 0.0, (1.0, 0.0, 0.0))],
+        )
+        assert out == pytest.approx(np.zeros((55, 3)), abs=1e-12)
+
     def test_the_elbow_bends_by_the_drawn_angle(self):
         out = perturb_arm_joints(
             bent(60.0), rest_pose(), PARENTS, [ArmJointDraw("left", "elbow", 3.5, (1.0, 0.0, 0.0))]

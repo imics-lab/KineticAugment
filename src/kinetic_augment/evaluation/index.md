@@ -8,3 +8,4 @@
 | `datasets/` | Dataset base class, synthetic data, WLASL loaders |
 | `metrics/` | Quality, temporal, diversity and constraint metrics |
 | `models/` | LSTM/GRU and face-stream classifiers, trainer |
+| `index.md` | This index |

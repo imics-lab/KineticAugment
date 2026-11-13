@@ -1,0 +1,4 @@
+wrist/hand pairs: 555
+original data      |pose wrist - hand wrist|: median 5.7 p95 13.3 %SW
+full replacement   |pose wrist - hand wrist|: median 11.3 p95 22.0 %SW (zero augmentation)
+delta transfer     identical to original at zero augmentation (by construction)

@@ -1,0 +1,2 @@
+N7: elbow rotation jump on wrist-validity toggle: n=13, median 0.94 rad, max 1.59; both-observed: n=706, median 0.024, p99 0.34, max 0.65; jumps>1rad: toggles 5, non-toggle 0
+N9: swing rotvec max step across antipode sweep (0.2 mrad steps): 3.30 rad

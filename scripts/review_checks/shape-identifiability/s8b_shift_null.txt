@@ -1,0 +1,22 @@
+01986 L upper  n= 54 R2=0.98  shift-null median=0.34 95%=0.63  p=0.022
+01986 L fore   n= 54 R2=0.93  shift-null median=0.43 95%=0.70  p=0.022
+01986 R upper  n= 62 R2=0.98  shift-null median=0.46 95%=0.87  p=0.019
+01986 R fore   n= 62 R2=0.93  shift-null median=0.34 95%=0.67  p=0.019
+01987 L upper  n= 69 R2=0.41  shift-null median=0.32 95%=0.65  p=0.300
+01987 L fore   n= 69 R2=0.64  shift-null median=0.45 95%=0.65  p=0.083
+01987 R upper  n= 73 R2=0.69  shift-null median=0.46 95%=0.80  p=0.141
+01987 R fore   n= 73 R2=0.58  shift-null median=0.39 95%=0.67  p=0.219
+01988 L upper  n=124 R2=0.90  shift-null median=0.29 95%=0.63  p=0.009
+01988 L fore   n=124 R2=0.84  shift-null median=0.31 95%=0.73  p=0.009
+01988 R upper  n=121 R2=0.53  shift-null median=0.45 95%=0.71  p=0.357
+01988 R fore   n=121 R2=0.73  shift-null median=0.27 95%=0.60  p=0.009
+01991 L upper  n= 49 R2=0.92  shift-null median=0.48 95%=0.85  p=0.025
+01991 L fore   n= 49 R2=0.84  shift-null median=0.47 95%=0.82  p=0.075
+01991 R upper  n= 48 R2=0.95  shift-null median=0.57 95%=0.93  p=0.051
+01991 R fore   n= 48 R2=0.77  shift-null median=0.57 95%=0.64  p=0.026
+01992 L upper  n= 59 R2=0.71  shift-null median=0.41 95%=0.73  p=0.080
+01992 L fore   n= 59 R2=0.55  shift-null median=0.37 95%=0.60  p=0.120
+01992 R upper  n= 59 R2=0.85  shift-null median=0.45 95%=0.73  p=0.020
+01992 R fore   n= 59 R2=0.94  shift-null median=0.21 95%=0.64  p=0.020
+
+11/20 arm segments significant at p<0.05 under the circular-shift null; median observed R2 0.84 vs median null-95% 0.68

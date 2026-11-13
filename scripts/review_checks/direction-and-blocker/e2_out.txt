@@ -1,0 +1,9 @@
+frames fitted: 409
+JointAnglePerturbation(stddev=0, arms, respect_limits=True)
+   frames with body_pose altered: 408/409; landmark displacement %SW median 6.52  p95 121.54  max 142.04; frames with any joint moved >1%SW: 408/409
+JointAnglePerturbation(stddev=0, arms, respect_limits=False)
+   frames with body_pose altered: 0/409; landmark displacement %SW median 0.00  p95 0.00  max 0.00; frames with any joint moved >1%SW: 0/409
+JointCoupledNoise(stddev=0)
+   frames with body_pose altered: 408/409; landmark displacement %SW median 6.52  p95 121.54  max 142.04; frames with any joint moved >1%SW: 408/409
+LimbLengthScaling(range=(1.0,1.0)) [betas += 1 -> shape SHOULD change]
+   frames with body_pose altered: 0/409; landmark displacement %SW median 0.00  p95 0.00  max 0.00; frames with any joint moved >1%SW: 0/409

@@ -1,0 +1,47 @@
+===== metric sim
+   ('none', 'rest', 'rest'): median 5.944%  reduction 0.0%
+   ('none', 'rest', 'clip'): median 5.347%  reduction 10.0%
+   ('none', 'clip', 'rest'): median 3.863%  reduction 35.0%
+   ('none', 'clip', 'clip'): median 3.654%  reduction 38.5%
+   ('analytic', 'rest', 'rest'): median 5.130%  reduction 13.7%
+   ('analytic', 'rest', 'clip'): median 4.428%  reduction 25.5%
+   ('analytic', 'clip', 'rest'): median 2.645%  reduction 55.5%
+   ('analytic', 'clip', 'clip'): median 2.293%  reduction 61.4%
+   root increment over 6 orderings (root/arm/width): [13.7, 13.7, 15.5, 20.5, 22.9, 22.9]
+   2-factor (root x arm, width rest) interaction: 6.79 pts; Shapley root 17.1  arm 38.4
+   frame-bootstrap 95% CI: root [11.3,16.3]  arm [31.7,37.5]  interaction [3.8,10.2]
+   clip-bootstrap 95% CI: root [2.7,26.3]  arm [28.1,43.5]  interaction [-7.7,17.6]
+===== metric rigid
+   ('none', 'rest', 'rest'): median 6.551%  reduction 0.0%
+   ('none', 'rest', 'clip'): median 6.623%  reduction -1.1%
+   ('none', 'clip', 'rest'): median 4.289%  reduction 34.5%
+   ('none', 'clip', 'clip'): median 3.793%  reduction 42.1%
+   ('analytic', 'rest', 'rest'): median 5.719%  reduction 12.7%
+   ('analytic', 'rest', 'clip'): median 5.900%  reduction 9.9%
+   ('analytic', 'clip', 'rest'): median 3.468%  reduction 47.1%
+   ('analytic', 'clip', 'clip'): median 2.524%  reduction 61.5%
+   root increment over 6 orderings (root/arm/width): [11.0, 12.5, 12.7, 12.7, 19.4, 19.4]
+   2-factor (root x arm, width rest) interaction: -0.17 pts; Shapley root 12.6  arm 34.4
+   frame-bootstrap 95% CI: root [10.2,14.8]  arm [31.8,36.6]  interaction [-2.1,2.4]
+   clip-bootstrap 95% CI: root [3.9,24.8]  arm [23.7,41.1]  interaction [-9.6,7.4]
+===== 'unexplained' path, sim metric, analytic root
+   arm=clip  width=rest  sim  : 2.645%  remaining 44.5% of baseline
+   arm=clip  width=rest  rigid: 3.468%  remaining 52.9% of baseline
+   arm=clip  width=clip  sim  : 2.293%  remaining 38.6% of baseline
+   arm=clip  width=clip  rigid: 2.524%  remaining 38.5% of baseline
+   arm=frame width=clip  sim  : 0.297%  remaining 5.0% of baseline
+   arm=frame width=clip  rigid: 0.494%  remaining 7.5% of baseline
+   arm=frame width=frame sim  : 0.000%  remaining 0.0% of baseline
+   arm=frame width=frame rigid: 0.000%  remaining 0.0% of baseline
+   arm=frame width=rest  sim  : 1.516%  remaining 25.5% of baseline
+   arm=frame width=rest  rigid: 2.169%  remaining 33.1% of baseline
+===== similarity scale under configurations
+   root=none     arm=rest  width=rest : median 0.9726  p5 0.9102  p95 1.0241
+   root=none     arm=clip  width=rest : median 1.0184  p5 0.9489  p95 1.0792
+   root=none     arm=rest  width=clip : median 0.9537  p5 0.8946  p95 0.9996
+   root=none     arm=clip  width=clip : median 0.9953  p5 0.9351  p95 1.0515
+   root=analytic arm=clip  width=clip : median 0.9978  p5 0.9373  p95 1.0439
+   root=none     arm=frame width=frame: median 0.9982  p5 0.9934  p95 1.0187
+   root=analytic arm=frame width=frame: median 1.0000  p5 1.0000  p95 1.0000
+   REST_W 0.3159  clip widths [0.3327, 0.3337, 0.3253, 0.3467, 0.3296]
+   rest arm lengths [0.2676, 0.2531, 0.2749, 0.2498]

@@ -12,7 +12,9 @@ Per clip it:
      joints, both hands' 21 points from the hand joints and fingertip vertices, the 105 embedded
      face points from the FLAME correspondence -- and scores them against the extraction:
         body   % of shoulder width, per arm landmark (MediaPipe pose world)
-        hands  mm, wrist-relative landmarks 1-20 (SMPL-X hand; the MANO hand alone for reference)
+        hands  mm, wrist-relative landmarks 1-20 (SMPL-X hand; the MANO hand alone for reference),
+               and finger curl, degrees per joint; both against the palm-size-normalised hand the
+               fit saw, not the raw MediaPipe hand
         face   mm RMS, rigid / non-rigid points, observed face carried onto the SMPL-X head
   4. Measures how well the three MediaPipe streams agree with each other in the image, before
      any fitting: pose wrist vs hand wrist, and pose face points vs the face mesh's equivalents.
@@ -21,6 +23,10 @@ Per clip it:
      and all of them combined. Arm joints edit the SMPL-X rotations and re-pose the mesh; the
      others act on the mesh and the read-back points. A weak-perspective camera fitted to the
      clip projects the augmented points back into the image.
+  6. Runs the week-4 augmentation chain (`scripts/demo_week4.py`) on the same round trip: every
+     entry of the ambitious profile alone (time warp and frame drop once per mode) and the
+     default, ambitious and literature profiles whole, plus the unaugmented `w4.base` they are
+     compared with. Written in the same aug/<name>/ format.
 
 Writes <out>/clips/<clip>/{v/<smoothing>/, aug/<augmentation>/}{clip.json, data.bin} and
 <out>/clips/<clip>/frames/NNNN.jpg, and updates <out>/clips.json. data.bin holds the arrays listed
@@ -29,6 +35,7 @@ in clip.json["arrays"] (little-endian, C order).
 Usage (from the repo root; see demo/round_trip/README.md):
     python scripts/export_round_trip_demo.py --clips 20983 --video-dir path/to/videos
     python scripts/export_round_trip_demo.py --sample 50 --video-dir path/to/videos
+    python scripts/export_round_trip_demo.py --clips 20983 --week4 --augment  # no augmentations
     python scripts/export_round_trip_demo.py --reindex
 """
 
@@ -45,6 +52,8 @@ from pathlib import Path
 import numpy as np
 
 import cv2  # noqa: E402
+
+from demo_week4 import RUNS as WEEK4, export_week4  # noqa: E402
 
 from kinetic_augment.augmentations.tier1 import (  # noqa: E402
     ARM_JOINTS,
@@ -87,7 +96,10 @@ from kinetic_augment.body_model.face_observations import (  # noqa: E402
 )
 from kinetic_augment.body_model import face_pipeline  # noqa: E402
 from kinetic_augment.body_model.face_pipeline import SIDES, load_face_models  # noqa: E402
-from kinetic_augment.body_model.hand_converter import landmark_errors_mm  # noqa: E402
+from kinetic_augment.body_model.hand_converter import (  # noqa: E402
+    landmark_errors_mm,
+    normalise_palm_size,
+)
 from kinetic_augment.body_model.hand_model import (  # noqa: E402
     POSE_SLOT_LANDMARKS,
     SMPLX_TIP_VERTICES,
@@ -122,6 +134,19 @@ POSE_FACE_PAIRS = (
     (6, 33, "R eye outer"),
     (9, 291, "mouth L"),
     (10, 61, "mouth R"),
+)
+# Finger joints as (a, b, c) landmark triples: the bend at b between bones a-b and b-c, per finger
+# chain [0, f1, f2, f3, f4].
+CURL_TRIPLES = tuple(
+    (chain[i], chain[i + 1], chain[i + 2])
+    for chain in (
+        (0, 1, 2, 3, 4),
+        (0, 5, 6, 7, 8),
+        (0, 9, 10, 11, 12),
+        (0, 13, 14, 15, 16),
+        (0, 17, 18, 19, 20),
+    )
+    for i in range(3)
 )
 SCALE_I16 = 10000.0  # mesh vertices stored as int16 in 0.1 mm
 NOSE_BRIDGE, NOSE_BASE = (168, 6, 197, 195, 5, 4), (129, 98, 97, 2, 326, 327, 358)
@@ -186,7 +211,7 @@ def face_residuals_mm(blue, green, corr, weights, hidden):
     return rms(used), rms(other)
 
 
-def extract(video: Path, cache: Path, reextract: bool):
+def extract(video: Path, cache: Path, reextract: bool, face_model: Path = None):
     """MediaPipe hands + pose and face mesh for one clip, cached in `cache`."""
     from extract_face_landmarks import extract_face
     from extract_hand_landmarks import HANDS_SETTINGS, HOLISTIC_SETTINGS, extract_hands
@@ -202,10 +227,31 @@ def extract(video: Path, cache: Path, reextract: bool):
         clip.meta = {"source": video.name, "mediapipe": mp.__version__}
         save_hand_clip(hands_path, clip)
     if reextract or not face_path.exists():
-        clip = extract_face(video)
+        clip = extract_face(video) if face_model is None else extract_face(video, face_model)
         clip.meta = {"source": video.name, "mediapipe": mp.__version__}
         save_face_clip(face_path, clip)
     return load_hand_clip(hands_path), load_face_clip(face_path)
+
+
+def curl_error_deg(fitted, observed):
+    """
+    Mean over the 15 finger joints of |bend angle of `fitted` - bend angle of `observed`|, degrees.
+
+    The bend at a joint is the angle between its two bones, arccos(u.v / |u||v|) with u = p[b] -
+    p[a] and v = p[c] - p[b], so it ignores hand size and position. Both hands are (21, 3); NaN
+    if either has a non-finite point or a zero-length bone at any joint.
+    """
+
+    def bends(points):
+        p = np.asarray(points, dtype=np.float64)
+        a, b, c = (list(i) for i in zip(*CURL_TRIPLES))
+        u, v = p[b] - p[a], p[c] - p[b]
+        norms = np.linalg.norm(u, axis=-1) * np.linalg.norm(v, axis=-1)
+        with np.errstate(all="ignore"):
+            cos = np.clip((u * v).sum(axis=-1) / norms, -1.0, 1.0)
+        return np.degrees(np.arccos(cos))
+
+    return float(np.mean(np.abs(bends(fitted) - bends(observed))))
 
 
 def mesh_hand_points(mesh, side):
@@ -331,7 +377,7 @@ def jitter_mm(points):
 
 
 def export_clip(clip_id, video_dir: Path, out_root: Path, models, variants, reextract=False,
-                augmentations=(), seed=SEED, sample=0):
+                augmentations=(), seed=SEED, sample=0, week4=()):
     started = time.time()
     video = video_dir / f"{clip_id}.mp4"
     out = out_root / "clips" / clip_id
@@ -353,6 +399,11 @@ def export_clip(clip_id, video_dir: Path, out_root: Path, models, variants, reex
         source = "off" if "off" in trips else variants[0]
         export_augmentations(clip_id, trips[source], source, out / "aug", models, augmentations,
                              seed, sample)
+    if week4:
+        source = "off" if "off" in trips else variants[0]
+        trip = trips[source]
+        export_week4(clip_id, trip.result, trip.hands, trip.face, out / "aug", models, week4,
+                     source)
 
 
 def write_data(path: Path, arrays):
@@ -404,14 +455,27 @@ def export_variant(clip_id, variant, hands, face, raw_hands, raw_face, out: Path
     mano_mm = np.full((n, 2), np.nan)
     shoulder_m = np.full(n, np.nan)
     head_reliable = np.zeros(n, bool)
+    curl_deg = np.full((n, 2), np.nan)
+    mano_curl_deg = np.full((n, 2), np.nan)
+    # The hands as the fit saw them: each frame rescaled to the track's median palm size.
+    hands_n = np.stack(
+        [
+            normalise_palm_size(
+                hands.world[:, s].astype(np.float64), np.isfinite(hands.world[:, s]).all(-1)
+            )[0]
+            for s in range(2)
+        ],
+        axis=1,
+    )
     for t in range(n):
         for s, side in enumerate(SIDES):
             wrist = POSE_WRISTS[s]
-            observed = hands.world[t, s].astype(np.float64)
+            observed = hands_n[t, s]
             if np.isfinite(observed).all() and ok[t, wrist]:
                 in_hands[t, s] = observed - observed[0] + pose_w[t, wrist]
             if np.isfinite(observed).all():
                 mano_mm[t, s] = np.nanmean(landmark_errors_mm(mano_recon[side][t], observed))
+                mano_curl_deg[t, s] = curl_error_deg(mano_recon[side][t], observed)
         if not result.body_ok[t]:
             continue
         mesh = pose_mesh(body, result.rotations[t], result.betas, result.transl[t])
@@ -426,13 +490,14 @@ def export_variant(clip_id, variant, hands, face, raw_hands, raw_face, out: Path
                         100 * np.linalg.norm(rt_arm[t, k] - pose_w[t, mp_id]) / shoulder_m[t]
                     )
         for s, side in enumerate(SIDES):
-            observed = hands.world[t, s].astype(np.float64)
+            observed = hands_n[t, s]
             if not np.isfinite(observed).all():
                 continue  # no hand: the SMPL-X hand stays flat, nothing to compare
             rt_hands[t, s] = mesh_hand_points(mesh, side)
             e = landmark_errors_mm(rt_hands[t, s], observed)
             err_hand_pts[t, s, 1:] = e
             hand_mm[t, s] = np.nanmean(e)
+            curl_deg[t, s] = curl_error_deg(rt_hands[t, s], observed)
         rt_face[t] = corr.points(mesh.vertices)
         head = result.head_fits[t]
         head_reliable[t] = bool(head.valid and head.reliable)
@@ -513,6 +578,8 @@ def export_variant(clip_id, variant, hands, face, raw_hands, raw_face, out: Path
             "body_pct_median": float(np.nanmedian(body_pct)),
             "hand_mm_median": nan_list(np.nanmedian(hand_mm, axis=0), 1),
             "mano_mm_median": nan_list(np.nanmedian(mano_mm, axis=0), 1),
+            "curl_deg_median": nan_list(np.nanmedian(curl_deg, axis=0), 1),
+            "mano_curl_deg_median": nan_list(np.nanmedian(mano_curl_deg, axis=0), 1),
             "face_rigid_mm_median": float(np.nanmedian(face_rms[:, 0])),
             "face_nonrigid_mm_median": float(np.nanmedian(face_rms[:, 1])),
             "wrist_gap_px_median": nan_list(np.nanmedian(wrist_gap_px, axis=0), 1),
@@ -552,6 +619,8 @@ def export_variant(clip_id, variant, hands, face, raw_hands, raw_face, out: Path
             "body_pct": nan_list(body_pct, 2),
             "hand_mm": nan_list(hand_mm, 1),
             "mano_mm": nan_list(mano_mm, 1),
+            "curl_deg": nan_list(curl_deg, 1),
+            "mano_curl_deg": nan_list(mano_curl_deg, 1),
             "face_rigid_mm": nan_list(face_rms[:, 0], 1),
             "face_nonrigid_mm": nan_list(face_rms[:, 1], 1),
             "shoulder_m": nan_list(shoulder_m, 4),
@@ -832,9 +901,13 @@ def update_index(out_root: Path, order):
         name: {"label": s.label, "description": s.description} for name, s in SMOOTHING.items()
     }
     index["augmentation"] = {
-        name: {"label": label, "description": description}
+        name: {"label": label, "description": description, "group": "tier1"}
         for name, (label, description) in AUGMENTATIONS.items()
     }
+    index["augmentation"].update({
+        name: {"label": run.label, "description": run.description, "group": run.group}
+        for name, run in WEEK4.items()
+    })
     clips = index["clips"] = {}
     for clip_dir in sorted((out_root / "clips").iterdir()):
         variants = {}
@@ -846,7 +919,8 @@ def update_index(out_root: Path, order):
             augs = {}
             for meta_path in sorted(clip_dir.glob("aug/*/clip.json")):
                 aug = json.loads(meta_path.read_text())
-                augs[aug["augmentation"]] = {"n": aug["n"], "title": aug["title"]}
+                augs[aug["augmentation"]] = {"n": aug["n"], "title": aug["title"],
+                                             "kind": aug.get("kind", "tier1")}
             if augs:
                 clips[clip_dir.name]["augmentations"] = augs
     index_path.write_text(json.dumps(index, indent=1, allow_nan=False))
@@ -884,6 +958,13 @@ def main():
         help="Tier 1 augmentations to export, from the unsmoothed round trip (default: all)",
     )
     parser.add_argument(
+        "--week4",
+        nargs="*",
+        choices=list(WEEK4),
+        default=list(WEEK4),
+        help="week-4 runs to export, from the unsmoothed round trip (default: all; none if empty)",
+    )
+    parser.add_argument(
         "--aug-draw",
         type=int,
         default=0,
@@ -901,7 +982,7 @@ def main():
     models = load_face_models()
     for clip_id in clips:
         export_clip(clip_id, video_dir, args.output_dir, models, args.smoothing, args.reextract,
-                    args.augment, args.seed, args.aug_draw)
+                    args.augment, args.seed, args.aug_draw, args.week4)
     update_index(args.output_dir, order)
 
 

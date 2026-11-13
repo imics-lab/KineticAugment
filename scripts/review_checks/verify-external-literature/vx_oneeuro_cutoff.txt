@@ -1,0 +1,3 @@
+median implied cutoff Hz: slowest-25% frames 0.49 (range 0.25-1.41); p10 frames 0.33; all frames 1.75
+median 3D step in slowest-25% frames: 0.91 mm/frame
+time constant at cutoff c: tau=1/(2 pi c): c=0.1 -> 1.59s ; c=0.49 -> 0.32s

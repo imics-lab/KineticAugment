@@ -10,3 +10,4 @@ Superseded code kept for reference; new work must not build on it. See `__init__
 | `canonicalization.py` | Shoulder-centred canonical space; used only by `pipeline.py` |
 | `mp_to_smplx.py` | Old image-space `MediaPipeToSMPLX` (replaced by `body_model.converter.fit_body`) |
 | `smplx_to_mp.py` | Old `SMPLXToMediaPipe` (replaced by `body_model.converter.reconstruct_body`) |
+| `index.md` | This index |

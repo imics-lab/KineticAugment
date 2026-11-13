@@ -1,0 +1,3 @@
+frames with all 6 arm landmarks: 351
+twist 10 deg: joints identical to 5.0e-16 m; augmented wrists differ median 4.2 mm p95 9.3 mm; augmentation displacement median 54.2 mm; ratio 0.08
+twist 30 deg: joints identical to 4.4e-16 m; augmented wrists differ median 12.7 mm p95 28.0 mm; augmentation displacement median 55.7 mm; ratio 0.23

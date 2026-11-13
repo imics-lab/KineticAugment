@@ -1,0 +1,84 @@
+================================================================================
+0. Re-extraction identity checks
+================================================================================
+01986: repo==my shared_default True | my fresh_default==tester default True | my fresh_raw==tester nosmooth True | repo==fresh_default True
+01987: repo==my shared_default True | my fresh_default==tester default True | my fresh_raw==tester nosmooth True | repo==fresh_default False
+01988: repo==my shared_default True | my fresh_default==tester default True | my fresh_raw==tester nosmooth True | repo==fresh_default False
+01991: repo==my shared_default True | my fresh_default==tester default True | my fresh_raw==tester nosmooth True | repo==fresh_default False
+01992: repo==my shared_default True | my fresh_default==tester default True | my fresh_raw==tester nosmooth True | repo==fresh_default False
+
+================================================================================
+1. One Euro identification: refilter raw -> compare to smoothed output
+================================================================================
+  OE(min_cutoff=0.1, beta=40.0, dcutoff=1.0) fresh: max |refilt - smoothed| = 1.235e-07 m
+  OE(min_cutoff=0.05, beta=80.0, dcutoff=1.0) fresh: max |refilt - smoothed| = 2.060e-02 m
+  OE(min_cutoff=0.1, beta=10.0, dcutoff=1.0) fresh: max |refilt - smoothed| = 6.159e-02 m
+  OE(min_cutoff=0.01, beta=40.0, dcutoff=1.0) fresh: max |refilt - smoothed| = 3.215e-03 m
+  OE(0.1,40,1) shared graph, filter state carried across clips: max diff = 3.235e-02 m
+
+================================================================================
+2. Own Method A/B (pooled median, % sw) -- must match script on repo
+================================================================================
+  repo           script set n=32  x:A=0.022,B=0.043  y:A=0.016,B=0.033  z:A=0.062,B=0.074  xy:A=0.066,B=0.060  xyz:A=0.175,B=0.098
+  fresh_default  script set n=35  x:A=0.017,B=0.034  y:A=0.017,B=0.030  z:A=0.062,B=0.059  xy:A=0.075,B=0.046  xyz:A=0.175,B=0.084
+  fresh_raw      script set n=32  x:A=0.125,B=0.255  y:A=0.122,B=0.214  z:A=0.227,B=0.316  xy:A=0.366,B=0.357  xyz:A=0.743,B=0.472
+  shared_raw     script set n=30  x:A=0.133,B=0.276  y:A=0.130,B=0.219  z:A=0.337,B=0.410  xy:A=0.381,B=0.370  xyz:A=0.842,B=0.511
+  T:static       script set n=27  x:A=0.154,B=0.368  y:A=0.250,B=0.447  z:A=0.366,B=0.512  xy:A=0.656,B=0.579  xyz:A=1.363,B=0.791
+  repo           ARMS ONLY xyz A=0.222 B=0.111 (n=28)
+  fresh_raw      ARMS ONLY xyz A=0.835 B=0.509 (n=28)
+  repo HIPS ONLY xyz A=0.030 B=0.013 (n=4)
+    01986 hip observed frac L=0.00 R=0.00
+    01987 hip observed frac L=0.91 R=0.91
+    01988 hip observed frac L=0.04 R=0.04
+    01991 hip observed frac L=0.82 R=0.82
+    01992 hip observed frac L=1.00 R=1.00
+  z ratio: script B_z/B_xy=1.23; per-axis B_z/mean(Bx,By)=1.94; B_z/(B_xy/sqrt2)=1.73
+  raw z ratio: B_z/B_xy=0.89; per-axis=1.35
+  shoulder widths (repo): 01986=0.3327, 01987=0.3337, 01988=0.3253, 01991=0.3467, 01992=0.3296
+
+================================================================================
+3. Frame-rate (decimation) dependence of the script budget max(A_xyz,B_xyz)
+================================================================================
+  repo       every 1 frame(s): offset0 A=0.175 B=0.098 budget=0.175 | mean over offsets A=0.175 B=0.098
+  repo       every 2 frame(s): offset0 A=0.434 B=0.192 budget=0.434 | mean over offsets A=0.443 B=0.208
+  repo       every 3 frame(s): offset0 A=0.660 B=0.352 budget=0.660 | mean over offsets A=0.679 B=0.519
+  fresh_raw  every 1 frame(s): offset0 A=0.743 B=0.472 budget=0.743 | mean over offsets A=0.743 B=0.472
+  fresh_raw  every 2 frame(s): offset0 A=1.050 B=0.759 budget=1.050 | mean over offsets A=1.075 B=0.931
+  fresh_raw  every 3 frame(s): offset0 A=1.516 B=1.053 budget=1.516 | mean over offsets A=1.531 B=0.942
+
+================================================================================
+4. ACF of second difference D (arm landmarks, runs>=12, all axes)
+================================================================================
+  iid theory: lag1=-0.667 lag2=+0.167
+  repo           lag1=-0.184 lag2=-0.135
+  fresh_default  lag1=-0.172 lag2=-0.107
+  fresh_raw      lag1=-0.400 lag2=-0.059
+  T:static       lag1=-0.537 lag2=+0.064
+  filter displacement (smoothed-raw) lag1=+0.621 lag2=+0.344
+
+================================================================================
+5. Same-statistic comparisons: 6 arm landmarks, |a-b|/sw (median, mean, p95) %
+================================================================================
+  raw vs smoothed (own extraction)         direct med=  2.41 mean=  2.74 p95=  5.67 | aligned med= 1.10 | n=2297
+  fresh graph vs shared graph (repo)       direct med=  1.26 mean=  4.03 p95= 18.16 | aligned med= 0.62 | n=2334
+  smoothed, 75% input (tester extracts)    direct med=  1.94 mean=  2.36 p95=  5.44 | aligned med= 0.89 | n=2342
+  raw, 75% input                           direct med=  2.27 mean=  2.77 p95=  6.39 | aligned med= 0.96 | n=2303
+  smoothed, padded                         direct med=  3.59 mean=  4.19 p95=  8.98 | aligned med= 1.65 | n=2343
+  smoothed, +25 brightness                 direct med=  2.83 mean=  3.37 p95=  7.43 | aligned med= 1.21 | n=2342
+  tracking vs static                       direct med=  9.22 mean= 10.00 p95= 20.06 | aligned med= 3.42 | n=2275
+  full vs heavy model                      direct med= 25.67 mean= 33.98 p95= 89.06 | aligned med=15.41 | n=1803
+  repo vs heavy model                      direct med= 24.75 mean= 33.07 p95= 85.89 | aligned med=15.60 | n=1794
+
+================================================================================
+6. Shared-graph leak: repo vs own fresh_default per clip (6 arm lms, % sw)
+================================================================================
+  01986: median=  0.00  first5=  0.00  rest=  0.00  last10=  0.00  max=  0.00
+         raw (no filter) fresh vs shared: median=  0.00 rest=  0.00
+  01987: median=  9.52  first5= 17.78  rest=  9.03  last10=  2.82  max= 33.05
+         raw (no filter) fresh vs shared: median=  9.33 rest=  9.01
+  01988: median=  1.09  first5=  8.62  rest=  1.05  last10=  0.57  max= 24.03
+         raw (no filter) fresh vs shared: median=  1.47 rest=  1.42
+  01991: median=  0.20  first5=  2.05  rest=  0.14  last10=  0.02  max=  6.82
+         raw (no filter) fresh vs shared: median=  0.00 rest=  0.00
+  01992: median=  6.82  first5= 21.64  rest=  6.46  last10=  5.03  max= 31.19
+         raw (no filter) fresh vs shared: median=  7.21 rest=  6.77

@@ -1,0 +1,11 @@
+frames serialised: 409, values per frame: 79
+direct error rebuilt by REAL SMPL-X forward from the saved npz: median 6.551%  p95 13.729%
+direct error via reconstruct_body (project FK):               median 6.551%
+max |real SMPL-X joint - reconstruct_body| over all frames/arm joints: 1.70e-07 m
+
+reconstruct_body change when betas[0]: 0 -> 2  : 0.00e+00 m
+real SMPL-X forward change for the same params : 6.638e-02 m
+
+synthetic, truth root = 180 deg about x (MediaPipe axis convention), 50 trials:
+  worst arm-joint position error: 4.95 mm
+  fitted global_orient vs truth: median 179.8 deg (min 179.0)

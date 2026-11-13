@@ -1,0 +1,10 @@
+frames: 409
+fitted body FRONT, z-component in MediaPipe world (camera-facing => ~ -1): median +1.00; fraction facing away (z>0): 100.0%
+   01986: median front_z +1.00, facing away 100%
+   01987: median front_z +1.00, facing away 100%
+   01988: median front_z +1.00, facing away 100%
+   01991: median front_z +1.00, facing away 100%
+   01992: median front_z +1.00, facing away 100%
+fitted body UP, y-component (upright => ~ -1): median +1.00
+left elbow local-y (flexion is NEGATIVE for left, per E2b/E6): median +84.2 deg, fraction positive 100.0%
+right elbow local-y (flexion is POSITIVE for right): median -85.6 deg, fraction negative 100.0%

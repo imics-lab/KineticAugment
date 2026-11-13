@@ -1,0 +1,36 @@
+01986 image-space bone-length variation (normalised coords as stored):
+  thigh      xy : CV   3.5%  (max-min)/mean  14.4%  (p95-p5)/median   9.5%
+  thigh      xyz: CV   3.7%  (max-min)/mean  15.3%  (p95-p5)/median  10.8%
+  shoulders  xy : CV   2.0%  (max-min)/mean   5.7%  (p95-p5)/median   5.5%
+  shoulders  xyz: CV   3.2%  (max-min)/mean  12.3%  (p95-p5)/median   9.3%
+  upper arm  xy : CV   7.7%  (max-min)/mean  20.1%  (p95-p5)/median  17.3%
+  upper arm  xyz: CV  11.9%  (max-min)/mean  40.7%  (p95-p5)/median  28.7%
+  forearm    xy : CV  30.0%  (max-min)/mean 110.1%  (p95-p5)/median  91.2%
+  forearm    xyz: CV  28.1%  (max-min)/mean  72.8%  (p95-p5)/median  58.3%
+  R thigh    xy : CV   2.8%
+  R thigh    xyz: CV   2.9%
+  R upper    xy : CV   7.5%
+  R upper    xyz: CV  18.7%
+  R fore     xy : CV  20.7%
+  R fore     xyz: CV  28.2%
+01986 legs: image y of L hip/knee min 1.172 1.679 | frac frames with hip y>1: 1.0 knee y>1: 1.0
+   world visibility mean: L hip 0.092 L knee 0.004
+frame-0 pose-block wrist z vs hand-block wrist z, per clip (pose L/R wrist 15/16; hands at 501/522):
+  01986: pose z15 -0.632 z16 -0.772 | blocks 501 z 0.000 522 z 0.000 | 1.196*W = 383px
+  01987: pose z15 -0.145 z16 -0.229 | blocks 501 z 0.000 522 z 0.000 | 1.196*W = 1531px
+  01988: pose z15 -0.751 z16 -0.648 | blocks 501 z 0.000 522 z 0.000 | 1.196*W = 765px
+  01991: pose z15 -0.285 z16 -1.139 | blocks 501 z 0.000 522 z -0.000 | 1.196*W = 344px
+  01992: pose z15 -1.196 z16 -1.222 | blocks 501 z 0.000 522 z 0.000 | 1.196*W = 344px
+fore/upper ratio aggregates on image data (xy / xyz):
+  01986 xy: median(fo)/median(up) 0.529, mean ratio 0.584, median ratio 0.514
+  01986 xyz: median(fo)/median(up) 1.594, mean ratio 1.428, median ratio 1.561
+  01987 xy: median(fo)/median(up) 0.498, mean ratio 0.583, median ratio 0.503
+  01987 xyz: median(fo)/median(up) 1.027, mean ratio 1.143, median ratio 1.102
+  01988 xy: median(fo)/median(up) 0.764, mean ratio 0.777, median ratio 0.751
+  01988 xyz: median(fo)/median(up) 1.202, mean ratio 1.265, median ratio 1.265
+  01991 xy: median(fo)/median(up) 0.733, mean ratio 0.687, median ratio 0.757
+  01991 xyz: median(fo)/median(up) 1.054, mean ratio 1.254, median ratio 1.053
+  01992 xy: median(fo)/median(up) 0.550, mean ratio 0.590, median ratio 0.552
+  01992 xyz: median(fo)/median(up) 1.569, mean ratio 1.511, median ratio 1.545
+  pooled xy: median/median 0.695, mean/mean 0.659, mean ratio 0.664, median ratio 0.646
+  pooled xyz: median/median 1.487, mean/mean 1.320, mean ratio 1.310, median ratio 1.283

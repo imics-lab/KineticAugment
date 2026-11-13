@@ -1,0 +1,10 @@
+rest included angle humerus vs forearm: 22.7 deg
+(A') forearm twist + compensating wrist (joint 20 local rot pre-multiplied by inverse twist)
+   30 deg: max|dJ| all 55 joints 1.7e-09 m; verts max 33.3 mm
+   60 deg: max|dJ| all 55 joints 3.3e-09 m; verts max 65.2 mm
+   90 deg: max|dJ| all 55 joints 5.0e-09 m; verts max 93.6 mm
+(B') elbow local rotation under compensated humerus twist: swing/twist about rest forearm axis
+  humerus twist   0: elbow rotvec [ 0.    -1.571  0.   ]  swing   89.5 deg  twist  -10.5 deg
+  humerus twist  30: elbow rotvec [-0.319 -1.394  0.446]  swing   81.0 deg  twist  -31.2 deg
+  humerus twist  60: elbow rotvec [-0.621 -1.148  0.87 ]  swing   77.3 deg  twist  -50.0 deg
+  humerus twist  90: elbow rotvec [-0.904 -0.835  1.267]  swing   79.6 deg  twist  -68.6 deg

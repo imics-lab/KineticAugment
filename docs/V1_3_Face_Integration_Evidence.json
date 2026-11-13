@@ -1,0 +1,617 @@
+{
+  "aggregate": {
+    "arbitrary_rigid_repose_inverse_error_m": {
+      "count": 740422,
+      "max": 9.205483015737869e-17,
+      "median": 3.8005887153050735e-17,
+      "p95": 6.727507242144006e-17
+    },
+    "attachment_coverage_of_observed_face": 0.9993548387096775,
+    "attachment_inverse_pixel_error_px": {
+      "count": 740422,
+      "max": 7.279509460923746e-13,
+      "median": 6.355287432313019e-14,
+      "p95": 2.604892696897332e-13
+    },
+    "attachment_reconstruction_error_m": {
+      "count": 740422,
+      "max": 4.062661642740952e-16,
+      "median": 9.71445146547012e-17,
+      "p95": 1.798766884999431e-16
+    },
+    "body_valid_frames": 1643,
+    "clip_count": 25,
+    "geometry_valid_hand_frames": 1472,
+    "head_attachment_frames": 1549,
+    "invalid_face_frames_with_accepted_geometry": 0,
+    "observed_face_frames": 1550,
+    "processed_frames": 1646,
+    "total_pipeline_seconds": 245.177
+  },
+  "annotation_search": {
+    "command": "rtk proxy rg --files --hidden --no-ignore --follow data /Users/bemnetbeshah/Workspace/cv-research/KineticAugment/data | rtk proxy rg -i '(wlasl|annot|label|gloss).*(\\.json|\\.csv|\\.tsv|\\.parquet)$|(^|/)(annotations?|labels?)(/|\\.)' || true",
+    "command_output": "(no matching paths)",
+    "filename_filter": "case-insensitive WLASL/annot/label/gloss names with JSON/CSV/TSV/Parquet extensions or annotation(s)/label(s) path components",
+    "matching_file_count": 0,
+    "matching_files": [],
+    "meaningful_recognition_accuracy_measured": false,
+    "scope": "bounded data-directory filename inventory; scoped symlinks followed",
+    "searched_roots": [
+      "/Users/bemnetbeshah/Workspace/cv-research/KineticAugment/.claude/worktrees/face-v1.3/data",
+      "/Users/bemnetbeshah/Workspace/cv-research/KineticAugment/data"
+    ]
+  },
+  "attachment_on_off_regression_fix_round1": {
+    "clips": [
+      {
+        "body_valid_mask_equal": true,
+        "clip": "01986",
+        "distance_finite_compared": 35,
+        "frames": [
+          10,
+          11,
+          12
+        ],
+        "geometry_valid_mask_equal": true,
+        "max_distance_delta_m": 0.0,
+        "max_rotation_delta": 0.0,
+        "max_translation_delta_m": 0.0,
+        "pass": true,
+        "rotation_finite_compared": 495,
+        "translation_finite_compared": 9
+      },
+      {
+        "body_valid_mask_equal": true,
+        "clip": "01991",
+        "distance_finite_compared": 21,
+        "frames": [
+          0,
+          1,
+          2
+        ],
+        "geometry_valid_mask_equal": true,
+        "max_distance_delta_m": 0.0,
+        "max_rotation_delta": 0.0,
+        "max_translation_delta_m": 0.0,
+        "pass": true,
+        "rotation_finite_compared": 495,
+        "translation_finite_compared": 9
+      }
+    ],
+    "comparison_gate_test": "tests/test_face_integration_validation.py; 3 passed",
+    "negative_case": "a lost hand validity bit plus a non-finite hand value causes pass=false",
+    "processed_clips": 2,
+    "processed_frames": 132,
+    "source": "/tmp/face-v1.3-validation-fix-round1/face_integration_validation.json"
+  },
+  "coverage": {
+    "clip_count": 25,
+    "clips": [
+      "01986",
+      "01987",
+      "01988",
+      "01991",
+      "01992",
+      "05631",
+      "07389",
+      "08917",
+      "08918",
+      "08938",
+      "09849",
+      "12328",
+      "13630",
+      "17083",
+      "21871",
+      "21942",
+      "28111",
+      "57641",
+      "57949",
+      "63229",
+      "63665",
+      "63669",
+      "69257",
+      "69364",
+      "69411"
+    ],
+    "frame_stride": 1,
+    "full_frame_coverage": true,
+    "input_directories": [
+      "/Users/bemnetbeshah/Workspace/cv-research/KineticAugment/.claude/worktrees/face-v1.3/data/test_output",
+      "/Users/bemnetbeshah/Workspace/cv-research/KineticAugment/data/round_trip_eval"
+    ],
+    "processed_frames": 1646
+  },
+  "final_fix": {
+    "channel_semantics": "Missing blendshape names map to the canonical MediaPipe 52-channel order, but every score stays masked invalid when channel semantics are unknown.",
+    "classifier_archive_probe": {
+      "accuracy_measured": false,
+      "clips": [
+        "01986",
+        "01987",
+        "01988",
+        "01991",
+        "01992",
+        "05631",
+        "07389",
+        "08917",
+        "08918",
+        "08938",
+        "09849",
+        "12328",
+        "13630",
+        "17083",
+        "21871",
+        "21942",
+        "28111",
+        "57641",
+        "57949",
+        "63229",
+        "63665",
+        "63669",
+        "69257",
+        "69364",
+        "69411"
+      ],
+      "modes": {
+        "body_only": {
+          "all_logits_finite": true,
+          "all_parameter_updates_finite": true,
+          "all_stream_values_finite": true,
+          "blendshape_valid_values": 0,
+          "finite_gradients": true,
+          "loss_before_step": 0.998117208480835,
+          "optimizer_step_completed": true,
+          "padded_frames": 144,
+          "streams": [
+            "body_hands"
+          ],
+          "updated_parameter_count": 8
+        },
+        "multimodal": {
+          "all_logits_finite": true,
+          "all_parameter_updates_finite": true,
+          "all_stream_values_finite": true,
+          "blendshape_valid_values": 72852,
+          "finite_gradients": true,
+          "loss_before_step": 0.7618099451065063,
+          "optimizer_step_completed": true,
+          "padded_frames": 144,
+          "streams": [
+            "blendshapes",
+            "body_hands",
+            "face",
+            "head"
+          ],
+          "updated_parameter_count": 20
+        }
+      },
+      "no_face_clips": [
+        "09849"
+      ],
+      "samples": 25,
+      "synthetic_labels_only": true
+    },
+    "collation": "Blendshape order is enforced only when the blendshape stream is present; valid incompatible named orders are rejected.",
+    "probe_command": "rtk proxy env PYTHONPATH=src .venv/bin/python scripts/validate_face_integration.py --probe-feature-dir /tmp/face-v1.3-validation-full --output-dir /tmp/face-v1.3-final-fix-probe",
+    "recognition_accuracy_measured": false,
+    "source_feature_dir": "/private/tmp/face-v1.3-validation-full"
+  },
+  "implementation_sha256": {
+    "scripts/validate_face_integration.py": "392b222160ed8c99cf2a19374be58e4ab76f289cd901117496d55a4e7f3432a2",
+    "src/kinetic_augment/body_model/face_features.py": "cd79d73ece0f55c7e99b160cbdf32ee9ee54b2b4f09f836ac7392e2968a3c064",
+    "src/kinetic_augment/body_model/face_pipeline.py": "903654d15cb33a87b34ad765f6549f0afdfb3a3ec0658a8a4dcee81fe06dec07",
+    "src/kinetic_augment/body_model/face_stream.py": "7edb6677ad5b7e016bb04ad2a7460a51920975870451fd8cc3d6262b8e9a6e28",
+    "src/kinetic_augment/evaluation/datasets/face_features.py": "a376ae39caa958b420e8aea1bd235faa70a10e820968e4bd6dc53a720e756310",
+    "src/kinetic_augment/evaluation/models/face_classifier.py": "b75b6d20ddfb2693ee19df7202f7023a76d76188d4f4aced1b29e8a5d2ff8b54"
+  },
+  "input_hashes_unchanged": true,
+  "input_sha256_by_file": {
+    "01986_face.npz": "be1fbbf4f0d0e12941b8ac1a55335abe388b85612e63189b07c989ce6ed08b06",
+    "01986_hands.npz": "4337a205b4277db95ae99aa2684ced7713de3dea2341b174996e032787a6b258",
+    "01987_face.npz": "514d6bea5227707f8627eafca12dabea607e89cbc7c6ab156c0fa9ab621b91d9",
+    "01987_hands.npz": "478183c080ab0f9a828f517d4df6c1f6552e5898c7af3d2c90de3688897d39f4",
+    "01988_face.npz": "098b4eb1d49a23b4921f27c2556e65923a48b2881fb43ec35821031be5114431",
+    "01988_hands.npz": "e2b5058626a19c99b600c0ec9415021027028605f9c532e58993e59622a8c02f",
+    "01991_face.npz": "ef33cf933b1f5d038068426dda78693967d2f89228af1f8ba3913bd47423c7ed",
+    "01991_hands.npz": "dff8a85b695d91b5e5e305dab4e75941713227e7a1f883c3e8b317d75949a25b",
+    "01992_face.npz": "461e5913e0ce3f88131308d111c6d42d096810789c50a3439226f43786058a71",
+    "01992_hands.npz": "38b9c73a5b0c9e48202e419c4d49aa2d5c9c310e2c8d8377d66fce80119600ff",
+    "05631_face.npz": "6d25cb37a8adedc7873b452862f5f5f211f47fbde599f0ceac76348d91df4b9d",
+    "05631_hands.npz": "72bfe09f958dd59284c4cb8ac6bdd2843e1c83c7fbd3e6d9329620039325c956",
+    "07389_face.npz": "9519e77fff5d7c4f87e9502bfedfedad8546a65d91b05f41015be428969fb1cb",
+    "07389_hands.npz": "2c924db95d6850335552772d81e48182384823af68c904464a71999f6671445b",
+    "08917_face.npz": "69b69c752881a6c83fd9e3a8c86aeca5263d807d3717988f644f062a1c646cb7",
+    "08917_hands.npz": "797bb8e257854b4f1116e4fe77885c478574fe2231ad708fcde69d2ca77ed860",
+    "08918_face.npz": "dd60d1a23acadfb1c5e26f4f4bcf62305adbc6d2ffec1caf1ffcbd4588b429c0",
+    "08918_hands.npz": "b1d5926d5896128729095d0f88c91dcf78d22bc6ccfedb11cf7647c3fda34040",
+    "08938_face.npz": "9a5a068f00e4405f2eca78b15291a0b78db4a2ef9710f592ca159968ae238c0d",
+    "08938_hands.npz": "6275fd5f070f45d87d1262d9e41381376d21481e4015de645ea29b3c09cb97d4",
+    "09849_face.npz": "a42a99852c8f2f82b30567a8a49ce4432c8c46a4c1dd29951e96a748e3dce5ca",
+    "09849_hands.npz": "3aeeeaad397b5076db69317f311cb620d94a1542619e019b1dabd108e0e7ba35",
+    "12328_face.npz": "3655b8c33b63019f1d3bea91bead1246bca3e5d3724df5fb0f07abea47d51178",
+    "12328_hands.npz": "f129b6f4ecebc831b7b3910817acd063d9fb80a83cf0c22adfa7d370a1872c7a",
+    "13630_face.npz": "f47da29f1c8595854131a004d3d93315570d82768ac454c7857c1a9f55bab094",
+    "13630_hands.npz": "10e3f0a3615a40dcc06ef9099762b9835c902794b038afd14978e44d389e0690",
+    "17083_face.npz": "62fddd2d3c64d1cd1b9ad4758080ff24e24cf18a1c7aae29353d37e99d40bb79",
+    "17083_hands.npz": "a07378be699e444389e41cabd3d32779d985f2f9a13cbd646223ddf58d8db4bc",
+    "21871_face.npz": "e0b8e40b3110fda0fce0553cbacc189b802d2ce059a2fa7966193e95bed4090b",
+    "21871_hands.npz": "7b9d6711083958c3590a61ea688d3ba0f6431341710e49fb990caf37ff0f65df",
+    "21942_face.npz": "66761db9cdfa3a9a01e0690267f06f4e107c62dd70d2e1280a4613a055b6ff6f",
+    "21942_hands.npz": "7861510ab04e9402e9e515827f428be5e085051bcadf61807902e47ab88a510d",
+    "28111_face.npz": "b104e452ef700d8b258b0752ce15a335532c568ff0c2dcbe463f9d155df12d22",
+    "28111_hands.npz": "fbd917403e0b9334a1d5b908dc5aa21a50dbcef901b0620cb2ed038abfc91fb6",
+    "57641_face.npz": "9679e9d8fcb4894d1b54e1ae158983f6914a1030f00c04ba66bf511679dc4c38",
+    "57641_hands.npz": "a5e7d624e63fbe124451a52ae3fb69d86013d7b60249fc5a3316d775277de5d7",
+    "57949_face.npz": "4d39f150a68c1b778e8e37b33967296245785180d95264b46d0b70885a6bbaf3",
+    "57949_hands.npz": "36548f8518bd4e123e8a8c2b06116e24579fabee125688d5882e99f5dc4f6e10",
+    "63229_face.npz": "83b5b37e659d44b8a699917386ca1ac5812f0fe1f0948a93171d309afdfecc29",
+    "63229_hands.npz": "0e6f8f75700feb30632cd519f6162b187f64cd7109c12a7b47be9f34712c8a29",
+    "63665_face.npz": "c4cef35e5babe94aee6ca3e569263bcb3fdf22d98286b59e8ab2cee3c7fb6f8f",
+    "63665_hands.npz": "d64dab27d452f4ab8d7d2a469ae94912ce9b679d544dc6a294a6e7692a81d9b7",
+    "63669_face.npz": "58355c97d6381d98f304e62d4eee60957e5aa1513f1553b1533988b74c0aae6d",
+    "63669_hands.npz": "106995ca7aef62d4bd20d006b77d844656b55be4c1432cfab8d6bf54f037a909",
+    "69257_face.npz": "f74ae570a6ce2fac4e8f61627445038a83650dca9fff8e97cf4f6472810eae2f",
+    "69257_hands.npz": "e3ba8ad4179938df7711e8ee73de6378dadd6ee4c1dfcf8e58393167c595e293",
+    "69364_face.npz": "26ce8d92c18465e82bcfb33bd3f7601329808e3965267e1d1264c118fdfa4ddd",
+    "69364_hands.npz": "98447363a1ef98b9bafecb2bdad14d53cffd1b64becb6a15d46e26f1e0e60c2f",
+    "69411_face.npz": "ea26806bb5a84c421e6c8e8b05128e121da9d28e30b3c8f08b973333373bb79b",
+    "69411_hands.npz": "8093dd4897c7566d8faa894b5b88e82a2113b5487d2c9e2d15732dcd25542a3b"
+  },
+  "per_clip": [
+    {
+      "body_valid_frames": 83,
+      "clip": "01986",
+      "elapsed_seconds": 15.17,
+      "frames": 83,
+      "geometry_valid_hand_frames": 100,
+      "head_attachment_frames": 83,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 83
+    },
+    {
+      "body_valid_frames": 75,
+      "clip": "01987",
+      "elapsed_seconds": 11.726,
+      "frames": 75,
+      "geometry_valid_hand_frames": 76,
+      "head_attachment_frames": 75,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 75
+    },
+    {
+      "body_valid_frames": 143,
+      "clip": "01988",
+      "elapsed_seconds": 24.834,
+      "frames": 144,
+      "geometry_valid_hand_frames": 193,
+      "head_attachment_frames": 143,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 143
+    },
+    {
+      "body_valid_frames": 49,
+      "clip": "01991",
+      "elapsed_seconds": 7.421,
+      "frames": 49,
+      "geometry_valid_hand_frames": 49,
+      "head_attachment_frames": 49,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 49
+    },
+    {
+      "body_valid_frames": 59,
+      "clip": "01992",
+      "elapsed_seconds": 15.638,
+      "frames": 59,
+      "geometry_valid_hand_frames": 117,
+      "head_attachment_frames": 59,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 59
+    },
+    {
+      "body_valid_frames": 24,
+      "clip": "05631",
+      "elapsed_seconds": 3.727,
+      "frames": 24,
+      "geometry_valid_hand_frames": 17,
+      "head_attachment_frames": 24,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 24
+    },
+    {
+      "body_valid_frames": 82,
+      "clip": "07389",
+      "elapsed_seconds": 8.127,
+      "frames": 82,
+      "geometry_valid_hand_frames": 52,
+      "head_attachment_frames": 72,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 72
+    },
+    {
+      "body_valid_frames": 32,
+      "clip": "08917",
+      "elapsed_seconds": 4.776,
+      "frames": 32,
+      "geometry_valid_hand_frames": 23,
+      "head_attachment_frames": 32,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 32
+    },
+    {
+      "body_valid_frames": 30,
+      "clip": "08918",
+      "elapsed_seconds": 4.621,
+      "frames": 30,
+      "geometry_valid_hand_frames": 24,
+      "head_attachment_frames": 30,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 30
+    },
+    {
+      "body_valid_frames": 55,
+      "clip": "08938",
+      "elapsed_seconds": 12.652,
+      "frames": 56,
+      "geometry_valid_hand_frames": 69,
+      "head_attachment_frames": 55,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 55
+    },
+    {
+      "body_valid_frames": 81,
+      "clip": "09849",
+      "elapsed_seconds": 14.06,
+      "frames": 81,
+      "geometry_valid_hand_frames": 0,
+      "head_attachment_frames": 0,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 0
+    },
+    {
+      "body_valid_frames": 88,
+      "clip": "12328",
+      "elapsed_seconds": 21.987,
+      "frames": 88,
+      "geometry_valid_hand_frames": 176,
+      "head_attachment_frames": 88,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 88
+    },
+    {
+      "body_valid_frames": 106,
+      "clip": "13630",
+      "elapsed_seconds": 7.692,
+      "frames": 106,
+      "geometry_valid_hand_frames": 47,
+      "head_attachment_frames": 106,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 106
+    },
+    {
+      "body_valid_frames": 62,
+      "clip": "17083",
+      "elapsed_seconds": 6.892,
+      "frames": 62,
+      "geometry_valid_hand_frames": 35,
+      "head_attachment_frames": 62,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 62
+    },
+    {
+      "body_valid_frames": 79,
+      "clip": "21871",
+      "elapsed_seconds": 7.332,
+      "frames": 79,
+      "geometry_valid_hand_frames": 41,
+      "head_attachment_frames": 79,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 79
+    },
+    {
+      "body_valid_frames": 68,
+      "clip": "21942",
+      "elapsed_seconds": 9.378,
+      "frames": 68,
+      "geometry_valid_hand_frames": 59,
+      "head_attachment_frames": 68,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 68
+    },
+    {
+      "body_valid_frames": 35,
+      "clip": "28111",
+      "elapsed_seconds": 4.505,
+      "frames": 35,
+      "geometry_valid_hand_frames": 19,
+      "head_attachment_frames": 35,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 35
+    },
+    {
+      "body_valid_frames": 29,
+      "clip": "57641",
+      "elapsed_seconds": 4.932,
+      "frames": 29,
+      "geometry_valid_hand_frames": 26,
+      "head_attachment_frames": 26,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 27
+    },
+    {
+      "body_valid_frames": 53,
+      "clip": "57949",
+      "elapsed_seconds": 8.134,
+      "frames": 53,
+      "geometry_valid_hand_frames": 53,
+      "head_attachment_frames": 53,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 53
+    },
+    {
+      "body_valid_frames": 47,
+      "clip": "63229",
+      "elapsed_seconds": 4.581,
+      "frames": 47,
+      "geometry_valid_hand_frames": 19,
+      "head_attachment_frames": 47,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 47
+    },
+    {
+      "body_valid_frames": 72,
+      "clip": "63665",
+      "elapsed_seconds": 7.318,
+      "frames": 72,
+      "geometry_valid_hand_frames": 43,
+      "head_attachment_frames": 72,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 72
+    },
+    {
+      "body_valid_frames": 93,
+      "clip": "63669",
+      "elapsed_seconds": 8.398,
+      "frames": 94,
+      "geometry_valid_hand_frames": 55,
+      "head_attachment_frames": 93,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 93
+    },
+    {
+      "body_valid_frames": 56,
+      "clip": "69257",
+      "elapsed_seconds": 12.968,
+      "frames": 56,
+      "geometry_valid_hand_frames": 74,
+      "head_attachment_frames": 56,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 56
+    },
+    {
+      "body_valid_frames": 75,
+      "clip": "69364",
+      "elapsed_seconds": 10.97,
+      "frames": 75,
+      "geometry_valid_hand_frames": 60,
+      "head_attachment_frames": 75,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 75
+    },
+    {
+      "body_valid_frames": 67,
+      "clip": "69411",
+      "elapsed_seconds": 7.338,
+      "frames": 67,
+      "geometry_valid_hand_frames": 45,
+      "head_attachment_frames": 67,
+      "invalid_face_frames_with_accepted_geometry": 0,
+      "observed_face_frames": 67
+    }
+  ],
+  "recognition_accuracy": {
+    "measured": false,
+    "reason": "No usable real WLASL label annotations were found for these cached clips."
+  },
+  "regressions": {
+    "attachment_on_off_body_hand": [
+      {
+        "body_ok_equal": true,
+        "body_rotations_max_abs_delta": 0.0,
+        "clip": "01986",
+        "face_attachment_disabled": true,
+        "frames": [
+          10,
+          11,
+          12
+        ],
+        "hand_face_distance_max_abs_delta_m": 0.0,
+        "pass": true,
+        "translation_max_abs_delta_m": 0.0
+      },
+      {
+        "body_ok_equal": true,
+        "body_rotations_max_abs_delta": 0.0,
+        "clip": "01991",
+        "face_attachment_disabled": true,
+        "frames": [
+          0,
+          1,
+          2
+        ],
+        "hand_face_distance_max_abs_delta_m": 0.0,
+        "pass": true,
+        "translation_max_abs_delta_m": 0.0
+      }
+    ],
+    "corrected_unreached_geometry_mask": {
+      "available": true,
+      "clip": "01986",
+      "corrected_unreached_hands": 16,
+      "frames": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "pass": true,
+      "unreached_hands_with_valid_geometry": 0
+    },
+    "face_only_after_producer_body_failure": {
+      "available": true,
+      "body_hand_valid_values": 0,
+      "face_survives_without_body_hand": true,
+      "face_valid_values": 52,
+      "pass": true,
+      "producer_body_fit_failed": true,
+      "producer_preserved_observed_face": true,
+      "source_frame": 0
+    },
+    "synthetic_classifier_wiring": {
+      "all_logits_finite": true,
+      "all_stream_values_finite": true,
+      "loss_before_step": 0.9666895866394043,
+      "optimizer_step_completed": true,
+      "padded_frames": 7,
+      "samples": 4,
+      "streams": [
+        "body_hands",
+        "face",
+        "head"
+      ],
+      "synthetic_labels_only": true
+    }
+  },
+  "roundtrip_metrics_recomputed_from_saved_feature_archives": true,
+  "schema": 1,
+  "verification": {
+    "final_fix_focused": {
+      "command": "rtk proxy env PYTHONPATH=src .venv/bin/python -m pytest tests/test_face_training_dataset.py tests/test_face_classifier.py tests/test_face_integration_validation.py -q --tb=long",
+      "failed": 0,
+      "git_diff_check": "passed",
+      "passed": 19,
+      "py_compile": "passed: scripts/validate_face_integration.py and src/kinetic_augment/evaluation/datasets/face_features.py",
+      "xfailed": 0
+    },
+    "full_suite": {
+      "command": "rtk proxy env PYTHONPATH=src .venv/bin/python -m pytest -q --tb=long",
+      "elapsed_seconds": 88.86,
+      "errors_in_sandbox": 3,
+      "failed_in_sandbox": 3,
+      "passed": 279,
+      "xfailed": 1
+    },
+    "git_diff_check": "passed",
+    "graphics_retry": {
+      "command": "rtk proxy env PYTHONPATH=src .venv/bin/python -m pytest tests/test_extract_face_landmarks.py tests/test_extract_hand_landmarks.py tests/test_extract_world_landmarks.py -q --tb=long",
+      "elapsed_seconds": 14.63,
+      "passed": 6
+    },
+    "validation_script_compiles": true,
+    "validation_script_max_line_length": 100
+  }
+}

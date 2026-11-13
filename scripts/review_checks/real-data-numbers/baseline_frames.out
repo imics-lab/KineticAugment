@@ -1,0 +1,25 @@
+skipped frames: 1
+old_sim                  pooled median  5.944%   p95 12.065%   n=2354
+direct                   pooled median  6.551%   p95 13.729%   n=2354
+direct_then_rigid        pooled median  6.551%   p95 13.729%   n=2354
+direct_then_sim          pooled median  5.944%   p95 12.065%   n=2354
+direct_then_scaleonly    pooled median  5.944%   p95 12.065%   n=2354
+ikframe_none             pooled median 167.697%   p95 181.551%   n=2354
+per-clip medians:
+   old_sim {'01986': 6.31, '01987': 6.38, '01988': 5.06, '01991': 9.2, '01992': 6.19}
+   direct {'01986': 6.38, '01987': 7.42, '01988': 5.57, '01991': 9.23, '01992': 6.83}
+fitted similarity scale: median 0.9726  p5 0.9102  p95 1.0241  mean 0.9717
+converter rigid rotation magnitude (deg, vs IK frame): median 3.57  p5 1.71 p95 6.41
+
+Direction error per bone (median deg / p95 deg):
+  ikframe      L upper arm: 0.000/0.00  L forearm: 0.000/0.00  R upper arm: 0.000/0.00  R forearm: 0.000/0.00
+  direct       L upper arm: 2.572/4.55  L forearm: 2.647/4.73  R upper arm: 2.814/5.41  R forearm: 2.127/5.35
+  aligned_sim  L upper arm: 2.572/4.55  L forearm: 2.647/4.73  R upper arm: 2.814/5.41  R forearm: 2.127/5.35
+  pooled median: {'ikframe': 0.0, 'direct': 2.581, 'aligned_sim': 2.581}
+
+Length error per bone (median % shoulder width):
+  direct       L upper arm: 8.58  L forearm: 7.53  R upper arm: 9.64  R forearm: 4.99   POOLED 7.86
+  aligned_sim  L upper arm: 5.89  L forearm: 8.21  R upper arm: 7.18  R forearm: 4.38   POOLED 6.66
+
+Position displacement at bone tip implied by aligned direction error alone (median % width):
+   L upper arm: 3.15  L forearm: 3.35  R upper arm: 3.61  R forearm: 2.83   POOLED 3.22

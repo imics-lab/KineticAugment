@@ -1,0 +1,22 @@
+==============================================================================
+Base pose: left shoulder swing ~70deg down / 20deg fwd, left elbow flexed 90deg (hinge)
+elbow included angle 100.0 deg between bone vectors
+
+(A) TERMINAL twist: elbow local rotation post-multiplied by twist about rest forearm axis
+  forearm twist  30 deg                      rotdiff S    0.0  E   30.0 deg | max|dJ| sh/el/wr 1.0e-09 m, all55 3.8e-02 m | verts max   49.4 mm mean(moved>1mm)  16.7 mm, n>1mm 1321
+  forearm twist  60 deg                      rotdiff S    0.0  E   60.0 deg | max|dJ| sh/el/wr 2.0e-09 m, all55 7.3e-02 m | verts max   95.3 mm mean(moved>1mm)  19.7 mm, n>1mm 2217
+  forearm twist  90 deg                      rotdiff S    0.0  E   90.0 deg | max|dJ| sh/el/wr 3.1e-09 m, all55 1.0e-01 m | verts max  134.8 mm mean(moved>1mm)  20.3 mm, n>1mm 3075
+
+(B) NON-terminal twist: shoulder twisted about humerus, elbow (3-DOF) compensates
+  humerus twist  30 deg + elbow comp.        rotdiff S   30.0  E   30.0 deg | max|dJ| sh/el/wr 8.0e-10 m, all55 1.4e-09 m | verts max   31.5 mm mean(moved>1mm)   5.7 mm, n>1mm 1605
+  humerus twist  60 deg + elbow comp.        rotdiff S   60.0  E   60.0 deg | max|dJ| sh/el/wr 1.4e-09 m, all55 2.4e-09 m | verts max   61.5 mm mean(moved>1mm)   5.2 mm, n>1mm 4032
+  humerus twist  90 deg + elbow comp.        rotdiff S   90.0  E   90.0 deg | max|dJ| sh/el/wr 1.7e-09 m, all55 2.9e-09 m | verts max   87.8 mm mean(moved>1mm)   5.5 mm, n>1mm 5740
+
+(C) shoulder twist WITHOUT compensation (what a hinge elbow would force): wrist moves
+  humerus twist  30 deg: elbow moves   0.000 mm, wrist moves  129.0 mm
+  humerus twist  60 deg: elbow moves   0.000 mm, wrist moves  249.2 mm
+  humerus twist  90 deg: elbow moves   0.000 mm, wrist moves  352.5 mm
+
+(D) truth = base + 60deg humerus twist(compensated) + 45deg forearm twist; swing IK solution:
+  shoulder rot error 64.74 deg, elbow rot error 79.64 deg, max arm-joint position error 1.0e-16 m
+  IK solution vs anatomical base: shoulder 4.74 deg, elbow 7.67 deg

@@ -1,0 +1,5 @@
+01986 83 320x240 pose frames 83 LH 52 RH 52
+01987 75 1280x720 pose frames 75 LH 52 RH 49
+01988 144 640x480 pose frames 143 LH 102 RH 96
+01991 49 288x192 pose frames 49 LH 0 RH 49
+01992 59 288x192 pose frames 59 LH 59 RH 58

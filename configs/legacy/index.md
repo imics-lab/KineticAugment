@@ -8,3 +8,4 @@ Configs for the deprecated `AugmentationPipeline` / legacy scripts. They do not 
 | `slr_profile_extended.yaml` | Legacy comprehensive SLR profile |
 | `har_running_profile.yaml` | Legacy human-activity-recognition "running" profile |
 | `augments.yaml` | Config for `scripts/legacy/render_augmented_from_yaml.py` (named pipelines with seeds) |
+| `index.md` | This index |

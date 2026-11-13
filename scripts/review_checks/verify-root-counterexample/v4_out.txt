@@ -1,0 +1,23 @@
+rest nose elevation above shoulder midline, angle forward of torso up-axis: 34.0 deg
+  neck(12) pitch    15 deg -> false torso rotation  14.02 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  neck(12) pitch    20 deg -> false torso rotation  18.77 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  neck(12) pitch    30 deg -> false torso rotation  28.40 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  neck(12) pitch    40 deg -> false torso rotation  38.22 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  neck(12) pitch   -20 deg -> false torso rotation  18.28 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+  head(15) pitch    15 deg -> false torso rotation   4.24 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) pitch    20 deg -> false torso rotation   5.45 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) pitch    30 deg -> false torso rotation   7.48 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) pitch    40 deg -> false torso rotation   8.79 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) pitch   -20 deg -> false torso rotation   6.57 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+  head(15) yaw      15 deg -> false torso rotation   0.23 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+  head(15) yaw      20 deg -> false torso rotation   0.67 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+  head(15) yaw      30 deg -> false torso rotation   2.12 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+  head(15) yaw      40 deg -> false torso rotation   4.35 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+  head(15) yaw     -20 deg -> false torso rotation   2.27 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+  head(15) roll     15 deg -> false torso rotation   0.45 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) roll     20 deg -> false torso rotation   0.62 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) roll     30 deg -> false torso rotation   0.96 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) roll     40 deg -> false torso rotation   1.32 deg, axis [1.    0.015 0.011]; shoulders moved 0.0e+00 m
+  head(15) roll    -20 deg -> false torso rotation   0.46 deg, axis [-1.    -0.015 -0.011]; shoulders moved 0.0e+00 m
+max |nose-root recon - hip-root recon| over real frames: 5.55e-16 m
+min nose visibility per clip: [0.9995 0.9995 0.9997 0.9993 0.9999]

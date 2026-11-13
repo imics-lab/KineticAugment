@@ -1,0 +1,3 @@
+sim: 3-dof per-frame root + per-clip median arm lengths + per-clip width: median 1.967%
+rigid: 3-dof per-frame root + per-clip median arm lengths + per-clip width: median 2.178%
+rigid: analytic root + per-clip SSE-optimal constant lengths/width: median 2.679%

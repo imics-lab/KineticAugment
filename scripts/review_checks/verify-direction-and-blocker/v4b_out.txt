@@ -1,0 +1,4 @@
+(c) FULL REPLACEMENT arm error in image %SW: median 8.49 p5 4.41 p95 14.92 (n=409)
+    camera-only (project original world arms) %SW: median 9.37 p5 3.85 p95 12.36 (n=409)
+    pose-wrist vs hand-wrist gap %SW: original median 5.65 p5 1.06 p95 13.30 (n=555) | full replacement median 11.28 p5 3.29 p95 22.01 (n=555)
+    pose-wrist vs hand-wrist gap, projecting ORIGINAL world wrist (camera only): median 11.24 p5 3.22 p95 19.37 (n=555)

@@ -1,0 +1,12 @@
+delta transfer on natural motion (segment vectors), errors in % image shoulder width
+  [wp ] k= 1 n= 433: true displacement median   4.1%SW | transfer error median  2.2 p95   7.2%SW | relative median 0.49 p95 1.30
+  [wp ] k= 3 n= 772: true displacement median   6.2%SW | transfer error median  3.8 p95  12.2%SW | relative median 0.54 p95 1.75
+  [wp ] k= 5 n= 945: true displacement median   7.3%SW | transfer error median  4.6 p95  16.6%SW | relative median 0.56 p95 1.72
+  [wp ] k=10 n=1090: true displacement median  10.3%SW | transfer error median  6.3 p95  22.0%SW | relative median 0.55 p95 2.05
+  [aff] k= 1 n= 433: true displacement median   4.1%SW | transfer error median  2.3 p95   6.9%SW | relative median 0.49 p95 1.27
+  [aff] k= 3 n= 772: true displacement median   6.2%SW | transfer error median  3.7 p95  12.6%SW | relative median 0.53 p95 1.67
+  [aff] k= 5 n= 945: true displacement median   7.3%SW | transfer error median  4.5 p95  15.6%SW | relative median 0.57 p95 1.70
+  [aff] k=10 n=1090: true displacement median  10.3%SW | transfer error median  6.2 p95  20.8%SW | relative median 0.56 p95 1.97
+
+zero-augmentation image error, FULL REPLACEMENT (project reconstructed world): wp median 8.04 p95 22.67%SW; affine median 9.05 p95 17.43%SW
+zero-augmentation image error, DELTA TRANSFER: 0 by construction (delta = recon(theta') - recon(theta) = 0)

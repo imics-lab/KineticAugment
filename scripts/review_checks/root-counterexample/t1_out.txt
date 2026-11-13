@@ -1,0 +1,46 @@
+== Reviewer's exact case: T-pose truth, root rotvec [0,0,0.7] ==
+  raw   max=  319.15 mm mean=  316.89 mm
+  sim   max=   79.18 mm mean=   44.70 mm
+  rig   max=   78.78 mm mean=   49.14 mm
+  tr    max=  108.33 mm mean=  108.33 mm
+  conv  max=   78.78 mm mean=   49.14 mm
+  similarity scale fitted = 1.0349
+
+== Rest shoulder geometry ==
+  L shoulder(16) [ 0.16408102  0.0852433  -0.01575559]  R shoulder(17) [-0.15179482  0.08043467 -0.0191426 ]  pelvis(0) [ 0.00312326 -0.35140747  0.01203655]
+  rest L-R shoulder vector [0.31587584 0.00480863 0.00338701]  angle from +x axis (deg) 1.0667457503217361
+  rest shoulder width (m) 0.3159305984123792
+  ancestors of L shoulder (16): [16, 13, 9, 6, 3, 0]
+
+== Axis x angle sweep, T-pose arms (mm, converter=rigid folded into global_orient) ==
+  axis  deg   raw max  sim mean  sim max conv mean conv max
+  x    10.0     76.27      0.20     0.36      0.20     0.36
+  x    20.0    151.95      0.40     0.73      0.40     0.73
+  x    30.0    226.48      0.59     1.08      0.59     1.08
+  x    40.1    300.01      0.79     1.43      0.79     1.43
+  x    45.0    334.87      0.88     1.60      0.88     1.60
+  y    10.0     28.47     10.84    19.56     11.04    19.40
+  y    20.0     56.73     21.82    39.31     22.97    38.79
+  y    30.0     84.55     33.06    59.41     36.32    58.46
+  y    40.1    112.00     44.83    80.23     51.50    78.49
+  y    45.0    125.01     50.74    90.56     59.51    88.26
+  z    10.0     81.12     10.89    19.45     10.91    19.39
+  z    20.0    161.62     21.87    38.99     22.32    38.80
+  z    30.0    240.89     33.06    58.77     34.86    58.57
+  z    40.1    319.10     44.70    79.17     49.12    78.76
+  z    45.0    356.18     50.51    89.26     56.68    88.64
+
+== Random arm poses (N(0,0.4) per arm joint, as harness), random root axis, 200 trials ==
+  per-trial mean over 6 joints; then mean over trials / worst single joint over all trials
+   10 deg: similarity mean    8.22 mm worst   22.61 | rigid-converter mean    8.93 mm worst   22.49
+   20 deg: similarity mean   16.51 mm worst   45.42 | rigid-converter mean   18.12 mm worst   45.88
+   30 deg: similarity mean   24.93 mm worst   68.56 | rigid-converter mean   27.78 mm worst   70.03
+   45 deg: similarity mean   37.97 mm worst  104.54 | rigid-converter mean   43.49 mm worst  109.74
+
+== Per-axis on random arm poses (rigid converter), yaw (y) vs roll (z) vs pitch (x) ==
+  axis x 10 deg: mean    0.22 mm, worst    0.45 mm
+  axis x 30 deg: mean    0.64 mm, worst    1.31 mm
+  axis y 10 deg: mean   11.58 mm, worst   25.03 mm
+  axis y 30 deg: mean   36.03 mm, worst   78.29 mm
+  axis z 10 deg: mean   11.69 mm, worst   24.07 mm
+  axis z 30 deg: mean   36.16 mm, worst   74.20 mm

@@ -1,0 +1,25 @@
+                                                 ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'SMPLXSkeleton' object has no attribute 'rest_nose'
+___________ TestValidity.test_refuses_to_fit_without_both_shoulders ____________
+tests/test_converter.py:309: in test_refuses_to_fit_without_both_shoulders
+    landmarks, validity = landmarks_from(skeleton, random_arm_pose(6))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_converter.py:60: in landmarks_from
+    rest_joints=np.vstack([skeleton.rest_joints, skeleton.rest_nose]),
+                                                 ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'SMPLXSkeleton' object has no attribute 'rest_nose'
+=========================== short test summary info ============================
+FAILED tests/test_converter.py::TestContract::test_fit_returns_genuine_smplx_parameter_shapes
+FAILED tests/test_converter.py::TestRoundTrip::test_exact_with_unrotated_root
+FAILED tests/test_converter.py::TestRoundTrip::test_exact_with_rotated_root
+FAILED tests/test_converter.py::TestRoundTrip::test_does_not_reconstruct_what_it_does_not_model
+FAILED tests/test_converter.py::TestRoundTrip::test_smplx_forward_pass_reproduces_the_reconstruction
+FAILED tests/test_converter.py::TestTorso::test_exact_with_spine_bend - Attri...
+FAILED tests/test_converter.py::TestTorso::test_nose_recovers_the_true_root_rotation
+FAILED tests/test_converter.py::TestTorso::test_torso_pitch_does_not_affect_arm_reconstruction
+FAILED tests/test_converter.py::TestTorso::test_torso_rotation_falls_back_when_the_apex_is_degenerate
+FAILED tests/test_converter.py::TestBodyShape::test_different_shape_keeps_bone_directions_exact
+FAILED tests/test_converter.py::TestValidity::test_invalid_landmarks_are_excluded_from_the_fit
+FAILED tests/test_converter.py::TestValidity::test_rotated_root_with_a_missing_wrist_reconstructs_the_rest
+FAILED tests/test_converter.py::TestValidity::test_refuses_to_fit_without_both_shoulders
+=================== 13 failed, 66 passed, 2 xfailed in 4.16s ===================

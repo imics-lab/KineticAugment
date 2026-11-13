@@ -1,0 +1,7 @@
+(a) weak-perspective per-frame residual, upper body 0-22, %SW: median 6.60 p5 4.04 p95 9.40 (n=409)
+(c) FULL REPLACEMENT arm error in image %SW: median 8.49 p5 4.41 p95 14.92 (n=409)
+    camera-only (project original world arms) %SW: median 9.37 p5 3.85 p95 12.36 (n=409)
+    pose-wrist vs hand-wrist gap %SW: original median 5.65 p5 1.06 p95 13.30 (n=555) | full replacement median 11.28 p5 3.29 p95 22.01 (n=555)
+(b) 3-frame 2-D segment angle change, |image change|>0: n=1465 corr 0.945 sign agree 76.3% |w-i|/|i| median 0.89
+(b) 3-frame 2-D segment angle change, |image change|>5: n=274 corr 0.956 sign agree 98.5% |w-i|/|i| median 0.33
+(d) delta transfer of natural 3-frame displacement (true >2%SW), relative error: median 0.58 p5 0.13 p95 2.09 (n=891)

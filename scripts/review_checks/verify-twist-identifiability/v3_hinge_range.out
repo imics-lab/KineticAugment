@@ -1,0 +1,8 @@
+L rest u [ 0.95  -0.27  -0.159] f [ 0.996  0.092 -0.01 ] angle 22.70
+   hinge about local y     : bone-angle range  20.91 .. 169.62 deg  (u.ax=-0.270, f.ax=+0.092)
+   hinge about local z     : bone-angle range   8.57 .. 170.31 deg  (u.ax=-0.159, f.ax=-0.010)
+   hinge about normal(u,f) : bone-angle range   0.00 .. 180.00 deg  (u.ax=-0.000, f.ax=-0.000)
+R rest u [-0.986 -0.133 -0.096] f [-0.998 -0.018 -0.061] angle 6.90
+   hinge about local y     : bone-angle range   6.59 .. 171.33 deg  (u.ax=-0.133, f.ax=-0.018)
+   hinge about local z     : bone-angle range   2.01 .. 170.96 deg  (u.ax=-0.096, f.ax=-0.061)
+   hinge about normal(u,f) : bone-angle range   0.00 .. 180.00 deg  (u.ax=+0.000, f.ax=+0.000)

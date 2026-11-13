@@ -1,0 +1,8 @@
+left elbow -60deg about local x: forearm dir = [ 0.996  0.037 -0.084] (front is +z)
+left elbow -60deg about local y: forearm dir = [0.506 0.092 0.857] (front is +z)
+left elbow -60deg about local z: forearm dir = [ 0.577 -0.816 -0.01 ] (front is +z)
+repo limits left_elbow: {'x': (0, 2.62), 'y': (-0.17, 0.17), 'z': (-1.57, 1.57)} right_elbow: {'x': (0, 2.62), 'y': (-0.17, 0.17), 'z': (-1.57, 1.57)}
+frames (torso-rooted fit): 409; frames where clamp alters an arm joint: 366/409
+elbow bend (0=straight) before clamp: median 78.1 deg  [p5 29.0, p95 99.9]
+elbow bend after  clamp: median 22.6 deg  [p5 12.7, p95 35.2]
+wrist displacement from zero-noise clamp: median 76.1%SW p95 102.5%SW max 113.5%SW

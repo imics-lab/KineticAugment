@@ -1,0 +1,6 @@
+reference up-axis: camera
+(a) nose-apex root vs shoulder-only fallback root: median 162.5 deg, min 150.8, max 172.1 (n=409)
+(b) left wrist height above left shoulder along the torso axis (m): observed median -0.171
+    shipped  body_pose in canonical frame: median +0.203; sign agrees with observation in 0.0% of frames; corr -0.995
+    nose     body_pose in canonical frame: median -0.072; sign agrees with observation in 94.4% of frames; corr +0.983
+    hip      body_pose in canonical frame: median -0.134; sign agrees with observation in 100.0% of frames; corr +0.963

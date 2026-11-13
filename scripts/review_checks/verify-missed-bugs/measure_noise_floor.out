@@ -1,0 +1,22 @@
+  landmark          observed    noise
+  left_shoulder         100%    0.08%
+  right_shoulder        100%    0.07%
+  left_elbow            100%    0.14%
+  right_elbow           100%    0.14%
+  left_wrist             89%    0.16%
+  right_wrist            91%    0.21%
+  left_hip               55%    0.01%
+  right_hip              55%    0.01%
+  left_knee               0%       --   EXCLUDED (low visibility)
+  right_knee              0%       --   EXCLUDED (low visibility)
+  left_ankle              0%       --   EXCLUDED (low visibility)
+  right_ankle             0%       --   EXCLUDED (low visibility)
+
+  4 landmark(s) excluded: MediaPipe reports visibility below 0.5 in over
+  50% of frames. The detector is stating that these coordinates are
+  its prior rather than an observation.
+
+================================================================
+z is 1.2x noisier than x/y
+PROPOSED V1 ERROR BUDGET: 0.18% of shoulder width (~0.6 mm at SMPL-X scale)
+================================================================

@@ -1,0 +1,11 @@
+kinetic_augment.body_model.mp_to_smplx mentions: [] | in non-string code lines: []
+kinetic_augment.body_model.smplx_to_mp mentions: [] | in non-string code lines: []
+warnings on construct: [('DeprecationWarning', True), ('DeprecationWarning', True)]
+image-space: 96 driven slots, max |slot - (child-parent)| = 0.0e+00; global_orient, betas all zero
+slot -> (stored at SMPL-X joint, bone it stores): [(17, 'left_elbow', 'left_shoulder->left_elbow'), (19, 'left_wrist', 'left_elbow->left_wrist'), (18, 'right_elbow', 'right_shoulder->right_elbow'), (20, 'right_wrist', 'right_elbow->right_wrist'), (3, 'left_knee', 'left_hip->left_knee'), (6, 'left_ankle', 'left_knee->left_ankle'), (4, 'right_knee', 'right_hip->right_knee'), (7, 'right_ankle', 'right_knee->right_ankle')]
+zero params + target_mp -> max |out - target| = 1.1920928955078125e-07
+params(frame t) + target(frame t+20): face rows equal target(t+20)? True | L shoulder equals target(t+20) shoulder? True
+world frames used: 54
+legacy params -> SMPL-X, best similarity: mean arm error median 189.6 mm (57% sw)
+fit_body params -> SMPL-X, direct (no extra align): median 19.9 mm (6.0% sw)
+legacy 'angle' at slot 17 (rad) == upper-arm length (m): median 0.2460

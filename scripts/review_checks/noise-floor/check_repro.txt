@@ -1,0 +1,10 @@
+default              vs repo npz (6 arm lmks): max=34.1474%  median=1.2736%  p95=18.5547%
+default_rerun        vs repo npz (6 arm lmks): max=34.1474%  median=1.2736%  p95=18.5547%
+default_sharedgraph  vs repo npz (6 arm lmks): max=0.0000%  median=0.0000%  p95=0.0000%
+nosmooth             vs repo npz (6 arm lmks): max=34.1474%  median=3.6755%  p95=18.7605%
+static               vs repo npz (6 arm lmks): max=71.5814%  median=10.3627%  p95=25.9977%
+complexity2          vs repo npz (6 arm lmks): max=145.6560%  median=24.4938%  p95=83.9744%
+resize75             vs repo npz (6 arm lmks): max=34.2782%  median=3.2446%  p95=19.3050%
+padshift             vs repo npz (6 arm lmks): max=37.1737%  median=5.0493%  p95=18.6050%
+bright               vs repo npz (6 arm lmks): max=35.3277%  median=4.4585%  p95=18.2173%
+nosmooth_resize75    vs repo npz (6 arm lmks): max=37.3854%  median=4.3541%  p95=19.2042%

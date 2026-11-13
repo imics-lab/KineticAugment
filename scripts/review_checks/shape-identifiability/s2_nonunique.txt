@@ -1,0 +1,61 @@
+
+=== Observed lengths fixed to those of: betas=0 (template)  L=[267.56 253.07 274.87 249.78 315.93] mm ===
+  reference  |beta|= 0.00  beta=[0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+             obs lengths (mm)=[267.56 253.07 274.87 249.78 315.93]  max |dL| vs ref = 0.0000 mm
+             height= 172.1 cm  L leg= 78.9 cm  hip W= 12.2 cm  pelvis->neck= 46.1 cm  volume=  76.0 L  depth= 29.4 cm
+ -- extremise height (SLSQP ok: True/True)
+  height MAX |beta|= 3.06  beta=[ 0.371 -1.28   1.175 -1.012 -0.107  0.653  1.376 -0.882 -0.838 -1.171]
+             obs lengths (mm)=[267.56 253.07 274.87 249.78 315.93]  max |dL| vs ref = 0.0000 mm
+             height= 178.1 cm  L leg= 80.8 cm  hip W= 11.9 cm  pelvis->neck= 47.9 cm  volume=  71.2 L  depth= 28.1 cm
+  height MIN |beta|= 3.06  beta=[-0.387  1.451 -1.117  0.995 -0.075 -0.322 -1.269  0.902  1.051  1.11 ]
+             obs lengths (mm)=[267.56 253.07 274.87 249.78 315.93]  max |dL| vs ref = 0.0000 mm
+             height= 165.8 cm  L leg= 76.9 cm  hip W= 12.7 cm  pelvis->neck= 44.2 cm  volume=  82.5 L  depth= 32.9 cm
+     => difference: height +12.3 cm, L leg +3.9 cm, volume -11.2 L, |beta_hi - beta_lo| = 6.10 sigma
+ -- extremise leg (SLSQP ok: True/True)
+  leg MAX    |beta|= 3.06  beta=[ 0.121 -0.676 -0.329  0.451 -0.736  0.689  0.372 -0.177 -2.527 -1.004]
+             obs lengths (mm)=[267.56 253.07 274.87 249.78 315.93]  max |dL| vs ref = 0.0000 mm
+             height= 175.1 cm  L leg= 82.7 cm  hip W= 11.4 cm  pelvis->neck= 45.3 cm  volume=  68.6 L  depth= 28.0 cm
+  leg MIN    |beta|= 3.06  beta=[-0.139  0.748  0.27  -0.406  0.682 -0.631 -0.366  0.209  2.534  1.041]
+             obs lengths (mm)=[267.56 253.07 274.87 249.78 315.93]  max |dL| vs ref = 0.0000 mm
+             height= 168.8 cm  L leg= 75.1 cm  hip W= 13.0 cm  pelvis->neck= 46.8 cm  volume=  84.1 L  depth= 32.4 cm
+     => difference: height +6.3 cm, L leg +7.6 cm, volume -15.5 L, |beta_hi - beta_lo| = 6.12 sigma
+ -- extremise volume (SLSQP ok: True/True)
+  volume MAX |beta|= 3.06  beta=[-0.088  1.172  0.482  0.272 -1.104  1.111  0.018  0.593  2.207  0.001]
+             obs lengths (mm)=[267.56 253.07 274.87 249.78 315.93]  max |dL| vs ref = 0.0000 mm
+             height= 169.6 cm  L leg= 76.8 cm  hip W= 13.6 cm  pelvis->neck= 46.8 cm  volume=  90.9 L  depth= 35.1 cm
+  volume MIN |beta|= 3.06  beta=[ 0.07  -1.148 -0.528 -0.352  1.104 -1.059  0.114 -0.833 -2.136 -0.169]
+             obs lengths (mm)=[267.56 253.07 274.87 249.78 315.93]  max |dL| vs ref = 0.0000 mm
+             height= 174.4 cm  L leg= 80.9 cm  hip W= 10.9 cm  pelvis->neck= 45.3 cm  volume=  62.5 L  depth= 27.4 cm
+     => difference: height -4.8 cm, L leg -4.1 cm, volume +28.4 L, |beta_hi - beta_lo| = 6.11 sigma
+
+=== Observed lengths fixed to those of: random N(0,I) body (|b|=1.5)  L=[273.9  263.49 281.62 259.73 318.05] mm ===
+  reference  |beta|= 1.50  beta=[ 0.585 -0.733  0.12  -0.163 -0.13  -0.062 -0.579 -0.066 -0.248  0.953]
+             obs lengths (mm)=[273.9  263.49 281.62 259.73 318.05]  max |dL| vs ref = 0.0000 mm
+             height= 179.4 cm  L leg= 82.7 cm  hip W= 11.6 cm  pelvis->neck= 48.0 cm  volume=  74.8 L  depth= 29.5 cm
+ -- extremise height (SLSQP ok: True/True)
+  height MAX |beta|= 3.06  beta=[ 0.923 -1.745  1.26  -0.91  -0.623  0.731  0.631 -0.921 -0.713 -0.61 ]
+             obs lengths (mm)=[273.9  263.49 281.62 259.73 318.05]  max |dL| vs ref = 0.0000 mm
+             height= 184.7 cm  L leg= 84.3 cm  hip W= 11.6 cm  pelvis->neck= 49.8 cm  volume=  72.3 L  depth= 28.9 cm
+  height MIN |beta|= 3.06  beta=[ 0.284  0.545 -0.691  0.897 -0.487 -0.43  -1.867  0.781  0.965  1.501]
+             obs lengths (mm)=[273.9  263.49 281.62 259.73 318.05]  max |dL| vs ref = 0.0000 mm
+             height= 174.2 cm  L leg= 80.9 cm  hip W= 12.3 cm  pelvis->neck= 46.8 cm  volume=  82.5 L  depth= 31.7 cm
+     => difference: height +10.4 cm, L leg +3.4 cm, volume -10.1 L, |beta_hi - beta_lo| = 5.52 sigma
+ -- extremise leg (SLSQP ok: True/True)
+  leg MAX    |beta|= 3.06  beta=[ 0.705 -1.236 -0.079  0.414 -1.151  0.677 -0.329 -0.252 -2.238 -0.445]
+             obs lengths (mm)=[273.9  263.49 281.62 259.73 318.05]  max |dL| vs ref = 0.0000 mm
+             height= 182.1 cm  L leg= 86.1 cm  hip W= 11.1 cm  pelvis->neck= 47.5 cm  volume=  69.8 L  depth= 28.8 cm
+  leg MIN    |beta|= 3.06  beta=[ 0.499 -0.059  0.542 -0.394  0.17  -0.618 -0.979  0.091  2.304  1.407]
+             obs lengths (mm)=[273.9  263.49 281.62 259.73 318.05]  max |dL| vs ref = 0.0000 mm
+             height= 176.8 cm  L leg= 79.3 cm  hip W= 12.6 cm  pelvis->neck= 49.0 cm  volume=  83.8 L  depth= 31.2 cm
+     => difference: height +5.3 cm, L leg +6.8 cm, volume -14.0 L, |beta_hi - beta_lo| = 5.52 sigma
+ -- extremise volume (SLSQP ok: True/True)
+  volume MAX |beta|= 3.06  beta=[ 0.541  0.378  0.719  0.299 -1.494  1.003 -0.722  0.589  1.979  0.547]
+             obs lengths (mm)=[273.9  263.49 281.62 259.73 318.05]  max |dL| vs ref = 0.0000 mm
+             height= 177.5 cm  L leg= 80.9 cm  hip W= 13.1 cm  pelvis->neck= 49.0 cm  volume=  90.7 L  depth= 34.2 cm
+  volume MIN |beta|= 3.06  beta=[ 0.652 -1.677 -0.286 -0.365  0.552 -0.924 -0.492 -0.97  -1.871  0.263]
+             obs lengths (mm)=[273.9  263.49 281.62 259.73 318.05]  max |dL| vs ref = 0.0000 mm
+             height= 181.4 cm  L leg= 84.4 cm  hip W= 10.6 cm  pelvis->neck= 47.4 cm  volume=  63.8 L  depth= 28.3 cm
+     => difference: height -3.9 cm, L leg -3.5 cm, volume +26.9 L, |beta_hi - beta_lo| = 5.57 sigma
+
+All solutions constrained to ||beta|| <= 3.06 (chi2(10) median radius).
+chi2(10) 95% radius = 4.28; 99% radius = 4.80 (|beta| below these is typical under the SMPL-X prior)

@@ -1,0 +1,8 @@
+5 lengths (V1 converter)           rank=5 sv(mm/sigma)=[41.52  17.548  2.867  0.473  0.045]
+5 lengths + nose-Lsh + nose-Rsh    rank=7 sv(mm/sigma)=[4.8413e+01 1.7811e+01 1.0538e+01 2.8480e+00 5.1100e-01 1.4100e-01
+ 1.9000e-02]
+nose->L shoulder rest 282.5 mm; cos(L,R nose rows)=0.9994
+  sigma_L=3mm obs=5: eff.dof=2.47
+  sigma_L=3mm obs=7: eff.dof=3.40
+  sigma_L=10mm obs=5: eff.dof=1.78
+  sigma_L=10mm obs=7: eff.dof=2.32

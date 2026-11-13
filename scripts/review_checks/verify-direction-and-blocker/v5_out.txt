@@ -1,0 +1,8 @@
+scripts/review_checks/verify-direction-and-blocker/v5_reextraction_spread.py:19: RuntimeWarning: All-NaN slice encountered
+  frac_exact = np.mean(np.nanmax(np.where(ok, e, np.nan), axis=1) < 1e-3)
+01986 median arm diff %%SW by shift: {-2: 2.14, -1: 1.04, 0: 0.0, 1: 1.05, 2: 2.18} | frames bit-identical (shift 0): 1.00
+01987 median arm diff %%SW by shift: {-2: 12.84, -1: 10.87, 0: 9.96, 1: 10.03, 2: 10.89} | frames bit-identical (shift 0): 0.00
+01988 median arm diff %%SW by shift: {-2: 3.49, -1: 2.11, 0: 1.05, 1: 2.05, 2: 3.18} | frames bit-identical (shift 0): 0.00
+01991 median arm diff %%SW by shift: {-2: 1.84, -1: 1.21, 0: 0.19, 1: 1.42, 2: 2.13} | frames bit-identical (shift 0): 0.00
+01992 median arm diff %%SW by shift: {-2: 6.87, -1: 6.8, 0: 6.8, 1: 7.58, 2: 8.25} | frames bit-identical (shift 0): 0.00
+pooled shift-0: median 1.28 p95 19.46 %SW (n=2354)

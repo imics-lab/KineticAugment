@@ -1,0 +1,7 @@
+L upper  direct-output direction error: median 2.57 deg, p95 4.55, max 5.88 | before Kabsch: max 1.21e-06 deg
+L fore   direct-output direction error: median 2.65 deg, p95 4.73, max 6.37 | before Kabsch: max 1.21e-06 deg
+R upper  direct-output direction error: median 2.81 deg, p95 5.41, max 7.02 | before Kabsch: max 1.48e-06 deg
+R fore   direct-output direction error: median 2.13 deg, p95 5.35, max 7.57 | before Kabsch: max 1.21e-06 deg
+|global_orient| median 3.57 deg, p95 6.41
+rigid re-alignment of direct output: max SSE reduction 4.94e-17 m^2 (min -7.46e-17)
+free-similarity scale on direct output: median 0.9726, p5 0.9102, p95 1.0241

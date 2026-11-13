@@ -1,0 +1,5 @@
+  01986: per-frame max arm diff vs stored: median   0.00 mm, last-10-frames median   0.00 mm; visibility>=0.5 agreement on wrists 100%
+  01987: per-frame max arm diff vs stored: median  49.27 mm, last-10-frames median  15.35 mm; visibility>=0.5 agreement on wrists 95%
+  01988: per-frame max arm diff vs stored: median   6.75 mm, last-10-frames median   3.86 mm; visibility>=0.5 agreement on wrists 93%
+  01991: per-frame max arm diff vs stored: median   2.04 mm, last-10-frames median   0.28 mm; visibility>=0.5 agreement on wrists 99%
+  01992: per-frame max arm diff vs stored: median  33.68 mm, last-10-frames median  22.35 mm; visibility>=0.5 agreement on wrists 100%

@@ -1,0 +1,11 @@
+truth betas=0, root rotated ~30deg: converter error at betas=0: mean 21.97 mm, max 62.05 mm
+ position-residual shape fit (lam=1e-06): |beta|=2.17  mean err 21.67 mm (from 21.97), height 172.1 cm vs truth 172.1 cm
+   beta = [ 0.01  0.43  0.2   1.41  1.09  0.7   0.71  0.49 -0.05 -0.32]
+ position-residual shape fit (lam=0.0001): |beta|=0.11  mean err 22.00 mm (from 21.97), height 173.0 cm vs truth 172.1 cm
+   beta = [ 0.1   0.05  0.    0.02  0.02 -0.    0.02  0.01 -0.01 -0.01]
+
+prior sd height 9.96 cm
+ sigma_L= 1 mm: posterior sd height 3.38 cm
+ sigma_L= 3 mm: posterior sd height 3.53 cm
+ sigma_L=10 mm: posterior sd height 4.31 cm
+ sigma_L=20 mm: posterior sd height 5.67 cm

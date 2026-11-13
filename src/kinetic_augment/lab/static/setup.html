@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Augmentation Lab: set up full mode</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    html, body { height: auto; }
+    .setup { max-width: 760px; margin: 0 auto; padding: 28px 20px 60px; line-height: 1.55; font-size: 14px; }
+    .setup h1 { font-size: 22px; margin: 0 0 4px; }
+    .setup h2 { font-size: 15px; margin: 26px 0 6px; }
+    .setup pre { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; overflow-x: auto; }
+    .setup table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+    .setup th, .setup td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+    .setup th { color: var(--muted); font-weight: 600; font-size: 12px; }
+    .setup td.miss { color: var(--used); }
+    .setup td.ok { color: var(--proven); }
+    .setup .box { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; margin: 12px 0; }
+    .setup input[type=text] { width: 100%; padding: 7px 8px; background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 5px; font-family: var(--mono); font-size: 12px; }
+    .setup .err { color: var(--error); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="setup">
+    <h1>Set up full mode</h1>
+    <p class="small"><a href="index.html">Back to the Lab</a></p>
+    <p>
+      The shared zip shows a fixed grid of settings worked out ahead of time. Full mode runs the
+      Lab on your own machine, so any knob can take any value, you can add your own videos, and
+      saved settings go straight into the repository. It needs the licensed body-model files, which
+      we cannot pass around, so you download those yourself.
+    </p>
+
+    <section id="live-box" class="box" hidden>
+      <strong id="live-title">Model files</strong>
+      <p id="live-note" class="small"></p>
+      <table id="live-table"><thead><tr><th>File</th><th>State</th></tr></thead><tbody></tbody></table>
+      <label for="model-dir">Model folder (the one that holds <code>smplx/</code>, <code>mano/</code>, <code>flame/</code>, <code>mediapipe/</code>)</label>
+      <p><input id="model-dir" type="text" spellcheck="false" placeholder="/path/to/models"></p>
+      <p><button id="model-save" type="button">Use this folder</button> <span id="model-msg" class="small"></span></p>
+    </section>
+
+    <h2>1. Get the code and install it</h2>
+<pre>git clone https://github.com/imics-lab/KineticAugment.git
+cd KineticAugment
+python -m venv .venv
+source .venv/bin/activate
+pip install -e '.[smplx,lab]'</pre>
+    <p class="small">Python 3.9 or newer.</p>
+
+    <h2>2. Get the model files</h2>
+    <p>
+      Put them under <code>models/</code> in the repository, or in any folder with the same layout
+      (step 4 tells the Lab where). SMPL-X, MANO and FLAME are free for research but you have to
+      register on each site first.
+    </p>
+    <table>
+      <thead><tr><th>File</th><th>What it is for</th><th>Where from</th></tr></thead>
+      <tbody>
+        <tr><td><code>smplx/SMPLX_NEUTRAL.npz</code></td><td>the body</td>
+            <td><a href="https://smpl-x.is.tue.mpg.de/" target="_blank" rel="noopener">https://smpl-x.is.tue.mpg.de/</a></td></tr>
+        <tr><td><code>mano/MANO_LEFT.npz</code>, <code>mano/MANO_RIGHT.npz</code></td><td>the hands</td>
+            <td>MANO comes with the SMPL-X download. Put <code>MANO_LEFT.pkl</code> and <code>MANO_RIGHT.pkl</code> in <code>&lt;repo&gt;/models/mano</code>, then run <code>python scripts/convert_mano.py</code> from the repository root (it always reads <code>models/mano</code>) to make these two files. If you keep your models somewhere else, convert in the repo first, then copy the two <code>.npz</code> files there.</td></tr>
+        <tr><td><code>mano/SMPL-X__FLAME_vertex_ids.npy</code></td><td>links the head to the face model</td>
+            <td>already in the repository</td></tr>
+        <tr><td><code>flame/generic_model.pkl</code></td><td>the face shape</td>
+            <td><a href="https://flame.is.tue.mpg.de/" target="_blank" rel="noopener">https://flame.is.tue.mpg.de/</a></td></tr>
+        <tr><td><code>flame/mediapipe_landmark_embedding.npz</code></td><td>ties MediaPipe face points to the face model</td>
+            <td><a href="https://github.com/Zielon/metrical-tracker/tree/master/flame/mediapipe" target="_blank" rel="noopener">https://github.com/Zielon/metrical-tracker/tree/master/flame/mediapipe</a></td></tr>
+        <tr><td><code>mediapipe/face_landmarker.task</code></td><td>reads the face out of a video</td>
+            <td>run <code>python scripts/download_models.py --face</code></td></tr>
+      </tbody>
+    </table>
+    <p>To check what is still missing, run:</p>
+<pre>python scripts/download_models.py --check</pre>
+
+    <h2>3. Start the Lab</h2>
+    <p>Each time, in a terminal opened in the repository folder:</p>
+<pre>source .venv/bin/activate
+kinetic-lab</pre>
+    <p>
+      If the terminal says <code>command not found: kinetic-lab</code>, the virtual environment is
+      not switched on (the prompt starts with <code>(.venv)</code> when it is). Stop the Lab with
+      Ctrl+C.
+    </p>
+    <p>
+      This opens <code>http://127.0.0.1:8770</code> in your browser. The server only listens on your
+      own machine. If the repository's <code>models/</code> folder is already complete, it is used
+      and you can skip step 4. Useful flags: <code>--port</code>, <code>--clips-dir</code>
+      (default <code>demo/round_trip/clips</code>), <code>--model-dir</code>, <code>--no-browser</code>.
+      Without the command on your path, <code>python -m kinetic_augment.lab.cli</code> does the same.
+    </p>
+
+    <h2>4. Tell the Lab where the models are</h2>
+    <p>
+      If the Lab shows this page with missing files, put the model folder path in the field above
+      and press the button. The path is remembered in <code>~/.kinetic_lab/config.json</code>, so
+      you do this once. Opened from the zip, this page can only show the steps; run the Lab
+      yourself and open it at <code>http://127.0.0.1:8770/setup.html</code> to use the field.
+    </p>
+
+    <h2>Then</h2>
+    <p>
+      Pick a clip and an augmentation, move the A and B markers on any knob, and the pane updates
+      in about a second. "＋ add video" fits a new <code>.mp4</code> (one to two minutes on a laptop).
+      "Save" writes the setting to <code>configs/viewer_saved/&lt;name&gt;.yaml</code>. The details are in
+      <code>docs/augmentation-lab.md</code>.
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      var live = location.protocol !== 'file:';
+      if (!live) return;                       // share mode: the steps only, no server calls
+      var box = document.getElementById('live-box');
+      var tbody = document.querySelector('#live-table tbody');
+      var msg = document.getElementById('model-msg');
+      var input = document.getElementById('model-dir');
+
+      function show(status) {
+        box.hidden = false;
+        var missing = status.missing || [];
+        document.getElementById('live-title').textContent =
+          missing.length ? 'Model files: ' + missing.length + ' missing' : 'Model files: all present';
+        document.getElementById('live-note').textContent = status.mode === 'live'
+          ? 'The Lab is running with these models.'
+          : 'The Lab is waiting for the models; its knobs turn on as soon as the folder is complete.';
+        tbody.textContent = '';
+        var rows = missing.length ? missing : ['(none)'];
+        rows.forEach(function (rel) {
+          var tr = document.createElement('tr');
+          var a = document.createElement('td'), b = document.createElement('td');
+          a.className = 'mono'; a.textContent = rel;
+          b.textContent = missing.length ? 'missing' : 'all present';
+          b.className = missing.length ? 'miss' : 'ok';
+          tr.appendChild(a); tr.appendChild(b); tbody.appendChild(tr);
+        });
+        if (status.model_dir && !input.value) input.value = status.model_dir;
+      }
+
+      fetch('/api/status').then(function (r) {
+        if (!r.ok) throw new Error('no server');
+        return r.json();
+      }).then(show).catch(function () { /* no server behind this page: steps only */ });
+
+      document.getElementById('model-save').addEventListener('click', function () {
+        msg.className = 'small'; msg.textContent = 'Checking...';
+        fetch('/api/models', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model_dir: input.value.trim() })
+        }).then(function (r) {
+          return r.json().then(function (body) { return { ok: r.ok, body: body }; });
+        }).then(function (res) {
+          if (!res.ok) { msg.className = 'err'; msg.textContent = res.body.detail || 'That did not work.'; return; }
+          show(res.body);
+          msg.className = 'small';
+          msg.textContent = res.body.error ? res.body.error
+            : (res.body.missing && res.body.missing.length ? 'Some files are still missing.' : 'Done. Open the Lab.');
+        }).catch(function () { msg.className = 'err'; msg.textContent = 'Could not reach the Lab server.'; });
+      });
+    })();
+  </script>
+</body>
+</html>

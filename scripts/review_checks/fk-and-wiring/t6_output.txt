@@ -1,0 +1,3 @@
+reconstruct_body reads: ['fit.body_pose', 'fit.global_orient', 'fit.transl', 'skeleton.num_joints', 'skeleton.parents', 'skeleton.rest_joints']
+fit_body reads from skeleton: ['skeleton.num_joints', 'skeleton.parents', 'skeleton.rest_joints']
+R shoulder+elbow+wrist only (no L shoulder): fits, no raise (Step 8 test will require a raise)

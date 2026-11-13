@@ -1,0 +1,4 @@
+frames 409: mean up dir [-0.009 -0.978 -0.168], mean fwd [ 0.082  0.168 -0.968], mean L-R dir [ 0.993 -0.016  0.067], handedness sign mean 0.997
+SMPL-X rest: L shoulder(16)-R shoulder(17) = [0.316 0.005 0.003]  head(15)-neck(12) = [0.025 0.16  0.021]
+as-is (MediaPipe frame) {'n': 409, 'up_err_med': 169.44, 'elbow_above_pct': 100.0, 'truth_elbow_above_pct': 0.0, 'wrist_front_pct': 0.0, 'truth_wrist_front_pct': 100.0, 'head_above_shoulders_pct': 0.0, 'head_to_nose_med_mm': 379.51, 'direct_med_mm': 21.6}
+C applied first {'n': 409, 'up_err_med': 10.7, 'elbow_above_pct': 0.0, 'truth_elbow_above_pct': 0.0, 'wrist_front_pct': 100.0, 'truth_wrist_front_pct': 100.0, 'head_above_shoulders_pct': 100.0, 'head_to_nose_med_mm': 191.7, 'direct_med_mm': 21.65}

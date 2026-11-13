@@ -1,0 +1,5 @@
+  noise   0.000 mm: global_orient spread across 8 draws    0.0 deg; |global_orient|  163.2 deg; observed-landmark max err 1.8 mm
+  noise   0.001 mm: global_orient spread across 8 draws    0.0 deg; |global_orient|    0.0 deg; observed-landmark max err 1.8 mm
+  noise   0.100 mm: global_orient spread across 8 draws    0.0 deg; |global_orient|    0.0 deg; observed-landmark max err 1.9 mm
+  noise   1.000 mm: global_orient spread across 8 draws    0.0 deg; |global_orient|    0.0 deg; observed-landmark max err 3.1 mm
+  reconstructed (unobserved) R shoulder across 8 draws at 0.1 mm noise: max pairwise distance 0 mm

@@ -5,6 +5,7 @@
 // change re-times the clip).
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GROUPS, W4_EXPLAIN, measuredChanges, measuredKeeps, appliedText, drawText } from './week4.js';
 
 const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -13,6 +14,17 @@ const ARM_BONES = [[11, 12], [11, 13], [13, 15], [12, 14], [14, 16]];
 const SKIN = '#c9a58f';
 
 let index = null, clip = null, A = {}, aug = null, G = {}, augName = null, images = [], t = 0, playing = false;
+let B = null; // the week-4 original (aug/w4.base), the comparison for the week-4 runs
+const isW4 = () => aug && aug.kind === 'week4';
+// The original a frame is compared with: the Tier 1 round trip (v/off) or the week-4 original.
+function origAt(f) {
+  if (isW4()) {
+    return { verts: at(B.arrays, 'mesh_verts', f), scale: B.meta.scale_i16, arm: at(B.arrays, 'aug_arm', f),
+      hands: at(B.arrays, 'aug_hands', f), face: at(B.arrays, 'aug_face', f), ok: !!B.meta.body_ok[f] };
+  }
+  return { verts: at(A, 'mesh_verts', f), scale: clip.scale_i16, arm: at(A, 'rt_arm', f),
+    hands: at(A, 'rt_hands', f), face: at(A, 'rt_face', f), ok: !!clip.flags.body_ok[f] };
+}
 
 // ---------- data ----------
 function view(buf, m) {
@@ -69,18 +81,28 @@ async function loadClip(id, startFrame = 0) {
   if (!names.includes(augName)) augName = names.includes('combined') ? 'combined' : names[0];
   const sel = $('aug');
   sel.innerHTML = '';
+  const groups = {};
   for (const a of names) {
+    const group = index.augmentation[a].group || 'tier1';
+    if (!groups[group]) {
+      groups[group] = document.createElement('optgroup');
+      groups[group].label = GROUPS[group] || group;
+      sel.appendChild(groups[group]);
+    }
     const o = new Option(index.augmentation[a].label, a);
     o.title = `${exported[a].title} · ${index.augmentation[a].description}`;
-    sel.add(o);
+    groups[group].appendChild(o);
   }
   sel.value = augName;
   const first = !clip || clip.clip !== id;
+  if (first) B = null;
   const [b, g] = await Promise.all([
     first ? fetchBundle(`clips/${id}/v/off`) : { meta: clip, arrays: A },
     fetchBundle(`clips/${id}/aug/${augName}`),
   ]);
+  if (g.meta.base && (!B || B.meta.augmentation !== g.meta.base)) B = await fetchBundle(`clips/${id}/aug/${g.meta.base}`);
   clip = b.meta; A = b.arrays; aug = g.meta; G = g.arrays;
+  $('orig-title').textContent = isW4() ? '1 · Original (week-4 round trip, observed face)' : '1 · Original (round trip, no augmentation)';
   if (first) {
     images = await Promise.all(Array.from({ length: clip.n },
       (_, i) => loadImage(`clips/${id}/frames/${String(i).padStart(4, '0')}.jpg`)));
@@ -96,6 +118,16 @@ async function loadClip(id, startFrame = 0) {
 }
 
 function summaryChips() {
+  if (isW4()) {
+    const fb = Object.entries(aug.fallbacks || {});
+    $('summary').innerHTML = [
+      `<span class="chip" title="${aug.description}"><b>${aug.title}</b></span>`,
+      `<span class="chip">frames <b>${clip.n}</b>${aug.n !== clip.n ? ` → <b>${aug.n}</b>` : ''}</span>`,
+      `<span class="chip" title="the profile whose ranges this run used">${aug.profile}</span>`,
+      fb.length ? `<span class="chip flag">fallback: ${fb.map(([k, v]) => `${k} ${v}`).join(', ')}</span>` : '',
+    ].join('');
+    return;
+  }
   const d = aug.draw;
   $('summary').innerHTML = [
     `<span class="chip" title="${aug.description}"><b>${aug.title}</b></span>`,
@@ -171,7 +203,31 @@ const EXPLAIN = {
   },
 };
 
+function explainW4() {
+  const e = W4_EXPLAIN[augName] || { does: aug.description, changes: [], keeps: [] }, m = aug.metrics;
+  const list = (items) => `<ul>${items.filter(Boolean).map((x) => `<li>${x}</li>`).join('')}</ul>`;
+  const combined = augName.startsWith('combined.');
+  const changes = combined
+    ? [`applied: ${appliedText(aug)}`, ...measuredChanges(aug, clip.n)]
+    : [...e.changes, ...measuredChanges(aug, clip.n)];
+  const keeps = combined ? ['what each applied entry keeps (pick the entry alone to see its list)',
+    ...Object.keys(aug.draws).filter((k) => aug.draws[k].gated).map((k) => `${k}: not drawn this time (probability gate)`)]
+    : [...e.keeps, ...measuredKeeps(aug)];
+  const id = m.identity_max_abs_diff_m;
+  const fb = Object.entries(aug.fallbacks || {});
+  $('explain').innerHTML = `
+    <div><h2>What “${aug.label}” does</h2>
+      <p>${e.does}</p>
+      <p class="clip-value">On this clip: ${aug.detail || aug.title}</p>
+      <p class="note"><b>Proven:</b> ${e.proven} · <b>used here (${aug.profile}):</b> ${e.used}</p>
+      <p class="note">Drawn once for the whole clip, from its own seeded stream.${fin(id) ? ` At its identity draw it reproduces the original (largest difference ${id.toExponential(1)} m).` : ''}${fb.length ? ` Fallback: ${fb.map(([k, v]) => `${k} → ${v}`).join(', ')}.` : ''}${aug.note ? ` ${aug.note}` : ''}${e.note ? ` ${e.note}` : ''}</p>
+    </div>
+    <div class="changes"><h3>Changes</h3>${list(changes.length ? changes : ['nothing measurable at this scale'])}</div>
+    <div class="keeps"><h3>Stays the same</h3>${list(keeps.length ? keeps : ['—'])}</div>`;
+}
+
 function explain() {
+  if (isW4()) { explainW4(); return; }
   const e = EXPLAIN[augName], d = aug.draw, m = aug.metrics;
   if (!e) { $('explain').innerHTML = ''; return; }
   const list = (items) => `<ul>${items.filter(Boolean).map((x) => `<li>${x}</li>`).join('')}</ul>`;
@@ -306,10 +362,10 @@ function pose(fig, arm, hands, face, ok) {
 }
 
 function update3d(f, k) {
-  const okO = !!clip.flags.body_ok[f], okA = !!aug.body_ok[k];
-  setMesh(geoms.orig, at(A, 'mesh_verts', f), 1 / clip.scale_i16);
+  const o = origAt(f), okO = o.ok, okA = !!aug.body_ok[k];
+  setMesh(geoms.orig, o.verts, 1 / o.scale);
   setMesh(geoms.aug, at(G, 'mesh_verts', k), 1 / aug.scale_i16);
-  const orig = [at(A, 'rt_arm', f), at(A, 'rt_hands', f), at(A, 'rt_face', f), okO];
+  const orig = [o.arm, o.hands, o.face, okO];
   const augm = [at(G, 'aug_arm', k), at(G, 'aug_hands', k), at(G, 'aug_face', k), okA];
   pose(figs.orig, ...orig); pose(figs.bothOrig, ...orig);
   pose(figs.aug, ...augm); pose(figs.bothAug, ...augm);
@@ -327,16 +383,25 @@ function update3d(f, k) {
 }
 
 function resetCamera(which) {
-  // frame the upper body: shoulders to head, from the clip's median pose
+  // front / side: the upper body, shoulders to head, from the clip's median pose.
+  // hands / face: close on this frame's wrists or face (the original's read-back points).
   const pts = [];
-  for (let f = 0; f < clip.n; f++) {
-    const w = at(A, 'w_pose', f), v = at(A, 'pose_vis', f);
-    for (const i of [0, 11, 12]) if (v[i] >= 0.5 && ok3(w, i)) pts.push(W3(w, i));
+  let d = 2.4;
+  if (which === 'hands' || which === 'face') {
+    const o = origAt(srcFrame(t));
+    if (which === 'hands') { for (let i = 0; i < 42; i++) if (ok3(o.hands, i)) pts.push(W3(o.hands, i)); d = 0.75; }
+    else { for (let i = 0; i < clip.face105.mp_indices.length; i++) if (ok3(o.face, i)) pts.push(W3(o.face, i)); d = 0.45; }
+  }
+  if (!pts.length) {
+    for (let f = 0; f < clip.n; f++) {
+      const w = at(A, 'w_pose', f), v = at(A, 'pose_vis', f);
+      for (const i of [0, 11, 12]) if (v[i] >= 0.5 && ok3(w, i)) pts.push(W3(w, i));
+    }
+    d = 2.4;
   }
   const c = new THREE.Vector3();
   pts.forEach((p) => c.add(p)); if (pts.length) c.divideScalar(pts.length);
-  c.y -= 0.15;
-  const d = 2.4;
+  if (d === 2.4) c.y -= 0.15;
   views.orig.controls.target.copy(c);
   camera.position.copy(c).add(which === 'side' ? new THREE.Vector3(-d, 0, 0) : new THREE.Vector3(0, 0, d));
   camera.lookAt(c);
@@ -362,7 +427,33 @@ function renderAll() {
 }
 
 // ---------- readout ----------
+function readoutW4(f, k) {
+  const m = aug.metrics;
+  const row = (label, v) => `<tr><td>${label}</td><td>${v}</td></tr>`;
+  const mm = (v) => (fin(v) ? (v < 1 ? v.toExponential(1) : v.toFixed(1)) : '– (not comparable)');
+  const draws = Object.entries(aug.draws).map(([name, d]) =>
+    `<tr><td colspan="2" style="white-space:normal"><b>${name}</b>: ${drawText(d)}</td></tr>`).join('');
+  $('readout').innerHTML = `<table>
+    <tr><th colspan="2">${aug.title}</th></tr>
+    <tr><td colspan="2" style="color:#8b93a7;white-space:normal">${aug.description}</td></tr>
+    ${row('frame', `${k + 1} / ${aug.n} ← source ${fmt(G.times.data[k] + 1, 2)} / ${clip.n}`)}
+    ${row('wrists moved, max (mm)', mm(m.wrist_moved_mm_max))}
+    ${row('arm bone length change, max (mm)', mm(m.bone_length_change_mm_max))}
+    ${row('wrist jitter, augmented / original', fmt(m.jitter_ratio, 3))}
+    ${row('face spread change (mm)', fmt(m.face_rigidity_mm, 2))}
+    ${row('closest hand to face (cm)', fmt(m.hand_face_cm_min, 1))}
+    ${row('points in the frame', `${fmt(m.in_frame_pct)}%`)}
+    ${row('identity draw reproduces the original', fin(m.identity_max_abs_diff_m) ? `max diff ${m.identity_max_abs_diff_m.toExponential(1)} m` : '–')}
+    ${row('applied', appliedText(aug))}
+    ${row('profile', aug.profile)}
+    ${row('camera fit residual', `${fmt(aug.camera.residual_frame_pct)}% of the frame`)}
+    <tr><th colspan="2">the draws</th></tr>
+    ${draws}
+  </table>`;
+}
+
 function readout(f, k) {
+  if (isW4()) { readoutW4(f, k); return; }
   const m = aug.metrics, d = aug.draw;
   const row = (label, v) => `<tr><td>${label}</td><td>${v}</td></tr>`;
   const joints = d.arm_joints.length
@@ -416,6 +507,8 @@ $('next').onclick = () => show(Math.min(t + 1, aug.n - 1));
 $('scrub').oninput = (e) => show(Number(e.target.value));
 $('reset-cam').onclick = () => resetCamera('front');
 $('side-cam').onclick = () => resetCamera('side');
+$('hands-cam').onclick = () => resetCamera('hands');
+$('face-cam').onclick = () => resetCamera('face');
 for (const id of ['t-mesh1', 't-pts1', 't-mesh2', 't-pts2', 't-mesh3', 't-pts3']) $(id).onchange = () => show(t);
 window.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'range') return;

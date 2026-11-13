@@ -1,0 +1,5 @@
+01986 shared-vs-fresh (both unsmoothed): frame0 0.0 mm; median 0.0 mm; max 0.0
+01987 shared-vs-fresh (both unsmoothed): frame0 139.2 mm; median 50.82 mm; max 139.2
+01988 shared-vs-fresh (both unsmoothed): frame0 99.5 mm; median 8.21 mm; max 99.5
+01991 shared-vs-fresh (both unsmoothed): frame0 0.0 mm; median 0.0 mm; max 0.0
+01992 shared-vs-fresh (both unsmoothed): frame0 89.1 mm; median 34.63 mm; max 111.9

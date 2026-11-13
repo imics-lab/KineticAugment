@@ -49,7 +49,58 @@ Below the panels, per-frame plots track the body, hand, finger-curl and face err
 and the gaps between streams. Those plots are what show whether a clip can be augmented safely.
 To run it yourself, see [Round-Trip Viewer](#round-trip-viewer) below.
 
+## Classifier input
+
+The sign classifier this framework feeds is a sequence model over **MediaPipe landmarks**. Each
+clip is a time series of pose, hand and face landmarks, given to the classifier in two forms:
+
+- **Normalised**: MediaPipe's image coordinates, x divided by frame width and y by frame height
+  (0 to 1), with MediaPipe's relative z.
+- **Unnormalised**: the same landmarks in absolute image units.
+
+The classifier does **not** centre on the shoulders or scale by shoulder width. That shapes the
+augmentations:
+
+- Scene augmentations (scale, uncentre, view) are not cancelled by the classifier, so they matter
+  more here than in the papers that normalise first ([Grounding §3](./docs/Augmentation_Grounding.md)).
+- Output must look like MediaPipe, noise and failures included. The round trip returns clean
+  SMPL-X/MANO geometry, which is a domain gap of its own.
+- Anything tied to the frame (aspect ratio, resolution, how much of the body is in view) is part
+  of the input and can vary between datasets.
+
+Candidate augmentations aimed at this input format are listed in [TODO.md](./TODO.md).
+
+## Augmentation ranges
+
+The week-4 profiles set every range about 25% beyond the widest range the literature supports, so the augmentation is deliberately more varied than what has been proven. The proven range is recorded next to each used one below, and in the YAML comments. See [Augmentation ranges](./docs/Augmentation_Ranges.md) for the 25% rule, the sources and per-row notes.
+
+| Augmentation | Proven range (source) | Used in week-4 profiles |
+|---|---|---|
+| View yaw | ±20° (Spoken2Sign **[M7]**) | ±25° |
+| View pitch | ±5° ("a few degrees" **[T]**) | ±6° |
+| Mirror | p = 0.5 **[M6]**; cost 1.3 pp on WLASL once **[T]** | p = 0.5 (a probability, not widened) |
+| Uniform duration | 0.67–1.5×; 0.5× hurt once **[L6.2, M6, M3, T]** | 0.6–1.65×, log-uniform |
+| Arm joints: shoulder, wrist | ±4° at p = 0.3 (SPOTER **[M1]**) | ±5° |
+| Arm joints: elbow | ±7.5°, no harm in pose-based translation **[T]** | ±9.5° |
+| Whole-scene scale | 0.8–1.2 (GISLR **[M10]**) | 0.75–1.25 |
+| Uncentre | ±0.1 of the frame (GISLR **[M10]**) | ±0.125, hands still kept in the frame |
+| Limb length | no literature; between-signer spread 5.7% in this project's MediaPipe data (Grounding §6.1) | ±7% |
+| Movement size | no measured range; 0.85–1.15 is Grounding's linguistic example **[L2.10, L2.11]** | 0.8–1.2, log-uniform |
+| Location jitter | σ = 10 mm, truncated at 20 mm (production spread **[T]**) | σ = 12.5 mm, truncated at 25 mm |
+| Joint coupled noise, arms | as arm joints above **[M1, T]** | shoulder/wrist σ = 2.5°, truncated at 5°; elbow σ = 4.75°, truncated at 9.5° |
+| Joint coupled noise, fingers | no published range | σ = 3.75°, truncated at 7.5° (estimate 3° / 6°, widened) |
+| Handshape jitter | no published range; GISLR "finger-tree rotate" gives no angle **[T]** | non-selected and thumb σ = 7.5°; selected σ = 3.75°; selected flexion σ = 2°; all truncated at 2σ |
+| Expression jitter | no published range; lexical mouth patterns excluded **[L7.3, L1.5]** | brows and eyes σ = 0.0625, truncated at 0.125; cheeks/nose σ = 0.0375, truncated at 0.075; mouth/jaw off |
+| Varied time warp | none: non-uniform warps are excluded **[L6.3, L6.4]** | knot rates 0.7–1.43×, log-uniform |
+| Segment time warp | none: excluded as above | window 20–60% of the clip, factor 0.6–1.65× |
+| Frame dropping | ≥ 10 fps, where human intelligibility stops improving **[T]**; masked runs ≤ 8 frames **[M4, M10]** | ≥ 8 fps; max gap 125 ms; p = 0–0.2; target 12–25 fps |
+| Hand-dropout runs | runs ≤ 8 frames **[M4, M10]**; start rate none, measured 0.039 per detected interior hand-frame (`scripts/measure_hand_dropout.py`) | runs of 1–10 frames; start rate 0–0.05 |
+
+`configs/slr_week4_default.yaml` turns on the scene augmentations, uniform duration, joint coupled noise on the arms and the fingers, and random frame dropping; everything else is present but off. To run a profile, load it with `load_profile` and pass each clip to `AugmentationChain(profile, skeleton).run(clip)`. Set the clip's camera first with `clip.replace(camera=scene.fit_clip_camera(clip, hands, skeleton, frames=result.frames))`: without it, uncentre is skipped (fallback `no_camera`) and the image-space outputs are `None`.
+
 ## Documentation
+
+*   **[Research onboarding guide](./docs/research-guide/index.md)**: Source walkthroughs, geometry, data/training, evidence-based status and a newcomer learning plan.
 
 The complete documentation provides the theory, architecture, and practical guides for using the framework.
 
@@ -202,12 +253,13 @@ report.save('results/', formats=['txt', 'csv', 'md'])
 KineticAugment/
 ├── src/kinetic_augment/
 │   ├── body_model/          # MediaPipe <-> SMPL-X conversion: body, hands, face; SMPL-X wrapper
-│   ├── augmentations/       # Registered extrinsic, intrinsic, temporal transforms; tier1.py (Tier 1, not registered)
+│   ├── augmentations/       # Registered extrinsic, intrinsic, temporal transforms; tier1.py (Tier 1, not registered); week-4 chain and profiles
 │   ├── constraints/         # Joint limits, velocity, collision detection
 │   ├── pipeline/            # Unified pipeline & PyTorch datasets
 │   ├── evaluation/          # Metrics, datasets, models, benchmarks
+│   ├── lab/                 # Augmentation Lab: local web page for comparing augmentations
 │   └── legacy/              # Deprecated: AugmentationPipeline, old converters, canonicalization
-├── configs/                 # YAML configs for Pipeline.from_yaml
+├── configs/                 # YAML configs for Pipeline.from_yaml and week-4 profiles
 │   └── legacy/              # Configs for the deprecated AugmentationPipeline
 ├── scripts/                 # Extraction, fitting, evaluation and demo scripts
 │   └── legacy/              # Print-based phase smoke scripts and old renderers
@@ -243,6 +295,24 @@ Then open <http://localhost:8765/#clip=20983> (round trip) or
 [demo/round_trip/README.md](demo/round_trip/README.md#quick-start-run-the-viewer-for-one-clip)
 gives every step, the model files needed, how to check each step worked, and fixes for common
 problems.
+
+## Augmentation Lab
+
+The Lab is a web page for comparing augmentations side by side with live or precomputed knobs.
+The shareable zip needs only a browser: unzip it and double-click `index.html`. Full mode runs the
+pipeline live on your machine:
+
+```sh
+python3 -m venv .venv               # once; Python 3.9 to 3.12
+source .venv/bin/activate           # every new terminal
+pip install -e '.[smplx,lab]'       # once
+kinetic-lab                         # opens http://127.0.0.1:8770
+```
+
+Full mode also needs the licensed SMPL-X, MANO and FLAME model files in `models/`. If `kinetic-lab`
+says "command not found", the virtual environment is not switched on.
+[docs/augmentation-lab.md](docs/augmentation-lab.md) has the step-by-step setup (which model files,
+where to get them, adding clips), building the zip and using saved settings.
 
 ## Available Augmentations
 

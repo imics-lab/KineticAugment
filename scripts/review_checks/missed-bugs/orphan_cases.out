@@ -1,0 +1,10 @@
+  L elbow invalid (wrist valid)            max error on the VALID landmarks over 50 exact synthetic poses: median   59.99 mm, max  153.30 mm (49% SMPL-X shoulder width)
+  L shoulder invalid (elbow+wrist valid)   max error on the VALID landmarks over 50 exact synthetic poses: median   24.50 mm, max   73.84 mm (23% SMPL-X shoulder width)
+  L wrist invalid (control: leaf)          max error on the VALID landmarks over 50 exact synthetic poses: median    0.00 mm, max    0.00 mm (0% SMPL-X shoulder width)
+
+Unobserved in-model landmark is fabricated, not NaN (and with no observed/defaulted flag):
+  wrist 15 invalid -> reconstruct_body()[15] = [0.709 0.259 0.533] (finite: True), 108 mm from the true wrist
+
+How often does each orphan case occur in the real clips (vis >= thr)?
+  threshold 0.5: elbow invalid & wrist valid: 0/820 arm-frames, shoulder invalid & elbow valid: 0/820 arm-frames, wrist invalid: 102/820 arm-frames
+  threshold 0.9: elbow invalid & wrist valid: 0/820 arm-frames, shoulder invalid & elbow valid: 0/820 arm-frames, wrist invalid: 330/820 arm-frames

@@ -2,11 +2,8 @@
 
 **Date:** 2026-10-07. **Branch:** `feat/face-v1.3`. **Scope:** the phase-A verification gate of the
 [V1.3 face design](V1_3_Face_Design.md) (§7), run on the 20 clips of `data/round_trip_eval`.
-**Plan:** V1.3 implementation plan. **Ledger:**
+**Plan:** [V1.3 implementation plan](V1_3_Implementation_Plan.md). **Ledger:**
 [V1 problem scope §12](V1_Problem_Scope.md#12-assumptions-ledger), rows O10 to O16 and P23 to P24.
-
-*Plans, ledgers, one-off scripts, tests and evidence files named here without a link are kept on
-the author's research branches and are not part of this repository.*
 
 Phase A fits a SMPL-X neck, head and jaw to MediaPipe FaceLandmarker output, places the fitted
 hands in the same frame, and measures signed distances from hand points to the head surface. The

@@ -1,0 +1,3 @@
+0.7 rad about z (review counterexample axis)       converter worst arm error over 50 poses: median 81.54 mm, max 97.69 mm
+180 deg about x (MediaPipe y-down convention C)    converter worst arm error over 50 poses: median 4.33 mm, max 5.47 mm
+180 deg about exact rest shoulder axis             converter worst arm error over 50 poses: median 0.00 mm, max 0.00 mm

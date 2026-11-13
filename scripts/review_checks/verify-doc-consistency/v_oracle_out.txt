@@ -1,0 +1,11 @@
+01986 {'baseline': 6.31, 'root': 4.66, 'length': 5.34, 'both': 2.55, 'length+sw': 5.08, 'both+sw': 2.45} 11s
+01987 {'baseline': 6.38, 'root': 5.8, 'length': 3.24, 'both': 2.57, 'length+sw': 3.55, 'both+sw': 2.51} 20s
+01988 {'baseline': 5.06, 'root': 4.43, 'length': 3.4, 'both': 1.93, 'length+sw': 3.32, 'both+sw': 2.06} 38s
+01991 {'baseline': 9.2, 'root': 4.8, 'length': 5.31, 'both': 3.37, 'length+sw': 3.57, 'both+sw': 1.95} 44s
+01992 {'baseline': 6.19, 'root': 5.22, 'length': 3.97, 'both': 1.74, 'length+sw': 3.69, 'both+sw': 1.06} 52s
+baseline   pooled median 5.94%  reduction 0.0%  n=2354
+root       pooled median 4.84%  reduction 18.6%  n=2354
+length     pooled median 3.86%  reduction 35.0%  n=2354
+both       pooled median 2.34%  reduction 60.6%  n=2354
+length+sw  pooled median 3.65%  reduction 38.5%  n=2354
+both+sw    pooled median 1.97%  reduction 66.9%  n=2354

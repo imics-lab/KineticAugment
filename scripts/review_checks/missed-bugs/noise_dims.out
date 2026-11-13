@@ -1,0 +1,3 @@
+isotropic sigma=1 per axis: method B xy=0.549 z=0.402 xyz=0.680  -> script's 'z is 0.73x noisier than x/y' (truth 1.00)
+                            method A xy=0.637 z=0.185  -> A ratio z/xy 0.29 (truth 1.00)
+  (method B xyz should be sqrt(3)=1.732 for this noise)

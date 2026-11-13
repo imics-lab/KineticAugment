@@ -1,0 +1,7 @@
+[shared_s] |D2|:  shoulders: rho=-0.15 med|D2| vis<.5=nanmm(n=0) vis>=.5=2.7mm(n=798) | elbows: rho=-0.06 med|D2| vis<.5=nanmm(n=0) vis>=.5=4.6mm(n=798) | wrists: rho=-0.11 med|D2| vis<.5=5.1mm(n=91) vis>=.5=7.2mm(n=707) | hips: rho=+0.04 med|D2| vis<.5=0.4mm(n=462) vis>=.5=0.5mm(n=336)
+[fresh_u] |D2|:  shoulders: rho=+0.01 med|D2| vis<.5=nanmm(n=0) vis>=.5=8.7mm(n=798) | elbows: rho=+0.07 med|D2| vis<.5=10.2mm(n=4) vis>=.5=11.6mm(n=794) | wrists: rho=-0.01 med|D2| vis<.5=11.6mm(n=127) vis>=.5=16.8mm(n=671) | hips: rho=+0.07 med|D2| vis<.5=2.9mm(n=445) vis>=.5=3.0mm(n=353)
+[static] |D2|:  shoulders: rho=+0.12 med|D2| vis<.5=nanmm(n=0) vis>=.5=16.0mm(n=798) | elbows: rho=+0.18 med|D2| vis<.5=19.1mm(n=15) vis>=.5=19.2mm(n=783) | wrists: rho=+0.09 med|D2| vis<.5=17.7mm(n=128) vis>=.5=25.1mm(n=670) | hips: rho=+0.10 med|D2| vis<.5=4.4mm(n=476) vis>=.5=5.1mm(n=322)
+[fresh_u vs static] shoulders: rho=+0.22 med|U-I| lowest-quartile-vis=20.1mm top-quartile=25.8mm | elbows: rho=+0.19 med|U-I| lowest-quartile-vis=27.0mm top-quartile=35.1mm | wrists: rho=+0.10 med|U-I| lowest-quartile-vis=36.5mm top-quartile=37.2mm | hips: rho=+0.18 med|U-I| lowest-quartile-vis=6.7mm top-quartile=8.4mm
+mask flip fresh_s vs fresh_u L wrist: 28/410 = 6.8%
+mask flip fresh_s vs fresh_u R wrist: 30/410 = 7.3%
+mask flip fresh_s vs fresh_u L elbow: 5/410 = 1.2%

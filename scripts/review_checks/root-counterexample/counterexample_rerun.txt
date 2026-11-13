@@ -1,0 +1,11 @@
+Synthetic same-skeleton case: ground-truth root rotvec [0, 0, 0.7] rad
+Fitted root rotvec: [0. 0. 0.]
+Position errors over shoulder, elbow, wrist correspondences (m):
+  raw:     max=0.319150222, mean=0.316892815
+  aligned: max=0.079179951, mean=0.044704071
+Arm-segment direction errors (degrees):
+  11->13: 0.000000000
+  13->15: 0.000001207
+  12->14: 0.000000000
+  14->16: 0.000000854
+  max=0.000001207, mean=0.000000515

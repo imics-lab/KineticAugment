@@ -1,0 +1,11 @@
+rest nose (SMPL-X idx 55): [0.    0.276 0.113]  rest head: [ 0.011  0.268 -0.004]
+frames (nose valid): 409  arms: 718
+cos(fitted up, data up):    current median -0.61 p5 -0.70 p95 -0.49 | step8 median 0.83 p5 0.83 p95 0.83
+cos(fitted front, data front): current median -0.61 p5 -0.70 p95 -0.48 | step8 median 0.83 p5 0.83 p95 0.83
+elbow local-y on anatomical flexion side: current 0.0% | step8 100.0%
++10deg local-y flex -> bend change deg: current median -9.80 p5 -9.94 p95 -8.31 | step8 median 9.68 p5 9.09 p95 9.91
+zero-noise clamp wrist displacement %SW: current median 101.31 p5 35.46 p95 129.87 | step8 median 76.09 p5 13.89 p95 102.50
+step8 bend before clamp median 78.14 p5 28.97 p95 99.87 after median 22.63 p5 12.74 p95 35.20
+frac arms where step8 clamp moves wrist >1%SW: 0.997
+max over frames of max-arm |recon(step8) - recon(current)| %SW: 14.854 (median 4.784)
+step8-style direct error vs input, per-frame median over arm landmarks %SW: median 6.53 p5 4.17 p95 10.07

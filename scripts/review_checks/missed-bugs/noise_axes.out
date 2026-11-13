@@ -1,0 +1,12 @@
+Real clips, script's own estimators, pooled median %% shoulder width:
+    x: A 0.0216%   B 0.0432%
+    y: A 0.0157%   B 0.0332%
+    z: A 0.0618%   B 0.0739%
+   xy: A 0.0665%   B 0.0603%
+  script's headline ratio  B_z / B_xy            = 1.23  ('z is 1.2x noisier')
+  per-axis ratio           B_z / mean(B_x, B_y)  = 1.94
+  per-axis ratio           A_z / mean(A_x, A_y)  = 3.31
+
+Method B on synthetic tracks with KNOWN per-axis sigma = 1 mm (truth for xyz band: sqrt(3) = 1.732 mm)
+  stationary + iid noise                          : script (gated) 0.675   ungated 1.729
+  slow sinusoid (0.2 Hz @30fps, 5 cm) + iid noise : script (gated) 0.820   ungated 1.728

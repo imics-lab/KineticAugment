@@ -1,0 +1,6 @@
+(1) float64 SMPL-X vs FK, 20 random full poses, nonzero betas/root/transl:
+    plain FK max abs err 1.13e-08 m; FK with smplx's rodrigues +1e-8 emulated: 1.08e-08 m
+(2) shaped skeleton -> fit_body -> SMPL-X forward with fit.betas (as returned):
+    test_converter.py TestBodyShape betas    |betas|=2.06: with fit.betas (zeros) max  57.13 mm; with the skeleton's betas 1.9e-07 m
+    betas ~ N(0,1)                           |betas|=2.03: with fit.betas (zeros) max  20.96 mm; with the skeleton's betas 1.5e-07 m
+    betas ~ N(0,2)                           |betas|=6.71: with fit.betas (zeros) max 186.40 mm; with the skeleton's betas 1.9e-07 m

@@ -1,0 +1,4 @@
+default vs complexity2  median |diff| % sw   x=8.63  y=8.98  z=20.51
+default vs resize75     median |diff| % sw   x=0.55  y=0.60  z=1.37
+default vs padshift     median |diff| % sw   x=1.23  y=0.91  z=2.63
+default vs nosmooth     median |diff| % sw   x=0.95  y=0.92  z=1.48

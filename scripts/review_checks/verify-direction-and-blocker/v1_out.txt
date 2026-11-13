@@ -1,0 +1,13 @@
+frames 409 max |real forward - reconstruct_body| on arm joints (m): 1.6996713016774693e-07
+cos(fitted up, MP data up from nose): median -0.550  min -0.691 max -0.344; frac<0: 1.000
+cos(fitted front, MP data front): median -0.549 min -0.691 max -0.340; frac<0: 1.000
+fitted up y-comp (MP y-down; upright=>neg): median 0.995; fitted front z: median 0.994; MP-data front z: median -0.620
+global_orient magnitude deg: median 3.6 p5 1.7 p95 6.4
+SMPL-X head above its shoulders along MP's own up: 0.0%; MP nose above shoulders (y-down): 100.0%; SMPL-X head above shoulders (y-down): 0.0%
+|SMPL-X head - MP nose| %SW median 116; |hip mid diff| %SW median 300
+left elbow local-y deg: median 82.2 frac>0 0.868 | right elbow local-y: median -83.9 frac<0 0.888
+  01986 n 83 up_dot med -0.60 front_dot med -0.60
+  01987 n 75 up_dot med -0.55 front_dot med -0.55
+  01988 n 143 up_dot med -0.56 front_dot med -0.56
+  01991 n 49 up_dot med -0.54 front_dot med -0.54
+  01992 n 59 up_dot med -0.42 front_dot med -0.42

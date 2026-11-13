@@ -1,0 +1,5 @@
+frames: 409; real-forward vs reconstruct_body on arm joints: max 1.70e-07 m
+MediaPipe nose above shoulders (y-down frame): 100.0% of frames
+SMPL-X head joint above its shoulders, same frame:  0.0% of frames
+|SMPL-X head - MP nose|: median 116%SW  (a correct torso would be ~ <50%SW)
+|SMPL-X hip centre - MP hip centre|: median 300%SW

@@ -1,0 +1,6 @@
+01986_world    aligned median: shipped 6.31%  shoulder-line root 4.74%
+01987_world    aligned median: shipped 6.38%  shoulder-line root 5.91%
+01988_world    aligned median: shipped 5.06%  shoulder-line root 5.11%
+01991_world    aligned median: shipped 9.20%  shoulder-line root 5.07%
+01992_world    aligned median: shipped 6.19%  shoulder-line root 5.20%
+pooled: shipped 5.94%  root 5.13%  reduction 13.7%

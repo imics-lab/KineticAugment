@@ -44,6 +44,8 @@ LEFT_SHOULDER_MP, RIGHT_SHOULDER_MP = 11, 12
 LEFT_SHOULDER_SMPLX, RIGHT_SHOULDER_SMPLX = 16, 17
 LEFT_HIP_MP, RIGHT_HIP_MP = 23, 24
 LEFT_HIP_SMPLX, RIGHT_HIP_SMPLX = 1, 2
+# Outward tilt of an arm bone left hanging because it was not observed (`fit_body`).
+HANG_ABDUCTION_DEG = 10.0
 
 # (SMPL-X joint, MediaPipe pose landmark) for the joints V1 models. Legs are
 # excluded because MediaPipe reports visibility near zero for them in
@@ -69,9 +71,10 @@ class BodyFit:
     different body.
 
     `placed` marks, per MediaPipe landmark, which positions the parameters
-    actually determine. A joint that was not observed leaves its bone at the rest
-    pose; reconstruction reports such landmarks as missing rather than inventing
-    them. None means every modelled landmark was placed.
+    actually determine. A joint that was not observed leaves its bone hanging down
+    the torso (so the mesh is not in a T-pose); reconstruction reports such
+    landmarks as missing rather than inventing them. None means every modelled
+    landmark was placed.
     """
 
     body_pose: np.ndarray
@@ -173,6 +176,37 @@ def _placed_landmarks(usable: np.ndarray) -> np.ndarray:
     return placed
 
 
+def _hang_unplaced_bones(rotations: np.ndarray, skeleton, placed: np.ndarray) -> np.ndarray:
+    """
+    Arm bones with no observed direction, turned to hang down the torso instead of resting.
+
+    SMPL-X rests in a T-pose, so an unsolved bone would stick straight out. In sign-language
+    video an arm MediaPipe cannot see is almost always lowered out of frame, so it hangs down
+    the rest torso frame's -y, tilted `HANG_ABDUCTION_DEG` outward to clear the hip. Only the
+    mesh shows this: the bones' landmarks stay unplaced, and reconstruction reports them missing.
+    """
+    rest = skeleton.rest_joints
+    parents = np.asarray(skeleton.parents, dtype=int)
+    local = Rotation.from_rotvec(rotations).as_matrix()
+    root, a = local[0], np.radians(HANG_ABDUCTION_DEG)
+
+    def world(j):
+        out = np.eye(3)
+        while j >= 0:
+            out = local[j] @ out
+            j = parents[j]
+        return out
+
+    for joint, child, _, mp_child in SMPLX_ARM_BONES:   # parents precede children
+        if placed[mp_child]:
+            continue
+        outward = np.sign(rest[joint, 0])   # SMPL-X's left side is +x
+        target = root @ np.array([outward * np.sin(a), -np.cos(a), 0.0])
+        d_rest = _unit(rest[child] - rest[joint])
+        local[joint] = swing_rotation(d_rest, world(parents[joint]).T @ target)
+    return Rotation.from_matrix(local).as_rotvec()
+
+
 def fit_body(landmarks: np.ndarray, validity: np.ndarray, skeleton) -> BodyFit:
     """
     Fit SMPL-X parameters to one frame of world-coordinate body landmarks.
@@ -205,9 +239,10 @@ def fit_body(landmarks: np.ndarray, validity: np.ndarray, skeleton) -> BodyFit:
     masked = np.where(usable[:, None], landmarks, np.nan)
     rotations = solve_swing_ik(masked, skeleton, SMPLX_ARM_BONES,
                                global_orient=Rotation.from_matrix(root).as_rotvec())
+    placed = _placed_landmarks(usable)
+    rotations = _hang_unplaced_bones(rotations, skeleton, placed)
     posed = forward_kinematics(rotations, skeleton)
 
-    placed = _placed_landmarks(usable)
     residuals = [landmarks[m] - posed[s] for s, m in ARM_CORRESPONDENCE if placed[m]]
 
     return BodyFit(

@@ -1,0 +1,31 @@
+scripts/review_checks/fk-and-wiring/t2_legacy_converters.py:25: DeprecationWarning: MediaPipeToSMPLX stores bone displacements in SMPL-X-shaped slots; its output is not valid SMPL-X input. For genuine SMPL-X parameters use kinetic_augment.body_model.converter.fit_body on world landmarks.
+  fitter = MediaPipeToSMPLX()
+scripts/review_checks/fk-and-wiring/t2_legacy_converters.py:95: DeprecationWarning: SMPLXToMediaPipe re-adds stored displacements to the original landmarks rather than evaluating SMPL-X, so it needs `target_mp` to reconstruct anything. For reconstruction from parameters alone use kinetic_augment.body_model.converter.reconstruct_body.
+  proj = SMPLXToMediaPipe(Tripwire())
+=== 1. Encoding (MediaPipeToSMPLX.fit) on a real image-space frame ===
+  global_orient all zero: True | betas all zero: True
+  body_pose slot 17 (SMPL-X joint 18) == raw child-parent displacement: True  value=[ 0.0603  0.3801 -0.2449]
+  body_pose slot 19 (SMPL-X joint 20) == raw child-parent displacement: True  value=[-0.0525  0.0685 -0.7188]
+  body_pose slot 18 (SMPL-X joint 19) == raw child-parent displacement: True  value=[-0.0883  0.3332 -0.3331]
+  body_pose slot 20 (SMPL-X joint 21) == raw child-parent displacement: True  value=[ 0.0728 -0.0125 -0.7976]
+  body_pose slot  3 (SMPL-X joint  4) == raw child-parent displacement: True  value=[-0.0205  0.4775 -0.0894]
+  left_hand_pose slot 0 == H[2]-H[1] (raw finger displacement): True
+  NOTE: SMPL-X joint 18's rotation drives bone 18->20 (forearm); slot 17 holds the upper-arm vector.
+
+=== 2. Legacy params through the REAL SMPL-X model (world frame 14) ===
+  legacy params -> SMPL-X -> best SIMILARITY alignment: mean 209.0 mm (62.3% shoulder width), max 261.0 mm
+  legacy params -> SMPL-X -> best RIGID alignment     : mean 338.3 mm (100.8% sw), max 586.8 mm
+  new converter fit_body->reconstruct_body (direct, no extra alignment): mean 23.1 mm (6.9% sw), max 47.1 mm
+  legacy 'rotation angles' (rad) in driven slots = bone lengths in metres: [0.27709999680519104, 0.29670000076293945, 0.27549999952316284, 0.2937000095844269]  vs measured bone lengths: [0.2771, 0.2967, 0.2755, 0.2937]
+
+=== 3. Decoding (SMPLXToMediaPipe.project) ===
+  signature: (self, smplx_params: Dict[str, numpy.ndarray], target_mp: numpy.ndarray, return_full_frame: bool = True) -> numpy.ndarray
+  project() with a tripwire wrapper raised nothing -> SMPL-X never consulted
+  round trip with target_mp=original: max |out-in| over all 543 = 1.1920928955078125e-07
+  target_mp = zeros: shoulders out = [0.0, 0.0, 0.0] [0.0, 0.0, 0.0] | L elbow out == stored displacement: True
+  target_mp = a different frame: L shoulder taken from target: True | face copied from target verbatim: True
+  all-zero params + target_mp=original -> max |output-original| = 1.1920928955078125e-07 (params carry nothing; target is passed through)
+
+=== 4. What is 'public'? ===
+  body_model.__all__: ['get_smplx_wrapper', 'get_mp_to_smplx', 'get_smplx_to_mp', 'SMPLX_TO_MEDIAPIPE_POSE', 'MEDIAPIPE_TO_SMPLX_POSE', 'SMPLX_JOINT_NAMES', 'MEDIAPIPE_POSE_NAMES', 'get_corresponding_joints']
+  get_mp_to_smplx() is legacy class: True | converter.fit_body exported from package: False

@@ -1,0 +1,17 @@
+root_deg=0: worst pos err 5.320e-15 m; poses with all 4 arm rots <1e-6deg: 0/200
+  L shoulder  rot err med/p95/max  13.81/ 44.87/ 75.24 deg | truth twist med  13.81 | max|err-twist| 5.05e-12
+  L elbow     rot err med/p95/max  19.64/ 42.86/ 62.37 deg | truth twist med  14.93 | max|err-twist| 3.60e+01
+  R shoulder  rot err med/p95/max  16.51/ 49.87/ 74.00 deg | truth twist med  16.51 | max|err-twist| 5.57e-12
+  R elbow     rot err med/p95/max  20.65/ 51.23/ 68.53 deg | truth twist med  16.74 | max|err-twist| 3.50e+01
+  all arm joints median 18.06 deg
+root_deg=30: worst pos err 7.003e-02 m; poses with all 4 arm rots <1e-6deg: 0/200
+  L shoulder  rot err med/p95/max  30.61/ 57.43/ 74.75 deg | truth twist med  17.23 | max|err-twist| 2.97e+01
+  L elbow     rot err med/p95/max  24.59/ 56.56/ 83.16 deg | truth twist med  16.07 | max|err-twist| 5.06e+01
+  R shoulder  rot err med/p95/max  31.45/ 48.81/ 65.33 deg | truth twist med  16.52 | max|err-twist| 3.21e+01
+  R elbow     rot err med/p95/max  19.68/ 49.32/ 71.37 deg | truth twist med  14.43 | max|err-twist| 4.38e+01
+  all arm joints median 28.21 deg
+seed7 fixture: max child pos err 1.3092278833360675e-16
+  joint 16: rot err 0.51 deg
+  joint 18: rot err 13.24 deg
+  joint 17: rot err 2.75 deg
+  joint 19: rot err 8.43 deg

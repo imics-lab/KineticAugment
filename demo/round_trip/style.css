@@ -109,3 +109,34 @@ body.smoothed .if-smoothed { display: inline !important; }
 .explain .note { color: var(--muted); font-size: 12px; }
 .explain .changes h3 { color: var(--aug); }
 .explain .keeps h3 { color: var(--orig); }
+
+/* the all-augmentations grid (all.html) */
+:root { --cols: 5; }
+.grid-bar {
+  position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line);
+  padding: 8px 16px; display: flex; flex-direction: column; gap: 6px;
+}
+.grid-controls { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; color: var(--muted); }
+.grid-controls .toggles { gap: 4px 12px; }
+.grid-controls .cams button, .grid-controls .cams { font-size: 12px; }
+.aug-grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 900px) { .aug-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .aug-grid { grid-template-columns: 1fr; } }
+.cell {
+  margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.cell figcaption { font-size: 12px; align-items: baseline; }
+.cell figcaption a { color: var(--text); text-decoration: none; }
+.cell figcaption a:hover { text-decoration: underline; }
+.cell .frame { margin-left: auto; min-width: 0; font-size: 10.5px; color: var(--muted); font-weight: 400; }
+.cell .tag { font-size: 10.5px; font-weight: 400; color: var(--muted); }
+.cell .vp { width: 100%; aspect-ratio: 3 / 4; background: #0b0d11; border-radius: 4px; touch-action: none; }
+.cell canvas { width: 100%; border-radius: 4px; background: #000; display: block; }
+.cell .cap { font-family: var(--mono); font-size: 10.5px; color: var(--aug); min-height: 2.6em; overflow-wrap: anywhere; }
+.cell .cap .was { font-family: inherit; }
+.cell.ended .vp { outline: 1px dashed var(--line); }
+.cell.ended .frame { color: #ffb3b3; }
+.grid-note { color: var(--muted); font-size: 12px; margin-top: 10px; }
+#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 4; }
+.chip.flag { color: #ffb3b3; }

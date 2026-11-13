@@ -1,0 +1,4 @@
+(a) model-free fit with SyntheticSkeleton (num_joints=4): IndexError: index 16 is out of bounds for axis 0 with size 4
+(b) reconstruct_body params: ['fit', 'skeleton']
+(c) shapes: (63,) (3,) (3,) (10,)
+betas changed -> reconstruct_body output moved by 0.00e+00 m; real SMPL-X forward with those betas differs from reconstruct_body by up to 68.2 mm

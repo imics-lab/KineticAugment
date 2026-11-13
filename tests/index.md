@@ -4,8 +4,65 @@ Run with `pytest tests/` from the repo root.
 
 | File | Description |
 |---|---|
-| `__init__.py` | Package marker |
-| `test_body_model.py` | Joint mapping, `SMPLXWrapper` (skipped without torch/models), `SMPLXParamsContainer` |
-| `test_legacy_converters.py` | Legacy image-space converters (`kinetic_augment.legacy`); pure numpy |
-| `test_smoothing.py` | Temporal landmark smoothing filters |
-| `test_tier1.py` | Tier 1 augmentations: sampling, transforms, re-timing, frame check |
+| `__init__.py` | Marks the automated test directory as a Python package |
+| `test_alignment.py` | Tests least-squares similarity alignment between coordinate spaces |
+| `test_assembly.py` | Tests assembling one SMPL-X pose from the body, hand and head fits: palm alignment, layout, mesh joints |
+| `test_body_model.py` | Joint mapping, `SMPLXWrapper` (skipped without torch/models; joint counts, deprecated `num_joints`), `SMPLXParamsContainer` |
+| `test_legacy_converters.py` | Legacy image-space converters (`kinetic_augment.legacy`); pure numpy; deprecation warnings point to the converter |
+| `test_converter.py` | Tests the V1 converter contract and its round trip through SMPL-X |
+| `test_extract_world_landmarks.py` | Tests that a clip's extracted landmarks do not depend on the clip processed before it |
+| `face_assets.py` | Skip marks and paths for the licensed FLAME assets and the MediaPipe face assets |
+| `test_face_correspondence.py` | Tests the MediaPipe → SMPL-X face correspondence, including the F1 eye-corner and nose-tip check |
+| `test_face_observations.py` | Tests FaceClip pixel conversion, file round trip and schema check |
+| `test_face_stream.py` | Tests reversible similarity attachment of observed full-face landmarks to head-local coordinates |
+| `test_face_features.py` | Tests feature archive schema, stream preflight validation, geometry masks, and crossing hand outlines |
+| `test_face_training_dataset.py` | Tests face feature training streams, synchronized temporal operations, WLASL split mapping, and mixed batches with unnamed no-face blendshape channels |
+| `test_face_classifier.py` | Tests masked temporal encoding, trainer integration, and synthetic facial signal learning |
+| `test_face_integration_validation.py` | Tests that attachment on/off comparisons reject validity or finite-value mask loss |
+| `test_kinematics.py` | Tests skeleton sources and forward kinematics against the real SMPL-X model |
+| `test_shape.py` | Tests the per-clip shape fit against the converter's own round-trip error and SMPL-X's shape prior |
+| `test_smoothing.py` | Tests the gap-aware landmark smoothing filters: gaps stay NaN and do not leak, constants pass through, noise drops, One Euro is causal |
+| `test_swing_ik.py` | Tests analytic swing inverse kinematics against known synthetic ground truth |
+| `hand_assets.py` | Shared model-asset paths, skip marks and a cached hand-model loader for the hand tests |
+| `test_hand_model.py` | Tests the 21-point hand operator against the full MANO/SMPL-X forward pass and hand anatomy |
+| `test_hand_converter.py` | Tests the hand fit: analytic start, real-model refinement, decoder, serialisation, shape and per-frame scale |
+| `test_week4_base.py` | Tests region tags, the registry clash check, ClipAugmentation, and range sampling helpers |
+| `clip_fixtures.py` | Shared week-4 clips: a synthetic SMPL-X `ClipData` and the pilot clip 01991 through `run_clip` (cached) |
+| `test_week4_clip.py` | Tests the clip container, slerp re-timing, frame selection, skinning on edited rest joints and the MediaPipe-layout outputs (unfitted frames, no face, mirroring) |
+| `test_week4_arm_ik.py` | Tests the two-bone arm IK (reachable, unreachable, zero-move, swivel side, straight-arm pole) and the torso frame on the real SMPL-X skeleton |
+| `test_week4_body_noise.py` | Tests coupled arm-joint noise (limits, side coupling, constant/drift, NaN frames, bone lengths) and the Tier 1 arm-joint wrapper |
+| `test_week4_location.py` | Tests movement-size scaling and location jitter (identity, path extent, constant offset, hand distance, unfitted frames) |
+| `test_week4_limb_length.py` | Tests limb length scaling: bone lengths, identity, wrist retargeting (reachable and unreachable), draw ranges |
+| `test_week4_face.py` | Tests blendshape groups, the expression map fit, expression jitter (identity, mouth off, unit-interval scores, rigid points, fallbacks, frame noise, key validation) |
+| `test_week4_fingers.py` | Tests handshape features, feature-change margins, flexion axes and mirroring, coupled finger noise (identity, DIP follows PIP, limits, coupling) and handshape jitter (preserved features, fallback, missing hand) |
+| `test_week4_scene.py` | Tests the face mirror table, blendshape mirror, scene composition (view, scale, mirror, shift), identity, hand swap, view distances, camera fit and uncentre keeping hands in frame |
+| `test_week4_timing.py` | Tests time warp rate maths and modes, short clips, frame-drop gap limit and fills, and hand-dropout runs (detected frames only, truncation, identity) |
+| `test_tier1.py` | Tests the Tier 1 augmentations: sampling ranges, transforms, re-timing, the camera fit and the hands-in-frame limit |
+| `test_head_converter.py` | Tests head occlusion and robust head rotation |
+| `test_head_placement.py` | Tests the 11-point neck fit: synthetic recovery of the head joint under 1 mm with the head rotation reproduced exactly |
+| `test_face_regions.py` | Tests vertex normals, full labelling of the head surface, and anchor points landing in their ASL-LEX regions |
+| `test_hand_face_geometry.py` | Tests exact closest-point-on-triangle, signed distance (forehead), and unposed-hand NaN and contact rules |
+| `test_image_proximity.py` | Tests image-space hand-to-head overlap, distance, region choice (front-most, back-facing ignored), hand point order and the head projection's scale and rotation |
+| `test_hand_depth.py` | Tests focal length, back-projection, hand scale, wrist targets on a synthetic perspective scene, and the depth-corrected pipeline on 20 pilot frames |
+| `test_face_pipeline.py` | Tests hand-near-face and the clip pipeline on 20 frames of a real pilot clip (valid head fits, residual, feature-file shapes) |
+| `test_hand_observations.py` | Tests the left/right assignment and the hand clip file format |
+| `test_extract_hand_landmarks.py` | Runs the hand extractor on pilot clips: clip-order independence, units, sides |
+| `test_extract_face_landmarks.py` | Integration test: real FaceLandmarker on a pilot clip (face found, frames align with hands, head-matrix layout) |
+| `test_face_metrics.py` | Tests the gate metrics: matrix rotation scale removal, head-pose agreement, correspondence floor |
+| `test_week4_profile.py` | Tests the week-4 profile loader, the proven-range comments in the shipped YAMLs, the chain's determinism, identity and stream independence |
+| `test_lab_bundle.py` | Tests the pane blob encode/decode (round trip, deltas, header) and that the week-4 demo helpers moved into `kinetic_augment.lab` still import |
+| `test_lab_chain_hook.py` | Tests the chain draw hook (none is unchanged, a hook replaces the draw before apply) and `profile_from_dict` against `load_profile` |
+| `test_week4_report.py` | Tests `report.measure`: identity gives zeros, a 1 cm wrist shift reads 10 mm, unaligned runs skip the frame-by-frame keys |
+| `test_lab_extreme.py` | Tests extreme draws: every entry's edge rule (low/high signs, mirrored axes, frame-drop keep recomputed) and the pass-through hook |
+| `test_lab_pane.py` | Tests the lab pane runner (`pane_profile`, `PaneRequest.key`, `run_pane` vs the week-4 chain, extreme truncation, speed) and the `ClipStore` |
+| `test_lab_models.py` | Tests `check_models`, `MODEL_LINKS` and the `LabConfig` round trip |
+| `test_lab_ingest.py` | Tests the `JobQueue` (one at a time, failures, unknown ids) and the missing-scripts error |
+| `test_lab_saving.py` | Tests `slugify`, profile validation and `save_setting` (file, index line, overwrite, nothing written when invalid) |
+| `test_lab_server.py` | Tests the lab routes with a fake store and models (setup mode, panes, uploads, saved settings) and the `kinetic-lab` host check |
+| `test_lab_schema.py` | Tests the lab knob schema: every lab entry and range key has a knob, defaults sit within limits, plain text is present, the extreme flag matches, and each knob's limits are accepted by the augmentation |
+| `test_lab_share.py` | Tests the share build: the pane grid (defaults, proven edges, extreme only where allowed), the size-budget choice, no modules or fetch in the page, mesh decimation and a small real zip |
+| `test_lab_js.py` | Runs the Lab page's Node tests (`tests/js/*.test.js`) on freshly written fixtures; skips without `node` |
+| `test_lab_docs.py` | Tests that every Lab file is in its folder index, AGENTS.md lists the indexes, the setup page is a plain classic page, and the Lab doc is linked |
+| `test_lab_yaml_edit.py` | Builds the Save button's YAML in Node for every lab entry (all knobs moved) and checks each loads with `validate_profile_text`, carries the edits, writes only moved knobs (no demo overrides or `mode_weights`, Ruling R18), keeps every line and comment; skips without `node` |
+| `js/` | Node tests for the Lab page's scripts and their fixture writer (see `js/index.md`) |
+| `index.md` | This index |

@@ -1,0 +1,2 @@
+direct pooled median 6.55%  aligned 5.94%  ratio-to-0.18: direct 36.4x aligned 33.0x
+length err pooled median: direct 7.86%  aligned 6.66%; per bone direct [8.58, 7.53, 9.64, 4.99]

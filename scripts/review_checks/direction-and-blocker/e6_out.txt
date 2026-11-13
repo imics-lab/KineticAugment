@@ -1,0 +1,9 @@
+flexion sign on local y: {18: -1.0, 19: 1.0}
+arms analysed: 718
+R1 full replacement, wrist error at ZERO augmentation (%SW): median 7.46, p5 3.39, p95 17.25
+R2/R3 at zero augmentation: 0 by construction
+wrist motion for a +10 deg flex (%SW): R2 median 13.06, p5 11.76, p95 13.86 | R3 median 13.13, p5 9.80, p95 15.40
+R2 vs R3 wrist-motion direction disagreement (deg): median 167.30, p5 151.70, p95 171.09
+R2/R3 wrist-motion magnitude ratio: median 0.99, p5 0.81, p95 1.33
+achieved change in elbow bend (deg), target +10: R2 median -9.53, p5 -12.68, p95 -7.83 | R3 median 10.00, p5 10.00, p95 10.00
+observed-forearm length ratio after aug: R1 (SMPL-X length / observed) median 1.00, p5 0.86, p95 1.35 | R2 median 1.00, p5 0.99, p95 1.01 | R3 1.0 exactly

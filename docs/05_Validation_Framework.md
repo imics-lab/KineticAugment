@@ -1,5 +1,11 @@
 # 05: The Validation Framework
 
+> Historical conceptual design. Its automatic guarantees about meaning and recognition benefit,
+> universal bone-length tolerance, and scalar acceptance threshold are not established. Use the
+> [augmentation validation proposal](Augmentation_Validation_Proposal.md) for the current design
+> targeting raw MediaPipe classifier inputs. Automated geometry checks cannot certify semantics
+> or training usefulness.
+
 Applying a sequence of individually valid augmentations does not guarantee that the final combined result is plausible. Complex interactions can lead to unforeseen edge cases. Therefore, the final step in the KineticAugment pipeline is a comprehensive **Validation Framework**.
 
 The purpose of validation is to provide a final, automated quality assurance check, ensuring that every sample added to the training dataset is of high quality and will help, not hinder, model performance.

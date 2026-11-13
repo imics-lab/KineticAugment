@@ -1,0 +1,7 @@
+01986 | L: n= 53 roll sd  11.4 range  43.5 deg | R: n= 57 roll sd  12.4 range  55.6 deg
+01987 | L: n= 68 roll sd  22.6 range  81.0 deg | R: n= 70 roll sd  17.3 range  61.0 deg
+01988 | L: n=122 roll sd  19.2 range  80.2 deg | R: n=118 roll sd  23.6 range  91.5 deg
+01991 | L: n= 49 roll sd   8.9 range  37.7 deg | R: n= 48 roll sd   4.7 range  18.2 deg
+01992 | L: n= 59 roll sd   2.6 range  11.7 deg | R: n= 59 roll sd   5.7 range  25.6 deg
+visibility of pose landmarks 17-22: median 0.94, frac>=0.5 0.87
+  per landmark medians: [0.91 0.95 0.92 0.95 0.92 0.94]

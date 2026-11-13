@@ -9,3 +9,4 @@ Used by `Pipeline`; only acts in `mode='smplx'` (no-op in landmark mode).
 | `joint_limits.py` | Anatomical range-of-motion limits |
 | `velocity_limits.py` | Maximum angular velocity limits |
 | `collision/` | PyBullet self-collision detection and resolution (experimental, off in all presets) |
+| `index.md` | This index |

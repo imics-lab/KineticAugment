@@ -1,0 +1,4 @@
+frames fitted: 409
+global_orient angle (deg): median 3.6  p5 1.7  p95 6.4
+SMPL-X head joint ABOVE shoulders in landmark frame (y-down): 0/409 frames
+distance SMPL-X head joint -> MediaPipe nose: median 0.380 m

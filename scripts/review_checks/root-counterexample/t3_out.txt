@@ -1,0 +1,7 @@
+(a) Current converter output, MediaPipe world frame (y DOWN; observed nose y ~ -0.6, hip centre y = 0, shoulders y ~ -0.45):
+    fitted SMPL-X pelvis y: median -0.894 m; head(15) y: median -0.275; shoulder-mid y: median -0.461
+    shoulder local rotation magnitude: current converter median 89.3 deg (p5 49.8, p95 105.4); with shoulders+hip root median 74.5 deg (p5 45.7, p95 88.9)
+(b) Same subsample (every 4th frame):
+    shoulder-only root + translation: median 6.01%  p95 12.65%  n=598
+    3-dof optimised root + translation: median 5.57%  p95 11.48%
+    all frames: shoulder-only root + IK + RIGID post-fit: median 5.72%  p95 12.48%  n=2354

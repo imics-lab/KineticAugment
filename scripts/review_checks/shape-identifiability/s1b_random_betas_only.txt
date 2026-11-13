@@ -1,0 +1,27 @@
+betas=0      10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.52  17.548  2.867  0.473  0.045] cond=923
+betas=0      10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.814  2.903  0.503  0.102] cond=313
+betas=0      10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.938 17.605  2.937  0.474  0.058] cond=720
+N(0,I) #0    10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.529 17.536  2.866  0.477  0.045] cond=917
+N(0,I) #0    10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.817  2.904  0.504  0.107] cond=298
+N(0,I) #0    10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.952 17.586  2.941  0.477  0.059] cond=715
+N(0,I) #1    10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.486 17.598  2.859  0.443  0.045] cond=918
+N(0,I) #1    10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.806  2.884  0.495  0.073] cond=436
+N(0,I) #1    10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.881 17.669  2.919  0.444  0.057] cond=736
+N(0,I) #2    10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.55  17.505  2.875  0.489  0.046] cond=905
+N(0,I) #2    10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.826  2.918  0.509  0.12 ] cond=265
+N(0,I) #2    10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.986 17.554  2.945  0.49   0.06 ] cond=696
+N(0,I) #3    10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.466 17.586  2.85   0.47   0.046] cond=908
+N(0,I) #3    10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.769  2.881  0.505  0.102] cond=312
+N(0,I) #3    10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.822 17.654  2.919  0.471  0.059] cond=711
+N(0,I) #4    10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.498 17.515  2.845  0.504  0.051] cond=821
+N(0,I) #4    10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.762  2.892  0.522  0.146] cond=218
+N(0,I) #4    10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.862 17.556  2.925  0.504  0.064] cond=649
+N(0,4I) #0   10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.488 17.598  2.858  0.447  0.045] cond=923
+N(0,4I) #0   10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.804  2.884  0.494  0.077] cond=416
+N(0,4I) #0   10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.906 17.675  2.928  0.448  0.056] cond=748
+N(0,4I) #1   10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.436 17.603  2.835  0.467  0.047] cond=882
+N(0,4I) #1   10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.736  2.87   0.507  0.094] cond=339
+N(0,4I) #1   10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[41.769 17.653  2.924  0.467  0.059] cond=704
+N(0,4I) #2   10b (5 obs)            rank=5 nullity=5 sv(mm/unit)=[41.569 17.458  2.882  0.514  0.05 ] cond=832
+N(0,4I) #2   10b (4 arm)            rank=4 nullity=6 sv(mm/unit)=[31.824  2.932  0.527  0.145] cond=219
+N(0,4I) #2   10b+scale/1% (5 obs)   rank=5 nullity=6 sv(mm/unit)=[42.015 17.488  2.954  0.515  0.064] cond=658

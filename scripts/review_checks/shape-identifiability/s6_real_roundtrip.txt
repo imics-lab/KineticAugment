@@ -1,0 +1,39 @@
+clip  config                     |beta|  height  vol L  direct median %SW
+01986 baseline betas=0             0.00   172.1   76.0              6.38%
+01986 MAP sigma=10mm               1.30   170.6   78.6              5.77%
+01986 MAP sigma=3mm                6.50   171.5   57.9              5.28%
+01986 MAP sigma=1mm               12.00   175.1   40.9              5.74%
+01986 unreg LS box|b|<=3           8.52   165.1   44.4              5.35%
+01986 per-bone length ORACLE        n/a     n/a    n/a              5.43%
+01987 baseline betas=0             0.00   172.1   76.0              7.42%
+01987 MAP sigma=10mm               2.93   155.4   87.0              4.53%
+01987 MAP sigma=3mm                4.25   151.5   99.4              4.15%
+01987 MAP sigma=1mm                5.93   146.8   92.5              4.08%
+01987 unreg LS box|b|<=3           8.79   137.8   61.4              4.07%
+01987 per-bone length ORACLE        n/a     n/a    n/a              3.99%
+01988 baseline betas=0             0.00   172.1   76.0              5.57%
+01988 MAP sigma=10mm               1.11   170.8   76.0              5.42%
+01988 MAP sigma=3mm                6.33   173.1   60.7              4.55%
+01988 MAP sigma=1mm               14.38   186.8   88.9              4.04%
+01988 unreg LS box|b|<=3           8.96   187.9   57.6              4.47%
+01988 per-bone length ORACLE        n/a     n/a    n/a              3.46%
+01991 baseline betas=0             0.00   172.1   76.0              9.23%
+01991 MAP sigma=10mm               1.78   168.7   85.0              6.58%
+01991 MAP sigma=3mm                6.05   167.3   63.9              5.89%
+01991 MAP sigma=1mm               11.14   160.9   39.0              6.13%
+01991 unreg LS box|b|<=3           8.74   160.0   52.1              5.86%
+01991 per-bone length ORACLE        n/a     n/a    n/a              3.83%
+01992 baseline betas=0             0.00   172.1   76.0              6.83%
+01992 MAP sigma=10mm               1.87   165.5   76.6              6.17%
+01992 MAP sigma=3mm                8.17   166.0   52.5              4.93%
+01992 MAP sigma=1mm               14.99   170.0   31.2              4.42%
+01992 unreg LS box|b|<=3           8.69   157.1   45.4              5.20%
+01992 per-bone length ORACLE        n/a     n/a    n/a              3.62%
+
+POOLED direct median (% shoulder width), all clips:
+  baseline betas=0             6.55%   reduction vs baseline   0.0%
+  MAP sigma=10mm               5.48%   reduction vs baseline  16.3%
+  MAP sigma=3mm                4.93%   reduction vs baseline  24.7%
+  MAP sigma=1mm                4.53%   reduction vs baseline  30.9%
+  unreg LS box|b|<=3           4.92%   reduction vs baseline  24.9%
+  per-bone length ORACLE       3.79%   reduction vs baseline  42.1%

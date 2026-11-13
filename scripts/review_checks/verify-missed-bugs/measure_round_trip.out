@@ -1,0 +1,8 @@
+  R upper arm            9.64%
+  R forearm              4.99%
+
+======================================================================
+  DIRECT  round-trip error : 6.55% of shoulder width   <- the real number
+  ALIGNED round-trip error : 5.94%   (diagnostic; free scale hides 0.61 pts)
+  noise-floor reference    : 0.18%   (reference scale, NOT a threshold)
+======================================================================

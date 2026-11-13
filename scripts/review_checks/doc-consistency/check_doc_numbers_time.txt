@@ -1,0 +1,1 @@
+PYTHONPATH=$SNAP/src  $W/check_doc_numbers.py >  2>&1  502.05s user 1.40s system 81% cpu 10:14.28 total

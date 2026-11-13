@@ -7,3 +7,4 @@
 | `temporal.py` | Smoothness and temporal coherence metrics |
 | `diversity.py` | Augmentation diversity and distribution metrics |
 | `constraint.py` | Constraint satisfaction and violation metrics |
+| `index.md` | This index |
