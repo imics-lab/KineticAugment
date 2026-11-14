@@ -14,7 +14,7 @@ recognizer remains an empirical question, not something a round-trip test can se
 
 Reviewed inputs: the supplied design and findings, their repository versions
 ([design](V1_3_Face_Design.md), [findings](V1_3_Findings.md)), the
-[implementation plan](V1_3_Implementation_Plan.md), current face/body/hand code, tests, cached
+implementation plan, current face/body/hand code, tests, cached
 observations and features, and primary research linked below. The current branch also includes
 image proximity and optional depth correction added after the supplied findings. Those additions
 are included in this audit. No production fitting code was changed.

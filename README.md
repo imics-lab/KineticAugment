@@ -68,8 +68,6 @@ augmentations:
 - Anything tied to the frame (aspect ratio, resolution, how much of the body is in view) is part
   of the input and can vary between datasets.
 
-Candidate augmentations aimed at this input format are listed in [TODO.md](./TODO.md).
-
 ## Augmentation ranges
 
 The week-4 profiles set every range about 25% beyond the widest range the literature supports, so the augmentation is deliberately more varied than what has been proven. The proven range is recorded next to each used one below, and in the YAML comments. See [Augmentation ranges](./docs/Augmentation_Ranges.md) for the 25% rule, the sources and per-row notes.

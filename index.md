@@ -11,14 +11,12 @@
 | `CONTRIBUTING.md` | Guidance for reporting issues and contributing code. |
 | `LICENSE` | MIT license and copyright terms. |
 | `README.md` | Project overview, installation steps, and usage guidance. |
-| `TODO.md` | Open work items, starting with applying the recommended augmentation ranges. |
 | `configs/` | YAML augmentation profiles for running and sign-language tasks. |
 | `data/` | Example configuration, source clips, and extraction outputs. |
 | `demo/` | Local web demos; `round_trip/` is the per-clip MediaPipe → SMPL-X → MediaPipe viewer. |
 | `docs/` | Framework concepts, architecture, validation, and roadmap. |
 | `examples/` | Runnable scripts demonstrating package usage. |
 | `models/` | Model setup guidance, version metadata, and local model asset locations. |
-| `presentation 2/` | Week 2 progress deck for the professor and the sample augmentation clips it shows. |
 | `pyproject.toml` | Package metadata, dependencies, and development-tool settings. |
 | `scripts/` | Model setup, rendering utilities, and phase validation scripts. |
 | `src/` | Installable Python source tree. |
