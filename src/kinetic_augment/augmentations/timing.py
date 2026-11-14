@@ -372,17 +372,29 @@ class HandDropout(ClipAugmentation):
         cap = int(self.ranges["max_run_frames"])
         runs: List[List[int]] = []
         for hand in range(2):
+            dropped = np.zeros(count, dtype=bool)
             t = 0
             while t < count:
-                if valid[t, hand] and starts[t, hand] < rate:
+                # A run needs a valid, non-dropped frame before it (unless at the clip start) so
+                # it never joins an earlier run or a natural miss.
+                if (
+                    valid[t, hand]
+                    and (t == 0 or (valid[t - 1, hand] and not dropped[t - 1]))
+                    and starts[t, hand] < rate
+                ):
                     length = min(int(lengths[t, hand]), cap)
                     end = t + 1
                     while end < min(t + length, count) and valid[end, hand]:
                         end += 1
-                    runs.append([hand, t, end - t])
-                    t = end
-                else:
-                    t += 1
+                    # Leave a valid frame after the run (unless it ends the clip).
+                    if end < count and not valid[end, hand]:
+                        end -= 1
+                    if end > t:
+                        runs.append([hand, t, end - t])
+                        dropped[t:end] = True
+                        t = end
+                        continue
+                t += 1
         return {"start_rate": rate, "runs": runs}
 
     def apply(self, target: Any, draw: Dict[str, Any], ctx: Any) -> Any:

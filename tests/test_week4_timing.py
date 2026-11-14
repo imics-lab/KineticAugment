@@ -312,3 +312,44 @@ def test_hand_dropout_truncates_runs():
     aug = HandDropout({"start_rate": [1.0, 1.0], "run_length_mean": 50, "max_run_frames": 4})
     draw = aug.sample(np.random.default_rng(0), Fake(), None)
     assert draw["runs"] and max(r[2] for r in draw["runs"]) <= 4
+
+
+def _missing_segments(mask):
+    segments, t = [], 0
+    while t < len(mask):
+        if mask[t]:
+            end = t
+            while end < len(mask) and mask[end]:
+                end += 1
+            segments.append((t, end))
+            t = end
+        else:
+            t += 1
+    return segments
+
+
+def test_hand_dropout_runs_never_merge_or_exceed_cap():
+    class Fake:
+        pass
+
+    cap = 3
+    aug = HandDropout({"start_rate": [1.0, 1.0], "run_length_mean": 50, "max_run_frames": cap})
+    for seed in range(60):
+        rng = np.random.default_rng(1000 + seed)
+        fake = Fake()
+        fake.hand_valid = rng.random((80, 2)) > 0.2
+        fake.hand_valid[0, 1] = False
+        draw = aug.sample(np.random.default_rng(seed), fake, None)
+        again = aug.sample(np.random.default_rng(seed), fake, None)
+        assert draw == again
+        for hand in range(2):
+            dropped = np.zeros(80, dtype=bool)
+            for h, start, length in draw["runs"]:
+                if h == hand:
+                    assert not dropped[start : start + length].any()
+                    assert fake.hand_valid[start : start + length, hand].all()
+                    dropped[start : start + length] = True
+            missing = dropped | ~fake.hand_valid[:, hand]
+            for start, end in _missing_segments(missing):
+                if dropped[start:end].any():
+                    assert end - start <= cap
