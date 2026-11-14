@@ -90,3 +90,43 @@ def truncated_normal(
         out = np.where(bad, rng.normal(0.0, sigma, size=shape), out)
         bad = np.abs(out) > limit
     return np.asarray(out)
+
+
+MAX_COUPLED_TRIES = 100
+
+
+def resample_coupled(draw, in_bounds, repair, max_tries: int = MAX_COUPLED_TRIES):
+    """
+    Truncate a coupled draw without clamping it.
+
+    Calls `draw()` up to `max_tries` times and returns the first result for which
+    `in_bounds(x)` holds, so the accepted vector keeps its coupling and no mass sits on a bound.
+    If every try fails, `repair(x)` fixes the last draw (it should resample only the out-of-bound
+    components from their truncated marginals). The loop is bounded.
+    """
+    x = draw()
+    for _ in range(max_tries - 1):
+        if in_bounds(x):
+            return x
+        x = draw()
+    return x if in_bounds(x) else repair(x)
+
+
+def truncated_ball(
+    rng: np.random.Generator, sigma: float, limit: float, dim: int = 3
+) -> np.ndarray:
+    """
+    `dim`-vector of iid Normal(0, sigma) components truncated to the ball ``|x| < limit``.
+
+    Exact and loop-free: the norm is ``sigma * chi(dim)`` truncated by inverse-CDF, the direction
+    uniform on the sphere.
+    """
+    from scipy.stats import chi
+
+    check_truncation(sigma, limit, "truncated_ball")
+    if sigma == 0:
+        return np.zeros(dim)
+    u = rng.uniform(0.0, chi.cdf(limit / sigma, dim))
+    radius = min(sigma * float(chi.ppf(u, dim)), np.nextafter(limit, 0.0))
+    direction = rng.normal(size=dim)
+    return direction / np.linalg.norm(direction) * radius

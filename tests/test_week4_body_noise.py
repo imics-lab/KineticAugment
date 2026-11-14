@@ -71,8 +71,10 @@ def _vectors(draw, side, joint):
 
 
 def test_mirror_coupling_correlates_sides():
+    # Wide truncation so the pre-truncation side_coupling (0.7) is what is measured; truncating
+    # to the default 5 deg ball attenuates the correlation of the kept draws (~0.56).
     clip = synthetic_clip(frames=2)
-    aug = ArmCoupledNoise()
+    aug = ArmCoupledNoise({"truncate_deg": 50.0, "elbow_truncate_deg": 50.0})
     left, right = [], []
     for seed in range(2000):
         draw = sample(aug, clip, seed)
@@ -81,6 +83,15 @@ def test_mirror_coupling_correlates_sides():
     left, right = np.array(left), np.array(right)
     assert np.corrcoef(left[:, 0], right[:, 0])[0, 1] == pytest.approx(0.7, abs=0.05)
     assert np.corrcoef(left[:, 1], -right[:, 1])[0, 1] == pytest.approx(0.7, abs=0.05)
+
+
+def test_mirror_coupling_survives_default_truncation():
+    clip = synthetic_clip(frames=2)
+    aug = ArmCoupledNoise()
+    draws = [sample(aug, clip, seed) for seed in range(2000)]
+    left = np.array([_vectors(d, "left", "shoulder") for d in draws])
+    right = np.array([_vectors(d, "right", "shoulder") for d in draws])
+    assert 0.45 < np.corrcoef(left[:, 0], right[:, 0])[0, 1] < 0.7
 
 
 def test_side_modes():
@@ -196,3 +207,50 @@ def test_arm_noise_coupling_bounds_allowed():
         aug = ArmCoupledNoise({"chain_coupling": c, "side_coupling": c})
         draw = aug.sample(np.random.default_rng(0), None, None)
         assert all(np.isfinite(j["angle_deg"]) for j in draw["joints"])
+
+
+def _truncated_std(sigma, limit):
+    from scipy.stats import truncnorm
+
+    return float(truncnorm.std(-limit / sigma, limit / sigma, scale=sigma))
+
+
+def test_truncation_has_no_mass_at_bounds():
+    clip = synthetic_clip(frames=2)
+    aug = ArmCoupledNoise()
+    angles = {"shoulder": [], "elbow": [], "wrist": []}
+    for seed in range(10000):
+        for j in sample(aug, clip, seed)["joints"]:
+            angles[j["joint"]].append(j["angle_deg"])
+    for joint, values in angles.items():
+        values = np.abs(np.array(values))
+        limit = 9.5 if joint == "elbow" else 5.0
+        assert np.all(values <= limit)
+        assert not np.any(values == limit)
+        assert np.mean(values > 0.999 * limit) < 0.02
+
+
+def test_uncoupled_elbow_std_matches_truncated_normal():
+    clip = synthetic_clip(frames=2)
+    aug = ArmCoupledNoise({"chain_coupling": 0.0, "side_mode": "independent"})
+    elbows = [
+        j["angle_deg"]
+        for seed in range(10000)
+        for j in sample(aug, clip, seed)["joints"]
+        if j["joint"] == "elbow"
+    ]
+    assert np.std(elbows) == pytest.approx(_truncated_std(4.75, 9.5), rel=0.05)
+
+
+def test_truncation_is_deterministic_per_seed():
+    clip = synthetic_clip(frames=2)
+    aug = ArmCoupledNoise()
+    assert sample(aug, clip, 7) == sample(aug, clip, 7)
+
+
+def test_tight_limit_falls_back_without_hanging():
+    clip = synthetic_clip(frames=2)
+    aug = ArmCoupledNoise({"truncate_deg": 0.05, "elbow_truncate_deg": 0.05})
+    for seed in range(20):
+        for j in sample(aug, clip, seed)["joints"]:
+            assert abs(j["angle_deg"]) < 0.05

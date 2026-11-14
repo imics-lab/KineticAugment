@@ -20,17 +20,18 @@ from scipy.signal import butter, filtfilt, freqz
 from .arm_ik import torso_frame, two_bone_ik, world_pose
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
-from .ranges import check_truncation, parse_range, truncated_normal
+from .ranges import (
+    check_truncation,
+    parse_range,
+    resample_coupled,
+    truncated_ball,
+    truncated_normal,
+)
 from .tier1 import ARM_JOINTS, SIDES, ArmJointDraw, perturb_arm_joints
 
 SIDE_MODES = ("mirror", "synchronous", "independent")
 _MIRROR = np.array([1.0, -1.0, -1.0])
 _ELBOW_AXIS = (0.0, 0.0, 1.0)  # ignored by the elbow, which bends in its own plane
-
-
-def _clamp_norm(v: np.ndarray, limit: float) -> np.ndarray:
-    norm = float(np.linalg.norm(v))
-    return v * (limit / norm) if norm > limit else v
 
 
 def _draw_dict(side: str, joint: str, vector: Optional[np.ndarray], elbow: float = 0.0) -> dict:
@@ -108,22 +109,49 @@ class ArmCoupledNoise(ClipAugmentation):
         if mode not in SIDE_MODES:
             raise ValueError(f"side_mode must be one of {SIDE_MODES}, got {mode!r}")
         k = float(r["side_coupling"]) if mode == "mirror" else 0.0
-        left = self._side(rng)
-        indep = self._side(rng)
-        if mode == "synchronous":
-            right = left
-        else:
+        limit, limit_e = float(r["truncate_deg"]), float(r["elbow_truncate_deg"])
+        sigma, sigma_e = float(r["sigma_deg"]), float(r["elbow_sigma_deg"])
+
+        def draw():
+            left = self._side(rng)
+            indep = self._side(rng)
+            if mode == "synchronous":
+                return left, left
             right = (
                 k * left[0] * _MIRROR + np.sqrt(1 - k**2) * indep[0],
                 k * left[1] + np.sqrt(1 - k**2) * indep[1],
                 k * left[2] * _MIRROR + np.sqrt(1 - k**2) * indep[2],
             )
-        limit, limit_e = float(r["truncate_deg"]), float(r["elbow_truncate_deg"])
+            return left, right
+
+        def side_ok(side):
+            shoulder, elbow, wrist = side
+            return (
+                np.linalg.norm(shoulder) <= limit
+                and abs(elbow) <= limit_e
+                and np.linalg.norm(wrist) <= limit
+            )
+
+        def repair_side(side):
+            shoulder, elbow, wrist = side
+            if np.linalg.norm(shoulder) > limit:
+                shoulder = truncated_ball(rng, sigma, limit)
+            if abs(elbow) > limit_e:
+                elbow = float(truncated_normal(rng, sigma_e, limit_e))
+            if np.linalg.norm(wrist) > limit:
+                wrist = truncated_ball(rng, sigma, limit)
+            return shoulder, elbow, wrist
+
+        left, right = resample_coupled(
+            draw,
+            lambda pair: side_ok(pair[0]) and side_ok(pair[1]),
+            lambda pair: (repair_side(pair[0]), repair_side(pair[1])),
+        )
         joints: List[dict] = []
         for side, (shoulder, elbow, wrist) in zip(SIDES, (left, right)):
-            joints.append(_draw_dict(side, "shoulder", _clamp_norm(shoulder, limit)))
-            joints.append(_draw_dict(side, "elbow", None, float(np.clip(elbow, -limit_e, limit_e))))
-            joints.append(_draw_dict(side, "wrist", _clamp_norm(wrist, limit)))
+            joints.append(_draw_dict(side, "shoulder", shoulder))
+            joints.append(_draw_dict(side, "elbow", None, float(elbow)))
+            joints.append(_draw_dict(side, "wrist", wrist))
         return {"joints": joints, "drift": self._drift(rng, clip)}
 
     def _drift(self, rng: np.random.Generator, clip: ClipData) -> Optional[List[List[float]]]:

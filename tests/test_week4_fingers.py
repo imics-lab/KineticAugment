@@ -294,3 +294,35 @@ def test_handshape_jitter_rejects_zero_truncation():
             "selected_flexion_sigma_deg": 0.0,
         }
     )
+
+
+def test_finger_truncation_has_no_mass_at_bound():
+    clip = synthetic_clip(frames=2)
+    aug = FingerCoupledNoise()
+    values = []
+    for seed in range(10000):
+        d = sample(aug, clip, seed)
+        values.extend(d["mcp_deg"] + d["pip_deg"])
+    values = np.array(values)
+    assert np.all(np.abs(values) <= 7.5)
+    assert not np.any(np.abs(values) == 7.5)
+
+
+def test_finger_thumb_std_matches_truncated_normal():
+    from scipy.stats import truncnorm
+
+    clip = synthetic_clip(frames=2)
+    aug = FingerCoupledNoise()
+    thumb = [sample(aug, clip, seed)["mcp_deg"][0] for seed in range(10000)]
+    expected = float(truncnorm.std(-2.0, 2.0, scale=3.75))
+    assert np.std(thumb) == pytest.approx(expected, rel=0.05)
+
+
+def test_finger_truncation_deterministic_and_tight_limit_terminates():
+    clip = synthetic_clip(frames=2)
+    aug = FingerCoupledNoise()
+    assert sample(aug, clip, 3) == sample(aug, clip, 3)
+    tight = FingerCoupledNoise({"truncate_deg": 0.01})
+    for seed in range(20):
+        d = sample(tight, clip, seed)
+        assert all(abs(v) <= 0.01 for v in d["mcp_deg"] + d["pip_deg"])

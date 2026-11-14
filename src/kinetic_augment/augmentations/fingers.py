@@ -20,6 +20,7 @@ import numpy as np
 
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
+from .ranges import resample_coupled, truncated_normal
 from .handshape import (
     FINGER_SLOTS,
     FINGERS,
@@ -81,9 +82,19 @@ class FingerCoupledNoise(ClipAugmentation):
         return x
 
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
-        limit = float(self.ranges["truncate_deg"])
-        mcp = np.clip(self._chain(rng), -limit, limit)
-        pip = np.clip(self._chain(rng), -limit, limit)
+        limit, sigma = float(self.ranges["truncate_deg"]), float(self.ranges["sigma_deg"])
+
+        def repair(pair):
+            return tuple(
+                np.where(np.abs(x) > limit, truncated_normal(rng, sigma, limit, size=5), x)
+                for x in pair
+            )
+
+        mcp, pip = resample_coupled(
+            lambda: (self._chain(rng), self._chain(rng)),
+            lambda pair: all(np.all(np.abs(x) <= limit) for x in pair),
+            repair,
+        )
         return {
             "mcp_deg": [float(v) for v in mcp],
             "pip_deg": [float(v) for v in pip],
