@@ -6,7 +6,7 @@ For every clip and anatomical side, fits each frame's hand, rebuilds its 21
 landmarks from the fitted parameters alone, and scores the plan's primary metric:
 millimetre distance between predicted and observed wrist-relative positions of
 landmarks 1-20, with no rotation or scale registration
-(docs/V1_2_Hand_Roundtrip_Plan.md, Section 6).
+(the V1.2 hand round-trip plan, Section 6; removed from the repo).
 
 The ladder separates optimiser error from model mismatch:
     swing start      analytic palm rotation + finger swing, neutral shape
