@@ -418,3 +418,14 @@ def test_default_folders_are_repo_relative():
 
     assert DEFAULT_ROOT.is_absolute() and DEFAULT_ROOT == REPO / "demo" / "round_trip" / "clips"
     assert DEFAULT_FOLDER.is_absolute() and DEFAULT_FOLDER == REPO / "configs" / "viewer_saved"
+
+
+@pytest.mark.parametrize("key", ["truncate_deg", "elbow_truncate_deg"])
+def test_pane_zero_truncation_is_422(tmp_path, lab_home, key):
+    # a zero cap with a positive sigma cannot be sampled; the real run_pane refuses it at once
+    client, _, _ = _app(tmp_path)
+    r = client.post(
+        "/api/pane",
+        json={"clip_id": "c1", "entry_id": "body.joint_coupled_noise", "values": {key: 0}},
+    )
+    assert r.status_code == 422 and key in r.json()["detail"]
