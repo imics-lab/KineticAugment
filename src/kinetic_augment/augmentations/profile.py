@@ -85,7 +85,8 @@ def _parse_entries(regions: Any) -> List[ProfileEntry]:
                 )
             ranges = dict(body_.get("ranges") or {})
             probability = float(body_.get("probability", 1.0))
-            # Building the instance validates the range keys (and their values) right now.
+            # Building the instance validates the range keys and, through the augmentation's
+            # `validate_ranges`, every range value (domain, finiteness, bone names), right now.
             instance = cls(ranges=ranges, probability=probability)
             for k in instance.defaulted:
                 print(
@@ -123,7 +124,8 @@ def profile_from_dict(
 
     Raises:
         ValueError: schema_version is not 1; `seed` missing; an unknown top-level key, region,
-            entry key or range key; an override that names an entry the profile does not have;
+            entry key or range key; a range value outside its domain (naming the entry and key);
+            an override that names an entry the profile does not have;
             both arm-noise entries enabled; or a Tier 1 range with a distribution Tier 1 does
             not draw (see `tier1_ranges`).
     """

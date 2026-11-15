@@ -114,6 +114,14 @@ def test_schema_shape_and_run_overrides():
     assert hd["start_rate"]["kind"] == "range"
 
 
+def _zero_truncation_with_sigma(key, value, flat):
+    """True when `key=value` is a truncation of 0 whose sigma (in `flat`) is positive."""
+    if not key.endswith("truncate_deg") or value != 0:
+        return False
+    sigma_key = key.replace("truncate_deg", "sigma_deg")
+    return float(flat.get(sigma_key, 0)) > 0
+
+
 @pytest.mark.parametrize("lab_id", LAB_IDS)
 def test_limits_accepted_by_augmentation(lab_id):
     run = RUNS[lab_id]
@@ -137,6 +145,11 @@ def test_limits_accepted_by_augmentation(lab_id):
             ranges = _nest({**flat, knob["key"]: value})
             for mw in FIXED & set(base):
                 ranges[mw] = base[mw]
+            if _zero_truncation_with_sigma(knob["key"], value, flat):
+                # a zero cap with a positive sigma cannot be sampled: refused at construction
+                with pytest.raises(ValueError, match=knob["key"]):
+                    cls(ranges=ranges)
+                continue
             try:
                 cls(ranges=ranges)
             except Exception as exc:  # pragma: no cover - failure message only

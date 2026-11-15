@@ -25,7 +25,7 @@ from scipy.interpolate import PchipInterpolator
 from . import tier1
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData, resample_clip, select_frames
-from .ranges import parse_range
+from .ranges import check_non_negative, check_positive, check_range, check_unit, parse_range
 
 __all__ = [
     "times_from_rates",
@@ -151,13 +151,23 @@ class TimeWarp(ClipAugmentation):
     def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
         super().__init__(ranges=ranges, probability=probability)
         self._probs = _mode_probs(self.ranges["mode_weights"], WARP_MODES, "mode_weights")
-        knots = self.ranges["num_knots"]
-        if int(knots) != knots or knots < 2:
-            raise ValueError(f"num_knots must be an integer >= 2, got {knots!r}")
-        if not 0.0 <= float(self.ranges["protect_end"]) < 1.0:
-            raise ValueError("protect_end must be in [0, 1)")
-        for k in ("knot_rate", "segment_width", "segment_factor"):
-            parse_range(self.ranges[k], self.DISTRIBUTIONS.get(k, "uniform"))
+
+    def validate_ranges(self) -> None:
+        r = self.ranges
+        knots = r["num_knots"]
+        if (
+            isinstance(knots, bool)
+            or not isinstance(knots, (int, float))
+            or not (int(knots) == knots and knots >= 2)
+        ):
+            raise ValueError(f"{self.label('num_knots')} must be an integer >= 2, got {knots!r}")
+        protect = check_non_negative(r["protect_end"], self.label("protect_end"))
+        if protect >= 1.0:
+            raise ValueError(f"{self.label('protect_end')} must be in [0, 1), got {protect!r}")
+        for k in ("duration", "knot_rate", "segment_factor"):
+            check_range(r[k], self.label(k), self.DISTRIBUTIONS[k], low=0.0, low_open=True)
+        # the window is a fraction of the clip, so it must lie in [0, 1] (sample() used to clip)
+        check_range(r["segment_width"], self.label("segment_width"), low=0.0, high=1.0)
 
     def _spec(self, name: str):
         return parse_range(self.ranges[name], self.DISTRIBUTIONS.get(name, "uniform"))
@@ -168,7 +178,6 @@ class TimeWarp(ClipAugmentation):
         mode = WARP_MODES[int(rng.choice(len(WARP_MODES), p=self._probs))]
         knots = self._spec("knot_rate")
         width = float(self._spec("segment_width").draw(rng))
-        width = min(max(width, 0.0), 1.0)
         return {
             "mode": mode,
             "duration": float(ctx.tier1_draw.duration),
@@ -242,12 +251,15 @@ class FrameDrop(ClipAugmentation):
     def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
         super().__init__(ranges=ranges, probability=probability)
         self._probs = _mode_probs(self.ranges["mode_weights"], DROP_MODES, "mode_weights")
-        if self.ranges["fill"] not in FILL_MODES:
-            raise ValueError(f"fill must be one of {FILL_MODES}, got {self.ranges['fill']!r}")
-        if float(self.ranges["min_fps"]) <= 0 or float(self.ranges["max_gap_ms"]) <= 0:
-            raise ValueError("min_fps and max_gap_ms must be positive")
-        parse_range(self.ranges["target_fps"])
-        parse_range(self.ranges["p"])
+
+    def validate_ranges(self) -> None:
+        r = self.ranges
+        if r["fill"] not in FILL_MODES:
+            raise ValueError(f"{self.label('fill')} must be one of {FILL_MODES}, got {r['fill']!r}")
+        for k in ("min_fps", "max_gap_ms"):
+            check_positive(r[k], self.label(k))
+        check_range(r["target_fps"], self.label("target_fps"), low=0.0, low_open=True)
+        check_range(r["p"], self.label("p"), low=0.0, high=1.0)
 
     def sample(self, rng: np.random.Generator, clip: Any, ctx: Any) -> Dict[str, Any]:
         mode = DROP_MODES[int(rng.choice(len(DROP_MODES), p=self._probs))]
@@ -357,11 +369,14 @@ class HandDropout(ClipAugmentation):
 
     def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
         super().__init__(ranges=ranges, probability=probability)
-        parse_range(self.ranges["start_rate"])
-        if float(self.ranges["run_length_mean"]) < 1.0:
-            raise ValueError("run_length_mean must be >= 1")
-        if int(self.ranges["max_run_frames"]) < 1:
-            raise ValueError("max_run_frames must be >= 1")
+
+    def validate_ranges(self) -> None:
+        r = self.ranges
+        check_range(r["start_rate"], self.label("start_rate"), low=0.0, high=1.0)
+        if check_positive(r["run_length_mean"], self.label("run_length_mean")) < 1.0:
+            raise ValueError(f"{self.label('run_length_mean')} must be >= 1")
+        if check_positive(r["max_run_frames"], self.label("max_run_frames")) < 1.0:
+            raise ValueError(f"{self.label('max_run_frames')} must be >= 1")
 
     def sample(self, rng: np.random.Generator, clip: Any, ctx: Any) -> Dict[str, Any]:
         valid = np.asarray(clip.hand_valid, dtype=bool)

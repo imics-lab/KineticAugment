@@ -156,7 +156,5 @@ def test_draws_in_range():
 
 
 def test_unknown_bone_raises():
-    clip = synthetic_clip(frames=2)
-    aug = LimbLengthScaling(ranges={"bones": ["thigh"]})
-    with pytest.raises(ValueError):
-        aug.sample(clip_rng(0, "clip", aug.key), clip, make_ctx())
+    with pytest.raises(ValueError, match="bones"):
+        LimbLengthScaling(ranges={"bones": ["thigh"]})

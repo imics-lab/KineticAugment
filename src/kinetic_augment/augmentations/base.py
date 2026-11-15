@@ -380,6 +380,25 @@ class ClipAugmentation(BaseAugmentation):
         self.probability = probability
         self.defaulted = [k for k in self.DEFAULT_RANGES if k not in given]
         super().__init__({"ranges": given, "probability": probability})
+        self.validate_ranges()
+
+    @property
+    def entry_name(self) -> str:
+        """`region.key`, which the range checks put in their error messages."""
+        return f"{(self.regions or ('?',))[0]}.{self.key}"
+
+    def label(self, range_key: str) -> str:
+        """`region.key.range_key`: the name a failed range check reports."""
+        return f"{self.entry_name}.{range_key}"
+
+    def validate_ranges(self) -> None:
+        """
+        Check the merged `self.ranges` (defaults plus the given values); called at construction.
+
+        Subclasses override this and raise ValueError naming `self.label(range_key)` for any value
+        outside its domain, using the `ranges.check_*` helpers. A profile that loads therefore
+        cannot fail on a range value at run time.
+        """
 
     @abstractmethod
     def sample(self, rng: np.random.Generator, clip: Any, ctx: Any) -> Dict[str, Any]:

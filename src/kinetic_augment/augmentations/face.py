@@ -17,7 +17,7 @@ from scipy.signal import butter, filtfilt, freqz
 from ..body_model.face_correspondence import RIGID
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
-from .ranges import check_truncation, truncated_normal
+from .ranges import check_non_negative, check_truncation, truncated_normal
 
 BLENDSHAPE_GROUPS: Dict[str, Callable[[str], bool]] = {
     "brows": lambda n: n.startswith("brow"),
@@ -95,14 +95,17 @@ class ExpressionJitter(ClipAugmentation):
                         raise ValueError(f"Unknown key {k!r} in group {group!r}")
                 given[group] = {**self.DEFAULT_RANGES[group], **value}
         super().__init__(ranges=given, probability=probability)
+
+    def validate_ranges(self) -> None:
         for group in BLENDSHAPE_GROUPS:
             g = self.ranges[group]
-            check_truncation(g["sigma"], g["truncate"], group)
+            for k in ("sigma", "truncate"):
+                check_non_negative(g[k], self.label(f"{group}.{k}"))
+            check_truncation(g["sigma"], g["truncate"], self.label(f"{group}.truncate"))
         for k in ("frame_noise", "ridge_alpha"):
-            if float(self.ranges[k]) < 0:
-                raise ValueError(f"{k} must be >= 0, got {self.ranges[k]!r}")
-        if int(self.ranges["min_face_frames"]) < 0:
-            raise ValueError("min_face_frames must be >= 0")
+            check_non_negative(self.ranges[k], self.label(k))
+        if check_non_negative(self.ranges["min_face_frames"], self.label("min_face_frames")) % 1:
+            raise ValueError(f"{self.label('min_face_frames')} must be a whole number")
 
     def _enabled_mask(self, names: Tuple[str, ...]) -> np.ndarray:
         """Boolean (51,) mask of the non-neutral scores in enabled groups."""

@@ -21,7 +21,10 @@ from .arm_ik import torso_frame, two_bone_ik, world_pose
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
 from .ranges import (
+    check_non_negative,
+    check_range,
     check_truncation,
+    check_unit,
     parse_range,
     resample_coupled,
     truncated_ball,
@@ -72,13 +75,11 @@ class ArmCoupledNoise(ClipAugmentation):
         "drift_deg": 0.0,
     }
 
-    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
-        super().__init__(ranges=ranges, probability=probability)
+    def validate_ranges(self) -> None:
         r = self.ranges
         for k in ("chain_coupling", "side_coupling"):
             # outside [0, 1] the sqrt(1 - c) / sqrt(1 - k^2) weights are NaN
-            if not 0.0 <= float(r[k]) <= 1.0:
-                raise ValueError(f"{k} must be in [0, 1], got {r[k]!r}")
+            check_unit(r[k], self.label(k))
         for k in (
             "sigma_deg",
             "truncate_deg",
@@ -86,10 +87,15 @@ class ArmCoupledNoise(ClipAugmentation):
             "elbow_truncate_deg",
             "drift_deg",
         ):
-            if not float(r[k]) >= 0:
-                raise ValueError(f"{k} must be >= 0, got {r[k]!r}")
+            check_non_negative(r[k], self.label(k))
+        check_truncation(r["sigma_deg"], r["truncate_deg"], self.label("truncate_deg"))
+        check_truncation(
+            r["elbow_sigma_deg"], r["elbow_truncate_deg"], self.label("elbow_truncate_deg")
+        )
         if r["side_mode"] not in SIDE_MODES:
-            raise ValueError(f"side_mode must be one of {SIDE_MODES}, got {r['side_mode']!r}")
+            raise ValueError(
+                f"{self.label('side_mode')} must be one of {SIDE_MODES}, got {r['side_mode']!r}"
+            )
 
     def _side(self, rng: np.random.Generator):
         """One side's shoulder vector, elbow scalar and wrist vector, before side coupling."""
@@ -197,6 +203,11 @@ class Tier1ArmJoints(ClipAugmentation):
     regions = ("body",)
     DEFAULT_RANGES = {"p": 0.3, "shoulder_wrist_deg": 5.0, "elbow_deg": 9.5}
 
+    def validate_ranges(self) -> None:
+        check_unit(self.ranges["p"], self.label("p"))
+        for k in ("shoulder_wrist_deg", "elbow_deg"):
+            check_non_negative(self.ranges[k], self.label(k))
+
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: ChainContext):
         if ctx.tier1_draw is None:
             raise ValueError("Tier1ArmJoints needs ctx.tier1_draw, but it is None")
@@ -257,6 +268,15 @@ class LimbLengthScaling(ClipAugmentation):
         "bones": ["upper_arm", "forearm"],
         "retarget": True,
     }
+
+    def validate_ranges(self) -> None:
+        bones = self.ranges["bones"]
+        if not isinstance(bones, (list, tuple)):
+            raise ValueError(f"{self.label('bones')} must be a list of {_BONES}, got {bones!r}")
+        for bone in bones:
+            if bone not in _BONES:
+                raise ValueError(f"{self.label('bones')} must be drawn from {_BONES}, got {bone!r}")
+        check_range(self.ranges["factor"], self.label("factor"), low=0.0, low_open=True)
 
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         bones = list(self.ranges["bones"])
@@ -379,6 +399,15 @@ class MovementSizeScaling(ClipAugmentation):
     DEFAULT_RANGES = {"factor": [0.8, 1.2]}
     DISTRIBUTIONS = {"factor": "log_uniform"}
 
+    def validate_ranges(self) -> None:
+        check_range(
+            self.ranges["factor"],
+            self.label("factor"),
+            self.DISTRIBUTIONS["factor"],
+            low=0.0,
+            low_open=True,
+        )
+
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         spec = parse_range(self.ranges["factor"], self.DISTRIBUTIONS["factor"])
         return {"factor": float(spec.draw(rng))}
@@ -407,9 +436,12 @@ class LocationJitter(ClipAugmentation):
     regions = ("body",)
     DEFAULT_RANGES = {"sigma_mm": 12.5, "truncate_mm": 25.0}
 
-    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
-        super().__init__(ranges=ranges, probability=probability)
-        check_truncation(self.ranges["sigma_mm"], self.ranges["truncate_mm"], "location_jitter")
+    def validate_ranges(self) -> None:
+        for k in ("sigma_mm", "truncate_mm"):
+            check_non_negative(self.ranges[k], self.label(k))
+        check_truncation(
+            self.ranges["sigma_mm"], self.ranges["truncate_mm"], self.label("truncate_mm")
+        )
 
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         sigma, limit = float(self.ranges["sigma_mm"]), float(self.ranges["truncate_mm"])

@@ -25,6 +25,7 @@ from . import tier1
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData, SceneTransform
 from .outputs import blendshape_mirror, build_outputs
+from .ranges import check_non_negative, check_range, check_unit
 
 __all__ = [
     "Mirror",
@@ -74,6 +75,9 @@ class Mirror(ClipAugmentation):
     regions = ("scene",)
     DEFAULT_RANGES = {"p": 0.5}
 
+    def validate_ranges(self) -> None:
+        check_unit(self.ranges["p"], self.label("p"))
+
     def sample(self, rng: np.random.Generator, clip: Any, ctx: ChainContext) -> Dict[str, Any]:
         return {"mirror": bool(_draw_of(ctx).mirror)}
 
@@ -102,6 +106,11 @@ class View(ClipAugmentation):
     regions = ("scene",)
     DEFAULT_RANGES = {"yaw_deg": 25.0, "pitch_deg": 6.0}
 
+    def validate_ranges(self) -> None:
+        # a scalar is the symmetric half-width: the draw is uniform in [-x, x], so x >= 0
+        for k in ("yaw_deg", "pitch_deg"):
+            check_non_negative(self.ranges[k], self.label(k))
+
     def sample(self, rng: np.random.Generator, clip: Any, ctx: ChainContext) -> Dict[str, Any]:
         tier = _draw_of(ctx)
         return {"yaw_deg": float(tier.yaw_deg), "pitch_deg": float(tier.pitch_deg)}
@@ -123,6 +132,9 @@ class Scale(ClipAugmentation):
     key = "scale"
     regions = ("scene",)
     DEFAULT_RANGES = {"factor": [0.75, 1.25]}
+
+    def validate_ranges(self) -> None:
+        check_range(self.ranges["factor"], self.label("factor"), low=0.0, low_open=True)
 
     def sample(self, rng: np.random.Generator, clip: Any, ctx: ChainContext) -> Dict[str, Any]:
         return {"factor": float(_draw_of(ctx).scale)}
@@ -150,6 +162,9 @@ class Uncentre(ClipAugmentation):
     key = "uncentre"
     regions = ("scene",)
     DEFAULT_RANGES = {"limit": 0.125}
+
+    def validate_ranges(self) -> None:
+        check_non_negative(self.ranges["limit"], self.label("limit"))
 
     def sample(self, rng: np.random.Generator, clip: Any, ctx: ChainContext) -> Dict[str, Any]:
         u = _draw_of(ctx).uncentre_u

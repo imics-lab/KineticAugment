@@ -31,16 +31,15 @@ from .handshape import (
     handshape_features,
     selected_fingers,
 )
-from .ranges import check_truncation, truncated_normal
+from .ranges import check_non_negative, check_truncation, check_unit, truncated_normal
 
 SIDES = ("left", "right")
 _NEIGHBOUR_CHAIN = (1, 2, 3, 4)  # index -> middle -> ring -> pinky in FINGERS order
 
 
-def _check_non_negative(ranges: Dict[str, Any], *keys: str) -> None:
+def _check_non_negative(aug: ClipAugmentation, *keys: str) -> None:
     for k in keys:
-        if float(ranges[k]) < 0:
-            raise ValueError(f"{k} must be >= 0, got {ranges[k]!r}")
+        check_non_negative(aug.ranges[k], aug.label(k))
 
 
 def _valid_hands(clip: ClipData):
@@ -65,11 +64,12 @@ class FingerCoupledNoise(ClipAugmentation):
         "dip_ratio": 0.667,
     }
 
-    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
-        super().__init__(ranges=ranges, probability=probability)
-        _check_non_negative(self.ranges, "sigma_deg", "truncate_deg", "dip_ratio")
-        if not 0.0 <= float(self.ranges["finger_coupling"]) <= 1.0:
-            raise ValueError("finger_coupling must be in [0, 1]")
+    def validate_ranges(self) -> None:
+        _check_non_negative(self, "sigma_deg", "truncate_deg", "dip_ratio")
+        check_truncation(
+            self.ranges["sigma_deg"], self.ranges["truncate_deg"], self.label("truncate_deg")
+        )
+        check_unit(self.ranges["finger_coupling"], self.label("finger_coupling"))
 
     def _chain(self, rng: np.random.Generator) -> np.ndarray:
         """One joint level's offsets for the five fingers (FINGERS order), before truncation."""
@@ -136,10 +136,9 @@ class HandshapeJitter(ClipAugmentation):
         "feature_margin_deg": 5.0,
     }
 
-    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
-        super().__init__(ranges=ranges, probability=probability)
+    def validate_ranges(self) -> None:
         _check_non_negative(
-            self.ranges,
+            self,
             "nonselected_sigma_deg",
             "selected_sigma_deg",
             "selected_flexion_sigma_deg",
@@ -150,7 +149,7 @@ class HandshapeJitter(ClipAugmentation):
         trunc = float(self.ranges["truncate_sigmas"])
         for k in ("nonselected_sigma_deg", "selected_sigma_deg", "selected_flexion_sigma_deg"):
             sigma = float(self.ranges[k])
-            check_truncation(sigma, trunc * sigma, f"{k} with truncate_sigmas")
+            check_truncation(sigma, trunc * sigma, f"{self.label(k)} with truncate_sigmas")
 
     def _draw_hand(self, rng: np.random.Generator, selected) -> np.ndarray:
         """(15, 3) offsets in degrees. The thumb always gets the non-selected sigma."""
