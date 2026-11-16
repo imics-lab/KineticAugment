@@ -39,6 +39,7 @@
 | `Hand_Pipeline_Variants.md` | The two saved hand pipelines (one shape per track, with and without a per-frame scale), what differs between them, their files, and how to compare them on a classifier (2026-10-29) |
 | `Augmentation_Ranges.md` | Proven against used range for every week-4 augmentation, the 25% rule, and the three week-4 profiles |
 | `augmentation-lab.md` | The Augmentation Lab: share mode and full mode, building the zip, and using saved settings |
+| `augmentation-lab/` | Unpacked share build of the Augmentation Lab (static, offline), ready to host; open `index.html` |
 | `media/` | Images and placeholder assets referenced by documentation |
 | `research-guide/` | Source-grounded research onboarding, verification status, and practical learning roadmap |
 | `superpowers/` | Design specs and implementation plans (`specs/`, `plans/`) |
