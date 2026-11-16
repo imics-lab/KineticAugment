@@ -126,6 +126,7 @@ Augmentation Lab: `kinetic-lab` starts a local web page for comparing augmentati
 - [`demo/index.md`](demo/index.md)
 - [`demo/round_trip/index.md`](demo/round_trip/index.md)
 - [`docs/index.md`](docs/index.md)
+- [`docs/augmentation-lab/index.md`](docs/augmentation-lab/index.md) — hosted share build; `data/`, `vendor/` and each clip folder have their own `index.md`
 - [`docs/augmentation-evidence/index.md`](docs/augmentation-evidence/index.md)
 - [`docs/augmentation-evidence/reports/index.md`](docs/augmentation-evidence/reports/index.md)
 - [`docs/augmentation-evidence/research_notes/index.md`](docs/augmentation-evidence/research_notes/index.md) — each report's notes subfolder has its own `index.md`
