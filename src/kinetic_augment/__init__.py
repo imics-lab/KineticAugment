@@ -16,8 +16,14 @@ Example:
     >>> pipeline = Pipeline.from_preset('moderate')
     >>> augmented_data = pipeline.process(landmarks)
 
-    >>> # Or from YAML config
+    >>> # Or from YAML config (Pipeline format)
     >>> pipeline = Pipeline.from_yaml('configs/slr_profile.yaml')
+
+    >>> # Week-4 profiles in configs/: load_profile, then run with AugmentationChain
+    >>> from kinetic_augment.augmentations.chain import AugmentationChain
+    >>> from kinetic_augment.augmentations.profile import load_profile
+    >>> chain = AugmentationChain(load_profile('configs/slr_week4_default.yaml'), skeleton)
+    >>> result = chain.run(clip)
 
     >>> # With PyTorch Dataset
     >>> from kinetic_augment import AugmentedLandmarkDataset
