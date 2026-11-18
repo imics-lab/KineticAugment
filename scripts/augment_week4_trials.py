@@ -226,7 +226,7 @@ def run_clip_trial(clip_id, args, profile, models, output_dir):
     result = run_clip(hands, face, models, frames=span)
     skeleton = models.skeleton
     clip = clip_from_result(clip_id, result, hands, face, skeleton)
-    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames)
+    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames, face=face)
     clip = clip.replace(camera=camera)
     base_out = build_outputs(clip, skeleton)
 

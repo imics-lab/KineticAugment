@@ -97,8 +97,8 @@ class AugmentationChain:
     Run a profile's enabled entries on clips, in `ORDER` (see the module docstring).
 
     Set `clip.camera` first, with `scene.fit_clip_camera(clip, hands, skeleton,
-    frames=result.frames)`: without a camera `scene.uncentre` is skipped (fallback "no_camera")
-    and the image-space outputs are None.
+    frames=result.frames, face=face)`: without a camera `scene.uncentre` is skipped (fallback
+    "no_camera") and the image-space outputs are None.
     """
 
     def __init__(

@@ -72,14 +72,16 @@ class SceneTransform:
         drift lives in `camera.offset[t]`. Its deviation from the clip mean is negated in x
         under `mirror` (the world reflection is about a fixed pivot and cannot reach it) and
         multiplied by `scale`. The mean stays put, so placement is unchanged; the identity
-        returns `camera` itself.
+        returns `camera` itself. Under `mirror` the hands' fitted depth scales swap sides with
+        the hands (`WeakCamera.mirrored_depth`); `scale` reaches z through the world points.
         """
         if camera is None or (not self.mirror and self.scale == 1.0):
             return camera
         offset = np.asarray(camera.offset, dtype=np.float64)
         mean = np.nanmean(offset, axis=0)
         factor = np.array([-1.0 if self.mirror else 1.0, 1.0]) * self.scale
-        return dataclasses.replace(camera, offset=mean + (offset - mean) * factor)
+        camera = dataclasses.replace(camera, offset=mean + (offset - mean) * factor)
+        return camera.mirrored_depth() if self.mirror else camera
 
 
 @dataclass(frozen=True, eq=False)

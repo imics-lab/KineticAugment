@@ -173,7 +173,7 @@ def export_week4(clip_id, result, hands, face, out_root: Path, models, names, sm
     skeleton, mp_indices = models.skeleton, np.asarray(models.corr.mp_indices, dtype=int)
     profiles = {key: load_profile(path) for key, path in PROFILES.items()}
     clip = clip_from_result(clip_id, result, hands, face, skeleton)
-    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames)
+    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames, face=face)
     clip = clip.replace(camera=camera)
     base_full = build_outputs(clip, skeleton, keep_vertices=True)
     base_out = build_outputs(clip, skeleton)

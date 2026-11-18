@@ -18,12 +18,13 @@ The face is the observed face carried in the head joint's frame, put back on the
 Then the clip's scene transform (and, when mirrored, the left/right relabelling) is applied to
 every point set, and the points are projected through the clip's weak camera if it has one.
 
-The image points follow MediaPipe's image landmarks: x / width, y / height and a relative z in
-the same units as x, smaller = closer to the camera. z is taken from the transformed world
-points (`WeakCamera.project_with_depth`), relative to MediaPipe's per-frame origins: the pose
-to the midpoint of the hips (SMPL-X joints 1 and 2, the joints the converter matches to
-MediaPipe's 23 and 24), each hand to its wrist, the face to the mean of its points. On the
-pilot clip this z correlates positively with MediaPipe's own pose and hand z.
+The image points follow MediaPipe's image landmarks: x / width, y / height and a relative z,
+smaller = closer to the camera. z is taken from the transformed world points
+(`WeakCamera.project_with_depth`), relative to MediaPipe's per-frame origins: the pose to the
+midpoint of the hips (SMPL-X joints 1 and 2, the joints the converter matches to MediaPipe's
+23 and 24), each hand to its wrist, the face to the mean of its points. Each stream's depth is
+scaled by the camera's fitted factor for it (`scene.fit_clip_camera`), so the z magnitudes
+match the clip's own MediaPipe z; an unfitted stream uses |scale x|.
 """
 
 from dataclasses import dataclass
@@ -50,6 +51,7 @@ POSE_ARMS = slice(11, 17)  # MediaPipe pose: L/R shoulder, elbow, wrist
 SMPLX_ARMS = slice(16, 22)  # SMPL-X: the same six joints
 SMPLX_HIPS = (1, 2)  # SMPL-X left and right hip: the pose z reference (MediaPipe 23, 24)
 IMAGE_SETS = ("pose", "hands", "face")
+HAND_STREAMS = ("left_hand", "right_hand")  # the camera's depth-scale streams, hand index order
 
 
 @dataclass(frozen=True, eq=False)
@@ -63,7 +65,7 @@ class ClipOutputs:
 
     The `*_image` arrays are MediaPipe's normalised image landmarks: x / width, y / height and
     z relative to the pose's hip midpoint (`hip_centre_world`), each hand's wrist or the face's
-    mean, in units of the frame width (module docstring). `pixels` gives them in pixels
+    mean, scaled per stream like the clip's MediaPipe z (module docstring). `pixels` gives them in pixels
     (x * width, y * height, z * width) when the source `frame_size` is known.
     """
 
@@ -252,7 +254,7 @@ def hand_points(joints: np.ndarray, tips: np.ndarray, side: str) -> np.ndarray:
     return out
 
 
-def _face_centre(face: np.ndarray) -> np.ndarray:
+def face_centre(face: np.ndarray) -> np.ndarray:
     """(T, 1, 3) per-frame mean of the finite face points; NaN where a frame has none."""
     finite = np.isfinite(face).all(axis=-1, keepdims=True)
     count = finite.sum(axis=1, keepdims=True)
@@ -350,9 +352,9 @@ def build_outputs(clip: ClipData, skeleton, keep_vertices: bool = False) -> Clip
     camera = scene.apply_camera(clip.camera)
     images = {name: None for name in IMAGE_SETS}
     if camera is not None:
-        images["pose"] = camera.project_with_depth(pose, hips[:, None])
-        images["hands"] = camera.project_with_depth(hands, hands[:, :, :1])
-        images["face"] = camera.project_with_depth(face, _face_centre(face))
+        images["pose"] = camera.project_with_depth(pose, hips[:, None], "pose")
+        images["hands"] = camera.project_with_depth(hands, hands[:, :, :1], HAND_STREAMS)
+        images["face"] = camera.project_with_depth(face, face_centre(face), "face")
     return ClipOutputs(
         pose_world=pose,
         hands_world=hands,

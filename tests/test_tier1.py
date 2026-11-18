@@ -13,6 +13,7 @@ from kinetic_augment.augmentations.tier1 import (
     WeakCamera,
     about,
     duration_times,
+    fit_depth_scale,
     fit_weak_camera,
     frame_loss,
     in_frame,
@@ -189,6 +190,38 @@ class TestCamera:
         after = camera.project_with_depth(closer, reference)[:, 3, 2]
         assert (after < before).all()
         assert after - before == pytest.approx(np.full(len(world), -1.4 * 0.05))
+
+    def test_a_fitted_depth_scale_replaces_the_x_rule_per_stream(self):
+        world, _, _, offset = synthetic_camera()
+        scales = {"pose": 2.5, "left_hand": 0.3, "right_hand": 0.6}
+        camera = WeakCamera((1.4, 1.4), offset, 0.0, depth_scales=scales)
+        reference = world[:, :1]
+        dz = world[..., 2] - reference[..., 2]
+        out = camera.project_with_depth(world, reference, stream="pose")
+        np.testing.assert_array_equal(out[..., :2], camera.project(world))
+        assert out[..., 2] == pytest.approx(2.5 * dz)
+        # an unfitted stream (or none named) keeps the x-scale rule
+        assert camera.project_with_depth(world, reference, "face")[..., 2] == pytest.approx(
+            1.4 * dz
+        )
+        assert camera.project_with_depth(world, reference)[..., 2] == pytest.approx(1.4 * dz)
+        # one stream per index of axis 1, as for the (T, 2, 21, 3) hands
+        hands = world.reshape(len(world), 2, 3, 3)
+        wrists = hands[:, :, :1]
+        out = camera.project_with_depth(hands, wrists, ("left_hand", "right_hand"))
+        hand_dz = hands[..., 2] - wrists[..., 2]
+        assert out[:, 0, :, 2] == pytest.approx(0.3 * hand_dz[:, 0])
+        assert out[:, 1, :, 2] == pytest.approx(0.6 * hand_dz[:, 1])
+
+    def test_the_depth_scale_fit_recovers_a_known_scale_and_refuses_too_few_points(self):
+        rng = np.random.default_rng(4)
+        world = rng.normal(scale=0.1, size=(40, 6))
+        observed = 2.7 * world
+        observed[3, 2] = np.nan  # ignored, not poisoning the fit
+        assert fit_depth_scale(world, observed) == pytest.approx(2.7)
+        assert fit_depth_scale(world[:2, :5], observed[:2, :5]) is None  # 10 points: too few
+        assert fit_depth_scale(world, np.full_like(world, np.nan)) is None
+        assert fit_depth_scale(world, -observed) is None  # a reversed depth is not a scale
 
 
 class TestFrameCheck:

@@ -345,6 +345,59 @@ def test_frame_size_survives_retiming_and_the_scene():
 
 
 @requires_smplx
+def test_depth_scales_survive_retiming_and_swap_sides_under_the_mirror():
+    from tests.clip_fixtures import synthetic_clip
+
+    clip = synthetic_clip(frames=6)
+    scales = {"pose": 2.0, "left_hand": 0.3, "right_hand": 0.6}
+    camera = dataclasses.replace(clip.camera, depth_scales=scales, depth_fallback=("face",))
+    clip = clip.replace(camera=camera)
+    for out in (resample_clip(clip, np.array([0.0, 2.5])), select_frames(clip, np.array([1]))):
+        assert out.camera.depth_scales == scales and out.camera.depth_fallback == ("face",)
+    scaled = SceneTransform(scale=1.3).apply_camera(camera)
+    assert scaled.depth_scales == scales  # scene scale reaches z through the world points
+    mirrored = SceneTransform(mirror=True).apply_camera(camera)
+    assert mirrored.depth_scales == {"pose": 2.0, "left_hand": 0.6, "right_hand": 0.3}
+    assert mirrored.depth_fallback == ("face",)
+    one_side = dataclasses.replace(
+        camera, depth_scales={"pose": 2.0, "left_hand": 0.3}, depth_fallback=("right_hand",)
+    )
+    mirrored = SceneTransform(mirror=True).apply_camera(one_side)
+    assert mirrored.depth_scales == {"pose": 2.0, "right_hand": 0.3}
+    assert mirrored.depth_fallback == ("left_hand",)
+
+
+@requires_smplx
+def test_build_outputs_uses_the_fitted_depth_scales():
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    skeleton = get_skeleton()
+    clip = synthetic_clip(frames=4)
+    scales = {"pose": 2.0, "left_hand": 0.3, "right_hand": 0.6, "face": 0.8}
+    clip = clip.replace(camera=dataclasses.replace(clip.camera, depth_scales=scales))
+    out = build_outputs(clip, skeleton)
+    np.testing.assert_allclose(
+        out.pose_image[..., 2],
+        2.0 * (out.pose_world[..., 2] - out.hip_centre_world[:, None, 2]),
+        atol=1e-12,
+    )
+    hand_dz = out.hands_world[..., 2] - out.hands_world[:, :, :1, 2]
+    np.testing.assert_allclose(out.hands_image[:, 0, :, 2], 0.3 * hand_dz[:, 0], atol=1e-12)
+    np.testing.assert_allclose(out.hands_image[:, 1, :, 2], 0.6 * hand_dz[:, 1], atol=1e-12)
+    face_dz = out.face_world[..., 2] - out.face_world[..., 2].mean(axis=1, keepdims=True)
+    np.testing.assert_allclose(out.face_image[..., 2], 0.8 * face_dz, atol=1e-12)
+    # scene scale k still multiplies z, from the transformed world points
+    pivot = np.array([0.05, -0.02, 0.1])
+    scaled = build_outputs(clip.replace(scene=SceneTransform(scale=1.2, pivot=pivot)), skeleton)
+    plain = build_outputs(synthetic_clip(frames=4), skeleton)  # same camera, no fitted z
+    for name in ("pose_image", "hands_image", "face_image"):
+        np.testing.assert_allclose(
+            getattr(scaled, name)[..., 2], 1.2 * getattr(out, name)[..., 2], atol=1e-12
+        )
+        np.testing.assert_array_equal(getattr(out, name)[..., :2], getattr(plain, name)[..., :2])
+
+
+@requires_smplx
 def test_build_outputs_unfitted_frames_stay_nan():
     from tests.clip_fixtures import get_skeleton, synthetic_clip
 
