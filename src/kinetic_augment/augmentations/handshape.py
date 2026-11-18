@@ -22,7 +22,8 @@ middle-ring, ring-pinky), each finger's azimuth about the palm normal taken from
 of its proximal bone (b1) against its MCP flexion axis, which flexion leaves unchanged and a turn
 about the palm normal (the abduction axis of `apply_finger_offsets`) shifts one for one (see
 `_spread_deg`). The earlier index-pinky angle between the raw bones also grew with flexion (flat
-rest hand 43.8, flexed pilot hand 68.6). The smallest gap is used so the hand reads wide only when every finger is parted from its
+rest hand 43.8, flexed pilot hand 68.6). The smallest gap is used so the hand reads wide only
+when every finger is parted from its
 neighbour. The thumb abduction is the angle between the thumb proximal bone (b1) and the index
 metacarpal (b0).
 
@@ -34,7 +35,9 @@ the brief's values.
 
 Dead band. `features_changed` counts a class change only when the other hand's value is beyond the
 threshold, on the opposite side from `before`, by more than a margin (`FEATURE_MARGIN_DEG`, 5
-degrees for each angle feature), so jitter of a degree or two around a threshold never flips a class.
+degrees for each angle feature), so jitter of a degree or two around a threshold never flips a
+class. A frame whose `before` value already lies within the margin of a threshold is skipped, so
+a finger that moves through a threshold in the clip itself does not reject draws.
 
 Offset convention (`apply_finger_offsets`). Each finger joint turns in its own right-handed basis
 (a, b, n) at rest: a = the flexion axis (`flexion_axes`), b = the bone direction, n = the palm
@@ -224,7 +227,7 @@ def feature_signature(features: HandshapeFeatures) -> Tuple:
 
 def _crossed(before, after, threshold: float, margin: float) -> bool:
     before, after = np.asarray(before, dtype=float), np.asarray(after, dtype=float)
-    ok = np.isfinite(before) & np.isfinite(after)
+    ok = np.isfinite(before) & np.isfinite(after) & (np.abs(before - threshold) >= margin)
     flipped = (before >= threshold) != (after >= threshold)
     return bool(np.any(ok & flipped & (np.abs(after - threshold) > margin)))
 
@@ -236,8 +239,8 @@ def features_changed(
     Whether `after` changes the finger states, spread class or thumb class of `before`.
 
     Each threshold is tested on its own with a dead band: a class change counts only when `after`
-    is on the opposite side of the threshold from `before` by more than the margin, wherever
-    `before` itself lies. `margin_deg` overrides every margin; by default each feature uses its
+    is on the opposite side of the threshold from `before` by more than the margin; frames whose
+    `before` lies within the margin of the threshold are skipped. `margin_deg` overrides every margin; by default each feature uses its
     entry of `FEATURE_MARGIN_DEG`. Frames that are not finite in either set are ignored.
     """
     margins = (

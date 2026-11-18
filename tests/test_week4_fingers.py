@@ -123,7 +123,7 @@ def test_features_changed_margin():
 
 
 def _abducted_rest(side, step_deg):
-    """Rest hand whose four fingers are each turned `step_deg` further from the last (palm plane)."""
+    """Rest hand whose four fingers are each turned `step_deg` further from the last."""
     from kinetic_augment.augmentations.handshape import _palm_normal
 
     skeleton = get_skeleton()
@@ -191,12 +191,28 @@ def test_two_degree_noise_on_rest_never_changes_features():
 def test_features_changed_dead_band_applies_to_both_sides_of_threshold():
     from kinetic_augment.augmentations.handshape import SPREAD_THRESHOLD_DEG as T
 
-    # Starting just inside the threshold, a move must clear it by more than the margin.
-    assert not features_changed(fake([10] * 5, spread=T - 2), fake([10] * 5, spread=T + 3))
-    assert features_changed(fake([10] * 5, spread=T - 2), fake([10] * 5, spread=T + 7))
-    assert not features_changed(fake([10] * 5, spread=T + 2), fake([10] * 5, spread=T - 3))
-    assert features_changed(fake([10] * 5, spread=T + 2), fake([10] * 5, spread=T - 7))
-    assert features_changed(fake([10] * 5, spread=T + 2), fake([10] * 5, spread=T - 3), 1.0)
+    # The augmented value must clear the threshold by more than the margin ...
+    assert not features_changed(fake([10] * 5, spread=T - 7), fake([10] * 5, spread=T + 3))
+    assert features_changed(fake([10] * 5, spread=T - 7), fake([10] * 5, spread=T + 7))
+    assert not features_changed(fake([10] * 5, spread=T + 7), fake([10] * 5, spread=T - 3))
+    assert features_changed(fake([10] * 5, spread=T + 7), fake([10] * 5, spread=T - 7))
+    assert features_changed(fake([10] * 5, spread=T + 7), fake([10] * 5, spread=T - 3), 1.0)
+    # ... and a frame that starts within the margin of the threshold is not counted at all.
+    assert not features_changed(fake([10] * 5, spread=T - 2), fake([10] * 5, spread=T + 12))
+    assert not features_changed(fake([10] * 5, spread=T + 2), fake([10] * 5, spread=T - 12))
+
+
+def test_handshape_jitter_pilot_clip_fallback_rate():
+    from tests.clip_fixtures import real_clip
+
+    clip, _, _ = real_clip()
+    aug = HandshapeJitter()
+    ctx = make_ctx()
+    fallbacks = sum(
+        bool(aug.sample(clip_rng(k, clip.clip_id, aug.key), clip, ctx).get("fallback"))
+        for k in range(100)
+    )
+    assert fallbacks <= 5, fallbacks
 
 
 def test_handshape_jitter_never_falls_back_on_the_rest_hand():
