@@ -17,14 +17,24 @@ a plain unsigned angle: the SMPL-X rest hand is slightly hyperextended at the MC
 sum barely moves for a 20 degree flexion (21.5 -> 22.6 degrees) and the rest thumb reads 55
 degrees; the signed sum is about 0 at rest and rises by the flexion. (The DIP joint's own rotation
 turns a bone that ends at the fingertip, which is not a joint, so it does not enter the bend.)
-The spread is the angle between the index and pinky proximal bones (b1); the thumb abduction is
-the angle between the thumb proximal bone (b1) and the index metacarpal (b0).
+The spread is abduction only: the smallest gap between adjacent fingers (index-middle,
+middle-ring, ring-pinky), each finger's azimuth about the palm normal taken from the lateral angle
+of its proximal bone (b1) against its MCP flexion axis, which flexion leaves unchanged and a turn
+about the palm normal (the abduction axis of `apply_finger_offsets`) shifts one for one (see
+`_spread_deg`). The earlier index-pinky angle between the raw bones also grew with flexion (flat
+rest hand 43.8, flexed pilot hand 68.6). The smallest gap is used so the hand reads wide only when every finger is parted from its
+neighbour. The thumb abduction is the angle between the thumb proximal bone (b1) and the index
+metacarpal (b0).
 
 Classes. A finger is extended when its bend is below `EXTENDED_MAX_DEG` (40), flexed from
 `FLEXED_MIN_DEG` (110) up, and curved in between (states 0, 1, 2). The spread is wide from
-`SPREAD_THRESHOLD_DEG` (25) up and the thumb is abducted from `THUMB_THRESHOLD_DEG` (45) up.
-Thresholds are the brief's values; they were not tuned (see the task report for the check on the
-cached clips).
+`SPREAD_THRESHOLD_DEG` and the thumb is abducted from `THUMB_THRESHOLD_DEG` up; both come from
+measurements on the SMPL-X rest hand (see the comments at the constants). The bend thresholds are
+the brief's values.
+
+Dead band. `features_changed` counts a class change only when the other hand's value is beyond the
+threshold, on the opposite side from `before`, by more than a margin (`FEATURE_MARGIN_DEG`, 5
+degrees for each angle feature), so jitter of a degree or two around a threshold never flips a class.
 
 Offset convention (`apply_finger_offsets`). Each finger joint turns in its own right-handed basis
 (a, b, n) at rest: a = the flexion axis (`flexion_axes`), b = the bone direction, n = the palm
@@ -33,11 +43,13 @@ in degrees, are applied in the joint's parent frame as `R_new = R(axis, angle) @
 rest parent frame (all rotations zero) is the world frame. The flexion axis is a pseudovector, so
 the left and right hands share the sign of flexion; twist and abduction axes are true vectors, so
 they are negated on the right hand. The same offsets therefore move both hands as mirror images.
-The two SMPL-X hands are mirror images up to about 1 degree of rest asymmetry.
+The two SMPL-X hands are mirror images up to a few degrees of rest asymmetry (measured: the rest
+thumb abduction is 45.43 degrees left and 45.35 right, but the rest finger bends differ by up to
+4.1 degrees, e.g. index -10.4 vs -14.5 and pinky -4.1 vs -6.1).
 """
 
 from dataclasses import dataclass
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -57,8 +69,21 @@ INDEX = FINGERS.index("index")
 
 EXTENDED_MAX_DEG = 40.0
 FLEXED_MIN_DEG = 110.0
-SPREAD_THRESHOLD_DEG = 25.0
-THUMB_THRESHOLD_DEG = 45.0
+# Spread = smallest projected gap between adjacent fingers. Measured on the SMPL-X rest hand
+# (fingers not spread, both hands): gaps 13.2 / 3.0 / 27.9 degrees, so the spread reads 3.0. A hand
+# with every finger parted a further 15 degrees from its neighbour reads about 18. The threshold 9
+# sits midway (6 degrees from either, more than the 5 degree margin), so the rest hand is not wide
+# and a hand with each finger abducted by 15 degrees is.
+SPREAD_THRESHOLD_DEG = 9.0
+# Thumb abduction. The SMPL-X rest thumb reads 45.4 degrees (left 45.43, right 45.35); a thumb
+# tucked against the palm reads about 15 and one swung out 20 degrees about the CMC about 65. The
+# old threshold 45 sat within 0.5 degrees of rest, so noise flipped the class. 55 puts rest 9.6
+# degrees below it (beyond the margin and any +-2 degree noise) while a thumb opened 15 degrees
+# beyond rest still counts as abducted.
+THUMB_THRESHOLD_DEG = 55.0
+# Dead band (degrees) of `features_changed` per angle feature. The tuning of each is above.
+FEATURE_MARGIN_DEG = {"bend": 5.0, "spread": 5.0, "thumb": 5.0}
+ADJACENT_FINGERS = ("index", "middle", "ring", "pinky")
 _SIDE_SIGN = {"left": 1.0, "right": -1.0}  # sign of the palm-normal cross product
 
 
@@ -68,7 +93,7 @@ class HandshapeFeatures:
 
     bend_deg: np.ndarray  # (T, 5) in FINGERS order
     state: np.ndarray  # (T, 5) int: 0 extended, 1 curved, 2 flexed, -1 not finite
-    spread_deg: np.ndarray  # (T,) index-pinky proximal bone angle
+    spread_deg: np.ndarray  # (T,) smallest adjacent-finger abduction gap (palm-plane projection)
     thumb_abduction_deg: np.ndarray  # (T,)
 
 
@@ -84,6 +109,39 @@ def _signed_angle_deg(u: np.ndarray, v: np.ndarray, hinge: np.ndarray) -> np.nda
 
 def _unit(v: np.ndarray) -> np.ndarray:
     return v / np.linalg.norm(v, axis=-1, keepdims=True)
+
+
+def _spread_deg(bones, axes: np.ndarray, rest_joints, side: str) -> np.ndarray:
+    """
+    Smallest abduction gap (degrees) between adjacent fingers, free of flexion.
+
+    The MCP flexes about the fixed axis a of its finger, so the lateral angle asin(unit(b1) . a) of
+    the proximal bone does not change with flexion, and a turn about the palm normal changes it by
+    minus the turn. Each finger's azimuth about the palm normal is therefore its rest azimuth
+    (from the rest bones, measured from the index finger) minus that lateral angle; the gaps are
+    the differences of adjacent azimuths, counted positive in the sense the rest fan opens.
+    Projecting the bones onto the palm plane would be unstable for flexed fingers (the projection
+    shrinks towards zero), whereas the lateral angle just stops responding to abduction there.
+    """
+    rest = np.asarray(rest_joints, dtype=np.float64)
+    start = HAND_START[side]
+    normal = _palm_normal(rest_joints, side)
+    flat = []
+    for name in ADJACENT_FINGERS:
+        s0, s1, _ = FINGER_SLOTS[name]
+        b1 = rest[start + s1] - rest[start + s0]
+        flat.append(b1 - np.dot(b1, normal) * normal)
+    rest_az = np.degrees(
+        [np.arctan2(np.dot(np.cross(flat[0], d), normal), np.dot(flat[0], d)) for d in flat]
+    )
+    orient = 1.0 if rest_az[-1] >= 0 else -1.0
+    azimuth = []
+    for k, name in enumerate(ADJACENT_FINGERS):
+        b1 = bones[name][1]
+        unit = b1 / np.linalg.norm(b1, axis=-1, keepdims=True)
+        sine = np.clip(np.sum(unit * axes[FINGER_SLOTS[name][0]], axis=-1), -1.0, 1.0)
+        azimuth.append(orient * (rest_az[k] - np.degrees(np.arcsin(sine))))
+    return np.min(np.diff(np.stack(azimuth, axis=0), axis=0), axis=0)
 
 
 def _hand_pose(rotations, rest_joints, parents, side: str) -> Tuple[np.ndarray, np.ndarray]:
@@ -131,7 +189,7 @@ def handshape_features(rotations, rest_joints, parents, side: str) -> HandshapeF
         hinge1 = world[:, s0] @ axes[s1]  # the PIP turns in the MCP's world frame
         bends.append(_signed_angle_deg(b0, b1, hinge0) + _signed_angle_deg(b1, b2, hinge1))
     bend = np.stack(bends, axis=1)
-    spread = _angle_deg(bones["index"][1], bones["pinky"][1])
+    spread = _spread_deg(bones, axes, rest_joints, side)
     thumb = _angle_deg(bones["thumb"][1], bones["index"][0])
     return HandshapeFeatures(bend, _classify(bend), spread, thumb)
 
@@ -166,28 +224,32 @@ def feature_signature(features: HandshapeFeatures) -> Tuple:
 
 def _crossed(before, after, threshold: float, margin: float) -> bool:
     before, after = np.asarray(before, dtype=float), np.asarray(after, dtype=float)
-    ok = np.isfinite(before) & np.isfinite(after) & (np.abs(before - threshold) >= margin)
+    ok = np.isfinite(before) & np.isfinite(after)
     flipped = (before >= threshold) != (after >= threshold)
     return bool(np.any(ok & flipped & (np.abs(after - threshold) > margin)))
 
 
 def features_changed(
-    before: HandshapeFeatures, after: HandshapeFeatures, margin_deg: float = 5.0
+    before: HandshapeFeatures, after: HandshapeFeatures, margin_deg: Optional[float] = None
 ) -> bool:
     """
     Whether `after` changes the finger states, spread class or thumb class of `before`.
 
-    Each threshold is tested on its own: a frame is skipped when `before` lies within `margin_deg`
-    of the threshold, and a change counts only when `after` is on the other side by more than
-    `margin_deg`. Frames that are not finite in either set are ignored.
+    Each threshold is tested on its own with a dead band: a class change counts only when `after`
+    is on the opposite side of the threshold from `before` by more than the margin, wherever
+    `before` itself lies. `margin_deg` overrides every margin; by default each feature uses its
+    entry of `FEATURE_MARGIN_DEG`. Frames that are not finite in either set are ignored.
     """
+    margins = (
+        FEATURE_MARGIN_DEG if margin_deg is None else dict.fromkeys(FEATURE_MARGIN_DEG, margin_deg)
+    )
     for t in (EXTENDED_MAX_DEG, FLEXED_MIN_DEG):
-        if _crossed(before.bend_deg, after.bend_deg, t, margin_deg):
+        if _crossed(before.bend_deg, after.bend_deg, t, margins["bend"]):
             return True
-    if _crossed(before.spread_deg, after.spread_deg, SPREAD_THRESHOLD_DEG, margin_deg):
+    if _crossed(before.spread_deg, after.spread_deg, SPREAD_THRESHOLD_DEG, margins["spread"]):
         return True
     return _crossed(
-        before.thumb_abduction_deg, after.thumb_abduction_deg, THUMB_THRESHOLD_DEG, margin_deg
+        before.thumb_abduction_deg, after.thumb_abduction_deg, THUMB_THRESHOLD_DEG, margins["thumb"]
     )
 
 
