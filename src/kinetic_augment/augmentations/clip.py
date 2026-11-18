@@ -113,6 +113,7 @@ class ClipData:
     fps: float
     camera: Optional[WeakCamera]
     scene: SceneTransform
+    gloss: Optional[str] = None  # WLASL gloss when known (the mirror blacklist reads it)
 
     @property
     def frames(self) -> int:

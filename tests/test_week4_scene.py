@@ -63,7 +63,7 @@ def test_registered_keys_and_defaults():
     ):
         assert AugmentationRegistry._registry[name] is cls
         assert cls.regions == ("scene",)
-    assert Mirror().ranges == {"p": 0.5}
+    assert Mirror().ranges == {"p": 0.5, "blacklist": "configs/mirror_blacklist.yaml"}
     assert View().ranges == {"yaw_deg": 25.0, "pitch_deg": 6.0}
     assert Scale().ranges == {"factor": [0.75, 1.25]}
     assert Uncentre().ranges == {"limit": 0.125}

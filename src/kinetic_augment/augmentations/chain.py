@@ -30,6 +30,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 import numpy as np
 
 from .base import AugmentationRegistry
+from .blacklist import gloss_for_clip
 from .body import wrist_world
 from .clip import ChainContext, ClipData
 from .outputs import ClipOutputs, build_outputs
@@ -130,6 +131,10 @@ class AugmentationChain:
 
     def run(self, clip: ClipData) -> ChainResult:
         seed = self.profile.seed
+        if clip.gloss is None:  # a clip built without a gloss gets it from the clip-id map
+            gloss = gloss_for_clip(clip.clip_id)
+            if gloss is not None:
+                clip = clip.replace(gloss=gloss)
         ctx = ChainContext(
             skeleton=self.skeleton,
             parents=np.asarray(self.skeleton.parents),

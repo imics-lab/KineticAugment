@@ -21,21 +21,13 @@ Usage (from the repo root):
 import argparse
 import csv
 import json
+import sys
 from pathlib import Path
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
 
-
-def load_blacklist(path):
-    """Return {gloss: category} for every gloss on the blacklist."""
-    config = yaml.safe_load(path.read_text())
-    return {
-        gloss.lower(): category
-        for category, entry in config["categories"].items()
-        for gloss in entry["glosses"]
-    }
+from kinetic_augment.augmentations.blacklist import load_blacklist  # noqa: E402
 
 
 def main():

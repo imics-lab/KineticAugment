@@ -23,6 +23,7 @@ import numpy as np
 
 from . import tier1
 from .base import AugmentationRegistry, ClipAugmentation
+from .blacklist import DEFAULT_BLACKLIST, blacklist_category, resolve_path
 from .clip import ChainContext, ClipData, SceneTransform
 from .outputs import blendshape_mirror, build_outputs
 from .ranges import check_non_negative, check_range, check_unit
@@ -73,13 +74,28 @@ class Mirror(ClipAugmentation):
 
     key = "mirror"
     regions = ("scene",)
-    DEFAULT_RANGES = {"p": 0.5}
+    DEFAULT_RANGES = {"p": 0.5, "blacklist": DEFAULT_BLACKLIST}
 
     def validate_ranges(self) -> None:
         check_unit(self.ranges["p"], self.label("p"))
+        path = self.ranges["blacklist"]
+        if path is None:
+            return
+        if not isinstance(path, str):
+            raise ValueError(
+                f"{self.label('blacklist')} must be a path string or null, got {path!r}"
+            )
+        if not resolve_path(path).is_file():
+            raise ValueError(f"{self.label('blacklist')} file not found: {path}")
 
     def sample(self, rng: np.random.Generator, clip: Any, ctx: ChainContext) -> Dict[str, Any]:
-        return {"mirror": bool(_draw_of(ctx).mirror)}
+        """The shared Tier 1 mirror draw, forced off for a blacklisted gloss (draw unchanged)."""
+        mirror = bool(_draw_of(ctx).mirror)
+        path = self.ranges["blacklist"]
+        category = blacklist_category(getattr(clip, "gloss", None), path) if path else None
+        if category is None:
+            return {"mirror": mirror}
+        return {"mirror": False, "blocked": f"blacklist:{category}"}
 
     def apply(self, target: ClipData, draw: Dict[str, Any], ctx: ChainContext) -> ClipData:
         if not draw["mirror"]:

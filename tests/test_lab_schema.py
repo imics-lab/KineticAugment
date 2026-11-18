@@ -14,7 +14,7 @@ from kinetic_augment.lab.schema import build_schema, load_knobs
 CONFIGS = Path(__file__).resolve().parents[1] / "configs"
 LAB_IDS = [k for k, r in RUNS.items() if r.entry is not None]
 NOT_EXTREME = {"temporal.time_warp.varied", "temporal.time_warp.segment"}
-FIXED = {"mode_weights"}
+FIXED = {"mode_weights", "blacklist"}  # not sliders: a mode table, a file path
 
 
 def _flat(ranges, prefix=""):
