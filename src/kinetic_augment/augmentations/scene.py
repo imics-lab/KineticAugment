@@ -195,9 +195,8 @@ class Uncentre(ClipAugmentation):
             return target
         outputs = build_outputs(target, ctx.skeleton)
         hands = np.where(outputs.hand_valid[:, :, None, None], outputs.hands_image, np.nan)
-        uv = np.concatenate(
-            [hands.reshape(len(hands), 42, 2), outputs.pose_image[:, list(WRIST_MP), :]], axis=1
-        )
+        hands, wrists = hands[..., :2], outputs.pose_image[:, list(WRIST_MP), :2]  # x, y only
+        uv = np.concatenate([hands.reshape(len(hands), 42, 2), wrists], axis=1)
         shift = tier1.uncentre_shift(uv, draw["u"], limit)
         draw["image_shift"] = [float(shift[0]), float(shift[1])]
         offset = target.camera.world_shift(shift)
@@ -226,7 +225,8 @@ def fit_clip_camera(
     World points are `build_outputs` of the clip with no scene transform: pose arms 11-16 and
     both hands' 42 points (hand points only where `hand_valid`). Image points are
     `hands.pose_image` (arms with visibility below 0.5 dropped) and `hands.image`, normalised
-    to [0, 1]; `pixel_size=(hands.width, hands.height)` gives one scale for both axes.
+    to [0, 1]; `pixel_size=(hands.width, hands.height)` gives one scale for both axes and is
+    recorded as the camera's `frame_size`.
 
     `ClipData` does not carry its source frame indices, so `frames` (the `result.frames` that
     built the clip) picks the matching image rows. It defaults to every row of `hands`, which

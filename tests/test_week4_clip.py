@@ -43,6 +43,7 @@ def assert_clips_equal(a: ClipData, b: ClipData):
             assert np.array_equal(x, y, equal_nan=True), f.name
         elif isinstance(x, WeakCamera):
             assert x.scale == y.scale and x.residual == y.residual
+            assert x.frame_size == y.frame_size
             assert np.array_equal(x.offset, y.offset)
         elif isinstance(x, SceneTransform):
             assert x.mirror == y.mirror and x.scale == y.scale
@@ -223,9 +224,10 @@ def test_build_outputs_identity_scene():
     assert out.face_world.shape == (T, 478, 3)
     assert out.head_world.shape == (T, 3)
     assert out.blendshapes.shape == (T, 52) and out.blendshape_names == clip.blendshape_names
-    assert out.pose_image.shape == (T, 33, 2)
-    assert out.hands_image.shape == (T, 2, 21, 2)
-    assert out.face_image.shape == (T, 478, 2)
+    assert out.pose_image.shape == (T, 33, 3)
+    assert out.hands_image.shape == (T, 2, 21, 3)
+    assert out.face_image.shape == (T, 478, 3)
+    assert out.hip_centre_world.shape == (T, 3)
     assert out.hand_valid.shape == (T, 2) and out.face_valid.shape == (T,)
     assert out.body_ok.shape == (T,) and out.times_s.shape == (T,)
     assert len(out.vertices) == T and out.vertices[0].shape == (10475, 3)
@@ -242,11 +244,104 @@ def test_build_outputs_identity_scene():
         np.testing.assert_allclose(out.hands_world[t, 1, 0], ref.joints[21], atol=1e-5)
         np.testing.assert_allclose(out.pose_world[t, 11:17], ref.joints[16:22], atol=1e-5)
         np.testing.assert_allclose(out.head_world[t], ref.joints[15], atol=1e-5)
+        hips = 0.5 * (ref.joints[1] + ref.joints[2])  # SMPL-X left and right hip
+        np.testing.assert_allclose(out.hip_centre_world[t], hips, atol=1e-5)
         np.testing.assert_allclose(out.vertices[t], ref.vertices, atol=1e-5)
     # the face rides rigidly on the head joint
     radii = np.linalg.norm(out.face_world - out.head_world[:, None], axis=-1)
     np.testing.assert_allclose(radii, np.linalg.norm(clip.face_local, axis=-1), atol=1e-9)
-    np.testing.assert_allclose(out.pose_image, clip.camera.project(out.pose_world))
+    # x, y exactly as the camera projects them; z is the third column
+    np.testing.assert_array_equal(out.pose_image[..., :2], clip.camera.project(out.pose_world))
+    np.testing.assert_array_equal(out.hands_image[..., :2], clip.camera.project(out.hands_world))
+    np.testing.assert_array_equal(out.face_image[..., :2], clip.camera.project(out.face_world))
+
+
+def _z_scale(camera):
+    return abs(camera.scale[0])
+
+
+@requires_smplx
+def test_build_outputs_mediapipe_relative_z():
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    clip = synthetic_clip(frames=5)
+    out = build_outputs(clip, get_skeleton())
+    s = _z_scale(clip.camera)
+    # pose: relative to the hip midpoint, which itself sits at z = 0
+    hips = clip.camera.project_with_depth(
+        out.hip_centre_world[:, None], out.hip_centre_world[:, None]
+    )
+    np.testing.assert_array_equal(hips[..., 2], 0.0)
+    expected = s * (out.pose_world[..., 2] - out.hip_centre_world[:, None, 2])
+    np.testing.assert_allclose(out.pose_image[..., 2], expected, atol=1e-12)
+    assert np.isnan(out.pose_image[:, :11]).all()  # unfilled pose rows stay NaN in z too
+    # hands: relative to each hand's wrist
+    np.testing.assert_array_equal(out.hands_image[:, :, 0, 2], 0.0)
+    expected = s * (out.hands_world[..., 2] - out.hands_world[:, :, :1, 2])
+    np.testing.assert_allclose(out.hands_image[..., 2], expected, atol=1e-12)
+    # face: relative to the per-frame mean of the face points
+    np.testing.assert_allclose(out.face_image[..., 2].mean(axis=1), 0.0, atol=1e-12)
+    expected = s * (out.face_world[..., 2] - out.face_world[..., 2].mean(axis=1, keepdims=True))
+    np.testing.assert_allclose(out.face_image[..., 2], expected, atol=1e-12)
+
+
+@requires_smplx
+def test_build_outputs_z_follows_the_scene():
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    skeleton = get_skeleton()
+    clip = synthetic_clip(frames=4)
+    s = _z_scale(clip.camera)
+    base = build_outputs(clip, skeleton)
+    pivot = np.array([0.05, -0.02, 0.1])
+    # view rotation: z comes from the rotated world points
+    rotation = Rotation.from_euler("yx", [20.0, -5.0], degrees=True).as_matrix()
+    viewed = build_outputs(
+        clip.replace(scene=SceneTransform(rotation=rotation, pivot=pivot)), skeleton
+    )
+    expected = s * (viewed.pose_world[..., 2] - viewed.hip_centre_world[:, None, 2])
+    np.testing.assert_allclose(viewed.pose_image[..., 2], expected, atol=1e-12)
+    assert not np.allclose(viewed.pose_image[:, 15, 2], base.pose_image[:, 15, 2])
+    # scale k multiplies z like x
+    scaled = build_outputs(clip.replace(scene=SceneTransform(scale=1.2, pivot=pivot)), skeleton)
+    for name in ("pose_image", "hands_image", "face_image"):
+        np.testing.assert_allclose(
+            getattr(scaled, name)[..., 2], 1.2 * getattr(base, name)[..., 2], atol=1e-12
+        )
+
+
+@requires_smplx
+def test_build_outputs_pixels():
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    skeleton = get_skeleton()
+    clip = synthetic_clip(frames=3)
+    out = build_outputs(clip, skeleton)
+    assert out.frame_size is None
+    with pytest.raises(ValueError, match="frame size"):
+        out.pixels("pose")
+    sized = clip.replace(camera=dataclasses.replace(clip.camera, frame_size=(640, 480)))
+    out = build_outputs(sized, skeleton)
+    assert out.frame_size == (640, 480)
+    for name in ("pose", "hands", "face"):
+        image = getattr(out, f"{name}_image")
+        np.testing.assert_array_equal(out.pixels(name), image * np.array([640.0, 480.0, 640.0]))
+    with pytest.raises(ValueError, match="pose, hands or face"):
+        out.pixels("arms")
+    no_camera = build_outputs(clip.replace(camera=None), skeleton)
+    assert no_camera.pose_image is None and no_camera.pixels("hands") is None
+
+
+@requires_smplx
+def test_frame_size_survives_retiming_and_the_scene():
+    from tests.clip_fixtures import synthetic_clip
+
+    clip = synthetic_clip(frames=6)
+    clip = clip.replace(camera=dataclasses.replace(clip.camera, frame_size=(320, 240)))
+    assert resample_clip(clip, np.array([0.0, 2.5, 5.0])).camera.frame_size == (320, 240)
+    assert select_frames(clip, np.array([0, 3])).camera.frame_size == (320, 240)
+    scene = SceneTransform(mirror=True, scale=1.1)
+    assert scene.apply_camera(clip.camera).frame_size == (320, 240)
 
 
 @requires_smplx
@@ -325,6 +420,10 @@ def test_build_outputs_mirror_swaps_sides(monkeypatch):
     left = clip.blendshape_names.index("eyeBlinkLeft")
     right = clip.blendshape_names.index("eyeBlinkRight")
     np.testing.assert_array_equal(mirrored.blendshapes[:, left], base.blendshapes[:, right])
+    # a left/right reflection leaves depth alone: each landmark takes its partner's z
+    np.testing.assert_allclose(mirrored.pose_image[..., 2], base.pose_image[:, POSE_MIRROR, 2])
+    np.testing.assert_allclose(mirrored.hands_image[..., 2], base.hands_image[:, ::-1, :, 2])
+    np.testing.assert_allclose(mirrored.face_image[..., 2], base.face_image[:, ::-1, 2], atol=1e-12)
 
 
 @requires_smplx

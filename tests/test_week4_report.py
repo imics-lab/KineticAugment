@@ -46,3 +46,22 @@ def test_measure_unaligned_skips_frame_keys():
     out = measure(base, base, aligned=False)
     assert not set(ALIGNED_ONLY) & set(out)
     assert {"jitter_ratio", "face_rigidity_mm", "hand_face_cm_min", "in_frame_pct"} <= set(out)
+
+
+@requires_smplx
+def test_in_frame_pct_reads_x_and_y_only():
+    base = base_outputs()
+
+    def place(image, z):
+        out = np.full(image.shape, np.nan)
+        out[..., :2] = 0.5  # every point in the middle of the frame
+        out[..., 2] = z  # depth far outside [0, 1] must not count against the frame check
+        return np.where(np.isnan(image), np.nan, out)
+
+    aug = dataclasses.replace(
+        base,
+        pose_image=place(base.pose_image, 7.0),
+        hands_image=place(base.hands_image, -3.0),
+        face_image=place(base.face_image, 5.0),
+    )
+    assert measure(base, aug, aligned=False)["in_frame_pct"] == 100.0

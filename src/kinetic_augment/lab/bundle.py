@@ -73,7 +73,12 @@ def write_data(path: Path, arrays):
 
 
 def bundle_arrays(outputs, vertices, times, mp_indices):
-    """The Tier 1 bundle arrays from week-4 outputs, hands and face masked where not valid."""
+    """
+    The Tier 1 bundle arrays from week-4 outputs, hands and face masked where not valid.
+
+    The `img_*` arrays keep the demo's (..., 2) x, y format; the outputs' relative z is not
+    exported.
+    """
     count = len(times)
     hand_mask = outputs.hand_valid[:, :, None, None]
     face_mask = outputs.face_valid[:, None, None]
@@ -102,19 +107,19 @@ def bundle_arrays(outputs, vertices, times, mp_indices):
             "float32",
         ),
         "img_arm": (
-            f32(None if no_camera else outputs.pose_image[:, ARMS], (count, 6, 2)),
+            f32(None if no_camera else outputs.pose_image[:, ARMS, :2], (count, 6, 2)),
             "float32",
         ),
         "img_hands": (
             f32(
-                None if no_camera else np.where(hand_mask, outputs.hands_image, np.nan),
+                None if no_camera else np.where(hand_mask, outputs.hands_image[..., :2], np.nan),
                 (count, 2, 21, 2),
             ),
             "float32",
         ),
         "img_face": (
             f32(
-                None if no_camera else np.where(face_mask, outputs.face_image, np.nan),
+                None if no_camera else np.where(face_mask, outputs.face_image[..., :2], np.nan),
                 (count, 478, 2),
             )[:, mp_indices],
             "float32",

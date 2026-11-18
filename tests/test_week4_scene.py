@@ -205,6 +205,7 @@ def test_fit_clip_camera_recovers_synthetic_camera():
     )
     fitted = fit_clip_camera(clip, hands, skeleton)
     assert fitted.residual < 1e-9
+    assert fitted.frame_size == (width, height)
     np.testing.assert_allclose(fitted.offset, camera.offset, atol=1e-9)
     np.testing.assert_allclose(fitted.scale, camera.scale, atol=1e-9)
     with pytest.raises(ValueError):
@@ -223,7 +224,8 @@ def test_uncentre_keeps_hands_in_frame():
     def points(c):
         o = build_outputs(c, skeleton)
         hand = np.where(o.hand_valid[:, :, None, None], o.hands_image, np.nan)
-        return np.concatenate([hand.reshape(len(hand), 42, 2), o.pose_image[:, [15, 16]]], axis=1)
+        hand, wrists = hand[..., :2], o.pose_image[:, [15, 16], :2]
+        return np.concatenate([hand.reshape(len(hand), 42, 2), wrists], axis=1)
 
     before = points(clip)
     moved = 0
@@ -299,11 +301,45 @@ def test_uncentre_after_mirror_scale_and_drift_keeps_hands_in_frame():
     shifted = Uncentre().apply(clip, draw, ctx)
     before, after = build_outputs(clip, skeleton), build_outputs(shifted, skeleton)
     np.testing.assert_allclose(
-        after.hands_image - before.hands_image,
-        np.broadcast_to(draw["image_shift"], before.hands_image.shape),
+        after.hands_image[..., :2] - before.hands_image[..., :2],
+        np.broadcast_to(draw["image_shift"], before.hands_image[..., :2].shape),
         atol=1e-9,
     )
-    uv_before, uv_after = before.hands_image.reshape(-1, 2), after.hands_image.reshape(-1, 2)
+    # the shift is in the image plane: relative depth does not move
+    np.testing.assert_allclose(after.hands_image[..., 2], before.hands_image[..., 2], atol=1e-12)
+    uv_before = before.hands_image[..., :2].reshape(-1, 2)
+    uv_after = after.hands_image[..., :2].reshape(-1, 2)
     was_in = tier1.in_frame(uv_before)
     assert was_in.any()
     assert tier1.in_frame(uv_after)[was_in].all()
+
+
+def _corr(a, b):
+    ok = np.isfinite(a) & np.isfinite(b)
+    return float(np.corrcoef(a[ok], b[ok])[0, 1])
+
+
+@requires_smplx
+def test_relative_z_agrees_with_mediapipe_on_the_pilot_clip():
+    """The round trip's z has MediaPipe's sign: arms vs the hips, hand points vs the wrist."""
+    from tests.clip_fixtures import get_skeleton, real_clip
+
+    clip, hands, _ = real_clip()
+    skeleton = get_skeleton()
+    camera = fit_clip_camera(clip, hands, skeleton)
+    assert camera.frame_size == (hands.width, hands.height)
+    out = build_outputs(clip.replace(camera=camera), skeleton)
+    mp_pose = np.asarray(hands.pose_image, dtype=np.float64)
+    mp_hips = 0.5 * (mp_pose[:, 23, 2] + mp_pose[:, 24, 2])
+    arms = list(range(11, 17))
+    ours = out.pose_image[:, arms, 2]
+    theirs = mp_pose[:, arms, 2] - mp_hips[:, None]
+    assert _corr(ours.ravel(), theirs.ravel()) > 0.5
+    mp_hand = np.asarray(hands.image, dtype=np.float64)[..., 2]
+    valid = out.hand_valid[:, :, None]
+    ours = np.where(valid, out.hands_image[..., 2], np.nan)
+    theirs = np.where(valid, mp_hand - mp_hand[..., :1], np.nan)
+    assert _corr(ours.ravel(), theirs.ravel()) > 0.3
+    np.testing.assert_array_equal(
+        out.pixels("hands"), out.hands_image * np.array([hands.width, hands.height, hands.width])
+    )

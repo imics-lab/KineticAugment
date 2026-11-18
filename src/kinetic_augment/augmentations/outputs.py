@@ -17,6 +17,13 @@ stretches and the hand stays on the wrist. The offset is zero when nothing was e
 The face is the observed face carried in the head joint's frame, put back on the posed head.
 Then the clip's scene transform (and, when mirrored, the left/right relabelling) is applied to
 every point set, and the points are projected through the clip's weak camera if it has one.
+
+The image points follow MediaPipe's image landmarks: x / width, y / height and a relative z in
+the same units as x, smaller = closer to the camera. z is taken from the transformed world
+points (`WeakCamera.project_with_depth`), relative to MediaPipe's per-frame origins: the pose
+to the midpoint of the hips (SMPL-X joints 1 and 2, the joints the converter matches to
+MediaPipe's 23 and 24), each hand to its wrist, the face to the mean of its points. On the
+pilot clip this z correlates positively with MediaPipe's own pose and hand z.
 """
 
 from dataclasses import dataclass
@@ -41,6 +48,8 @@ NUM_JOINTS = 55
 SIDES = ("left", "right")
 POSE_ARMS = slice(11, 17)  # MediaPipe pose: L/R shoulder, elbow, wrist
 SMPLX_ARMS = slice(16, 22)  # SMPL-X: the same six joints
+SMPLX_HIPS = (1, 2)  # SMPL-X left and right hip: the pose z reference (MediaPipe 23, 24)
+IMAGE_SETS = ("pose", "hands", "face")
 
 
 @dataclass(frozen=True, eq=False)
@@ -51,6 +60,11 @@ class ClipOutputs:
     `pose_world` fills only rows 11-16 (the arms); the other 27 are NaN. Hands are the posed
     SMPL-X hands for every fitted frame, unfitted fingers included; `hand_valid` says which
     are fitted. `face_valid` and `hand_valid` are false wherever the body was not posed.
+
+    The `*_image` arrays are MediaPipe's normalised image landmarks: x / width, y / height and
+    z relative to the pose's hip midpoint (`hip_centre_world`), each hand's wrist or the face's
+    mean, in units of the frame width (module docstring). `pixels` gives them in pixels
+    (x * width, y * height, z * width) when the source `frame_size` is known.
     """
 
     pose_world: np.ndarray  # (T, 33, 3)
@@ -59,14 +73,38 @@ class ClipOutputs:
     head_world: np.ndarray  # (T, 3) the SMPL-X head joint
     blendshapes: np.ndarray  # (T, 52)
     blendshape_names: Tuple[str, ...]
-    pose_image: Optional[np.ndarray]  # (T, 33, 2)
-    hands_image: Optional[np.ndarray]  # (T, 2, 21, 2)
-    face_image: Optional[np.ndarray]  # (T, 478, 2)
+    pose_image: Optional[np.ndarray]  # (T, 33, 3) x, y, z
+    hands_image: Optional[np.ndarray]  # (T, 2, 21, 3)
+    face_image: Optional[np.ndarray]  # (T, 478, 3)
     hand_valid: np.ndarray  # (T, 2)
     face_valid: np.ndarray  # (T,)
     body_ok: np.ndarray  # (T,)
     times_s: np.ndarray  # (T,)
     vertices: Optional[List[Optional[np.ndarray]]]  # per frame (V, 3), None where not posed
+    hip_centre_world: Optional[np.ndarray] = None  # (T, 3) midpoint of SMPL-X hips 1 and 2
+    frame_size: Optional[Tuple[int, int]] = None  # source (width, height) in pixels
+
+    def pixels(self, which: str) -> Optional[np.ndarray]:
+        """
+        The `which` ("pose", "hands" or "face") image points in pixels: x * W, y * H, z * W.
+
+        None when the clip has no camera (the image arrays are None too).
+
+        Raises:
+            ValueError: `which` is not one of the three, or the frame size is unknown.
+        """
+        if which not in IMAGE_SETS:
+            raise ValueError(f"which must be pose, hands or face, got {which!r}")
+        image = getattr(self, f"{which}_image")
+        if image is None:
+            return None
+        if self.frame_size is None:
+            raise ValueError(
+                "the source frame size is unknown (the camera was fitted without pixel_size), "
+                "so there are no pixel coordinates"
+            )
+        width, height = self.frame_size
+        return image * np.array([width, height, width], dtype=np.float64)
 
 
 def blendshape_mirror(names: Sequence[str]) -> np.ndarray:
@@ -214,6 +252,14 @@ def hand_points(joints: np.ndarray, tips: np.ndarray, side: str) -> np.ndarray:
     return out
 
 
+def _face_centre(face: np.ndarray) -> np.ndarray:
+    """(T, 1, 3) per-frame mean of the finite face points; NaN where a frame has none."""
+    finite = np.isfinite(face).all(axis=-1, keepdims=True)
+    count = finite.sum(axis=1, keepdims=True)
+    total = np.where(finite, face, 0.0).sum(axis=1, keepdims=True)
+    return np.where(count > 0, total / np.maximum(count, 1), np.nan)
+
+
 def _face_mirror() -> np.ndarray:
     try:
         from .face_mirror import FACE_MIRROR
@@ -234,7 +280,9 @@ def build_outputs(clip: ClipData, skeleton, keep_vertices: bool = False) -> Clip
     `face_local` on the posed head joint where `face_valid`. Unposed frames stay NaN. Then the
     clip's scene transform goes on every point set; when it mirrors, the pose rows, the hands
     (and `hand_valid`), the face rows (`face_mirror.FACE_MIRROR`) and the `*Left`/`*Right`
-    blendshapes swap sides. Image arrays come from the clip's camera, or are None without one.
+    blendshapes swap sides. Image arrays come from the clip's camera, or are None without one:
+    x, y as the camera projects them and MediaPipe's relative z from the same transformed world
+    points (module docstring).
     """
     scene = clip.scene
     face_perm = _face_mirror() if scene.mirror else None
@@ -258,6 +306,7 @@ def build_outputs(clip: ClipData, skeleton, keep_vertices: bool = False) -> Clip
     hands = np.full((T, 2, 21, 3), np.nan)
     face = np.full((T, 478, 3), np.nan)
     head = np.full((T, 3), np.nan)
+    hips = np.full((T, 3), np.nan)
     vertices: Optional[List[Optional[np.ndarray]]] = [None] * T if keep_vertices else None
     tip_ids = _tip_ids()
 
@@ -282,12 +331,14 @@ def build_outputs(clip: ClipData, skeleton, keep_vertices: bool = False) -> Clip
         for s, side in enumerate(SIDES):
             hands[t, s] = hand_points(joints, tips[5 * s : 5 * s + 5], side)
         head[t] = joints[HEAD]
+        hips[t] = joints[list(SMPLX_HIPS)].mean(axis=0)
         if face_valid[t]:
             rotation = global_rotations(clip.rotations[t], parents)[HEAD]
             face[t] = from_head_frame(clip.face_local[t], rotation, joints[HEAD])
 
     pose, hands = scene.apply_points(pose), scene.apply_points(hands)
     face, head = scene.apply_points(face), scene.apply_points(head)
+    hips = scene.apply_points(hips)  # symmetric: no relabelling under the mirror
     blendshapes = np.array(clip.blendshapes, dtype=np.float64, copy=True)
     if scene.mirror:
         pose = pose[:, POSE_MIRROR]
@@ -297,6 +348,11 @@ def build_outputs(clip: ClipData, skeleton, keep_vertices: bool = False) -> Clip
         blendshapes = blendshapes[:, blendshape_mirror(clip.blendshape_names)]
 
     camera = scene.apply_camera(clip.camera)
+    images = {name: None for name in IMAGE_SETS}
+    if camera is not None:
+        images["pose"] = camera.project_with_depth(pose, hips[:, None])
+        images["hands"] = camera.project_with_depth(hands, hands[:, :, :1])
+        images["face"] = camera.project_with_depth(face, _face_centre(face))
     return ClipOutputs(
         pose_world=pose,
         hands_world=hands,
@@ -304,12 +360,14 @@ def build_outputs(clip: ClipData, skeleton, keep_vertices: bool = False) -> Clip
         head_world=head,
         blendshapes=blendshapes,
         blendshape_names=tuple(clip.blendshape_names),
-        pose_image=None if camera is None else camera.project(pose),
-        hands_image=None if camera is None else camera.project(hands),
-        face_image=None if camera is None else camera.project(face),
+        pose_image=images["pose"],
+        hands_image=images["hands"],
+        face_image=images["face"],
         hand_valid=hand_valid,
         face_valid=face_valid,
         body_ok=np.array(clip.body_ok, dtype=bool, copy=True),
         times_s=np.array(clip.times_s, dtype=np.float64, copy=True),
         vertices=vertices,
+        hip_centre_world=hips,
+        frame_size=None if camera is None else camera.frame_size,
     )

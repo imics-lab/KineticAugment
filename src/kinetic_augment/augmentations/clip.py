@@ -79,7 +79,7 @@ class SceneTransform:
         offset = np.asarray(camera.offset, dtype=np.float64)
         mean = np.nanmean(offset, axis=0)
         factor = np.array([-1.0 if self.mirror else 1.0, 1.0]) * self.scale
-        return WeakCamera(camera.scale, mean + (offset - mean) * factor, camera.residual)
+        return dataclasses.replace(camera, offset=mean + (offset - mean) * factor)
 
 
 @dataclass(frozen=True, eq=False)
@@ -243,7 +243,7 @@ def select_frames(clip: ClipData, keep: np.ndarray) -> ClipData:
     index = np.flatnonzero(keep) if keep.dtype == bool else keep.astype(int)
     camera = clip.camera
     if camera is not None:
-        camera = WeakCamera(camera.scale, np.asarray(camera.offset)[index], camera.residual)
+        camera = dataclasses.replace(camera, offset=np.asarray(camera.offset)[index])
     return clip.replace(
         rotations=clip.rotations[index],
         transl=clip.transl[index],

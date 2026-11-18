@@ -202,11 +202,13 @@ class WeakCamera:
 
     One scale per axis for the clip (its sign carries any flip between the frames), one offset
     per frame because MediaPipe's world landmarks are re-centred on the hips every frame.
+    `frame_size` is the source video's (width, height) in pixels, None where it is not known.
     """
 
     scale: Tuple[float, float]
     offset: np.ndarray  # (T, 2)
     residual: float  # median distance of fit points from the image, normalised
+    frame_size: Optional[Tuple[int, int]] = None
 
     def project(self, points: np.ndarray) -> np.ndarray:
         """(T, ..., 3) world points to (T, ..., 2) normalised image points."""
@@ -214,11 +216,26 @@ class WeakCamera:
         shape = (len(points),) + (1,) * (points.ndim - 2) + (2,)
         return np.asarray(self.scale) * points[..., :2] + self.offset.reshape(shape)
 
+    def project_with_depth(self, points: np.ndarray, reference: np.ndarray) -> np.ndarray:
+        """
+        (T, ..., 3) world points to (T, ..., 3) image points with MediaPipe's relative z.
+
+        x, y are `project(points)`. z is the world depth relative to `reference` (broadcast
+        against `points`, e.g. (T, 1, 3) for one point per frame) times the x scale's
+        magnitude, so it is in the same units as x (the frame width) and, like MediaPipe's
+        world z, smaller is closer to the camera. A reflection between world and image in x
+        does not reverse depth, hence the magnitude.
+        """
+        points = np.asarray(points, dtype=np.float64)
+        reference = np.asarray(reference, dtype=np.float64)
+        depth = abs(self.scale[0]) * (points[..., 2] - reference[..., 2])
+        return np.concatenate([self.project(points), depth[..., None]], axis=-1)
+
     def resampled(self, times: np.ndarray) -> "WeakCamera":
         """The camera re-timed with a clip (for the duration augmentation)."""
         frames = np.arange(len(self.offset))
         offset = np.stack([np.interp(times, frames, self.offset[:, a]) for a in range(2)], -1)
-        return WeakCamera(self.scale, offset, self.residual)
+        return dataclasses.replace(self, offset=offset)
 
     def world_shift(self, image_shift: Sequence[float]) -> np.ndarray:
         """The world translation (z = 0) that moves the projection by `image_shift`."""
@@ -233,7 +250,8 @@ def fit_weak_camera(
 
     Without `pixel_size` each axis gets its own scale. With the frame's (width, height) in
     pixels, one scale serves both axes, as it should for square pixels; that holds up better
-    when the camera is used far from the points it was fitted on.
+    when the camera is used far from the points it was fitted on. The camera then records it
+    as `frame_size`.
 
     Points not finite in both are ignored. A frame with fewer than two usable points gets the
     offset of the nearest frame that has them.
@@ -262,7 +280,8 @@ def fit_weak_camera(
     scale = scale_px / size
     projected = scale * world + offset[:, None]
     residual = float(np.median(np.linalg.norm(projected - image, axis=-1)[ok]))
-    return WeakCamera((float(scale[0]), float(scale[1])), offset, residual)
+    frame_size = None if pixel_size is None else (int(pixel_size[0]), int(pixel_size[1]))
+    return WeakCamera((float(scale[0]), float(scale[1])), offset, residual, frame_size)
 
 
 def in_frame(uv: np.ndarray) -> np.ndarray:
