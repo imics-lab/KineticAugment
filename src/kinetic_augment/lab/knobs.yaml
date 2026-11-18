@@ -179,6 +179,19 @@ body.limb_length_scaling:
     step: null
     share: false
     active: true
+  - key: max_residual_mm
+    kind: scalar
+    plain: The most a wrist may miss its original position after the arm is shortened; past this the
+      clip is left unchanged.
+    technical: wrist miss limit (max_residual_mm)
+    unit: mm
+    proven: null
+    limits:
+    - 1
+    - 50
+    step: 0.5
+    share: false
+    active: true
 body.movement_size:
   title: Movement size
   does: 'Makes every movement bigger or smaller: each wrist''s path is scaled about its own centre, and

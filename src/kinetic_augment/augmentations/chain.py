@@ -86,6 +86,8 @@ def _non_identity(name: str, draw: Dict[str, Any]) -> bool:
         return any(draw.get("image_shift", [0.0, 0.0]))
     if name == "body.tier1_arm_joints":
         return bool(draw["joints"])
+    if name == "body.limb_length_scaling":
+        return not draw.get("fallback")  # a fallback returned the clip unchanged
     return True
 
 

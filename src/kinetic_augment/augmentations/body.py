@@ -22,6 +22,7 @@ from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
 from .ranges import (
     check_non_negative,
+    check_positive,
     check_range,
     check_truncation,
     check_unit,
@@ -267,9 +268,11 @@ class LimbLengthScaling(ClipAugmentation):
         "factor": [0.93, 1.07],
         "bones": ["upper_arm", "forearm"],
         "retarget": True,
+        "max_residual_mm": 10.0,
     }
 
     def validate_ranges(self) -> None:
+        check_positive(self.ranges["max_residual_mm"], self.label("max_residual_mm"))
         bones = self.ranges["bones"]
         if not isinstance(bones, (list, tuple)):
             raise ValueError(f"{self.label('bones')} must be a list of {_BONES}, got {bones!r}")
@@ -311,6 +314,11 @@ class LimbLengthScaling(ClipAugmentation):
         targets = wrist_world(target, parents)
         out, residual = retarget_wrists(target.replace(rest_joints=rest), targets, parents)
         draw["residual_m"] = float(residual)
+        # The residual is only known after the IK, so the fallback is decided here. The chain reads
+        # the draw after `apply`, so it records the fallback and does not list the entry as applied.
+        if residual * 1000.0 > float(self.ranges["max_residual_mm"]):
+            draw["fallback"] = "residual_over_limit"
+            return target
         return out
 
     def identity_draw(self) -> Dict[str, Any]:

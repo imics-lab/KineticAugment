@@ -34,6 +34,7 @@ regions:
         factor: [0.93, 1.07]  # proven: none — no literature; between-signer spread 5.7% (Grounding §6.1); default/ambitious use ±7%
         bones: [upper_arm, forearm]  # setting: which bones are scaled
         retarget: true  # setting: re-solve the arm so each wrist keeps its world position
+        max_residual_mm: 10.0  # setting: largest wrist miss (mm) before the clip is left unchanged
     movement_size:
       enabled: true  # setting: on/off switch for this augmentation
       probability: 1.0  # setting: chance the augmentation runs on a clip

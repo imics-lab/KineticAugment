@@ -135,13 +135,45 @@ def test_nan_frames_are_skipped():
     assert np.isfinite(np.delete(out.rotations, 2, axis=0)).all()
 
 
-def test_unreachable_records_residual():
+def test_unreachable_falls_back_to_identity():
     clip = straight_clip()
     draw = draw_of({"upper_arm": 0.93, "forearm": 0.93})
     out = LimbLengthScaling().apply(clip, draw, make_ctx())
-    assert np.isfinite(out.rotations).all()
-    assert draw["residual_m"] > 0
+    assert draw["fallback"] == "residual_over_limit"
+    assert draw["residual_m"] > 0.010
+    assert out is clip
     json.dumps(draw)
+
+
+def test_bent_arm_applies_within_threshold():
+    clip = bent_clip()
+    draw = draw_of({"upper_arm": 0.95, "forearm": 0.95})
+    out = LimbLengthScaling().apply(clip, draw, make_ctx())
+    assert "fallback" not in draw
+    assert draw["residual_m"] <= 0.010
+    assert out.rest_joints is not clip.rest_joints
+
+
+def test_max_residual_mm_controls_fallback():
+    clip = straight_clip()
+    draw = draw_of({"upper_arm": 0.93, "forearm": 0.93})
+    LimbLengthScaling(ranges={"max_residual_mm": 1000.0}).apply(clip, draw, make_ctx())
+    assert "fallback" not in draw
+
+
+def test_fallback_not_listed_as_applied():
+    from kinetic_augment.augmentations.chain import _non_identity
+
+    draw = draw_of({"upper_arm": 0.93})
+    draw["fallback"] = "residual_over_limit"
+    assert not _non_identity("body.limb_length_scaling", draw)
+    assert _non_identity("body.limb_length_scaling", draw_of({"upper_arm": 0.93}))
+
+
+@pytest.mark.parametrize("bad", [0, -1.0, float("nan"), "x"])
+def test_max_residual_mm_validated(bad):
+    with pytest.raises(ValueError, match="max_residual_mm"):
+        LimbLengthScaling(ranges={"max_residual_mm": bad})
 
 
 def test_draws_in_range():
