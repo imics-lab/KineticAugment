@@ -362,6 +362,12 @@ def test_handshape_jitter_fallback():
     out = aug.apply(clip, draw, make_ctx())
     assert np.array_equal(out.rotations, clip.rotations, equal_nan=True)
 
+    from kinetic_augment.augmentations.chain import _non_identity
+
+    assert not _non_identity("fingers.handshape_jitter", draw)
+    ok = {k: v for k, v in draw.items() if k != "fallback"}
+    assert _non_identity("fingers.handshape_jitter", ok)
+
 
 def test_missing_hand_skipped():
     clip = synthetic_clip(frames=6)

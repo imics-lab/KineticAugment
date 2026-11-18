@@ -24,7 +24,7 @@ import numpy as np
 
 from . import tier1
 from .base import AugmentationRegistry, ClipAugmentation
-from .blacklist import DEFAULT_BLACKLIST, blacklist_category, resolve_path
+from .blacklist import DEFAULT_BLACKLIST, blacklist_category, load_blacklist, resolve_path
 from .clip import ChainContext, ClipData, SceneTransform
 from .outputs import blendshape_mirror, build_outputs, face_centre
 from .ranges import check_non_negative, check_range, check_unit
@@ -89,13 +89,22 @@ class Mirror(ClipAugmentation):
             )
         if not resolve_path(path).is_file():
             raise ValueError(f"{self.label('blacklist')} file not found: {path}")
+        try:
+            load_blacklist(path)
+        except Exception as exc:  # malformed YAML or missing keys fail at load, not mid-run
+            raise ValueError(
+                f"{self.label('blacklist')} is not a valid blacklist: {exc!r}"
+            ) from exc
 
     def sample(self, rng: np.random.Generator, clip: Any, ctx: ChainContext) -> Dict[str, Any]:
         """The shared Tier 1 mirror draw, forced off for a blacklisted gloss (draw unchanged)."""
         mirror = bool(_draw_of(ctx).mirror)
         path = self.ranges["blacklist"]
-        category = blacklist_category(getattr(clip, "gloss", None), path) if path else None
+        gloss = getattr(clip, "gloss", None)
+        category = blacklist_category(gloss, path) if path else None
         if category is None:
+            if path and not gloss:  # unchecked: recorded so the coverage gap is auditable
+                return {"mirror": mirror, "blacklist": "gloss_unknown"}
             return {"mirror": mirror}
         return {"mirror": False, "blocked": f"blacklist:{category}"}
 

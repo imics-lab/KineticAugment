@@ -334,6 +334,7 @@ def test_hand_dropout_runs_never_merge_or_exceed_cap():
 
     cap = 3
     aug = HandDropout({"start_rate": [1.0, 1.0], "run_length_mean": 50, "max_run_frames": cap})
+    runs_seen = 0
     for seed in range(60):
         rng = np.random.default_rng(1000 + seed)
         fake = Fake()
@@ -342,6 +343,7 @@ def test_hand_dropout_runs_never_merge_or_exceed_cap():
         draw = aug.sample(np.random.default_rng(seed), fake, None)
         again = aug.sample(np.random.default_rng(seed), fake, None)
         assert draw == again
+        runs_seen += len(draw["runs"])
         for hand in range(2):
             dropped = np.zeros(80, dtype=bool)
             for h, start, length in draw["runs"]:
@@ -353,3 +355,4 @@ def test_hand_dropout_runs_never_merge_or_exceed_cap():
             for start, end in _missing_segments(missing):
                 if dropped[start:end].any():
                     assert end - start <= cap
+    assert runs_seen > 0  # the invariants above were exercised on real runs

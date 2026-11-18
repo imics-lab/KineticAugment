@@ -55,8 +55,11 @@ def test_non_blacklisted_unchanged():
 
 
 def test_missing_gloss_allows_mirroring():
-    assert _sample(None, True) == {"mirror": True}
-    assert _sample(False, True) == {"mirror": True}  # no clip at all
+    unknown = {"mirror": True, "blacklist": "gloss_unknown"}
+    assert _sample(None, True) == unknown
+    assert _sample(False, True) == unknown  # no clip at all
+    assert _sample(None, False) == {"mirror": False, "blacklist": "gloss_unknown"}
+    assert _sample(None, True, Mirror(ranges={"blacklist": None})) == {"mirror": True}
     assert _sample("not-a-gloss", True) == {"mirror": True}
 
 
@@ -67,6 +70,17 @@ def test_blacklist_null_disables_and_custom_path(tmp_path):
     aug = Mirror(ranges={"blacklist": str(custom)})
     assert _sample("book", True, aug)["blocked"] == "blacklist:mine"
     assert _sample("left", True, aug) == {"mirror": True}
+
+
+def test_malformed_blacklist_file_fails_at_load(tmp_path):
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("categories: [unclosed\n")
+    with pytest.raises(ValueError, match="scene.mirror.blacklist"):
+        Mirror(ranges={"blacklist": str(bad)})
+    wrong = tmp_path / "wrong.yaml"
+    wrong.write_text("other: 1\n")
+    with pytest.raises(ValueError, match="scene.mirror.blacklist"):
+        Mirror(ranges={"blacklist": str(wrong)})
 
 
 def test_blacklist_validation():

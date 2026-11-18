@@ -76,7 +76,11 @@ class ChainResult:
 
 
 def _non_identity(name: str, draw: Dict[str, Any]) -> bool:
-    """Whether a draw changed anything; only the scene entries and Tier 1 arm joints can be 0."""
+    """Whether a draw changed anything.
+
+    The scene entries, Tier 1 arm joints and expression jitter can be identity; limb scaling and
+    handshape jitter return the clip unchanged when their draw records a fallback.
+    """
     if name == "scene.mirror":
         return bool(draw["mirror"])
     if name == "scene.view":
@@ -89,6 +93,8 @@ def _non_identity(name: str, draw: Dict[str, Any]) -> bool:
         return bool(draw["joints"])
     if name == "body.limb_length_scaling":
         return not draw.get("fallback")  # a fallback returned the clip unchanged
+    if name == "fingers.handshape_jitter":
+        return not draw.get("fallback")  # "no_valid_redraw" returned the identity draw
     if name == "face.expression_jitter":
         # every enabled group inactive (all scores constant) and no noise: nothing moved
         noise = draw.get("noise")

@@ -73,7 +73,8 @@ def test_sample_reads_tier1_draw():
     draw = make_draw(mirror=True, yaw=7.0, pitch=-2.0, scale=1.1, u=(0.2, 0.9))
     ctx = make_ctx(draw)
     rng = np.random.default_rng(0)
-    assert Mirror().sample(rng, None, ctx) == {"mirror": True}
+    # no clip means no gloss: the decision is the Tier 1 one, plus the audit flag
+    assert Mirror().sample(rng, None, ctx) == {"mirror": True, "blacklist": "gloss_unknown"}
     assert View().sample(rng, None, ctx) == {"yaw_deg": 7.0, "pitch_deg": -2.0}
     assert Scale().sample(rng, None, ctx) == {"factor": 1.1}
     assert Uncentre().sample(rng, None, ctx) == {"u": [0.2, 0.9], "limit": 0.125}
