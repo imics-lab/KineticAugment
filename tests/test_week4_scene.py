@@ -235,3 +235,75 @@ def test_uncentre_keeps_hands_in_frame():
         assert loss == 0.0 or loss is None
         moved += int(out.scene.shift.any())
     assert moved > 0
+
+
+def drift_clip(frames=12):
+    """A synthetic clip whose camera offset drifts linearly: x by -0.09, y by +0.04 in total."""
+    from tests.clip_fixtures import synthetic_clip
+
+    clip = synthetic_clip(frames=frames)
+    ramp = np.linspace(0.0, 1.0, frames)[:, None]
+    offset = 0.5 + ramp * np.array([-0.09, 0.04])
+    return clip.replace(camera=tier1.WeakCamera(clip.camera.scale, offset, 0.0))
+
+
+def shoulder_centre_drift(clip, skeleton):
+    out = build_outputs(clip, skeleton)
+    track = out.pose_image[:, [11, 12]].mean(axis=1)
+    return track - track.mean(axis=0)
+
+
+@requires_smplx
+def test_mirror_negates_image_drift_in_x():
+    from tests.clip_fixtures import get_skeleton
+
+    skeleton, clip = get_skeleton(), drift_clip()
+    base = shoulder_centre_drift(clip, skeleton)
+    mirrored = shoulder_centre_drift(
+        Mirror().apply(clip, {"mirror": True}, make_ctx(None)), skeleton
+    )
+    assert base[-1, 0] < -0.04
+    np.testing.assert_allclose(mirrored[:, 0], -base[:, 0], atol=1e-9)
+    np.testing.assert_allclose(mirrored[:, 1], base[:, 1], atol=1e-9)
+
+
+@requires_smplx
+def test_scale_multiplies_image_drift():
+    from tests.clip_fixtures import get_skeleton
+
+    skeleton, clip = get_skeleton(), drift_clip()
+    base = shoulder_centre_drift(clip, skeleton)
+    scaled = Scale().apply(clip, {"factor": 1.2}, make_ctx(None))
+    np.testing.assert_allclose(shoulder_centre_drift(scaled, skeleton), 1.2 * base, atol=1e-9)
+
+
+@requires_smplx
+def test_camera_drift_involutions():
+    clip, ctx = drift_clip(), make_ctx(None)
+    twice = Mirror().apply(Mirror().apply(clip, {"mirror": True}, ctx), {"mirror": True}, ctx)
+    np.testing.assert_allclose(twice.scene.apply_camera(twice.camera).offset, clip.camera.offset)
+    back = Scale().apply(Scale().apply(clip, {"factor": 1.3}, ctx), {"factor": 1 / 1.3}, ctx)
+    np.testing.assert_allclose(
+        back.scene.apply_camera(back.camera).offset, clip.camera.offset, atol=1e-12
+    )
+    assert clip.scene.apply_camera(clip.camera) is clip.camera
+
+
+@requires_smplx
+def test_uncentre_after_mirror_scale_and_drift_keeps_hands_in_frame():
+    from tests.clip_fixtures import get_skeleton
+
+    skeleton, clip, ctx = get_skeleton(), drift_clip(), make_ctx(None)
+    clip = Scale().apply(Mirror().apply(clip, {"mirror": True}, ctx), {"factor": 1.25}, ctx)
+    draw = {"u": [0.0, 1.0], "limit": 0.125}
+    shifted = Uncentre().apply(clip, draw, ctx)
+    before, after = build_outputs(clip, skeleton), build_outputs(shifted, skeleton)
+    np.testing.assert_allclose(
+        after.hands_image - before.hands_image,
+        np.broadcast_to(draw["image_shift"], before.hands_image.shape),
+        atol=1e-9,
+    )
+    uv_before, uv_after = before.hands_image.reshape(-1, 2), after.hands_image.reshape(-1, 2)
+    was_in = tier1.in_frame(uv_before)
+    assert was_in.any()
+    assert tier1.in_frame(uv_after)[was_in].all()

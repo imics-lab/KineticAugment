@@ -296,7 +296,7 @@ def build_outputs(clip: ClipData, skeleton, keep_vertices: bool = False) -> Clip
         face = face[:, face_perm]
         blendshapes = blendshapes[:, blendshape_mirror(clip.blendshape_names)]
 
-    camera = clip.camera
+    camera = scene.apply_camera(clip.camera)
     return ClipOutputs(
         pose_world=pose,
         hands_world=hands,
