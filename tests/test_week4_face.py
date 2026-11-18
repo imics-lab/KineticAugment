@@ -218,3 +218,89 @@ def test_expression_group_rejects_zero_truncation():
     with pytest.raises(ValueError):
         ExpressionJitter({"eyes": {"sigma": -0.1}})
     ExpressionJitter({"brows": {"sigma": 0.0, "truncate": 0.0}})
+
+
+def _structured_clip(frames=80, seed=0, dead=()):
+    """Face points that really depend on the scores, so the ridge map has motion everywhere."""
+    rng = np.random.default_rng(seed)
+    scores = np.zeros((frames, 52))
+    scores[:, 1:] = rng.uniform(0.1, 0.9, size=(frames, 51))
+    for name in dead:
+        scores[:, NAMES.index(name)] = 0.0
+    basis = rng.normal(size=(51, 478 * 3)) * 0.01
+    face = rng.normal(size=(478, 3)) + (scores[:, 1:] @ basis).reshape(frames, 478, 3)
+    return _Clip(face, np.ones(frames, dtype=bool), scores)
+
+
+def test_lips_do_not_move_with_only_brows_and_eyes():
+    from kinetic_augment.augmentations.face import GROUP_REGIONS
+
+    aug = ExpressionJitter()  # brows, eyes, cheeks_nose on; mouth_jaw off
+    clip = _structured_clip()
+    lips = list(GROUP_REGIONS["mouth_jaw"])
+    for seed in range(5):
+        draw = aug.sample(np.random.default_rng(seed), clip, None)
+        out = aug.apply(clip, draw, None)
+        assert not _same(out.face_local, clip.face_local)
+        assert np.array_equal(out.face_local[:, lips], clip.face_local[:, lips])
+
+
+def test_group_moves_only_its_region():
+    from kinetic_augment.augmentations.face import GROUP_REGIONS
+
+    ranges = {g: {"enabled": g == "brows"} for g in BLENDSHAPE_GROUPS}
+    aug = ExpressionJitter(ranges=ranges)
+    clip = _structured_clip()
+    out = aug.apply(clip, aug.sample(np.random.default_rng(0), clip, None), None)
+    moved = np.flatnonzero((out.face_local != clip.face_local).any(axis=(0, 2)))
+    assert len(moved) > 0 and set(moved) <= set(GROUP_REGIONS["brows"])
+
+
+def test_constant_blendshapes_untouched_and_not_fitted():
+    dead = ("eyeWideLeft", "browInnerUp")
+    clip = _structured_clip(dead=dead)
+    w, _ = fit_expression_map(clip.face_local, clip.blendshapes, clip.face_valid)
+    for name in dead:
+        assert not w[NAMES.index(name) - 1].any()
+    aug = ExpressionJitter()
+    for seed in range(5):
+        draw = aug.sample(np.random.default_rng(seed), clip, None)
+        out = aug.apply(clip, draw, None)
+        for name in dead:
+            i = NAMES.index(name)
+            assert np.array_equal(out.blendshapes[:, i], clip.blendshapes[:, i])
+            assert draw["offsets"][i - 1] == 0.0
+
+
+def test_group_with_all_scores_constant_is_inactive():
+    clip = _structured_clip(dead=("cheekSquintLeft", "cheekSquintRight", "noseSneerLeft",
+                                  "noseSneerRight"))  # fmt: skip
+    aug = ExpressionJitter()
+    draw = aug.sample(np.random.default_rng(0), clip, None)
+    assert draw["inactive"] == ["cheeks_nose"]
+    assert not any(draw["offsets"][i - 1] for i, n in enumerate(NAMES) if i and
+                   BLENDSHAPE_GROUPS["cheeks_nose"](n))  # fmt: skip
+
+
+def test_only_inactive_group_enabled_counts_as_not_applied():
+    from kinetic_augment.augmentations.chain import _non_identity
+
+    ranges = {g: {"enabled": g == "cheeks_nose"} for g in BLENDSHAPE_GROUPS}
+    clip = _structured_clip(dead=("cheekSquintLeft", "cheekSquintRight", "noseSneerLeft",
+                                  "noseSneerRight"))  # fmt: skip
+    aug = ExpressionJitter(ranges=ranges)
+    draw = aug.sample(np.random.default_rng(0), clip, None)
+    assert draw["inactive"] == ["cheeks_nose"]
+    assert not _non_identity("face.expression_jitter", draw)
+    out = aug.apply(clip, draw, None)
+    assert _same(out.face_local, clip.face_local)
+    assert _same(out.blendshapes, clip.blendshapes)
+    live = ExpressionJitter().sample(np.random.default_rng(0), _structured_clip(), None)
+    assert _non_identity("face.expression_jitter", live)
+
+
+def test_ridge_alpha_must_be_positive():
+    with pytest.raises(ValueError, match="ridge_alpha"):
+        ExpressionJitter({"ridge_alpha": 0.0})
+    with pytest.raises(ValueError, match="ridge_alpha"):
+        ExpressionJitter({"ridge_alpha": -1.0})

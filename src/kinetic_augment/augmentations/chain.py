@@ -89,6 +89,10 @@ def _non_identity(name: str, draw: Dict[str, Any]) -> bool:
         return bool(draw["joints"])
     if name == "body.limb_length_scaling":
         return not draw.get("fallback")  # a fallback returned the clip unchanged
+    if name == "face.expression_jitter":
+        # every enabled group inactive (all scores constant) and no noise: nothing moved
+        noise = draw.get("noise")
+        return any(draw["offsets"]) or (noise is not None and bool(np.any(noise)))
     return True
 
 
