@@ -17,7 +17,7 @@ regions:
         elbow_sigma_deg: 4.75  # proven: ±7.5° elbow, no harm in pose-based translation [T]; default/ambitious use 4.75
         elbow_truncate_deg: 9.5  # proven: ±7.5° elbow [T]; default/ambitious use 9.5
         chain_coupling: 0.5  # proven: none — shoulder/wrist share a common draw; designer's choice
-        side_coupling: 0.7  # proven: none — left/right correlation; designer's choice
+        side_coupling: 0.7  # proven: none — left/right coupling of the Gaussian before truncation (realised correlation ~0.56 at 5°); designer's choice
         side_mode: mirror  # setting: how the two sides relate (mirror, independent or synchronous)
         drift_deg: 0.0  # proven: none — slow drift over the clip is off
     tier1_arm_joints:
@@ -53,7 +53,7 @@ regions:
       ranges:
         sigma_deg: 3.75  # proven: none — no published range; estimate 3° widened 25%
         truncate_deg: 7.5  # proven: none — no published range; estimate 6° widened 25%
-        finger_coupling: 0.5  # proven: none — correlation between neighbouring fingers; designer's choice
+        finger_coupling: 0.5  # proven: none — neighbouring-finger coupling before truncation (realised correlation is lower); designer's choice
         dip_ratio: 0.667  # setting: DIP flexion follows the PIP by this ratio
     handshape_jitter:
       enabled: false  # setting: on/off switch for this augmentation

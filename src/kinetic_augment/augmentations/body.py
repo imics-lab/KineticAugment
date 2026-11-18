@@ -3,7 +3,9 @@ Week-4 body augmentations on SMPL-X arm joints.
 
 `ArmCoupledNoise` draws one small rotation per arm joint (shoulder, elbow, wrist, both sides) for
 the clip. Joints along a chain share a common component (`chain_coupling`), and the right side is
-correlated with the mirrored left (`side_coupling`). `Tier1ArmJoints` applies the Tier 1 arm-joint
+correlated with the mirrored left (`side_coupling`). The couplings are those of the Gaussian
+before truncation; the realised correlation is lower (about 0.56 for `side_coupling` 0.7 at the
+5 degree default). `Tier1ArmJoints` applies the Tier 1 arm-joint
 draw that the chain hands over in `ChainContext.tier1_draw`. `LimbLengthScaling` rescales the arm
 bones in the rest skeleton and, optionally, re-aims each frame's arm so the wrists stay put.
 
@@ -260,7 +262,13 @@ def _scale_hand(rest: np.ndarray, parents: np.ndarray, wrist: int, factor: float
 
 @AugmentationRegistry.register("body.limb_length_scaling")
 class LimbLengthScaling(ClipAugmentation):
-    """Scale arm bone lengths in the rest skeleton, keeping the wrists in place if `retarget`."""
+    """Scale arm bone lengths in the rest skeleton, keeping the wrists in place if `retarget`.
+
+    The `max_residual_mm` fallback acts on one side. On straight-arm clips shortening below about
+    0.98 cannot keep the wrists in place (01991: 0.93 leaves 33.9 mm, 0.97 14.5 mm, 0.99 4.8 mm)
+    and falls back to the unchanged clip, while lengthening always reaches. The realised range
+    is roughly 0.98-1.07 and about a quarter of draws fall back at the default limits.
+    """
 
     key = "limb_length_scaling"
     regions = ("body",)

@@ -6,7 +6,7 @@
 | `base.py` | Base classes (`BaseAugmentation`, landmark/SMPL-X variants, `ClipAugmentation`, region tags) and `AugmentationRegistry` |
 | `ranges.py` | Seeded per-clip RNG, range parsing (uniform and log-uniform), truncated-normal sampling |
 | `clip.py` | Week-4 clip container (`ClipData`, `SceneTransform`, `ChainContext`), building it from a `run_clip` result, slerp re-timing and frame selection |
-| `outputs.py` | MediaPipe-layout outputs from a `ClipData`: SMPL-X skinning on edited rest joints (`pose_mesh_rest`), pose arms, hands, carried face, scene transform, mirroring and camera projection |
+| `outputs.py` | MediaPipe-layout outputs from a `ClipData`: SMPL-X skinning on edited rest joints (`pose_mesh_rest`), pose arms, hands, carried face, scene transform, mirroring and camera projection; image z is relative per stream (hip midpoint, wrist, face mean) with fitted depth scales, and `pixels()` gives x * width, y * height, z * width |
 | `arm_ik.py` | Analytic two-bone arm IK (wrist to a world target, swivel plane and hand world orientation kept), local `world_pose` FK and the torso frame |
 | `blacklist.py` | Mirror blacklist loader (`configs/mirror_blacklist.yaml`) and the clip id -> gloss map from `data/wlasl/clip_glosses.csv`; both cached |
 | `body.py` | Week-4 body augmentations: coupled arm-joint noise (`body.joint_coupled_noise`), the Tier 1 arm-joint wrapper (`body.tier1_arm_joints`), limb length scaling with wrist retargeting (`body.limb_length_scaling`), movement-size scaling (`body.movement_size`) and location jitter (`body.location_jitter`), plus the shared `retarget_wrists` helper |
@@ -21,6 +21,6 @@
 | `intrinsic.py` | SMPL-X parameter-space joint, hand, coupled and global-orientation perturbations |
 | `temporal.py` | Time warping, speed variation, frame dropping |
 | `timing.py` | Week-4 temporal augmentations: time warp modes (uniform, varied speed, slowed segment), frame dropping (rate or random with a gap limit; none/hold/interpolate fill) and hand-dropout runs |
-| `tier1.py` | Tier 1 augmentations (Augmentation_Grounding.md §3: mirror, view, duration, arm joints, scale, uncentre) with a weak-perspective camera that keeps the hands in frame; not in the registry or `Pipeline` |
+| `tier1.py` | Tier 1 augmentations (Augmentation_Grounding.md §3: mirror, view, duration, arm joints, scale, uncentre) with a weak-perspective camera that keeps the hands in frame and records the frame size, per-stream depth scales and depth fallbacks; not in the registry or `Pipeline` |
 | `report.py` | `measure(base, aug, aligned)`: wrist movement, bone-length change, wrist jitter ratio, face rigidity, closest hand-to-face distance and in-frame share for one augmented run |
 | `index.md` | This index |

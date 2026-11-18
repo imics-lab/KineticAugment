@@ -181,6 +181,18 @@ pipeline = Pipeline.from_yaml('configs/slr_profile.yaml')
 augmented = pipeline.process(landmarks, enforce_constraints=True)
 ```
 
+The week-4 profiles (`configs/slr_week4_*.yaml`) use their own format and run through the
+augmentation chain:
+
+```python
+from kinetic_augment.augmentations.chain import AugmentationChain
+from kinetic_augment.augmentations.profile import load_profile
+
+# `skeleton` is the SMPL-X rest skeleton; `clip` is a `ClipData` (fitted body, hands, face)
+chain = AugmentationChain(load_profile('configs/slr_week4_default.yaml'), skeleton)
+result = chain.run(clip)  # ChainResult: .clip, .outputs, .draws, .applied, .fallbacks
+```
+
 `configs/legacy/` holds configs for the deprecated `AugmentationPipeline` (in `src/kinetic_augment/legacy/`). They use a different format and do not load with `Pipeline.from_yaml`.
 
 ### PyTorch Dataset Integration
