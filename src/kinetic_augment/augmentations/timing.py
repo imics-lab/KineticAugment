@@ -15,7 +15,7 @@ interpolating. Hand dropout works on the outputs: runs of NaN hand rows, drawn o
 frames.
 """
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence
 
 import dataclasses
 
@@ -25,7 +25,7 @@ from scipy.interpolate import PchipInterpolator
 from . import tier1
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData, resample_clip, select_frames
-from .ranges import check_non_negative, check_positive, check_range, check_unit, parse_range
+from .ranges import check_non_negative, check_positive, check_range, parse_range
 
 __all__ = [
     "times_from_rates",

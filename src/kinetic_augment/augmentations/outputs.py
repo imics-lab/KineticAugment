@@ -65,8 +65,8 @@ class ClipOutputs:
 
     The `*_image` arrays are MediaPipe's normalised image landmarks: x / width, y / height and
     z relative to the pose's hip midpoint (`hip_centre_world`), each hand's wrist or the face's
-    mean, scaled per stream like the clip's MediaPipe z (module docstring). `pixels` gives them in pixels
-    (x * width, y * height, z * width) when the source `frame_size` is known.
+    mean, scaled per stream like the clip's MediaPipe z (module docstring). `pixels` gives them in
+    pixels (x * width, y * height, z * width) when the source `frame_size` is known.
     """
 
     pose_world: np.ndarray  # (T, 33, 3)

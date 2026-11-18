@@ -179,7 +179,7 @@ def _classify(bend: np.ndarray) -> np.ndarray:
 
 
 def handshape_features(rotations, rest_joints, parents, side: str) -> HandshapeFeatures:
-    """Bend, state, spread and thumb abduction of one hand over frames (see the module docstring)."""
+    """Bend, state, spread and thumb abduction of one hand over frames (see module docstring)."""
     pos, world = _hand_pose(rotations, rest_joints, parents, side)
     axes = flexion_axes(rest_joints, side)
     bends, bones = [], {}
@@ -240,8 +240,9 @@ def features_changed(
 
     Each threshold is tested on its own with a dead band: a class change counts only when `after`
     is on the opposite side of the threshold from `before` by more than the margin; frames whose
-    `before` lies within the margin of the threshold are skipped. `margin_deg` overrides every margin; by default each feature uses its
-    entry of `FEATURE_MARGIN_DEG`. Frames that are not finite in either set are ignored.
+    `before` lies within the margin of the threshold are skipped. `margin_deg` overrides every
+    margin; by default each feature uses its entry of `FEATURE_MARGIN_DEG`. Frames that are not
+    finite in either set are ignored.
     """
     margins = (
         FEATURE_MARGIN_DEG if margin_deg is None else dict.fromkeys(FEATURE_MARGIN_DEG, margin_deg)

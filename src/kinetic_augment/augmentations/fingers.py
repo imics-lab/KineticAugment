@@ -4,7 +4,8 @@ Week-4 finger augmentations on the SMPL-X hand joints.
 `FingerCoupledNoise` draws one flexion offset per finger MCP and PIP for the clip (constant over
 time). Index, middle, ring and pinky are coupled to their neighbour in that order
 (`x_f = c * x_(f-1) + sqrt(1 - c^2) * z_f`); the thumb is independent. The DIP follows the PIP at
-`dip_ratio`. `HandshapeJitter` draws a small rotation on every finger joint, larger on fingers
+`dip_ratio`. `finger_coupling` is the coupling before truncation, so the realised neighbour
+correlation is lower. `HandshapeJitter` draws a small rotation on every finger joint, larger on fingers
 that are not selected (see `handshape.selected_fingers`), and redraws it while it would change the
 handshape class (`handshape.features_changed`); after `max_redraws` redraws it gives up and
 returns the identity draw with `draw["fallback"] = "no_valid_redraw"`.
@@ -14,13 +15,12 @@ at least one frame, in the convention of `handshape.apply_finger_offsets` (the s
 both hands as mirror images). Draws are plain lists, so they are JSON-serialisable.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import numpy as np
 
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
-from .ranges import resample_coupled, truncated_normal
 from .handshape import (
     FINGER_SLOTS,
     FINGERS,
@@ -31,7 +31,13 @@ from .handshape import (
     handshape_features,
     selected_fingers,
 )
-from .ranges import check_non_negative, check_truncation, check_unit, truncated_normal
+from .ranges import (
+    check_non_negative,
+    check_truncation,
+    check_unit,
+    resample_coupled,
+    truncated_normal,
+)
 
 SIDES = ("left", "right")
 _NEIGHBOUR_CHAIN = (1, 2, 3, 4)  # index -> middle -> ring -> pinky in FINGERS order
