@@ -14,7 +14,7 @@ from kinetic_augment.lab.schema import build_schema, load_knobs
 CONFIGS = Path(__file__).resolve().parents[1] / "configs"
 LAB_IDS = [k for k, r in RUNS.items() if r.entry is not None]
 NOT_EXTREME = {"temporal.time_warp.varied", "temporal.time_warp.segment"}
-FIXED = {"mode_weights"}
+FIXED = {"mode_weights", "blacklist"}  # not sliders: a mode table, a file path
 
 
 def _flat(ranges, prefix=""):
@@ -199,5 +199,5 @@ def test_no_yaml_aliases():
 def test_caps_sit_on_truncation_knobs():
     knobs = {k["key"]: k for k in _entries()["body.joint_coupled_noise"]["knobs"]}
     assert knobs["sigma_deg"]["proven"] is None and knobs["elbow_sigma_deg"]["proven"] is None
-    assert knobs["truncate_deg"]["proven"] == [0, 4]
-    assert knobs["elbow_truncate_deg"]["proven"] == [0, 7.5]
+    assert knobs["truncate_deg"]["proven"] == [0.25, 4]
+    assert knobs["elbow_truncate_deg"]["proven"] == [0.25, 7.5]

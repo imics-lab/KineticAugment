@@ -14,10 +14,16 @@ from typing import Any, Callable, Dict, Optional, Tuple
 import numpy as np
 from scipy.signal import butter, filtfilt, freqz
 
-from ..body_model.face_correspondence import RIGID
+from ..body_model.face_correspondence import (
+    LEFT_EYE,
+    LEFT_EYEBROW,
+    RIGHT_EYE,
+    RIGHT_EYEBROW,
+    RIGID,
+)
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
-from .ranges import check_truncation, truncated_normal
+from .ranges import check_non_negative, check_positive, check_truncation, truncated_normal
 
 BLENDSHAPE_GROUPS: Dict[str, Callable[[str], bool]] = {
     "brows": lambda n: n.startswith("brow"),
@@ -30,6 +36,55 @@ BLENDSHAPE_GROUPS: Dict[str, Callable[[str], bool]] = {
 _GROUP_KEYS = ("enabled", "sigma", "truncate")
 _NUM_POINTS = 478
 
+# A score whose std over the fitted frames is below this carries no signal (MediaPipe emits a flat
+# 0 for cheekSquint/noseSneer and some scores barely move), so the ridge cannot map it to motion:
+# its offset would vanish or explode. Such scores are left out of the fit and never jittered.
+MIN_SCORE_STD = 0.01
+
+# Landmark region each group moves. Index sets are MediaPipe's face-mesh connection groups
+# (mediapipe.solutions.face_mesh_connections: LIPS, FACE_OVAL, NOSE, irises); eyes, brows and the
+# eye/brow rings are reused from body_model.face_correspondence. A group's jitter reaches only
+# these landmarks, so brow/eye offsets cannot leak into the lips.
+_LIPS = (
+    0, 13, 14, 17, 37, 39, 40, 61, 78, 80, 81, 82, 84, 87, 88, 91, 95, 146, 178, 181, 185, 191,
+    267, 269, 270, 291, 308, 310, 311, 312, 314, 317, 318, 321, 324, 375, 402, 405, 409, 415,
+)  # fmt: skip
+# Lower half of FACE_OVAL (chin and jaw line), below the mouth corners.
+_JAW_LINE = (
+    58, 132, 136, 148, 149, 150, 152, 172, 176, 288, 361, 365, 377, 378, 379, 397, 400,
+)  # fmt: skip
+_NOSE_WINGS = (
+    1, 2, 4, 5, 6, 19, 45, 48, 64, 94, 97, 98, 115, 168, 195, 197, 220, 275, 278, 294, 326, 327,
+    344, 440,
+)  # fmt: skip
+_IRISES = tuple(range(468, 478))
+GROUP_REGIONS: Dict[str, Tuple[int, ...]] = {
+    "brows": tuple(sorted(RIGHT_EYEBROW + LEFT_EYEBROW)),
+    "eyes": tuple(sorted(RIGHT_EYE + LEFT_EYE + _IRISES)),
+    "cheeks_nose": tuple(sorted(_NOSE_WINGS)),
+    "mouth_jaw": tuple(sorted(_LIPS + _JAW_LINE)),
+}
+
+
+def constant_scores(blendshapes: np.ndarray, valid: np.ndarray) -> np.ndarray:
+    """Boolean (51,) mask of the non-neutral scores whose std on the usable frames is too small.
+
+    Usable frames are valid with finite scores. With none, nothing is flagged.
+    """
+    scores = np.asarray(blendshapes, dtype=np.float64)[:, 1:]
+    use = np.asarray(valid, dtype=bool) & np.isfinite(scores).all(axis=1)
+    if not use.any():
+        return np.zeros(scores.shape[1], dtype=bool)
+    return scores[use].std(axis=0) < MIN_SCORE_STD
+
+
+def region_mask(group: str) -> np.ndarray:
+    """Boolean (478,) mask of the landmarks `group` may move (rigid points excluded)."""
+    mask = np.zeros(_NUM_POINTS, dtype=bool)
+    mask[list(GROUP_REGIONS[group])] = True
+    mask[list(RIGID)] = False
+    return mask
+
 
 def fit_expression_map(
     face_local: np.ndarray, blendshapes: np.ndarray, valid: np.ndarray, alpha: float = 1e-2
@@ -38,6 +93,7 @@ def fit_expression_map(
 
     Returns `(W, median_face)`: `W` is (51, 478*3) and maps centred scores to the flattened offset
     from the median face; rigid point columns are zero. Fitted on valid frames with finite scores.
+    Scores with std below `MIN_SCORE_STD` are left out of the fit and get zero rows.
     """
     scores = np.asarray(blendshapes, dtype=np.float64)[:, 1:]
     points = np.asarray(face_local, dtype=np.float64)
@@ -47,9 +103,12 @@ def fit_expression_map(
     if not use.any():
         return np.zeros((n_scores, _NUM_POINTS * 3)), np.zeros((_NUM_POINTS, 3))
     median = np.median(points[use], axis=0)
-    x = scores[use] - scores[use].mean(axis=0)
+    live = ~constant_scores(blendshapes, valid)
+    x = scores[use][:, live] - scores[use][:, live].mean(axis=0)
     y = (points[use] - median).reshape(int(use.sum()), -1)
-    w = np.linalg.solve(x.T @ x + float(alpha) * np.eye(n_scores), x.T @ y)
+    w = np.zeros((n_scores, _NUM_POINTS * 3))
+    if live.any():
+        w[live] = np.linalg.solve(x.T @ x + float(alpha) * np.eye(int(live.sum())), x.T @ y)
     for p in RIGID:
         w[:, 3 * p : 3 * p + 3] = 0.0
     return w, median
@@ -95,14 +154,17 @@ class ExpressionJitter(ClipAugmentation):
                         raise ValueError(f"Unknown key {k!r} in group {group!r}")
                 given[group] = {**self.DEFAULT_RANGES[group], **value}
         super().__init__(ranges=given, probability=probability)
+
+    def validate_ranges(self) -> None:
         for group in BLENDSHAPE_GROUPS:
             g = self.ranges[group]
-            check_truncation(g["sigma"], g["truncate"], group)
-        for k in ("frame_noise", "ridge_alpha"):
-            if float(self.ranges[k]) < 0:
-                raise ValueError(f"{k} must be >= 0, got {self.ranges[k]!r}")
-        if int(self.ranges["min_face_frames"]) < 0:
-            raise ValueError("min_face_frames must be >= 0")
+            for k in ("sigma", "truncate"):
+                check_non_negative(g[k], self.label(f"{group}.{k}"))
+            check_truncation(g["sigma"], g["truncate"], self.label(f"{group}.truncate"))
+        check_non_negative(self.ranges["frame_noise"], self.label("frame_noise"))
+        check_positive(self.ranges["ridge_alpha"], self.label("ridge_alpha"))
+        if check_non_negative(self.ranges["min_face_frames"], self.label("min_face_frames")) % 1:
+            raise ValueError(f"{self.label('min_face_frames')} must be a whole number")
 
     def _enabled_mask(self, names: Tuple[str, ...]) -> np.ndarray:
         """Boolean (51,) mask of the non-neutral scores in enabled groups."""
@@ -119,16 +181,24 @@ class ExpressionJitter(ClipAugmentation):
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         names = tuple(clip.blendshape_names)
         offsets = np.zeros(len(names) - 1)
+        dead = constant_scores(clip.blendshapes, self._valid_frames(clip))
+        inactive = []
         for group, member in BLENDSHAPE_GROUPS.items():
             g = self.ranges[group]
             if not bool(g["enabled"]):
                 continue
             idx = [i for i, n in enumerate(names[1:]) if member(n)]
+            # Draw for every member (keeps the rng stream stable), then drop the dead scores.
             offsets[idx] = truncated_normal(rng, float(g["sigma"]), float(g["truncate"]), len(idx))
+            if all(dead[i] for i in idx):
+                inactive.append(group)
+        offsets[dead] = 0.0
         draw: Dict[str, Any] = {"offsets": [float(v) for v in offsets], "noise": None}
+        if inactive:
+            draw["inactive"] = inactive
         std = float(self.ranges["frame_noise"])
         if std > 0:
-            mask = self._enabled_mask(names)
+            mask = self._enabled_mask(names) & ~dead
             noise = np.zeros((clip.blendshapes.shape[0], len(offsets)))
             noise[:, mask] = _lowpass_noise(rng, noise.shape[0], int(mask.sum()), clip.fps) * std
             draw["noise"] = noise.tolist()
@@ -164,8 +234,13 @@ class ExpressionJitter(ClipAugmentation):
                 float(self.ranges["ridge_alpha"]),
             )
             face = np.array(target.face_local, dtype=np.float64, copy=True)
-            shift = (new[valid, 1:] - old[valid, 1:]) @ w
-            face[valid] += shift.reshape(-1, _NUM_POINTS, 3)
+            change = new[valid, 1:] - old[valid, 1:]
+            names = tuple(target.blendshape_names)
+            for group, member in BLENDSHAPE_GROUPS.items():
+                members = np.array([member(n) for n in names[1:]], dtype=bool)
+                shift = (change * members) @ w
+                shift = shift.reshape(-1, _NUM_POINTS, 3) * region_mask(group)[None, :, None]
+                face[valid] += shift
             changes["face_local"] = face
         return target.replace(**changes)
 

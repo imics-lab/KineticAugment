@@ -420,3 +420,56 @@ def test_arm_noise_drift_draw_is_json():
     drift = result.draws["body.joint_coupled_noise"]["drift"]
     assert isinstance(drift, list) and len(drift) == 12
     json.dumps(result.draws)
+
+
+BAD_RANGES = [
+    ("body.limb_length_scaling", "bones", ["foo"]),
+    ("body.limb_length_scaling", "bones", "upper_arm"),
+    ("body.limb_length_scaling", "factor", [-1, 0]),
+    ("body.limb_length_scaling", "factor", [0, 1.2]),
+    ("body.movement_size", "factor", [0, 1.2]),
+    ("body.movement_size", "factor", "abc"),
+    ("body.movement_size", "factor", [0.8, float("inf")]),
+    ("scene.scale", "factor", [-1, 1]),
+    ("scene.scale", "factor", [1, float("inf")]),
+    ("scene.scale", "factor", [float("nan"), 1]),
+    ("scene.mirror", "p", 1.7),
+    ("scene.mirror", "p", -0.1),
+    ("scene.view", "yaw_deg", -30),
+    ("scene.view", "pitch_deg", -1),
+    ("scene.view", "yaw_deg", [0, 30]),
+    ("scene.view", "yaw_deg", float("inf")),
+    ("scene.uncentre", "limit", -0.2),
+    ("body.tier1_arm_joints", "p", 5),
+    ("body.tier1_arm_joints", "shoulder_wrist_deg", -1),
+    ("body.tier1_arm_joints", "elbow_deg", float("nan")),
+    ("temporal.frame_drop", "p", [0, 3]),
+    ("temporal.frame_drop", "p", [0.3, 0.1]),
+    ("temporal.frame_drop", "target_fps", [-5, 25]),
+    ("temporal.hand_dropout", "start_rate", [-1, 2]),
+    ("temporal.time_warp", "segment_width", [0.5, 3]),
+    ("temporal.time_warp", "segment_width", [-0.1, 0.5]),
+    ("temporal.time_warp", "duration", [0, 2]),
+    ("temporal.time_warp", "knot_rate", [-1, 2]),
+    ("temporal.time_warp", "segment_factor", [0, 2]),
+    ("body.joint_coupled_noise", "truncate_deg", 0),
+    ("body.joint_coupled_noise", "sigma_deg", float("inf")),
+    ("body.location_jitter", "sigma_mm", float("nan")),
+    ("fingers.joint_coupled_noise", "truncate_deg", 0),
+    ("fingers.handshape_jitter", "truncate_sigmas", 0),
+]
+
+
+@pytest.mark.parametrize("name,key,value", BAD_RANGES)
+def test_bad_range_value_fails_at_load(name, key, value):
+    from kinetic_augment.augmentations.profile import profile_from_dict
+
+    region, entry = name.split(".")
+    data = {
+        "seed": 0,
+        "schema_version": 1,
+        "regions": {region: {entry: {"enabled": True, "ranges": {key: value}}}},
+    }
+    with pytest.raises(ValueError) as err:
+        profile_from_dict(data)
+    assert key in str(err.value)

@@ -117,9 +117,109 @@ def test_features_changed_margin():
     assert features_changed(fake([0, 0, 0, 0, 10]), fake([0, 0, 0, 0, EXTENDED_MAX_DEG + 8]))
     assert not features_changed(fake([10] * 5), fake([10] * 5))
     # Spread and thumb classes, with their own thresholds.
-    assert features_changed(fake([10] * 5, spread=10), fake([10] * 5, spread=40))
-    assert features_changed(fake([10] * 5, thumb=20), fake([10] * 5, thumb=60))
-    assert not features_changed(fake([10] * 5, spread=10), fake([10] * 5, spread=29))
+    assert features_changed(fake([10] * 5, spread=0), fake([10] * 5, spread=40))
+    assert features_changed(fake([10] * 5, thumb=20), fake([10] * 5, thumb=70))
+    assert not features_changed(fake([10] * 5, spread=0), fake([10] * 5, spread=12))
+
+
+def _abducted_rest(side, step_deg):
+    """Rest hand whose four fingers are each turned `step_deg` further from the last."""
+    from kinetic_augment.augmentations.handshape import _palm_normal
+
+    skeleton = get_skeleton()
+    normal = _palm_normal(skeleton.rest_joints, side)
+    rot = np.zeros((1, 55, 3))
+    for k, name in enumerate(("index", "middle", "ring", "pinky")):
+        rot[0, HAND_START[side] + FINGER_SLOTS[name][0]] = np.radians(step_deg * k) * normal
+    return rot
+
+
+def test_rest_hand_spread_is_not_wide_and_thumb_not_abducted():
+    from kinetic_augment.augmentations.handshape import (
+        FEATURE_MARGIN_DEG,
+        SPREAD_THRESHOLD_DEG,
+        THUMB_THRESHOLD_DEG,
+        feature_signature,
+    )
+
+    for side in ("left", "right"):
+        f = features(zero_clip(), side)
+        assert f.spread_deg[0] < SPREAD_THRESHOLD_DEG - FEATURE_MARGIN_DEG["spread"], f.spread_deg
+        thumb_gap = THUMB_THRESHOLD_DEG - f.thumb_abduction_deg[0]
+        assert thumb_gap > FEATURE_MARGIN_DEG["thumb"], f.thumb_abduction_deg
+        assert feature_signature(f)[1:] == (False, False)
+
+
+def test_abducted_hand_reads_wide():
+    from kinetic_augment.augmentations.handshape import SPREAD_THRESHOLD_DEG, feature_signature
+
+    for side in ("left", "right"):
+        rest = features(_abducted_rest(side, 0.0), side).spread_deg[0]
+        # Each finger abducted 15 degrees from its neighbour, in whichever sense widens the fan.
+        wide = max(features(_abducted_rest(side, d), side).spread_deg[0] for d in (15.0, -15.0))
+        assert wide - rest > 10.0, (rest, wide)
+        assert wide >= SPREAD_THRESHOLD_DEG
+        sign = 15.0 if features(_abducted_rest(side, 15.0), side).spread_deg[0] == wide else -15.0
+        assert feature_signature(features(_abducted_rest(side, sign), side))[1] is True
+
+
+def test_spread_ignores_finger_flexion():
+    skeleton = get_skeleton()
+    for side in ("left", "right"):
+        axes = flexion_axes(skeleton.rest_joints, side)
+        base = features(np.zeros((1, 55, 3)), side).spread_deg[0]
+        for angle in (30.0, 60.0):
+            rot = np.zeros((1, 55, 3))
+            for name in ("index", "middle", "ring", "pinky"):
+                slot = FINGER_SLOTS[name][0]
+                rot[0, HAND_START[side] + slot] = np.radians(angle) * axes[slot]
+            assert abs(features(rot, side).spread_deg[0] - base) < 4.0, (side, angle)
+
+
+def test_two_degree_noise_on_rest_never_changes_features():
+    skeleton = get_skeleton()
+    rng = np.random.default_rng(11)
+    rest = np.zeros((1, 55, 3))
+    for side in ("left", "right"):
+        before = features(rest, side)
+        for _ in range(200):
+            noise = rng.uniform(-2.0, 2.0, (15, 3))
+            moved = apply_finger_offsets(rest, skeleton.rest_joints, side, noise)
+            assert not features_changed(before, features(moved, side)), noise
+
+
+def test_features_changed_dead_band_applies_to_both_sides_of_threshold():
+    from kinetic_augment.augmentations.handshape import SPREAD_THRESHOLD_DEG as T
+
+    # The augmented value must clear the threshold by more than the margin ...
+    assert not features_changed(fake([10] * 5, spread=T - 7), fake([10] * 5, spread=T + 3))
+    assert features_changed(fake([10] * 5, spread=T - 7), fake([10] * 5, spread=T + 7))
+    assert not features_changed(fake([10] * 5, spread=T + 7), fake([10] * 5, spread=T - 3))
+    assert features_changed(fake([10] * 5, spread=T + 7), fake([10] * 5, spread=T - 7))
+    assert features_changed(fake([10] * 5, spread=T + 7), fake([10] * 5, spread=T - 3), 1.0)
+    # ... and a frame that starts within the margin of the threshold is not counted at all.
+    assert not features_changed(fake([10] * 5, spread=T - 2), fake([10] * 5, spread=T + 12))
+    assert not features_changed(fake([10] * 5, spread=T + 2), fake([10] * 5, spread=T - 12))
+
+
+def test_handshape_jitter_pilot_clip_fallback_rate():
+    from tests.clip_fixtures import real_clip
+
+    clip, _, _ = real_clip()
+    aug = HandshapeJitter()
+    ctx = make_ctx()
+    fallbacks = sum(
+        bool(aug.sample(clip_rng(k, clip.clip_id, aug.key), clip, ctx).get("fallback"))
+        for k in range(100)
+    )
+    assert fallbacks <= 5, fallbacks
+
+
+def test_handshape_jitter_never_falls_back_on_the_rest_hand():
+    clip = zero_clip(frames=4)
+    aug = HandshapeJitter()
+    for seed in range(100):
+        assert not sample(aug, clip, seed).get("fallback"), seed
 
 
 def test_selected_fingers_defaults_to_index():
@@ -262,6 +362,12 @@ def test_handshape_jitter_fallback():
     out = aug.apply(clip, draw, make_ctx())
     assert np.array_equal(out.rotations, clip.rotations, equal_nan=True)
 
+    from kinetic_augment.augmentations.chain import _non_identity
+
+    assert not _non_identity("fingers.handshape_jitter", draw)
+    ok = {k: v for k, v in draw.items() if k != "fallback"}
+    assert _non_identity("fingers.handshape_jitter", ok)
+
 
 def test_missing_hand_skipped():
     clip = synthetic_clip(frames=6)
@@ -294,3 +400,35 @@ def test_handshape_jitter_rejects_zero_truncation():
             "selected_flexion_sigma_deg": 0.0,
         }
     )
+
+
+def test_finger_truncation_has_no_mass_at_bound():
+    clip = synthetic_clip(frames=2)
+    aug = FingerCoupledNoise()
+    values = []
+    for seed in range(10000):
+        d = sample(aug, clip, seed)
+        values.extend(d["mcp_deg"] + d["pip_deg"])
+    values = np.array(values)
+    assert np.all(np.abs(values) <= 7.5)
+    assert not np.any(np.abs(values) == 7.5)
+
+
+def test_finger_thumb_std_matches_truncated_normal():
+    from scipy.stats import truncnorm
+
+    clip = synthetic_clip(frames=2)
+    aug = FingerCoupledNoise()
+    thumb = [sample(aug, clip, seed)["mcp_deg"][0] for seed in range(10000)]
+    expected = float(truncnorm.std(-2.0, 2.0, scale=3.75))
+    assert np.std(thumb) == pytest.approx(expected, rel=0.05)
+
+
+def test_finger_truncation_deterministic_and_tight_limit_terminates():
+    clip = synthetic_clip(frames=2)
+    aug = FingerCoupledNoise()
+    assert sample(aug, clip, 3) == sample(aug, clip, 3)
+    tight = FingerCoupledNoise({"truncate_deg": 0.01})
+    for seed in range(20):
+        d = sample(tight, clip, seed)
+        assert all(abs(v) <= 0.01 for v in d["mcp_deg"] + d["pip_deg"])

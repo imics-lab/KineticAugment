@@ -80,3 +80,34 @@ def test_demo_week4_still_imports():
         sys.path.remove(scripts)
     assert demo_week4.RUNS is runs.RUNS
     assert demo_week4.run_profile is runs.run_profile
+
+
+def test_bundle_image_arrays_keep_x_and_y():
+    """The bundle's img_* arrays stay (..., 2) x, y although the outputs now carry z."""
+    from types import SimpleNamespace
+
+    from kinetic_augment.lab.bundle import bundle_arrays
+
+    rng = np.random.default_rng(3)
+    t = 4
+    outputs = SimpleNamespace(
+        hand_valid=np.ones((t, 2), bool),
+        face_valid=np.ones(t, bool),
+        pose_world=rng.normal(size=(t, 33, 3)),
+        hands_world=rng.normal(size=(t, 2, 21, 3)),
+        face_world=rng.normal(size=(t, 478, 3)),
+        pose_image=rng.normal(size=(t, 33, 3)),
+        hands_image=rng.normal(size=(t, 2, 21, 3)),
+        face_image=rng.normal(size=(t, 478, 3)),
+    )
+    mp = np.array([0, 5, 9])
+    arrays, _ = bundle_arrays(outputs, [None] * t, np.arange(t, dtype=float), mp)
+    np.testing.assert_array_equal(
+        arrays["img_arm"][0], outputs.pose_image[:, 11:17, :2].astype(np.float32)
+    )
+    np.testing.assert_array_equal(
+        arrays["img_hands"][0], outputs.hands_image[..., :2].astype(np.float32)
+    )
+    np.testing.assert_array_equal(
+        arrays["img_face"][0], outputs.face_image[:, mp, :2].astype(np.float32)
+    )

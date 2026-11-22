@@ -41,10 +41,10 @@ body.joint_coupled_noise:
     technical: shoulder/wrist truncation (truncate_deg)
     unit: °
     proven:
-    - 0
+    - 0.25
     - 4
     limits:
-    - 0
+    - 0.25
     - 10
     step: 0.25
     share: false
@@ -69,10 +69,10 @@ body.joint_coupled_noise:
     technical: elbow truncation (elbow_truncate_deg)
     unit: °
     proven:
-    - 0
+    - 0.25
     - 7.5
     limits:
-    - 0
+    - 0.25
     - 15
     step: 0.25
     share: false
@@ -91,7 +91,9 @@ body.joint_coupled_noise:
     active: true
   - key: side_coupling
     kind: scalar
-    plain: How much the left and right arms change alike (0 = independently, 1 = identically).
+    plain: How much the left and right arms change alike (0 = independently, 1 = identically). This is
+      the coupling before the limit cuts large draws, so the real match is lower (about 0.56 for 0.7 at
+      the 5° default).
     technical: side coupling (side_coupling)
     unit: 0–1
     proven: null
@@ -139,7 +141,9 @@ body.limb_length_scaling:
   - the timing
   proven: No published range; the spread between signers in this project's data is 5.7% (Grounding §6.1)
   used: Each arm bone scaled to between 0.93 and 1.07 times its length (0.93–1.07)
-  note: 'An opt-in experiment arm: off in the default profile.'
+  note: 'An opt-in experiment arm: off in the default profile. Shortening is cut off more than lengthening:
+    on straight-arm clips a factor below about 0.98 cannot keep the wrists in place within the residual
+    limit and the clip is left unchanged (about a quarter of draws), so the real range is roughly 0.98–1.07.'
   extreme: true
   knobs:
   - key: factor
@@ -177,6 +181,19 @@ body.limb_length_scaling:
     proven: null
     limits: null
     step: null
+    share: false
+    active: true
+  - key: max_residual_mm
+    kind: scalar
+    plain: The most a wrist may miss its original position after the arm is shortened; past this the
+      clip is left unchanged.
+    technical: wrist miss limit (max_residual_mm)
+    unit: mm
+    proven: null
+    limits:
+    - 1
+    - 50
+    step: 0.5
     share: false
     active: true
 body.movement_size:
@@ -283,14 +300,15 @@ fingers.joint_coupled_noise:
     unit: °
     proven: null
     limits:
-    - 0
+    - 0.25
     - 15
     step: 0.25
     share: false
     active: true
   - key: finger_coupling
     kind: scalar
-    plain: How much neighbouring fingers bend alike (0 = independently, 1 = identically).
+    plain: How much neighbouring fingers bend alike (0 = independently, 1 = identically). This is the
+      coupling before the limit cuts large draws, so the real match is lower.
     technical: finger coupling (finger_coupling)
     unit: 0–1
     proven: null
@@ -410,7 +428,8 @@ face.expression_jitter:
     scores to points fitted on the clip. Mouth and jaw stay as they are, since mouth patterns can change
     the sign.'
   changes:
-  - the brows, eyelids and cheeks, by a few millimetres
+  - the brows, eyelids and nose wings, by a few millimetres (the cheeks_nose group is inactive on real
+    MediaPipe clips, whose blendshapes for it are constant)
   - the face expression scores (blendshapes)
   keeps:
   - the mouth and jaw
@@ -1097,7 +1116,9 @@ temporal.hand_dropout:
 scene.mirror:
   title: Mirror left and right
   does: 'Flips the body left to right about the vertical plane through the shoulders and swaps the sides:
-    hands, body points, face points and the Left/Right expression scores (blendshapes).'
+    hands, body points, face points and the Left/Right expression scores (blendshapes). Clips whose gloss is
+    on the mirror blacklist (configs/mirror_blacklist.yaml) are never flipped; clips missing from
+    data/wlasl/clip_glosses.csv have no known gloss, are not checked, and are marked gloss_unknown.'
   changes:
   - which hand does what
   - each handshape and the face become their mirror images

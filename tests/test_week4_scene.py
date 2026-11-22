@@ -63,7 +63,7 @@ def test_registered_keys_and_defaults():
     ):
         assert AugmentationRegistry._registry[name] is cls
         assert cls.regions == ("scene",)
-    assert Mirror().ranges == {"p": 0.5}
+    assert Mirror().ranges == {"p": 0.5, "blacklist": "configs/mirror_blacklist.yaml"}
     assert View().ranges == {"yaw_deg": 25.0, "pitch_deg": 6.0}
     assert Scale().ranges == {"factor": [0.75, 1.25]}
     assert Uncentre().ranges == {"limit": 0.125}
@@ -73,7 +73,8 @@ def test_sample_reads_tier1_draw():
     draw = make_draw(mirror=True, yaw=7.0, pitch=-2.0, scale=1.1, u=(0.2, 0.9))
     ctx = make_ctx(draw)
     rng = np.random.default_rng(0)
-    assert Mirror().sample(rng, None, ctx) == {"mirror": True}
+    # no clip means no gloss: the decision is the Tier 1 one, plus the audit flag
+    assert Mirror().sample(rng, None, ctx) == {"mirror": True, "blacklist": "gloss_unknown"}
     assert View().sample(rng, None, ctx) == {"yaw_deg": 7.0, "pitch_deg": -2.0}
     assert Scale().sample(rng, None, ctx) == {"factor": 1.1}
     assert Uncentre().sample(rng, None, ctx) == {"u": [0.2, 0.9], "limit": 0.125}
@@ -205,10 +206,65 @@ def test_fit_clip_camera_recovers_synthetic_camera():
     )
     fitted = fit_clip_camera(clip, hands, skeleton)
     assert fitted.residual < 1e-9
+    assert fitted.frame_size == (width, height)
     np.testing.assert_allclose(fitted.offset, camera.offset, atol=1e-9)
     np.testing.assert_allclose(fitted.scale, camera.scale, atol=1e-9)
     with pytest.raises(ValueError):
         fit_clip_camera(synthetic_clip(frames=5), hands, skeleton)
+    # no observed z in this fixture and no face clip: every stream falls back, and says so
+    assert fitted.depth_scales == {}
+    assert fitted.depth_fallback == ("pose", "left_hand", "right_hand", "face")
+
+
+@requires_smplx
+def test_fit_clip_camera_fits_a_depth_scale_per_stream():
+    from types import SimpleNamespace
+
+    from tests.clip_fixtures import get_skeleton, synthetic_clip
+
+    skeleton = get_skeleton()
+    clip = synthetic_clip(frames=6)
+    out = build_outputs(clip.replace(camera=None), skeleton)
+    width, height = 640, 480
+    camera = tier1.WeakCamera((400.0 / width, 400.0 / height), clip.camera.offset, 0.0)
+    truth = {"pose": 2.2, "left_hand": 0.35, "right_hand": 0.5, "face": 0.75}
+    pose_image = np.full((6, 33, 3), np.nan)
+    pose_image[..., :2] = camera.project(out.pose_world)
+    pose_image[:, 11:17, 2] = truth["pose"] * (
+        out.pose_world[:, 11:17, 2] - out.hip_centre_world[:, None, 2]
+    )
+    pose_image[:, [23, 24], 2] = 0.0  # MediaPipe's pose z origin is the hip midpoint
+    image = np.zeros((6, 2, 21, 3))
+    image[..., :2] = camera.project(out.hands_world)
+    for side, stream in enumerate(("left_hand", "right_hand")):
+        dz = out.hands_world[:, side, :, 2] - out.hands_world[:, side, :1, 2]
+        image[:, side, :, 2] = truth[stream] * dz + 0.01  # MediaPipe's wrist z is not exactly 0
+    face_z = out.face_world[..., 2]
+    landmarks = np.zeros((6, 478, 3))
+    landmarks[..., 2] = truth["face"] * face_z + 0.2  # MediaPipe's face z has its own origin
+    hands = SimpleNamespace(
+        pose_image=pose_image,
+        pose_visibility=np.ones((6, 33)),
+        image=image,
+        width=width,
+        height=height,
+    )
+    face = SimpleNamespace(landmarks=landmarks)
+    fitted = fit_clip_camera(clip, hands, skeleton, face=face)
+    assert set(fitted.depth_scales) == set(truth) and fitted.depth_fallback == ()
+    for stream, value in truth.items():
+        assert fitted.depth_scales[stream] == pytest.approx(value, rel=1e-9), stream
+    # x and y are fitted exactly as before
+    plain = fit_clip_camera(clip, hands, skeleton)
+    np.testing.assert_array_equal(fitted.offset, plain.offset)
+    assert fitted.scale == plain.scale
+    assert plain.depth_fallback == ("face",)
+    # a side whose hand is never valid has nothing to fit and falls back
+    hand_valid = clip.hand_valid.copy()
+    hand_valid[:, 0] = False
+    one_hand = fit_clip_camera(clip.replace(hand_valid=hand_valid), hands, skeleton, face=face)
+    assert "left_hand" not in one_hand.depth_scales
+    assert one_hand.depth_fallback == ("left_hand",)
 
 
 @requires_smplx
@@ -223,7 +279,8 @@ def test_uncentre_keeps_hands_in_frame():
     def points(c):
         o = build_outputs(c, skeleton)
         hand = np.where(o.hand_valid[:, :, None, None], o.hands_image, np.nan)
-        return np.concatenate([hand.reshape(len(hand), 42, 2), o.pose_image[:, [15, 16]]], axis=1)
+        hand, wrists = hand[..., :2], o.pose_image[:, [15, 16], :2]
+        return np.concatenate([hand.reshape(len(hand), 42, 2), wrists], axis=1)
 
     before = points(clip)
     moved = 0
@@ -235,3 +292,151 @@ def test_uncentre_keeps_hands_in_frame():
         assert loss == 0.0 or loss is None
         moved += int(out.scene.shift.any())
     assert moved > 0
+
+
+def drift_clip(frames=12):
+    """A synthetic clip whose camera offset drifts linearly: x by -0.09, y by +0.04 in total."""
+    from tests.clip_fixtures import synthetic_clip
+
+    clip = synthetic_clip(frames=frames)
+    ramp = np.linspace(0.0, 1.0, frames)[:, None]
+    offset = 0.5 + ramp * np.array([-0.09, 0.04])
+    return clip.replace(camera=tier1.WeakCamera(clip.camera.scale, offset, 0.0))
+
+
+def shoulder_centre_drift(clip, skeleton):
+    out = build_outputs(clip, skeleton)
+    track = out.pose_image[:, [11, 12]].mean(axis=1)
+    return track - track.mean(axis=0)
+
+
+@requires_smplx
+def test_mirror_negates_image_drift_in_x():
+    from tests.clip_fixtures import get_skeleton
+
+    skeleton, clip = get_skeleton(), drift_clip()
+    base = shoulder_centre_drift(clip, skeleton)
+    mirrored = shoulder_centre_drift(
+        Mirror().apply(clip, {"mirror": True}, make_ctx(None)), skeleton
+    )
+    assert base[-1, 0] < -0.04
+    np.testing.assert_allclose(mirrored[:, 0], -base[:, 0], atol=1e-9)
+    np.testing.assert_allclose(mirrored[:, 1], base[:, 1], atol=1e-9)
+
+
+@requires_smplx
+def test_scale_multiplies_image_drift():
+    from tests.clip_fixtures import get_skeleton
+
+    skeleton, clip = get_skeleton(), drift_clip()
+    base = shoulder_centre_drift(clip, skeleton)
+    scaled = Scale().apply(clip, {"factor": 1.2}, make_ctx(None))
+    np.testing.assert_allclose(shoulder_centre_drift(scaled, skeleton), 1.2 * base, atol=1e-9)
+
+
+@requires_smplx
+def test_camera_drift_involutions():
+    clip, ctx = drift_clip(), make_ctx(None)
+    twice = Mirror().apply(Mirror().apply(clip, {"mirror": True}, ctx), {"mirror": True}, ctx)
+    np.testing.assert_allclose(twice.scene.apply_camera(twice.camera).offset, clip.camera.offset)
+    back = Scale().apply(Scale().apply(clip, {"factor": 1.3}, ctx), {"factor": 1 / 1.3}, ctx)
+    np.testing.assert_allclose(
+        back.scene.apply_camera(back.camera).offset, clip.camera.offset, atol=1e-12
+    )
+    assert clip.scene.apply_camera(clip.camera) is clip.camera
+
+
+@requires_smplx
+def test_uncentre_after_mirror_scale_and_drift_keeps_hands_in_frame():
+    from tests.clip_fixtures import get_skeleton
+
+    skeleton, clip, ctx = get_skeleton(), drift_clip(), make_ctx(None)
+    clip = Scale().apply(Mirror().apply(clip, {"mirror": True}, ctx), {"factor": 1.25}, ctx)
+    draw = {"u": [0.0, 1.0], "limit": 0.125}
+    shifted = Uncentre().apply(clip, draw, ctx)
+    before, after = build_outputs(clip, skeleton), build_outputs(shifted, skeleton)
+    np.testing.assert_allclose(
+        after.hands_image[..., :2] - before.hands_image[..., :2],
+        np.broadcast_to(draw["image_shift"], before.hands_image[..., :2].shape),
+        atol=1e-9,
+    )
+    # the shift is in the image plane: relative depth does not move
+    np.testing.assert_allclose(after.hands_image[..., 2], before.hands_image[..., 2], atol=1e-12)
+    uv_before = before.hands_image[..., :2].reshape(-1, 2)
+    uv_after = after.hands_image[..., :2].reshape(-1, 2)
+    was_in = tier1.in_frame(uv_before)
+    assert was_in.any()
+    assert tier1.in_frame(uv_after)[was_in].all()
+
+
+def _corr(a, b):
+    ok = np.isfinite(a) & np.isfinite(b)
+    return float(np.corrcoef(a[ok], b[ok])[0, 1])
+
+
+@requires_smplx
+def test_relative_z_agrees_with_mediapipe_on_the_pilot_clip():
+    """The round trip's z has MediaPipe's sign: arms vs the hips, hand points vs the wrist."""
+    from tests.clip_fixtures import get_skeleton, real_clip
+
+    clip, hands, _ = real_clip()
+    skeleton = get_skeleton()
+    camera = fit_clip_camera(clip, hands, skeleton)
+    assert camera.frame_size == (hands.width, hands.height)
+    out = build_outputs(clip.replace(camera=camera), skeleton)
+    mp_pose = np.asarray(hands.pose_image, dtype=np.float64)
+    mp_hips = 0.5 * (mp_pose[:, 23, 2] + mp_pose[:, 24, 2])
+    arms = list(range(11, 17))
+    ours = out.pose_image[:, arms, 2]
+    theirs = mp_pose[:, arms, 2] - mp_hips[:, None]
+    assert _corr(ours.ravel(), theirs.ravel()) > 0.5
+    mp_hand = np.asarray(hands.image, dtype=np.float64)[..., 2]
+    valid = out.hand_valid[:, :, None]
+    ours = np.where(valid, out.hands_image[..., 2], np.nan)
+    theirs = np.where(valid, mp_hand - mp_hand[..., :1], np.nan)
+    assert _corr(ours.ravel(), theirs.ravel()) > 0.3
+    np.testing.assert_array_equal(
+        out.pixels("hands"), out.hands_image * np.array([hands.width, hands.height, hands.width])
+    )
+
+
+def _magnitude_ratio(ours, theirs):
+    ok = np.isfinite(ours) & np.isfinite(theirs)
+    return float(np.median(np.abs(ours[ok])) / np.median(np.abs(theirs[ok])))
+
+
+@requires_smplx
+def test_fitted_z_magnitudes_match_mediapipe_on_the_pilot_clip():
+    """Fitted per-stream z scales give MediaPipe-sized z: median |z| within 0.8-1.25."""
+    from tests.clip_fixtures import get_skeleton, real_clip
+
+    clip, hands, face = real_clip()
+    skeleton = get_skeleton()
+    camera = fit_clip_camera(clip, hands, skeleton, face=face)
+    out = build_outputs(clip.replace(camera=camera), skeleton)
+    assert "pose" in camera.depth_scales and "face" in camera.depth_scales
+
+    mp_pose = np.asarray(hands.pose_image, dtype=np.float64)
+    visible = np.asarray(hands.pose_visibility)[:, 11:17] >= 0.5
+    theirs = mp_pose[:, 11:17, 2] - 0.5 * (mp_pose[:, 23, 2] + mp_pose[:, 24, 2])[:, None]
+    ratio = _magnitude_ratio(out.pose_image[:, 11:17, 2], np.where(visible, theirs, np.nan))
+    assert 0.8 <= ratio <= 1.25, ratio
+
+    mp_hand = np.asarray(hands.image, dtype=np.float64)[..., 2]
+    fitted_hands = 0
+    for side, stream in enumerate(("left_hand", "right_hand")):
+        valid = out.hand_valid[:, side, None]
+        ours = np.where(valid, out.hands_image[:, side, 1:, 2], np.nan)
+        theirs = np.where(valid, mp_hand[:, side, 1:] - mp_hand[:, side, :1], np.nan)
+        if stream in camera.depth_fallback:
+            assert not (np.isfinite(ours) & np.isfinite(theirs)).any(), stream
+            continue
+        fitted_hands += 1
+        ratio = _magnitude_ratio(ours, theirs)
+        assert 0.8 <= ratio <= 1.25, (stream, ratio)
+    assert fitted_hands >= 1
+
+    mp_face = np.asarray(face.landmarks, dtype=np.float64)[out.face_valid, :, 2]
+    theirs = mp_face - np.nanmean(mp_face, axis=1, keepdims=True)
+    ratio = _magnitude_ratio(out.face_image[out.face_valid, :, 2], theirs)
+    assert 0.8 <= ratio <= 1.25, ratio

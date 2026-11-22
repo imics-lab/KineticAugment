@@ -3,7 +3,9 @@ Week-4 body augmentations on SMPL-X arm joints.
 
 `ArmCoupledNoise` draws one small rotation per arm joint (shoulder, elbow, wrist, both sides) for
 the clip. Joints along a chain share a common component (`chain_coupling`), and the right side is
-correlated with the mirrored left (`side_coupling`). `Tier1ArmJoints` applies the Tier 1 arm-joint
+correlated with the mirrored left (`side_coupling`). The couplings are those of the Gaussian
+before truncation; the realised correlation is lower (about 0.56 for `side_coupling` 0.7 at the
+5 degree default). `Tier1ArmJoints` applies the Tier 1 arm-joint
 draw that the chain hands over in `ChainContext.tier1_draw`. `LimbLengthScaling` rescales the arm
 bones in the rest skeleton and, optionally, re-aims each frame's arm so the wrists stay put.
 
@@ -20,17 +22,22 @@ from scipy.signal import butter, filtfilt, freqz
 from .arm_ik import torso_frame, two_bone_ik, world_pose
 from .base import AugmentationRegistry, ClipAugmentation
 from .clip import ChainContext, ClipData
-from .ranges import check_truncation, parse_range, truncated_normal
+from .ranges import (
+    check_non_negative,
+    check_positive,
+    check_range,
+    check_truncation,
+    check_unit,
+    parse_range,
+    resample_coupled,
+    truncated_ball,
+    truncated_normal,
+)
 from .tier1 import ARM_JOINTS, SIDES, ArmJointDraw, perturb_arm_joints
 
 SIDE_MODES = ("mirror", "synchronous", "independent")
 _MIRROR = np.array([1.0, -1.0, -1.0])
 _ELBOW_AXIS = (0.0, 0.0, 1.0)  # ignored by the elbow, which bends in its own plane
-
-
-def _clamp_norm(v: np.ndarray, limit: float) -> np.ndarray:
-    norm = float(np.linalg.norm(v))
-    return v * (limit / norm) if norm > limit else v
 
 
 def _draw_dict(side: str, joint: str, vector: Optional[np.ndarray], elbow: float = 0.0) -> dict:
@@ -71,13 +78,11 @@ class ArmCoupledNoise(ClipAugmentation):
         "drift_deg": 0.0,
     }
 
-    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
-        super().__init__(ranges=ranges, probability=probability)
+    def validate_ranges(self) -> None:
         r = self.ranges
         for k in ("chain_coupling", "side_coupling"):
             # outside [0, 1] the sqrt(1 - c) / sqrt(1 - k^2) weights are NaN
-            if not 0.0 <= float(r[k]) <= 1.0:
-                raise ValueError(f"{k} must be in [0, 1], got {r[k]!r}")
+            check_unit(r[k], self.label(k))
         for k in (
             "sigma_deg",
             "truncate_deg",
@@ -85,10 +90,15 @@ class ArmCoupledNoise(ClipAugmentation):
             "elbow_truncate_deg",
             "drift_deg",
         ):
-            if not float(r[k]) >= 0:
-                raise ValueError(f"{k} must be >= 0, got {r[k]!r}")
+            check_non_negative(r[k], self.label(k))
+        check_truncation(r["sigma_deg"], r["truncate_deg"], self.label("truncate_deg"))
+        check_truncation(
+            r["elbow_sigma_deg"], r["elbow_truncate_deg"], self.label("elbow_truncate_deg")
+        )
         if r["side_mode"] not in SIDE_MODES:
-            raise ValueError(f"side_mode must be one of {SIDE_MODES}, got {r['side_mode']!r}")
+            raise ValueError(
+                f"{self.label('side_mode')} must be one of {SIDE_MODES}, got {r['side_mode']!r}"
+            )
 
     def _side(self, rng: np.random.Generator):
         """One side's shoulder vector, elbow scalar and wrist vector, before side coupling."""
@@ -108,22 +118,49 @@ class ArmCoupledNoise(ClipAugmentation):
         if mode not in SIDE_MODES:
             raise ValueError(f"side_mode must be one of {SIDE_MODES}, got {mode!r}")
         k = float(r["side_coupling"]) if mode == "mirror" else 0.0
-        left = self._side(rng)
-        indep = self._side(rng)
-        if mode == "synchronous":
-            right = left
-        else:
+        limit, limit_e = float(r["truncate_deg"]), float(r["elbow_truncate_deg"])
+        sigma, sigma_e = float(r["sigma_deg"]), float(r["elbow_sigma_deg"])
+
+        def draw():
+            left = self._side(rng)
+            indep = self._side(rng)
+            if mode == "synchronous":
+                return left, left
             right = (
                 k * left[0] * _MIRROR + np.sqrt(1 - k**2) * indep[0],
                 k * left[1] + np.sqrt(1 - k**2) * indep[1],
                 k * left[2] * _MIRROR + np.sqrt(1 - k**2) * indep[2],
             )
-        limit, limit_e = float(r["truncate_deg"]), float(r["elbow_truncate_deg"])
+            return left, right
+
+        def side_ok(side):
+            shoulder, elbow, wrist = side
+            return (
+                np.linalg.norm(shoulder) <= limit
+                and abs(elbow) <= limit_e
+                and np.linalg.norm(wrist) <= limit
+            )
+
+        def repair_side(side):
+            shoulder, elbow, wrist = side
+            if np.linalg.norm(shoulder) > limit:
+                shoulder = truncated_ball(rng, sigma, limit)
+            if abs(elbow) > limit_e:
+                elbow = float(truncated_normal(rng, sigma_e, limit_e))
+            if np.linalg.norm(wrist) > limit:
+                wrist = truncated_ball(rng, sigma, limit)
+            return shoulder, elbow, wrist
+
+        left, right = resample_coupled(
+            draw,
+            lambda pair: side_ok(pair[0]) and side_ok(pair[1]),
+            lambda pair: (repair_side(pair[0]), repair_side(pair[1])),
+        )
         joints: List[dict] = []
         for side, (shoulder, elbow, wrist) in zip(SIDES, (left, right)):
-            joints.append(_draw_dict(side, "shoulder", _clamp_norm(shoulder, limit)))
-            joints.append(_draw_dict(side, "elbow", None, float(np.clip(elbow, -limit_e, limit_e))))
-            joints.append(_draw_dict(side, "wrist", _clamp_norm(wrist, limit)))
+            joints.append(_draw_dict(side, "shoulder", shoulder))
+            joints.append(_draw_dict(side, "elbow", None, float(elbow)))
+            joints.append(_draw_dict(side, "wrist", wrist))
         return {"joints": joints, "drift": self._drift(rng, clip)}
 
     def _drift(self, rng: np.random.Generator, clip: ClipData) -> Optional[List[List[float]]]:
@@ -168,6 +205,11 @@ class Tier1ArmJoints(ClipAugmentation):
     key = "tier1_arm_joints"
     regions = ("body",)
     DEFAULT_RANGES = {"p": 0.3, "shoulder_wrist_deg": 5.0, "elbow_deg": 9.5}
+
+    def validate_ranges(self) -> None:
+        check_unit(self.ranges["p"], self.label("p"))
+        for k in ("shoulder_wrist_deg", "elbow_deg"):
+            check_non_negative(self.ranges[k], self.label(k))
 
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: ChainContext):
         if ctx.tier1_draw is None:
@@ -220,7 +262,13 @@ def _scale_hand(rest: np.ndarray, parents: np.ndarray, wrist: int, factor: float
 
 @AugmentationRegistry.register("body.limb_length_scaling")
 class LimbLengthScaling(ClipAugmentation):
-    """Scale arm bone lengths in the rest skeleton, keeping the wrists in place if `retarget`."""
+    """Scale arm bone lengths in the rest skeleton, keeping the wrists in place if `retarget`.
+
+    The `max_residual_mm` fallback acts on one side. On straight-arm clips shortening below about
+    0.98 cannot keep the wrists in place (01991: 0.93 leaves 33.9 mm, 0.97 14.5 mm, 0.99 4.8 mm)
+    and falls back to the unchanged clip, while lengthening always reaches. The realised range
+    is roughly 0.98-1.07 and about a quarter of draws fall back at the default limits.
+    """
 
     key = "limb_length_scaling"
     regions = ("body",)
@@ -228,7 +276,18 @@ class LimbLengthScaling(ClipAugmentation):
         "factor": [0.93, 1.07],
         "bones": ["upper_arm", "forearm"],
         "retarget": True,
+        "max_residual_mm": 10.0,
     }
+
+    def validate_ranges(self) -> None:
+        check_positive(self.ranges["max_residual_mm"], self.label("max_residual_mm"))
+        bones = self.ranges["bones"]
+        if not isinstance(bones, (list, tuple)):
+            raise ValueError(f"{self.label('bones')} must be a list of {_BONES}, got {bones!r}")
+        for bone in bones:
+            if bone not in _BONES:
+                raise ValueError(f"{self.label('bones')} must be drawn from {_BONES}, got {bone!r}")
+        check_range(self.ranges["factor"], self.label("factor"), low=0.0, low_open=True)
 
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         bones = list(self.ranges["bones"])
@@ -263,6 +322,11 @@ class LimbLengthScaling(ClipAugmentation):
         targets = wrist_world(target, parents)
         out, residual = retarget_wrists(target.replace(rest_joints=rest), targets, parents)
         draw["residual_m"] = float(residual)
+        # The residual is only known after the IK, so the fallback is decided here. The chain reads
+        # the draw after `apply`, so it records the fallback and does not list the entry as applied.
+        if residual * 1000.0 > float(self.ranges["max_residual_mm"]):
+            draw["fallback"] = "residual_over_limit"
+            return target
         return out
 
     def identity_draw(self) -> Dict[str, Any]:
@@ -351,6 +415,15 @@ class MovementSizeScaling(ClipAugmentation):
     DEFAULT_RANGES = {"factor": [0.8, 1.2]}
     DISTRIBUTIONS = {"factor": "log_uniform"}
 
+    def validate_ranges(self) -> None:
+        check_range(
+            self.ranges["factor"],
+            self.label("factor"),
+            self.DISTRIBUTIONS["factor"],
+            low=0.0,
+            low_open=True,
+        )
+
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         spec = parse_range(self.ranges["factor"], self.DISTRIBUTIONS["factor"])
         return {"factor": float(spec.draw(rng))}
@@ -379,9 +452,12 @@ class LocationJitter(ClipAugmentation):
     regions = ("body",)
     DEFAULT_RANGES = {"sigma_mm": 12.5, "truncate_mm": 25.0}
 
-    def __init__(self, ranges: Optional[Dict[str, Any]] = None, probability: float = 1.0):
-        super().__init__(ranges=ranges, probability=probability)
-        check_truncation(self.ranges["sigma_mm"], self.ranges["truncate_mm"], "location_jitter")
+    def validate_ranges(self) -> None:
+        for k in ("sigma_mm", "truncate_mm"):
+            check_non_negative(self.ranges[k], self.label(k))
+        check_truncation(
+            self.ranges["sigma_mm"], self.ranges["truncate_mm"], self.label("truncate_mm")
+        )
 
     def sample(self, rng: np.random.Generator, clip: ClipData, ctx: Any) -> Dict[str, Any]:
         sigma, limit = float(self.ranges["sigma_mm"]), float(self.ranges["truncate_mm"])

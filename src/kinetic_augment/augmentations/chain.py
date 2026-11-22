@@ -30,6 +30,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 import numpy as np
 
 from .base import AugmentationRegistry
+from .blacklist import gloss_for_clip
 from .body import wrist_world
 from .clip import ChainContext, ClipData
 from .outputs import ClipOutputs, build_outputs
@@ -75,7 +76,11 @@ class ChainResult:
 
 
 def _non_identity(name: str, draw: Dict[str, Any]) -> bool:
-    """Whether a draw changed anything; only the scene entries and Tier 1 arm joints can be 0."""
+    """Whether a draw changed anything.
+
+    The scene entries, Tier 1 arm joints and expression jitter can be identity; limb scaling and
+    handshape jitter return the clip unchanged when their draw records a fallback.
+    """
     if name == "scene.mirror":
         return bool(draw["mirror"])
     if name == "scene.view":
@@ -86,6 +91,14 @@ def _non_identity(name: str, draw: Dict[str, Any]) -> bool:
         return any(draw.get("image_shift", [0.0, 0.0]))
     if name == "body.tier1_arm_joints":
         return bool(draw["joints"])
+    if name == "body.limb_length_scaling":
+        return not draw.get("fallback")  # a fallback returned the clip unchanged
+    if name == "fingers.handshape_jitter":
+        return not draw.get("fallback")  # "no_valid_redraw" returned the identity draw
+    if name == "face.expression_jitter":
+        # every enabled group inactive (all scores constant) and no noise: nothing moved
+        noise = draw.get("noise")
+        return any(draw["offsets"]) or (noise is not None and bool(np.any(noise)))
     return True
 
 
@@ -94,8 +107,8 @@ class AugmentationChain:
     Run a profile's enabled entries on clips, in `ORDER` (see the module docstring).
 
     Set `clip.camera` first, with `scene.fit_clip_camera(clip, hands, skeleton,
-    frames=result.frames)`: without a camera `scene.uncentre` is skipped (fallback "no_camera")
-    and the image-space outputs are None.
+    frames=result.frames, face=face)`: without a camera `scene.uncentre` is skipped (fallback
+    "no_camera") and the image-space outputs are None.
     """
 
     def __init__(
@@ -128,6 +141,10 @@ class AugmentationChain:
 
     def run(self, clip: ClipData) -> ChainResult:
         seed = self.profile.seed
+        if clip.gloss is None:  # a clip built without a gloss gets it from the clip-id map
+            gloss = gloss_for_clip(clip.clip_id)
+            if gloss is not None:
+                clip = clip.replace(gloss=gloss)
         ctx = ChainContext(
             skeleton=self.skeleton,
             parents=np.asarray(self.skeleton.parents),

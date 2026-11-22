@@ -81,9 +81,10 @@ def _hand_face_cm_min(outputs: ClipOutputs) -> float:
 
 
 def _in_frame_pct(outputs: ClipOutputs) -> float:
-    arms = outputs.pose_image[:, 11:17].reshape(-1, 2)
-    hands = outputs.hands_image[outputs.hand_valid].reshape(-1, 2)
-    face = outputs.face_image[outputs.face_valid].reshape(-1, 2)
+    # x, y only: the third column is MediaPipe's relative z, not a frame coordinate
+    arms = outputs.pose_image[:, 11:17, :2].reshape(-1, 2)
+    hands = outputs.hands_image[outputs.hand_valid][..., :2].reshape(-1, 2)
+    face = outputs.face_image[outputs.face_valid][..., :2].reshape(-1, 2)
     points = np.concatenate([arms, hands, face])
     points = points[np.isfinite(points).all(axis=1)]
     if not len(points):

@@ -149,7 +149,7 @@ def prepare_clip(clip_id: str, result, hands, face, models) -> PreparedClip:
     """Turn a `run_clip` result into a clip with its fitted camera and the unaugmented outputs."""
     skeleton, mp_indices = models.skeleton, np.asarray(models.corr.mp_indices, dtype=int)
     clip = clip_from_result(clip_id, result, hands, face, skeleton)
-    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames)
+    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames, face=face)
     clip = clip.replace(camera=camera)
     base_full = build_outputs(clip, skeleton, keep_vertices=True)
     base_out = build_outputs(clip, skeleton)

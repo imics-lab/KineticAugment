@@ -128,7 +128,8 @@ def scene_bone_change_mm(base, aug, draws):
 def points_of(outputs):
     """(arms (T,6,2), hands (T,2,21,2), face (T,478,2)) in the front view, NaN where unusable."""
     if outputs.pose_image is not None:
-        arms, hands, face = outputs.pose_image[:, 11:17], outputs.hands_image, outputs.face_image
+        arms, hands = outputs.pose_image[:, 11:17, :2], outputs.hands_image[..., :2]
+        face = outputs.face_image[..., :2]
     else:
         arms = outputs.pose_world[:, 11:17, :2]
         hands, face = outputs.hands_world[..., :2], outputs.face_world[..., :2]
@@ -225,7 +226,7 @@ def run_clip_trial(clip_id, args, profile, models, output_dir):
     result = run_clip(hands, face, models, frames=span)
     skeleton = models.skeleton
     clip = clip_from_result(clip_id, result, hands, face, skeleton)
-    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames)
+    camera = fit_clip_camera(clip, hands, skeleton, frames=result.frames, face=face)
     clip = clip.replace(camera=camera)
     base_out = build_outputs(clip, skeleton)
 

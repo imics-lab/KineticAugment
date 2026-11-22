@@ -22,7 +22,7 @@ clips start and end with the hands below the frame.
 """
 
 import dataclasses
-from typing import Optional, Sequence, Tuple
+from typing import Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -202,11 +202,27 @@ class WeakCamera:
 
     One scale per axis for the clip (its sign carries any flip between the frames), one offset
     per frame because MediaPipe's world landmarks are re-centred on the hips every frame.
+    `frame_size` is the source video's (width, height) in pixels, None where it is not known.
+
+    `depth_scales` maps a `DEPTH_STREAMS` name to the fitted factor from world depth (metres,
+    relative to the stream's reference) to MediaPipe's relative z; `depth_fallback` names the
+    streams that had too little observed z to fit and use |scale x| instead (MediaPipe's
+    nominal "same scale as x", which its own z does not follow: about 3x for the pose and
+    0.4x for the hands on the evaluation clips).
     """
 
     scale: Tuple[float, float]
     offset: np.ndarray  # (T, 2)
     residual: float  # median distance of fit points from the image, normalised
+    frame_size: Optional[Tuple[int, int]] = None
+    depth_scales: Optional[Dict[str, float]] = None
+    depth_fallback: Tuple[str, ...] = ()
+
+    def depth_scale(self, stream: Optional[str] = None) -> float:
+        """The stream's fitted depth scale, else the magnitude of the x scale."""
+        if stream is not None and self.depth_scales and stream in self.depth_scales:
+            return float(self.depth_scales[stream])
+        return abs(self.scale[0])
 
     def project(self, points: np.ndarray) -> np.ndarray:
         """(T, ..., 3) world points to (T, ..., 2) normalised image points."""
@@ -214,11 +230,45 @@ class WeakCamera:
         shape = (len(points),) + (1,) * (points.ndim - 2) + (2,)
         return np.asarray(self.scale) * points[..., :2] + self.offset.reshape(shape)
 
+    def project_with_depth(
+        self,
+        points: np.ndarray,
+        reference: np.ndarray,
+        stream: Union[str, Sequence[str], None] = None,
+    ) -> np.ndarray:
+        """
+        (T, ..., 3) world points to (T, ..., 3) image points with MediaPipe's relative z.
+
+        x, y are `project(points)`. z is the world depth relative to `reference` (broadcast
+        against `points`, e.g. (T, 1, 3) for one point per frame) times `depth_scale(stream)`,
+        in units of the frame width; like MediaPipe's world z, smaller is closer to the camera.
+        `stream` may be one name per index of axis 1 (the hands' left and right). The depth
+        comes from the given (already scene-transformed) points, so a scene scale k reaches z.
+        """
+        points = np.asarray(points, dtype=np.float64)
+        reference = np.asarray(reference, dtype=np.float64)
+        depth = points[..., 2] - reference[..., 2]
+        if stream is None or isinstance(stream, str):
+            factor = self.depth_scale(stream)
+        else:
+            factor = np.array([self.depth_scale(s) for s in stream])
+            factor = factor.reshape((1, len(factor)) + (1,) * (depth.ndim - 2))
+        return np.concatenate([self.project(points), (factor * depth)[..., None]], axis=-1)
+
     def resampled(self, times: np.ndarray) -> "WeakCamera":
         """The camera re-timed with a clip (for the duration augmentation)."""
         frames = np.arange(len(self.offset))
         offset = np.stack([np.interp(times, frames, self.offset[:, a]) for a in range(2)], -1)
-        return WeakCamera(self.scale, offset, self.residual)
+        return dataclasses.replace(self, offset=offset)
+
+    def mirrored_depth(self) -> "WeakCamera":
+        """The camera with the left- and right-hand depth fits swapped (sides relabelled)."""
+        swap = {"left_hand": "right_hand", "right_hand": "left_hand"}
+        scales = None
+        if self.depth_scales is not None:
+            scales = {swap.get(k, k): v for k, v in self.depth_scales.items()}
+        fallback = tuple(swap.get(k, k) for k in self.depth_fallback)
+        return dataclasses.replace(self, depth_scales=scales, depth_fallback=fallback)
 
     def world_shift(self, image_shift: Sequence[float]) -> np.ndarray:
         """The world translation (z = 0) that moves the projection by `image_shift`."""
@@ -233,7 +283,8 @@ def fit_weak_camera(
 
     Without `pixel_size` each axis gets its own scale. With the frame's (width, height) in
     pixels, one scale serves both axes, as it should for square pixels; that holds up better
-    when the camera is used far from the points it was fitted on.
+    when the camera is used far from the points it was fitted on. The camera then records it
+    as `frame_size`.
 
     Points not finite in both are ignored. A frame with fewer than two usable points gets the
     offset of the nearest frame that has them.
@@ -262,7 +313,32 @@ def fit_weak_camera(
     scale = scale_px / size
     projected = scale * world + offset[:, None]
     residual = float(np.median(np.linalg.norm(projected - image, axis=-1)[ok]))
-    return WeakCamera((float(scale[0]), float(scale[1])), offset, residual)
+    frame_size = None if pixel_size is None else (int(pixel_size[0]), int(pixel_size[1]))
+    return WeakCamera((float(scale[0]), float(scale[1])), offset, residual, frame_size)
+
+
+DEPTH_STREAMS = ("pose", "left_hand", "right_hand", "face")
+MIN_DEPTH_POINTS = 20  # one hand frame's 20 non-wrist points
+
+
+def fit_depth_scale(world_depth: np.ndarray, observed_depth: np.ndarray) -> Optional[float]:
+    """
+    Least-squares factor s with observed = s * world, through the origin, over finite pairs.
+
+    Both are relative depths of one stream against its own per-frame reference (world in
+    metres, observed in MediaPipe's z units). None with fewer than `MIN_DEPTH_POINTS` pairs,
+    no spread in the world depth, or a non-positive fit (a reversed depth is not a scale).
+    """
+    world = np.asarray(world_depth, dtype=np.float64).ravel()
+    observed = np.asarray(observed_depth, dtype=np.float64).ravel()
+    ok = np.isfinite(world) & np.isfinite(observed)
+    if ok.sum() < MIN_DEPTH_POINTS:
+        return None
+    den = float(np.sum(world[ok] ** 2))
+    if den <= 0.0:
+        return None
+    scale = float(np.sum(world[ok] * observed[ok])) / den
+    return scale if np.isfinite(scale) and scale > 0.0 else None
 
 
 def in_frame(uv: np.ndarray) -> np.ndarray:

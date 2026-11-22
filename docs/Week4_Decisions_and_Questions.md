@@ -28,6 +28,45 @@ From the week-4 whiteboard and the 2026-11-10 brainstorms (augmentation ideas; v
   "not measured" until classifier runs.
 - **Augmentation lab** (visualise and play with augmentations): designed, plan written.
 
+## Full augmentation list (from README § Augmentation ranges)
+
+Week-4 profiles use ~25% beyond the proven range for every row, Tier 1 included.
+
+**Tier 1: backed by literature**
+
+| Augmentation | Proven | Used |
+|---|---|---|
+| View yaw | ±20° | ±25° |
+| View pitch | ±5° | ±6° |
+| Mirror | p = 0.5 (signs that can't be mirrored excluded) | p = 0.5 |
+| Uniform duration | 0.67–1.5× | 0.6–1.65× |
+| Arm joints: shoulder, wrist | ±4° at p = 0.3 | ±5° |
+| Arm joints: elbow | ±7.5° | ±9.5° |
+| Whole-scene scale | 0.8–1.2× | 0.75–1.25× |
+| Uncentre | ±0.1 frame | ±0.125, hands kept in frame |
+
+**Tier 2: new augmentations or ranges**
+
+| Augmentation | Basis | Used |
+|---|---|---|
+| Limb length | signer spread 5.7% (later dropped) | ±7% |
+| Movement size | linguistic example 0.85–1.15× | 0.8–1.2× |
+| Location jitter | σ 10 mm, max 20 mm | σ 12.5 mm, max 25 mm |
+| Joint noise, arms | arm-joint ranges above | shoulder/wrist σ 2.5° (max 5°); elbow σ 4.75° (max 9.5°) |
+| Joint noise, fingers | estimate 3° / 6° | σ 3.75° (max 7.5°) |
+| Handshape jitter | none published | non-selected + thumb σ 7.5°; selected σ 3.75°; selected flexion σ 2° (max 2σ) |
+| Expression jitter | none; lexical mouth excluded | brows/eyes σ 0.0625; cheeks/nose σ 0.0375; mouth/jaw off |
+| Varied time warp | none; Grounding excludes non-uniform warps | rates 0.7–1.43× |
+| Segment time warp | none; Grounding excludes non-uniform warps | 20–60% window, 0.6–1.65× |
+| Frame dropping | ≥ 10 fps; gaps ≤ 8 frames | ≥ 8 fps, max gap 125 ms, p 0–0.2 |
+| Hand-dropout runs | runs ≤ 8 frames; measured rate 0.039 | 1–10 frames, start rate 0–0.05 |
+
+Default profile (`slr_week4_default.yaml`) turns on: scene augs, uniform duration, arm + finger
+joint noise, frame dropping. The rest exist but are off.
+
+**Candidates, not built** (TODO.md): MediaPipe residual re-injection, measured detector failures,
+onset/offset jitter, aspect ratio/resolution, small camera roll, depth (z) perturbation, weak drop.
+
 ## Questions for professor
 
 1. Can I get the classifier training code, a signer-held-out split and GPU time to run the baselines?
