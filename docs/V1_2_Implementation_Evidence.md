@@ -1,7 +1,7 @@
 # V1.2 implementation evidence
 
 **Date:** 2026-10-06. **Cited by:** [V1.2 findings](V1_2_Findings.md) and the
-[V1.2 assumption ledger](V1_2_Assumptions.md). **Plan:** [V1.2 implementation plan](V1_2_Implementation_Plan.md).
+[V1.2 assumption ledger](V1_2_Assumptions.md). **Plan:** V1.2 implementation plan.
 
 This appendix keeps the measurements that the findings rely on but that no committed data file
 holds. They were taken while Tasks 1–6 of the implementation plan were built and reviewed, on
@@ -187,7 +187,7 @@ themselves or the reason. The Task 5 review (2026-10-06) analysed the extraction
   - 01988 frame 128, with no hand assigned.
 - Task 7 recomputed the gaps and margins of the assigned detections from the clips' image
   landmarks: median 2.10%, maximum 8.12%, minimum margin 4.72% of the image height.
-- The [probes](V1_2_Feasibility_Probes.md) ("Duplicates") describe the same-side pairs as duplicate
+- The probes ("Duplicates") describe the same-side pairs as duplicate
   detections of one hand in 01991, and as overlapping hands at the frame edge in 01988.
 
 ## 7. Extraction: clip order and determinism (Task 5)

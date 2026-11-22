@@ -107,7 +107,7 @@ It needs `data/wlasl/WLASL_v0.3.json`, which is not committed (see
   found. The strong list rests on Lifeprint, Handspeak and one footnote.
 - **Mirroring can still cost accuracy without changing any sign.** Flipping cost 1.3 points on
   WLASL in one RGB study (Kvanchiani et al. 2024), and nobody has traced that loss to particular
-  glosses. The blacklist prevents wrong labels; the ablation in [`TODO.md`](../TODO.md), with
+  glosses. The blacklist prevents wrong labels; the planned ablation, with
   per-class deltas, is what shows whether mirroring helps.
 - **Some WLASL signers may already be left-handed.** For the absolute-side glosses their clips
   still move in the correct direction, so a flip is wrong whichever hand the signer used.

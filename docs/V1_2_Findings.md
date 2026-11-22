@@ -1,9 +1,9 @@
 # V1.2 findings: MediaPipe hands → MANO and SMPL-X → landmarks
 
 **Date:** 2026-10-06. **Scope:** the feasibility slice P0–P2 and the P3 pilot measurement of the
-[V1.2 plan](V1_2_Hand_Roundtrip_Plan.md), built by the [implementation plan](V1_2_Implementation_Plan.md)
+V1.2 plan, built by the implementation plan
 on branch `feat/v1.2-hands`. **Ledger:** [V1.2 assumptions](V1_2_Assumptions.md). **Earlier
-measurements:** [V1.2 feasibility probes](V1_2_Feasibility_Probes.md).
+measurements:** V1.2 feasibility probes.
 
 The round trip fits genuine MANO or SMPL-X parameters to each hand MediaPipe detects (21 world
 landmarks, in metres), rebuilds the 21 landmarks from those parameters alone, and scores the
@@ -22,7 +22,7 @@ pilot clips, what limits the error, and which assumptions the evidence settles.
 - *Tests*: `tests/test_hand_model.py`, `tests/test_hand_converter.py`,
   `tests/test_hand_observations.py` and `tests/test_extract_hand_landmarks.py`. On 2026-10-06 all
   68 passed and none was skipped (implementation evidence §9).
-- *Probes*: [V1.2 feasibility probes](V1_2_Feasibility_Probes.md), measured before implementation.
+- *Probes*: V1.2 feasibility probes, measured before implementation.
 - *Implementation evidence*: [V1.2 implementation evidence](V1_2_Implementation_Evidence.md), which
   keeps the measurements taken while the code was built: the synthetic gates, batch coupling, the
   check-2 diagnosis, extraction determinism and the checks run for these findings. Each comes with
@@ -386,7 +386,7 @@ naming the opposite hand, matches the assigned side.
 - **Unassigned: 12.** Nine are a second detection at a side already taken. The seven in 01991 are
   duplicate detections of one hand. The other two are in 01988, at frames 28 and 30 by the clips;
   the probes describe that pair as overlapping hands at the frame edge
-  ([probes](V1_2_Feasibility_Probes.md), "Duplicates"). The extraction does not store unassigned
+  (probes, "Duplicates"). The extraction does not store unassigned
   detections, so the 01988 pair is not re-checked here. The last three lie beyond the 10% cap:
   01988 frames 126–128, with gaps of 10.3%, 11.5% and 13.8% of the height. The clips record which
   frames hold an unassigned detection, but not why; the reasons come from the Task 5 review and the

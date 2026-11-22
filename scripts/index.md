@@ -34,7 +34,6 @@ Run from the repo root.
 | `measure_noise_floor.py` | Measures MediaPipe's frame-to-frame noise floor to set the round-trip error budget |
 | `measure_round_trip.py` | Measures the shape-fitted identity round trip against the rigid-skeleton floor (the V1 gate), fitted and held out |
 | `render_face_regions.py` | Renders the SMPL-X head-region segmentation (front and side views) to `docs/media/face_regions.png` for visual review (V1.3) |
-| `review_checks/` | Frozen verification scripts and outputs behind `docs/V1_Review_Assessment.md` (not project code) |
 | `study_shape_fit.py` | Reproduces the Step 10 shape-fit evidence: prior, identifiability, ladder, design sweeps, and adaptive IK |
 | `view_body_hand_round_trip.py` | Renders one clip's stitched body (SMPL-X) + hand (MANO) round trip beside MediaPipe's 2-D output, with the SMPL-X body figure posed from the round-trip parameters |
 | `view_face_round_trip.py` | Renders one clip's body + hands + face round trip (V1.3): MediaPipe 2-D with face landmarks, front and side views with the observed and SMPL-X face, nose and ears and hand-to-head lines, the posed SMPL-X mesh with the head tinted by region, error and hand-to-face distance strips; saves stills of the closest approach |

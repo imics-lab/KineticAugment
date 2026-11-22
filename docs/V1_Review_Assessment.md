@@ -376,7 +376,7 @@ None of these replaces a landmark-array round trip, but they are ready-made base
 
 ## 7. Reproduction
 
-> **Note:** the `work/<folder>/` scripts cited throughout this report now live in [`scripts/review_checks/<folder>/`](../scripts/review_checks/index.md); read that index first. Run them from the repo root with `PYTHONPATH=src:scripts/review_checks/<folder>`. The commands below use the original scratchpad layout (`$SNAP` = repo root, `$W` = `scripts/review_checks`).
+> **Note:** the `work/<folder>/` scripts cited throughout this report were later kept in `scripts/review_checks/<folder>/`. That folder has since been removed from the repo; recover it from git history if needed. The commands below use the original scratchpad layout.
 >
 > **Status update (2026-10-05):** after this report was written, Step 8 was completed (suite 81 passed / 2 xfailed). Finding 4.1, the upside-down torso, no longer reproduces on current code: `main-check/upside.py` now reports a 6.4° median torso error, with the head above the shoulders in 173/173 frames. The other findings have not been re-checked against Step 8.
 

@@ -19,18 +19,13 @@
 | `V1_Findings.md` | Presentation-ready summary of what V1 established: the result, findings, decisions, and open questions |
 | `V1_Problem_Scope.md` | Scopes the MediaPipe ↔ SMPL-X round-trip conversion task and its success criteria |
 | `V1_Review_Assessment.md` | Empirical test of the external V1 approach review: claim verdicts, missed errors, and recommended next steps (2026-10-05) |
-| `V1_2_Hand_Roundtrip_Plan.md` | Proposed V1.2 MediaPipe ↔ MANO/SMPL-X hand conversion plan, mapping, metrics, and implementation gates |
 | `V1_2_Assumptions.md` | V1.2 assumption ledger, dependency map, verification order, and failure traces |
-| `V1_2_Feasibility_Probes.md` | Measurements of the hand model assets and MediaPipe hand data taken before V1.2 implementation |
-| `V1_2_Implementation_Plan.md` | Task-by-task implementation plan for the V1.2 hand round-trip feasibility slice (P0–P3) |
 | `V1_2_Findings.md` | Measured V1.2 hand round-trip results, assumption status and next steps |
 | `V1_2_Implementation_Evidence.md` | Measurements taken while implementing V1.2 (synthetic gates, batch coupling, extraction determinism), kept with their provenance |
 | `V1_3_Face_Design.md` | Approved V1.3 design: SMPL-X neck, head and jaw from FaceLandmarker, signed hand-to-face distances with ASL-LEX regions, and the face stream |
-| `V1_3_Implementation_Plan.md` | Task-by-task plan for V1.3: face correspondence, head/neck/jaw fit, hand-to-face geometry, gate, face stream |
 | `V1_3_Findings.md` | Phase-A gate results for the V1.3 face fit: head pose, jaw, ear placement, hand-to-head distances, the depth-gap diagnostic, and the F1–F6 verdicts (2026-10-07) |
 | `V1_3_Training_Data_Audit.md` | Independent audit of face features for landmark-based recognition, including tests, geometry risks, research comparisons and proposed training gates (2026-10-11) |
 | `V1_3_Audit_Evidence.json` | Cache fingerprints, synthetic counterexamples and fresh fitting measurements supporting the training-data audit |
-| `V1_3_Face_Integration_Plan.md` | Implementation contract for reversible face attachment, quality masks, synchronized training samples and a masked facial classifier |
 | `V1_3_Face_Integration_Results.md` | Real-cache coverage, geometric and masking regressions, reproduction commands, and recognition-data limitations for the V1.3 integration |
 | `V1_3_Face_Integration_Evidence.json` | Compact machine-readable aggregate and per-clip evidence from the real-cache validation |
 | `V1_3_Head_Placement_Spike_08925.md` | One-clip spike: pose-only proximity, 11-point pose-face head placement, depth correction, and a roll traced to pose-world face points (2026-10-18) |
@@ -41,6 +36,6 @@
 | `augmentation-lab.md` | The Augmentation Lab: share mode and full mode, building the zip, and using saved settings |
 | `media/` | Images and placeholder assets referenced by documentation |
 | `research-guide/` | Source-grounded research onboarding, verification status, and practical learning roadmap |
-| `superpowers/` | Design specs and implementation plans (`specs/`, `plans/`) |
+| `superpowers/` | Design specs (`specs/`) |
 | `legacy/` | **Legacy.** Outdated original architecture, catalogue and roadmap docs |
 | `index.md` | This index |
