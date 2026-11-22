@@ -25,6 +25,15 @@ The framework is not tied to one application. Everything that depends on the tas
 *   **Comprehensive Evaluation:** Built-in metrics for quality, smoothness, diversity, and constraint satisfaction.
 *   **Task-Specific Profiles:** Easily configure the augmentation pipeline using YAML configuration files.
 
+## Try it in your browser: the Augmentation Lab
+
+**[Open the Augmentation Lab →](https://imics-lab.github.io/augmentation-lab/)**
+
+Pick a sign clip, move an augmentation's knobs, and compare augmented signing side by side with the
+original. The page runs in the browser (recent Chrome, or Safari 16.4 and newer) with nothing to
+install. Its grids of augmented results are computed ahead of time for a few WLASL clips. To run
+the lab with live knobs on your own clips, see [docs/augmentation-lab.md](docs/augmentation-lab.md).
+
 ## Seeing the augmentations: the round-trip demo
 
 <p align="center">
