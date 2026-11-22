@@ -212,6 +212,8 @@ __marimo__/
 .claude_index/
 .claude_cache/
 .claudeignore
+.claude/
+.cloudroom/
 
 .fuse_hidden*
 
